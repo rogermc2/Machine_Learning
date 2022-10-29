@@ -44,6 +44,7 @@ begin
    Python.Execute_String ("import tree");
    Base := Python.Import_File ("base");
    Classes := Python.Import_File ("classes");
+   Put_Line ("Lesson 3 modules loaded");
 
    Python.Execute_String
      ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)");

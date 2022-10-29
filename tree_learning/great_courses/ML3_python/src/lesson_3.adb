@@ -21,19 +21,17 @@ procedure Lesson_3 is
                      Classifier_Utilities.Load_Data ("../diabetes.csv");
    Feature_Names : constant String_List := Data.Feature_Names;
    X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
---     Labels        : constant Value_Data_Lists_2D := Data.Label_Values;
+   --     Labels        : constant Value_Data_Lists_2D := Data.Label_Values;
    Repository    : Scripts_Repository := null;
    Python        : Python_Scripting := null;
    Errors        : Boolean;
    Num_Samples   : constant Natural := Natural (X_Data.Length);
---     Base          : Python.Module;
---     Classes       : Python.Module;
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
    Features      : Feature_Names_List;
---     No_Weights    : Weights.Weight_List :=
---                       Classifier_Types.Float_Package.Empty_Vector;
---     Correct       : Natural := 0;
---     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
+   --     No_Weights    : Weights.Weight_List :=
+   --                       Classifier_Types.Float_Package.Empty_Vector;
+   --     Correct       : Natural := 0;
+   --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 begin
    Put_Line ("Lesson 3");
    Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
@@ -52,27 +50,33 @@ begin
                                Python_Name));
    Python.Execute_Command ("import os", Errors => Errors);
    Python.Execute_Command ("cwd = os.getcwd()", Errors => Errors);
+   Assert (not Errors, "os.getcwd()");
    Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
-   Python.Execute_Command ("from pathlib import Path", Errors => Errors);
---     Python.Execute_Command ("cwd = Path(cwd).parent / ('..')",
---                             Errors => Errors);
---     Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
-   Python.Execute_Command ("cwd = '/System/Volumes/Data/Ada_Projects/machine_learning/tree_learning'", Errors => Errors);
-   Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
-   Python.Execute_Command (Command => "os.listdir()", Errors => Errors);
-   Python.Execute_Command (Command => "sys.path.append('/System/Volumes/Data/Ada_Projects/machine_learning/tree_learning')", Errors => Errors);
-   Python.Execute_Command (Command => "os.listdir()", Errors => Errors);
+   --     Python.Execute_Command ("from pathlib import Path", Errors => Errors);
+   --     Assert (not Errors, "import Path failed");
+   --     Python.Execute_Command ("cwd = Path(cwd).parent / ('..')",
+   --                             Errors => Errors);
+   --     Python.Execute_Command ("cwd = '/Ada_Projects/machine_learning/tree_learning'",
+   --                             Errors => Errors);
+   Python.Execute_Command (Command => "os.chdir(os.path.join (cwd, 'src'))", Errors => Errors);
+   Assert (not Errors, "os.chdir(cwd) failed");
+   Python.Execute_Command ("cwd = os.getcwd()", Errors => Errors);
+   Python.Execute_Command ("print ('cwd: ', os.getcwd())", Errors => Errors);
+   Python.Execute_Command (Command => "os.listdir(os.getcwd())",
+                           Errors => Errors);
+   Assert (not Errors, "os.listdir(os.getcwd()) failed");
 
    Python.Execute_Command ("import Tree2", Errors => Errors);
+   Put_Line ("Errors: " & Boolean'Image (Errors));
+   Assert (not Errors, "import Tree2 failed");
    Put_Line ("Lesson 3 Tree imported");
    Python.Execute_Command (Command => "cwd = os.path.join (cwd, 'Tree2')",
                            Errors => Errors);
    Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
+   Python.Execute_Command (Command => "os.listdir(os.getcwd())", Errors => Errors);
    Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
    Python.Execute_Command ("import base", Errors => Errors);
    Python.Execute_Command ("import classes", Errors => Errors);
---     Base := Python.Import_File ("base");
---     Classes := Python.Import_File ("classes");
 
    Python.Execute_Command
      ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)",
@@ -81,29 +85,29 @@ begin
    --  better accuracy can be achieved
    Put_Line ("Lesson 3 fit");
    Python.Execute_Command ("clf = fit(X_Data, Labels)", Errors => Errors);
---     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
---     Printing.Print_Tree ("Diabetes Tree", aClassifier);
+   --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
+   --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
    New_Line;
 
---     for index in X_Data.First_Index .. X_Data.Last_Index loop
---          if Base_Decision_Tree.Predict
---            (aClassifier, X_Data).Element (index).Element (1) =
---                Labels.Element (index).Element (1) then
---             Correct := Correct + 1;
---          end if;
---     end loop;
---     Put_Line ("Prediction: " &
---                 Float'Image (100.0 * Float (Correct) / Float (X_Data.Length)));
---     New_Line;
+   --     for index in X_Data.First_Index .. X_Data.Last_Index loop
+   --          if Base_Decision_Tree.Predict
+   --            (aClassifier, X_Data).Element (index).Element (1) =
+   --                Labels.Element (index).Element (1) then
+   --             Correct := Correct + 1;
+   --          end if;
+   --     end loop;
+   --     Put_Line ("Prediction: " &
+   --                 Float'Image (100.0 * Float (Correct) / Float (X_Data.Length)));
+   --     New_Line;
 
    Python.Destroy;
    Unregister_Python_Scripting (Repository);
 
---     Graphviz_Exporter.C_Init
---       (Exporter, aClassifier.Attributes.Decision_Tree);
---     Graphviz_Exporter.Export_Graphviz
---       (Exporter, aClassifier.Attributes.Decision_Tree, Feature_Names => Features,
---        Output_File_Name => To_Unbounded_String ("diabetes.dot"));
+   --     Graphviz_Exporter.C_Init
+   --       (Exporter, aClassifier.Attributes.Decision_Tree);
+   --     Graphviz_Exporter.Export_Graphviz
+   --       (Exporter, aClassifier.Attributes.Decision_Tree, Feature_Names => Features,
+   --        Output_File_Name => To_Unbounded_String ("diabetes.dot"));
 
 end Lesson_3;
