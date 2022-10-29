@@ -3,14 +3,12 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with GNATCOLL.Scripts;        use GNATCOLL.Scripts;
-with GNATCOLL.Scripts.Python; use GNATCOLL.Scripts.Python;
-
 with ML_Types;
 
 with Classifier_Utilities;
 --  with Graphviz_Exporter;
 with Printing;
+with Python;
 
 procedure Lesson_3 is
    use ML_Types;
@@ -21,13 +19,10 @@ procedure Lesson_3 is
                      Classifier_Utilities.Load_Data ("../diabetes.csv");
    Feature_Names : constant String_List := Data.Feature_Names;
    X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
---     Labels        : constant Value_Data_Lists_2D := Data.Label_Values;
-   Repository    : Scripts_Repository := null;
-   Python        : Python_Scripting := null;
-   Errors        : Boolean;
+   Labels        : constant Value_Data_Lists_2D := Data.Label_Values;
    Num_Samples   : constant Natural := Natural (X_Data.Length);
---     Base          : Python.Module;
---     Classes       : Python.Module;
+   Base          : Python.Module;
+   Classes       : Python.Module;
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
    Features      : Feature_Names_List;
 --     No_Weights    : Weights.Weight_List :=
@@ -45,39 +40,17 @@ begin
    Print_Value_Data_List ("Features row 16", X_Data.Element (16));
    New_Line;
 
-   Repository := new Scripts_Repository_Record;
-   Register_Python_Scripting (Repo => Repository, Module => "Test");
-   --  Python_Name = "python"
-   Python := Python_Scripting (Lookup_Scripting_Language (Repository,
-                               Python_Name));
-   Python.Execute_Command ("import os", Errors => Errors);
-   Python.Execute_Command ("cwd = os.getcwd()", Errors => Errors);
-   Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
-   Python.Execute_Command ("from pathlib import Path", Errors => Errors);
-   Python.Execute_Command ("cwd = Path(cwd).parent / ('..')",
-                           Errors => Errors);
-   Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
-   Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
-   Python.Execute_Command (Command => "os.listdir()", Errors => Errors);
-   Python.Execute_Command (Command => "sys.path.append(cwd)", Errors => Errors);
+   Python.Initialize;
+   Python.Execute_String ("import tree");
+   Base := Python.Import_File ("base");
+   Classes := Python.Import_File ("classes");
 
-   Python.Execute_Command ("import Tree", Errors => Errors);
-   Python.Execute_Command (Command => "cwd = os.path.join (cwd, 'Tree')",
-                           Errors => Errors);
-   Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
-   Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
-   Python.Execute_Command ("import_file (base)", Errors => Errors);
-   Python.Execute_Command ("import classes", Errors => Errors);
---     Base := Python.Import_File ("base");
---     Classes := Python.Import_File ("classes");
-
-   Python.Execute_Command
-     ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)",
-      Errors => Errors);
+   Python.Execute_String
+     ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)");
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
    Put_Line ("Lesson 3 fit");
-   Python.Execute_Command ("clf = fit(X_Data, Labels)", Errors => Errors);
+   Python.Execute_String ("clf = fit(X_Data, Labels)");
 --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
 --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
@@ -94,8 +67,9 @@ begin
 --                 Float'Image (100.0 * Float (Correct) / Float (X_Data.Length)));
 --     New_Line;
 
-   Python.Destroy;
-   Unregister_Python_Scripting (Repository);
+   Python.Close_Module (Base);
+   Python.Close_Module (Classes);
+   Python.Finalize;
 
 --     Graphviz_Exporter.C_Init
 --       (Exporter, aClassifier.Attributes.Decision_Tree);
