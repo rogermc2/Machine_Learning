@@ -42,12 +42,21 @@ package body Python is
                                  return PyObject;
    pragma Import (C, PyObject_CallObject, "PyObject_CallObject");
    
+   pragma Warnings (Off, "function ""PyList_Check"" is not referenced");
+   function PyList_Check (Obj : in PyObject) return Interfaces.C.Int;
+   pragma Import (C, PyList_Check, "PyList_Check");
+   
+   pragma Warnings (Off, "function ""PyCheck_Tuple"" is not referenced");
+   function PyCheck_Tuple (Obj : in PyObject) return Interfaces.C.Int;
+   pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
+   
    pragma Warnings (Off, "procedure ""PyErr_Print"" is not referenced");
    procedure PyErr_Print;
    pragma Import (C, PyErr_Print, "PyErr_Print");
    
---     procedure PySys_SetPath (Path : Interfaces.C.char_array);
---     pragma Import (C, PySys_SetPath, "PySys_SetPath");
+   pragma Warnings (Off, "procedure ""PySys_SetPath"" is not referenced");
+   procedure PySys_SetPath (Path : Interfaces.C.char_array);
+   pragma Import (C, PySys_SetPath, "PySys_SetPath");
     
    --  -------------------------------------------------------------------------
     
@@ -153,10 +162,11 @@ package body Python is
       end if;
       
       return PyResult;
-   end Call_Object;      
-
+      
+   end Call_Object;     
+   
    --  -------------------------------------------------------------------------
-   --  public operations
+     --  public operations
    
    procedure Call (M : in Module; Function_Name : in String) is
       F      : constant PyObject := Get_Symbol (M, Function_Name);
@@ -168,6 +178,31 @@ package body Python is
 
    --  -------------------------------------------------------------------------
     
+   function Call (M : in Module; Function_Name : in String; A : in Integer)
+                  return Integer is
+      F : constant PyObject := Get_Symbol (M, Function_Name);
+      
+      function Py_BuildValue (Format : in Interfaces.C.char_array;
+                              A      : in Interfaces.C.int) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("(i)"),
+                                 Interfaces.C.int (A));
+      PyResult := Call_Object (F, Function_Name, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Integer (Result);
+      
+   end Call;
+   
+   -- --------------------------------------------------------------------------
+ 
    function Call (M : in Module; Function_Name : in String;
                   A : in Integer; B : Integer) return Integer is
       F : constant PyObject := Get_Symbol (M, Function_Name);

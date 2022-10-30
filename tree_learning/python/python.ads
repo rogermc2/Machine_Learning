@@ -18,6 +18,8 @@ package Python is
    --  Overloads for "all" needed combinations of parameters and return types:
    
    procedure Call (M : in Module; Function_Name : in String);
+   function  Call (M : in Module; Function_Name : in String; A : in Integer)
+                   return Integer;
    function  Call (M : in Module; Function_Name : in String; A : in Integer;
                    B : Integer) return Integer;
    --  ...
