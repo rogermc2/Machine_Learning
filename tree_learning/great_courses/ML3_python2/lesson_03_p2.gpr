@@ -1,14 +1,13 @@
 with "../../decision_tree_classifier/classifier";
 
-project Lesson_03 is
+project Lesson_03_P2 is
 
    type Operating_System_Type is
       ("high_sierra", "monterey");
    Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
-
    for Source_Dirs use ("src", "../../python", "../../tree");
    for Object_Dir use "obj";
-   for Main use ("lesson_3.adb");
+   for Main use ("lesson_3p2.adb");
    for Exec_Dir use ".";
 
    package Compiler is
@@ -16,7 +15,9 @@ project Lesson_03 is
    end Compiler;
 
    package Linker is
+
       case Operating_System is
+
          when "high_sierra" =>
             for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.4/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
 
@@ -25,5 +26,5 @@ project Lesson_03 is
       end case;
    end Linker;
 
-end Lesson_03;
+end Lesson_03_P2;
 

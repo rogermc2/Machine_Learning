@@ -10,11 +10,11 @@ with Classifier_Utilities;
 with Printing;
 with Python;
 
-procedure Lesson_3 is
+procedure Lesson_3P2 is
    use ML_Types;
    use ML_Types.String_Package;
    use Printing;
-   Routine_Name  : constant String := "Lesson_3";
+   Routine_Name  : constant String := "Lesson_3P2";
    Data          : constant Multi_Output_Data_Record :=
                      Classifier_Utilities.Load_Data ("../diabetes.csv");
    Feature_Names : constant String_List := Data.Feature_Names;
@@ -78,4 +78,4 @@ begin
 --       (Exporter, aClassifier.Attributes.Decision_Tree, Feature_Names => Features,
 --        Output_File_Name => To_Unbounded_String ("diabetes.dot"));
 
-end Lesson_3;
+end Lesson_3P2;
