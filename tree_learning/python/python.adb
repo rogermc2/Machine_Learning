@@ -4,7 +4,7 @@ package body Python is
 
    subtype PyObject is System.Address;
 
-   procedure Py_SetProgramName (Name : in Interfaces.C.char_array);
+   procedure Py_SetProgramName (Name : Interfaces.C.char_array);
    pragma Import (C, Py_SetProgramName, "Py_SetProgramName");
 
    procedure Py_Initialize;
@@ -13,41 +13,41 @@ package body Python is
    procedure Py_Finalize;
    pragma Import (C, Py_Finalize, "Py_Finalize");
     
-   function PyRun_SimpleString (Command : in Interfaces.C.char_array)
+   function PyRun_SimpleString (Command : Interfaces.C.char_array)
                                 return Interfaces.C.int;
    pragma Import (C, PyRun_SimpleString, "PyRun_SimpleString");
     
    pragma Warnings (Off, "procedure ""Py_IncRef"" is not referenced");
-   procedure Py_IncRef (Obj : in PyObject);
+   procedure Py_IncRef (Obj : PyObject);
    pragma Import (C, Py_IncRef, "Py_IncRef");
     
-   procedure Py_DecRef (Obj : in PyObject);
+   procedure Py_DecRef (Obj : PyObject);
    pragma Import (C, Py_DecRef, "Py_DecRef");
     
-   function PyInt_AsLong (I : in PyObject) return Interfaces.C.long;
+   function PyInt_AsLong (I : PyObject) return Interfaces.C.long;
    pragma Import (C, PyInt_AsLong, "PyLong_AsLong");
       
-   function PyString_FromString (Str : in Interfaces.C.char_array)
+   function PyString_FromString (Str : Interfaces.C.char_array)
                                  return PyObject;
    pragma Import (C, PyString_FromString, "PyUnicode_FromString");
     
-   function PyImport_Import (Obj : in PyObject) return PyObject;
+   function PyImport_Import (Obj : PyObject) return PyObject;
    pragma Import (C, PyImport_Import, "PyImport_Import");
    
    function PyObject_GetAttrString
-     (Obj : in PyObject; Name : in Interfaces.C.char_array) return PyObject;
+     (Obj : PyObject; Name : Interfaces.C.char_array) return PyObject;
    pragma Import (C, PyObject_GetAttrString, "PyObject_GetAttrString");
    
-   function PyObject_CallObject (Obj : in PyObject; Args : in PyObject)
+   function PyObject_CallObject (Obj : PyObject; Args : PyObject)
                                  return PyObject;
    pragma Import (C, PyObject_CallObject, "PyObject_CallObject");
    
    pragma Warnings (Off, "function ""PyList_Check"" is not referenced");
-   function PyList_Check (Obj : in PyObject) return Interfaces.C.Int;
+   function PyList_Check (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyList_Check, "PyList_Check");
    
    pragma Warnings (Off, "function ""PyCheck_Tuple"" is not referenced");
-   function PyCheck_Tuple (Obj : in PyObject) return Interfaces.C.Int;
+   function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
    
    pragma Warnings (Off, "procedure ""PyErr_Print"" is not referenced");
@@ -60,7 +60,7 @@ package body Python is
     
    --  -------------------------------------------------------------------------
     
-   procedure Initialize (Program_Name : in String := "") is
+   procedure Initialize (Program_Name : String := "") is
       use  Interfaces.C;
    begin
       if Program_Name /= "" then
@@ -84,9 +84,9 @@ package body Python is
       Execute_String ("sys.path.append('../..')");
       Execute_String ("sys.path.append('../../python')");
       Execute_String ("sys.path.append('../../tree')");
---        Execute_String
---          ("sys.path.append('/Applications_Packages/scikit-learn/sklearn/tree')");
---        PySys_SetPath (To_C ("Applications_Packages/scikit-learn/sklearn/tree"));
+      --        Execute_String
+      --          ("sys.path.append('/Applications_Packages/scikit-learn/sklearn/tree')");
+      --        PySys_SetPath (To_C ("Applications_Packages/scikit-learn/sklearn/tree"));
       
    end Initialize;
     
@@ -99,7 +99,7 @@ package body Python is
     
    --  -------------------------------------------------------------------------
     
-   procedure Execute_String (Script : in String) is
+   procedure Execute_String (Script : String) is
       Dummy : Interfaces.C.int;
    begin
       Dummy := PyRun_SimpleString (Interfaces.C.To_C (Script));
@@ -107,7 +107,7 @@ package body Python is
     
    --  -------------------------------------------------------------------------
     
-   function Import_File (File_Name : in String) return Module is
+   function Import_File (File_Name : String) return Module is
       use type System.Address;
       PyFileName : constant PyObject :=
                      PyString_FromString (Interfaces.C.To_C (File_Name));
@@ -125,7 +125,7 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
-   procedure Close_Module (M : in Module) is
+   procedure Close_Module (M : Module) is
    begin
       Py_DecRef (PyObject (M));
    end Close_Module;
@@ -133,7 +133,7 @@ package body Python is
    --  -------------------------------------------------------------------------   
    --  helpers for use from all overloaded Call subprograms
    
-   function Get_Symbol (M : in Module; Function_Name : in String)
+   function Get_Symbol (M : Module; Function_Name : String)
                         return PyObject is
       PyModule : constant PyObject := PyObject (M);
       F        : constant PyObject := PyObject_GetAttrString
@@ -150,8 +150,8 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
-   function Call_Object (F        : in PyObject; Function_Name : in String;
-                         PyParams : in PyObject) return PyObject is
+   function Call_Object (F        : PyObject; Function_Name : String;
+                         PyParams : PyObject) return PyObject is
       PyResult : PyObject;
       use type System.Address;
    begin
@@ -166,9 +166,9 @@ package body Python is
    end Call_Object;     
    
    --  -------------------------------------------------------------------------
-     --  public operations
+   --  public operations
    
-   procedure Call (M : in Module; Function_Name : in String) is
+   procedure Call (M : Module; Function_Name : String) is
       F      : constant PyObject := Get_Symbol (M, Function_Name);
       Result : PyObject;
    begin
@@ -178,12 +178,12 @@ package body Python is
 
    --  -------------------------------------------------------------------------
     
-   function Call (M : in Module; Function_Name : in String; A : in Integer)
+   function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer is
       F : constant PyObject := Get_Symbol (M, Function_Name);
       
-      function Py_BuildValue (Format : in Interfaces.C.char_array;
-                              A      : in Interfaces.C.int) return PyObject;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              A      : Interfaces.C.int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       PyParams : PyObject;
@@ -203,18 +203,18 @@ package body Python is
    
    -- --------------------------------------------------------------------------
  
-   function Call (M : in Module; Function_Name : in String;
-                  A : in Integer; B : Integer) return Integer is
+   function Call (M : Module; Function_Name : String;
+                  A : Integer; B : Integer) return Integer is
       F : constant PyObject := Get_Symbol (M, Function_Name);
       
-      function Py_BuildValue (Format : in Interfaces.C.char_array;
-                              A      : in Interfaces.C.int;
-                              B      : in Interfaces.C.int) return PyObject;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              A      : Interfaces.C.int;
+                              B      : Interfaces.C.int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       PyParams : PyObject;
       PyResult : PyObject;
-      Result : aliased Interfaces.C.long;
+      Result   : aliased Interfaces.C.long;
    begin
       PyParams := Py_BuildValue (Interfaces.C.To_C ("ii"), Interfaces.C.int (A),
                                  Interfaces.C.int (B));
@@ -228,4 +228,29 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
+   function  Call (M    : Module; Function_Name : String;
+                   A, B : Integer_Matrix) return Integer is
+      F : constant PyObject := Get_Symbol (M, Function_Name);
+      
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              A      : Interfaces.C.int;
+                              B      : Interfaces.C.int) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("ii"), Interfaces.C.int (A),
+                                 Interfaces.C.int (B));
+      PyResult := Call_Object (F, Function_Name, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Integer (Result);
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+   
 end Python;

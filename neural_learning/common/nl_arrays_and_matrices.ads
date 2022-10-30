@@ -173,6 +173,8 @@ package NL_Arrays_And_Matrices is
                                return Integer_Array;
    function To_Integer_Matrix (List : NL_Types.Integer_List_2D)
                                 return Integer_Matrix;
+   function To_Integer_Matrix (List : NL_Types.Value_Data_Lists_2D)
+                               return Integer_Matrix;
    function To_Integer_Matrix (Bin : Binary_Matrix) return Integer_Matrix;
    function To_Integer_Matrix (Bool : Boolean_Matrix)  return Integer_Matrix;
    function To_Integer_Matrix (IA : Integer_Array) return Integer_Matrix;

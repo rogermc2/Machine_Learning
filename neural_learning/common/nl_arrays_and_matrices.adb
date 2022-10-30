@@ -817,6 +817,39 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Integer_Matrix (List : NL_Types.Value_Data_Lists_2D)
+                               return Integer_Matrix is
+      use NL_Types;
+   begin
+      Assert (List.Element (1).Element (1).Value_Kind = Integer_Type,
+              " To_Integer_Matrix List type is not integer.");
+      if not List.Is_Empty then
+         declare
+            List_Row : Value_Data_List;
+            Result   : Integer_Matrix
+              (List.First_Index .. List.Last_Index,
+               List (1).First_Index .. List (1).Last_Index);
+         begin
+            for row in Result'Range loop
+               List_Row := List (row);
+               for col in Result'Range (2) loop
+                  Result (row, col) := List_Row (col).Integer_Value;
+               end loop;
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Integer_Matrix (1 .. 0, 1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
+
+   end To_Integer_Matrix;
+
+   --  ------------------------------------------------------------------------
+
    function To_Integer_Matrix (Bin : Binary_Matrix) return Integer_Matrix is
       Result : Integer_Matrix (Bin'Range, Bin'Range (2));
    begin

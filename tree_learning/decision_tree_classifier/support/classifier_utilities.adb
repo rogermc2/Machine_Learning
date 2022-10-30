@@ -6,6 +6,7 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
+with NL_Types;
 --  with Printing;
 with Utilities;
 
@@ -343,7 +344,7 @@ package body Classifier_Utilities is
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return ML_Types.Multi_Output_Data_Record is
       Data_File    : File_Type;
-      Raw_CSV_Data : ML_Types.Raw_Data_Vector;
+      Raw_CSV_Data : NL_Types.Raw_Data_Vector;
       Output_Data  : ML_Types.Multi_Output_Data_Record;
    begin
       Open (Data_File, In_File, File_Name);
