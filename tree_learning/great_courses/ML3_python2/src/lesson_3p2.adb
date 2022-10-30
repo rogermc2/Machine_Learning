@@ -53,7 +53,7 @@ begin
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
    Put_Line ("Lesson 3 fit");
-   Python.Execute_String ("clf = fit(X_Data, Labels)");
+   Python.Execute_String ("clf.fit(X_Data, Labels)");
 --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
 --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
