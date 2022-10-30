@@ -1,8 +1,14 @@
 with Interfaces.C;
 
+with Matrices;
+
 package body Python is
 
    subtype PyObject is System.Address;
+   
+   --  this matrix is column-major (i.e. the first index defines the column,
+   --  the second index defines the row).
+   package Integer_Matrices is new Matrices (Integer, Integer);
 
    procedure Py_SetProgramName (Name : Interfaces.C.char_array);
    pragma Import (C, Py_SetProgramName, "Py_SetProgramName");
