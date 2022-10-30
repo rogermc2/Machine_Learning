@@ -21,8 +21,8 @@ procedure Lesson_3P2 is
    X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
    Labels        : constant Value_Data_Lists_2D := Data.Label_Values;
    Num_Samples   : constant Natural := Natural (X_Data.Length);
-   Base          : Python.Module;
-   Classes       : Python.Module;
+--     Base          : Python.Module;
+--     Classes       : Python.Module;
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
    Features      : Feature_Names_List;
 --     No_Weights    : Weights.Weight_List :=
@@ -42,12 +42,14 @@ begin
 
    Python.Initialize;
    Python.Execute_String ("import tree");
-   Base := Python.Import_File ("base");
-   Classes := Python.Import_File ("classes");
+   Python.Execute_String ("from tree import base");
+--     Base := Python.Import_File ("../../python/base");
+--     Classes := Python.Import_File ("classes");
+   Python.Execute_String ("from tree import classes");
    Put_Line ("Lesson 3 modules loaded");
 
    Python.Execute_String
-     ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)");
+     ("clf = tree.classes.DecisionTreeClassifier(max_leaf_nodes = 3)");
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
    Put_Line ("Lesson 3 fit");
@@ -68,8 +70,8 @@ begin
 --                 Float'Image (100.0 * Float (Correct) / Float (X_Data.Length)));
 --     New_Line;
 
-   Python.Close_Module (Base);
-   Python.Close_Module (Classes);
+--     Python.Close_Module (Base);
+--     Python.Close_Module (Classes);
    Python.Finalize;
 
 --     Graphviz_Exporter.C_Init
