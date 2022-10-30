@@ -24,8 +24,8 @@ package Python is
                    return Integer;
    function  Call (M : Module; Function_Name : String; A, B : Integer)
                    return Integer;
-   function  Call (M    : Module; Function_Name : String;
-                   A, B : Integer_Matrix) return Integer;
+   procedure  Call (M    : Module; Function_Name : String;
+                   A, B : Integer_Matrix);
    --  ...
    
 private

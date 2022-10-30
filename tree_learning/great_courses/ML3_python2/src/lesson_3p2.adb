@@ -27,7 +27,6 @@ procedure Lesson_3P2 is
    Classes       : Python.Module;
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
    Features      : Feature_Names_List;
-   Fit_Result    : Py.Handle;
    --     No_Weights    : Weights.Weight_List :=
    --                       Classifier_Types.Float_Package.Empty_Vector;
    --     Correct       : Natural := 0;
@@ -58,7 +57,7 @@ begin
    --  better accuracy can be achieved
    Put_Line ("Lesson 3 fit");
    --     Python.Execute_String ("clf.fit(X_Data, Labels)");
-   Fit_Result := Python.Call (M => Classes, Function_Name => "fit",
+   Python.Call (M => Classes, Function_Name => "fit",
                 A => X_Data, B             => Labels);
    --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
    --     Printing.Print_Tree ("Diabetes Tree", aClassifier);

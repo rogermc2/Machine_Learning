@@ -234,8 +234,8 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
-   function  Call (M    : Module; Function_Name : String;
-                   A, B : Integer_Matrix) return Integer is
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : Integer_Matrix) is
       F : constant PyObject := Get_Symbol (M, Function_Name);
       
       function Py_BuildValue (Format : Interfaces.C.char_array;
@@ -254,7 +254,6 @@ package body Python is
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
-      return Integer (Result);
    end Call;
    
    --  -------------------------------------------------------------------------
