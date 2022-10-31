@@ -39,7 +39,8 @@ package API_Vectors_Matrices is
    pragma Convention (C, API_2D_Int_Array);
 
    package Int_Array_Pointers is new Interfaces.C.Pointers
-     (Size, API_Int_Array, API_2D_Int_Array, API_Int_Array'(others => <>));
+     (Index => Int, Element => API_Int_Array, Element_Array => API_2D_Int_Array,
+      Default_Terminator => API_Int_Array'(others => <>));
 
    type API_Unsigned_Array is array
      (Interfaces.C.unsigned range <>) of aliased Interfaces.C.unsigned;
@@ -53,21 +54,21 @@ package API_Vectors_Matrices is
    type API_Float is new Interfaces.C.Double;
    type API_Int is new Interfaces.C.Int;
 
---     type API_Int_Array is array (API_Int range <>) of aliased API_Int;
---
---     package API_Int_Pointers is
---       new Interfaces.C.Pointers
---         (Index => API_Int,  Element => API_Int,
---          Element_Array => API_Int_Array, Default_Terminator => 0);
---     subtype API_Int_Ptr is API_Int_Pointers.Pointer;
---
---     type API_Int_Ptr_Array is array (API_Int range <>)
---       of aliased API_Int_Ptr;
---     package API_Int_Pointers_To_Pointers is
---       new Interfaces.C.Pointers
---         ( Index => API_Int, Element => API_Int_Ptr,
---           Element_Array => API_Int_Ptr_Array, Default_Terminator => null);
---     subtype API_Int_Ptr_Ptr is API_Int_Pointers_To_Pointers.Pointer;
+   --     type API_Int_Array is array (API_Int range <>) of aliased API_Int;
+   --
+   --     package API_Int_Pointers is
+   --       new Interfaces.C.Pointers
+   --         (Index => API_Int,  Element => API_Int,
+   --          Element_Array => API_Int_Array, Default_Terminator => 0);
+   --     subtype API_Int_Ptr is API_Int_Pointers.Pointer;
+   --
+   --     type API_Int_Ptr_Array is array (API_Int range <>)
+   --       of aliased API_Int_Ptr;
+   --     package API_Int_Pointers_To_Pointers is
+   --       new Interfaces.C.Pointers
+   --         ( Index => API_Int, Element => API_Int_Ptr,
+   --           Element_Array => API_Int_Ptr_Array, Default_Terminator => null);
+   --     subtype API_Int_Ptr_Ptr is API_Int_Pointers_To_Pointers.Pointer;
 
    type API_Float_Array is array (API_Int range <>) of aliased API_Float;
    package API_Float_Pointers is
