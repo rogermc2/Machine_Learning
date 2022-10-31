@@ -9,6 +9,8 @@ with C_Types; use C_Types;
 --  C element.
 --  An object of type Pointer is interpreted as a pointer to the initial
 --  Element of an Element_Array.
+--  For example, see
+--  https://www.adaic.org/resources/add_content/standards/05rm/html/RM-B-3-2.html
 package API_Vectors_Matrices is
 
    package Int_Pointers is new Interfaces.C.Pointers
