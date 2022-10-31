@@ -5,6 +5,10 @@ with Interfaces.C.Pointers;
 with C_Types; use C_Types;
 
 --  An Ada array corresponds to a C pointer to the first element.
+--  The type Pointer is C-compatible and corresponds to one use of a
+--  C element.
+--  An object of type Pointer is interpreted as a pointer to the initial
+--  Element of an Element_Array.
 package API_Vectors_Matrices is
 
    package Int_Pointers is new Interfaces.C.Pointers
