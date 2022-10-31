@@ -4,7 +4,7 @@ with Interfaces.C.Pointers;
 
 --  with GL.Algebra;
 
-package MLP_Types is
+package C_Types is
     pragma Preelaborate;
     use Interfaces;
 
@@ -66,4 +66,4 @@ private
     --                               Always    => 16#0207#);
     --     for Compare_Function'Size use UInt'Size;
 
-end MLP_Types;
+end C_Types;
