@@ -9,7 +9,7 @@ project Lesson_03_P2 is
    for Exec_Dir use ".";
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnatw.Tkmru", "-gnatyclux");
+      for Default_Switches ("ada") use ("-gnat12", "-gnatw.Tkmru", "-gnatyclux");
    end Compiler;
 
    package Linker is
