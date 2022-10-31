@@ -1,6 +1,7 @@
 with Interfaces.C;
 
-with Matrices;
+with API_Vectors_Matrices;
+--  with Matrices;
 
 package body Python is
 
@@ -8,7 +9,7 @@ package body Python is
    
    --  this matrix is column-major (i.e. the first index defines the column,
    --  the second index defines the row).
-   package Integer_Matrices is new Matrices (Integer, Integer);
+--     package Integer_Matrices is new Matrices (Integer, Integer);
 
    procedure Py_SetProgramName (Name : Interfaces.C.char_array);
    pragma Import (C, Py_SetProgramName, "Py_SetProgramName");
@@ -236,19 +237,22 @@ package body Python is
     
    procedure Call (M    : Module; Function_Name : String;
                    A, B : Integer_Matrix) is
+      use API_Vectors_Matrices;
       F : constant PyObject := Get_Symbol (M, Function_Name);
       
       function Py_BuildValue (Format : Interfaces.C.char_array;
-                              A      : Interfaces.C.int;
-                              B      : Interfaces.C.int) return PyObject;
+                              A      : API_Int_Ptr_Ptr;
+                              B      : API_Int_Ptr_Ptr) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       PyParams : PyObject;
       PyResult : PyObject;
+      C_A      : API_Int_Ptr_Ptr;
+      C_B      : API_Int_Ptr_Ptr;
       Result   : aliased Interfaces.C.long;
    begin
-      PyParams := Py_BuildValue (Interfaces.C.To_C ("ii"), Interfaces.C.int (A),
-                                 Interfaces.C.int (B));
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("ii"), C_A, C_B);
+                              
       PyResult := Call_Object (F, Function_Name, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
