@@ -15,9 +15,6 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 --  https://www.adaic.org/resources/add_content/standards/05rm/html/RM-B-3-2.html
 package API_Vectors_Matrices is
 
-    type Buffer_Target (<>) is tagged limited private;
-    type Buffer_Usage is private;
-
     package Int_Pointers is new Interfaces.C.Pointers
       (Size, Int, Int_Array, Int'Last);
 
@@ -54,7 +51,6 @@ package API_Vectors_Matrices is
 
     type API_Float is new Interfaces.C.Double;
     type API_Int is new Interfaces.C.Int;
-
     type API_Int_Array is array (API_Int range <>) of aliased API_Int;
 
     package API_Int_Pointers is
@@ -64,14 +60,16 @@ package API_Vectors_Matrices is
     subtype API_Int_Ptr is API_Int_Pointers.Pointer;
 
     type API_Int_Ptr_Array is array (API_Int range <>)
-      of aliased API_Int_Ptr;
+     of aliased API_Int_Ptr;
+
     package API_Int_Pointers_To_Pointers is
       new Interfaces.C.Pointers
         ( Index => API_Int, Element => API_Int_Ptr,
           Element_Array => API_Int_Ptr_Array, Default_Terminator => null);
     subtype API_Int_Ptr_Ptr is API_Int_Pointers_To_Pointers.Pointer;
 
-    type API_Float_Array is array (API_Int range <>) of aliased API_Float;
+   type API_Float_Array is array (API_Int range <>) of aliased API_Float;
+
     package API_Float_Pointers is
       new Interfaces.C.Pointers
         (Index => API_Int,  Element => API_Float,
@@ -79,51 +77,19 @@ package API_Vectors_Matrices is
     subtype API_Float_Ptr is API_Float_Pointers.Pointer;
 
     type API_Float_Ptr_Array is array (API_Int range <>)
-      of aliased API_Float_Ptr;
+     of aliased API_Float_Ptr;
+
     package API_Float_Pointers_To_Pointers is
       new Interfaces.C.Pointers
         ( Index => API_Int, Element => API_Float_Ptr,
           Element_Array => API_Float_Ptr_Array, Default_Terminator => null);
     subtype API_Float_Ptr_Ptr is API_Float_Pointers_To_Pointers.Pointer;
 
-    procedure Allocate (Target : Buffer_Target; Number_Of_Bytes : Long;
-                        Usage  : Buffer_Usage);
     procedure API_2D (A, B : Integer_Matrix);
 
-    generic
-        with package Pointers is new Interfaces.C.Pointers (<>);
-    procedure Load_To_Buffer (Target : Buffer_Target'Class;
-                              Data   : Pointers.Element_Array;
-                              Usage  : Buffer_Usage);
 private
-    --  This type is never used directly. However, enumerations refer to it for
-    --  defining their Size attribute.
-    subtype Enum is Interfaces.C.unsigned;
     --  These types are actually not pointers.
     subtype IntPtr is Interfaces.C.long;
     subtype SizeIPtr is Interfaces.C.long;
-
-    type Buffer_Kind is (Array_Buffer, Element_Array_Buffer, Pixel_Pack_Buffer,
-                         Pixel_Unpack_Buffer, Uniform_Buffer, Texture_Buffer,
-                         Transform_Feedback_Buffer, Transform_Feedback,
-                         Copy_Read_Buffer, Copy_Write_Buffer,
-                         Draw_Indirect_Buffer, Shader_Storage_Buffer,
-                         Atomic_Counter_Buffer);
-
-    type Buffer_Target (Kind : Buffer_Kind) is tagged limited null record;
-
-    type Buffer_Usage is (Stream_Draw, Stream_Read, Stream_Copy,
-                          Static_Draw, Static_Read, Static_Copy,
-                          Dynamic_Draw, Dynamic_Read, Dynamic_Copy);
-    for Buffer_Usage use (Stream_Draw  => 16#88E0#,
-                          Stream_Read  => 16#88E1#,
-                          Stream_Copy  => 16#88E2#,
-                          Static_Draw  => 16#88E4#,
-                          Static_Read  => 16#88E5#,
-                          Static_Copy  => 16#88E6#,
-                          Dynamic_Draw => 16#88E8#,
-                          Dynamic_Read => 16#88E9#,
-                          Dynamic_Copy => 16#88EA#);
-    for Buffer_Usage'Size use Enum'Size;
 
 end API_Vectors_Matrices;
