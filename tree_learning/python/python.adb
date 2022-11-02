@@ -1,6 +1,6 @@
 with Interfaces.C;
 
-with API_Vectors_Matrices;
+with API_Binding;
 --  with Matrices;
 
 package body Python is
@@ -237,18 +237,18 @@ package body Python is
     
    procedure Call (M    : Module; Function_Name : String;
                    A, B : Integer_Matrix) is
-      use API_Vectors_Matrices;
+      use API_Binding;
       F : constant PyObject := Get_Symbol (M, Function_Name);
       
       function Py_BuildValue (Format : Interfaces.C.char_array;
-                              A      : API_Int_Ptr_Ptr;
-                              B      : API_Int_Ptr_Ptr) return PyObject;
+                              A      : API_Int_Pointer_Array;
+                              B      : API_Int_Pointer_Array) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       PyParams : PyObject;
       PyResult : PyObject;
-      C_A      : API_Int_Ptr_Ptr;
-      C_B      : API_Int_Ptr_Ptr;
+      C_A      : API_Int_Pointer_Array;
+      C_B      : API_Int_Pointer_Array;
       Result   : aliased Interfaces.C.long;
    begin
       PyParams := Py_BuildValue (Interfaces.C.To_C ("ii"), C_A, C_B);
