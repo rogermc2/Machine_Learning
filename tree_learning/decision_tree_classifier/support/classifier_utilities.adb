@@ -6,7 +6,7 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
-with NL_Types;
+--  with NL_Types;
 --  with Printing;
 with Utilities;
 
@@ -344,7 +344,7 @@ package body Classifier_Utilities is
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return ML_Types.Multi_Output_Data_Record is
       Data_File    : File_Type;
-      Raw_CSV_Data : NL_Types.Raw_Data_Vector;
+      Raw_CSV_Data : ML_Types.Raw_Data_Vector;  -- Unbound string list
       Output_Data  : ML_Types.Multi_Output_Data_Record;
    begin
       Open (Data_File, In_File, File_Name);
@@ -886,8 +886,7 @@ package body Classifier_Utilities is
 
       for row in reverse 1 .. Num_Rows loop
          for col in Start .. Start + End_Offset loop
-            Result (col - Start + 1, row) :=
-              Float (List_1D.Element (col).Float_Value);
+            Result (col - Start + 1, row) := List_1D.Element (col).Float_Value;
          end loop;
          Start := Start + Num_Cols;
       end loop;

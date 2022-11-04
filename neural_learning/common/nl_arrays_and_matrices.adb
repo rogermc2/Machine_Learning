@@ -817,9 +817,9 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Integer_Matrix (List : NL_Types.Value_Data_Lists_2D)
+   function To_Integer_Matrix (List : ML_Types.Value_Data_Lists_2D)
                                return Integer_Matrix is
-      use NL_Types;
+      use ML_Types;
    begin
       Assert (List.Element (1).Element (1).Value_Kind = Integer_Type,
               " To_Integer_Matrix List type is not integer.");
@@ -983,7 +983,7 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Unbound_Array (UB_List : NL_Types.Unbounded_List)
+   function To_Unbound_Array (UB_List : ML_Types.Unbounded_List)
                               return Unbounded_String_Array is
    begin
       if not UB_List.Is_Empty then

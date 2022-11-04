@@ -3,8 +3,8 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with ML_Types; use ML_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types; use NL_Types;
 
 with Classifier_Utilities;
 
@@ -30,7 +30,7 @@ package Utilities is
 
    Utilities_Exception : exception;
 
-   procedure Check_Rows (Rows : in out Rows_Vector);
+   procedure Check_Rows (Rows : in out ML_Types.Rows_Vector);
    function Get_Column (List_2D      : Value_Data_Lists_2D;
                         Column_Index : Positive)
                          return Value_Data_List;
@@ -47,7 +47,8 @@ package Utilities is
    procedure Permute (anArray : in out Integer_Array);
    function Permute (aMatrix : Integer_Matrix) return Integer_Matrix;
    procedure Permute (aList : in out String_List);
-   function Permute (aMatrix : Real_Float_Matrix) return Real_Float_Matrix;
+   function Permute (aMatrix : ML_Types.Real_Float_Matrix)
+                     return ML_Types.Real_Float_Matrix;
    pragma Inline (Permute);
    procedure Print_Feature_Values (Message : String; Rows : Rows_Vector;
                                    Column  : Class_Range);
@@ -69,7 +70,7 @@ package Utilities is
                            return String_List;
    procedure Swap (Data : in out Binary_Matrix; L, R : Positive);
    procedure Swap (Data : in out Boolean_Matrix; L, R : Positive);
-   procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive);
+   procedure Swap (Data : in out ML_Types.Real_Float_Matrix; L, R : Positive);
    procedure Swap (Data : in out Float_Array; L, R : Positive);
    procedure Swap (Data : in out Integer_Array; L, R : Positive);
    procedure Swap (Data : in out Integer_Matrix; L, R : Positive);

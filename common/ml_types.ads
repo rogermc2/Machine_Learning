@@ -53,6 +53,11 @@ package ML_Types is
    subtype Class_Names_List is Unbounded_Package.Vector;
    subtype Feature_Names_List is Unbounded_Package.Vector;
 
+   use Unbounded_Package;
+   package Unbounded_Package_2D is new
+     Ada.Containers.Vectors (Positive, Unbounded_List);
+   subtype Unbounded_List_2D is Unbounded_Package_2D.Vector;
+
    type Node_Kind is (Undefined_Node, Decision_Node, Prediction_Node);
 
    type Header_Data_Type (Class_Count : Class_Range := 2) is record

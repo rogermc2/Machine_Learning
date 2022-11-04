@@ -10,12 +10,12 @@ with ML_Types;
 
 with Classifier_Utilities;
 --  with Graphviz_Exporter;
-with Printing;
+--  with Printing;
 
 procedure Lesson_3 is
    use ML_Types;
    use ML_Types.String_Package;
-   use Printing;
+--     use Printing;
    Routine_Name  : constant String := "Lesson_3";
    Data          : constant Multi_Output_Data_Record :=
                      Classifier_Utilities.Load_Data ("../diabetes.csv");
@@ -39,8 +39,8 @@ begin
       Features.Append (Element (Names_Cursor));
       Next (Names_Cursor);
    end loop;
-   Print_Unbounded_List ("Features", Features);
-   Print_Value_Data_List ("Features row 16", X_Data.Element (16));
+--     Print_Unbounded_List ("Features", Features);
+--     Print_Value_Data_List ("Features row 16", X_Data.Element (16));
    New_Line;
 
    Repository := new Scripts_Repository_Record;
