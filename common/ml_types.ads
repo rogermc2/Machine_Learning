@@ -52,6 +52,7 @@ package ML_Types is
    subtype Features_List is Unbounded_Package.Vector;
    subtype Class_Names_List is Unbounded_Package.Vector;
    subtype Feature_Names_List is Unbounded_Package.Vector;
+   package Unbounded_Sorting is new Unbounded_Package.Generic_Sorting ("<");
 
    use Unbounded_Package;
    package Unbounded_Package_2D is new
@@ -74,7 +75,6 @@ package ML_Types is
    package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
    subtype Rows_Vector is Rows_Package.Vector;
 
-   use Unbounded_Package;
    package Raw_Data_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_List);
    subtype Raw_Data_Vector is Raw_Data_Package.Vector;

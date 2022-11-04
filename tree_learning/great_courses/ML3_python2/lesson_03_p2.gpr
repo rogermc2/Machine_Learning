@@ -3,7 +3,7 @@ project Lesson_03_P2 is
    type Operating_System_Type is
       ("high_sierra", "monterey");
    Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
-   for Source_Dirs use ("src", "../../python", "../../python/Tree2", "../../../neural_learning/common", "../../../neural_learning/decision_tree_classifier/support", "../../../neural_learning/utils");
+   for Source_Dirs use ("src", "../../python", "../../python/Tree2", "../../../neural_learning/common", "../../../neural_learning/decision_tree_classifier/support", "../../../neural_learning/utils", "../../../common");
    for Object_Dir use "obj";
    for Main use ("lesson_3p2.adb");
    for Exec_Dir use ".";

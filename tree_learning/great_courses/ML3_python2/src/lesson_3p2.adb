@@ -3,7 +3,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with NL_Types;
+with ML_Types; use ML_Types;
 
 with Classifier_Utilities;
 --  with Graphviz_Exporter;
@@ -12,8 +12,7 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Python;
 
 procedure Lesson_3P2 is
-   use NL_Types;
-   use NL_Types.String_Package;
+   use ML_Types.String_Package;
    Routine_Name  : constant String := "Lesson_3P2";
    Data          : constant Multi_Output_Data_Record :=
                      Classifier_Utilities.Load_Data ("../diabetes.csv");
