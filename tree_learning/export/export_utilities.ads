@@ -1,6 +1,7 @@
 
 with Config;
 with Export_Types; use Export_Types;
+with Lines;
 
 package Export_Utilities is
 
