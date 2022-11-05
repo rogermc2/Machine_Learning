@@ -3,6 +3,8 @@ with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+with ML_Types;
+
 package NL_Types is
    pragma Preelaborate;
 
@@ -74,20 +76,8 @@ package NL_Types is
      Ada.Containers.Vectors (Positive, Float_List_2D);
    subtype Float_List_3D is List_Of_Float_Lists_Package.Vector;
 
-   package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
-   subtype Integer_List is Integer_Package.Vector;
-   package Integer_Sorting is new Integer_Package.Generic_Sorting ("<");
-   type Array_Of_Integer_Lists is array (Integer range <>) of Integer_List;
-
-   procedure Check_Lengths (Routine_Name : String; L : Integer_List;
+   procedure Check_Lengths (Routine_Name : String; L : ML_Types.Integer_List;
                             R            : Float_List);
-
-   use Integer_Package;
-   package Integer_Package_2D is new
-     Ada.Containers.Vectors (Positive, Integer_List);
-   subtype Integer_List_2D is Integer_Package_2D.Vector;
-   function Transpose (Values : Integer_List_2D) return  Integer_List_2D;
-   pragma Inline (Transpose);
 
    package Integer_DLL_Package is new
      Ada.Containers.Doubly_Linked_Lists (Integer);

@@ -5,9 +5,9 @@ with Maths;
 with Utilities;
 
 with Base;
+with ML_Types;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
 with Test_Support; use Test_Support;
 
 procedure Simple is
@@ -27,7 +27,7 @@ procedure Simple is
    Y_Train      : Integer_Matrix (1 .. 75, 1 .. 1);
    Y_Test       : Integer_Matrix (1 .. Num_Samples - 75, 1 .. 1);
    Indicies     : Integer_Array (1 .. Num_Samples);
-   Layer_Sizes  : NL_Types.Integer_List;
+   Layer_Sizes  : ML_Types.Integer_List;
    MLP          : MLP_Classifier;
    Score        : Float;
 begin
@@ -68,7 +68,7 @@ begin
    end loop;
 
    Layer_Sizes.Append (5);
-   MLP := C_Init (Hidden_Layer_Sizes => Layer_Sizes);
+   MLP := C_Init (Layer_Sizes => Layer_Sizes);
    Fit (MLP, X_Train, Y_Train);
 
    Score := Base.Score (MLP, X_Test, Y_Test);

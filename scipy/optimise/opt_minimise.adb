@@ -3,6 +3,7 @@
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with L_BFGS_B;
+with ML_Types;
 with NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
@@ -53,7 +54,7 @@ package body Opt_Minimise is
       --  L prefix indicates local variable
       L_Method     : Method_Type := Method;
       L_Bounds     : Opt_Constraints.Bounds_List := Bounds;
-      I_Fixed      : NL_Types.Integer_List;
+      I_Fixed      : ML_Types.Integer_List;
       All_Fixed    : Boolean := True;
       --  L655 determine if finite differences are needed for any grad or jac
       FD_Needed    : Boolean := Jac /= Fd_Callable;

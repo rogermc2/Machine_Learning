@@ -763,7 +763,7 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Integer_Array (List : NL_Types.Integer_List)
+   function To_Integer_Array (List : ML_Types.Integer_List)
                               return Integer_Array is
    begin
       if not List.Is_Empty then
@@ -787,12 +787,12 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Integer_Matrix (List : NL_Types.Integer_List_2D)
+   function To_Integer_Matrix (List : ML_Types.Integer_List_2D)
                                return Integer_Matrix is
    begin
       if not List.Is_Empty then
          declare
-            List_Row : NL_Types.Integer_List;
+            List_Row : ML_Types.Integer_List;
             Result   : Integer_Matrix
               (List.First_Index .. List.Last_Index,
                List (1).First_Index .. List (1).Last_Index);

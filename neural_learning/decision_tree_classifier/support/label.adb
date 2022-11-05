@@ -39,20 +39,21 @@ with Encode_Utils;
 with Generic_Label_Binarize_Array;
 with Generic_Label_Binarize_Array_List;
 with Generic_Label_Binarize_Matrix;
+with NL_Types; use NL_Types;
 --  with Printing;
 --  with Test_Support;
 
 package body Label is
 
    function Transform_CM
-     (Y : Integer_Array_List; Class_Mapping : in out Integer_List)
+     (Y : Integer_Array_List; Class_Mapping : in out ML_Types.Integer_List)
       return Binary_Matrix;
    function Transform_CM
-     (Y : Integer_Matrix; Class_Mapping : in out Integer_List)
+     (Y : Integer_Matrix; Class_Mapping : in out ML_Types.Integer_List)
       return Binary_Matrix;
    function Transform_CM
      (Y             : Unbounded_String_Array_List;
-      Class_Mapping : in out Unbounded_List) return Binary_Matrix;
+      Class_Mapping : in out ML_Types.Unbounded_List) return Binary_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -68,7 +69,8 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    procedure C_Init (MLB     : in out Multi_Label_Binarizer;
-                     Classes : Integer_List := Integer_Package.Empty_Vector) is
+                     Classes : ML_Types.Integer_List :=
+                       ML_Types.Integer_Package.Empty_Vector) is
    begin
       MLB.Classes := Classes;
 
@@ -76,8 +78,10 @@ package body Label is
 
    --  -------------------------------------------------------------------------
    --  L742
-   procedure Fit (Binarizer : in out Label_Binarizer; Classes : Integer_List) is
-      use Integer_Sorting;
+   procedure Fit (Binarizer : in out Label_Binarizer;
+                  Classes   : ML_Types.Integer_List) is
+      use ML_Types;
+      use ML_Types.Integer_Sorting;
       Routine_Name : constant String := "Label.Binarizer Fit Classes ";
       L_Classes    : Integer_List := Classes;
    begin
@@ -106,7 +110,7 @@ package body Label is
       Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "label binarization does not support multioutput target data");
-      Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
+      Binarizer.Classes := Unique_Labels (Y);
 
    end Fit;
 
@@ -144,7 +148,7 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    procedure Fit (Binarizer : in out Label_Binarizer;
-                  Y         : NL_Types.Array_Of_Integer_Lists) is
+                  Y         : ML_Types.Array_Of_Integer_Lists) is
       use Multiclass_Utils;
       Routine_Name : constant String :=
                        "Label.Fit Binarizer Array_Of_Integer_Lists ";
@@ -192,7 +196,7 @@ package body Label is
                   Y         : Integer_Array_List) is
       Routine_Name : constant String :=
                        "Label.Fit MLB Integer_Array_List ";
-      Classes      : NL_Types.Integer_List;
+      Classes      : ML_Types.Integer_List;
       Duplicates   : Boolean := False;
    begin
       if Binarizer.Classes.Is_Empty then
@@ -219,7 +223,7 @@ package body Label is
                   Y         : Integer_Matrix) is
       Routine_Name : constant String :=
                        "Label.Fit Multi_Label_Binarizer ";
-      Classes      : NL_Types.Integer_List;
+      Classes      : ML_Types.Integer_List;
       Duplicates   : Boolean := False;
    begin
       if Binarizer.Classes.Is_Empty then
@@ -246,7 +250,7 @@ package body Label is
                   Y         : Unbounded_String_Array_List) is
       --        Routine_Name : constant String :=
       --                         "Label.Fit MLB Unbounded_String_Array_List ";
-      Classes      : NL_Types.Unbounded_List;
+      Classes      : ML_Types.Unbounded_List;
       --        Duplicates   : Boolean := False;
    begin
       if Binarizer.Classes.Is_Empty then
@@ -295,7 +299,7 @@ package body Label is
    function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
                            Y         : Integer_Array_List)
                            return Binary_Matrix is
-      use Integer_Sorting;
+      use ML_Types.Integer_Sorting;
       Routine_Name  : constant String :=
                         "Label.Fit_Transform Integer_Array_List ";
    begin
@@ -306,7 +310,7 @@ package body Label is
 
       else
          declare
-            Class_Mapping : Integer_List;
+            Class_Mapping : ML_Types.Integer_List;
             --  L814 yt = self._transform(y, class_mapping)
             CM_Matrix     : constant Binary_Matrix :=
                               Transform_CM (Y, Class_Mapping);
@@ -356,7 +360,7 @@ package body Label is
    function Fit_Transform (Binarizer : in out UB_Multi_Label_Binarizer;
                            Y         : Unbounded_String_Array_List)
                            return Binary_Matrix is
-      use Unbounded_Sorting;
+      use ML_Types.Unbounded_Sorting;
       Routine_Name  : constant String :=
                         "Label.Fit_Transform Unbounded_String_Array_List ";
    begin
@@ -367,7 +371,7 @@ package body Label is
 
       else
          declare
-            Class_Mapping : Unbounded_List;
+            Class_Mapping : ML_Types.Unbounded_List;
             --  L814 yt = self._transform(y, class_mapping)
             CM_Matrix     : constant Binary_Matrix :=
                               Transform_CM (Y, Class_Mapping);
@@ -423,7 +427,7 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L586
    function Inverse_Binarize_Multiclass
-     (Y_Prob : Real_Float_Matrix; Classes : Integer_List)
+     (Y_Prob : Real_Float_Matrix; Classes : ML_Types.Integer_List)
       return Integer_Matrix is
       use Classifier_Utilities;
       --          Routine_Name   :  constant String :=
@@ -444,7 +448,8 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L586
    function Inverse_Binarize_Multiclass
-     (Y : Binary_Matrix; Classes : Integer_List) return Integer_Matrix is
+     (Y : Binary_Matrix; Classes : ML_Types.Integer_List)
+      return Integer_Matrix is
       --        Routine_Name     :  constant String :=
       --                             "Label.Inverse_Binarize_Multiclass Integer_Matrix ";
       Dim              : Natural := 0;
@@ -480,7 +485,7 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L586
    function Inverse_Binarize_Multiclass
-     (Y : Binary_Matrix ; Classes : Unbounded_List)
+     (Y : Binary_Matrix ; Classes : ML_Types.Unbounded_List)
       return Unbounded_String_Array is
       use Classifier_Utilities;
       --          Routine_Name   :  constant String :=
@@ -501,12 +506,13 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L586
    function Inverse_Binarize_Multiclass
-     (Y : Binary_Matrix ; Classes : Integer_List) return Integer_Array_List is
+     (Y : Binary_Matrix ; Classes : ML_Types.Integer_List)
+      return Integer_Array_List is
       --          Routine_Name   :  constant String :=
       --                             "Label.Inverse_Binarize_Multiclass Integer_Array_List ";
       Inverse          : Integer_Array_List;
-      Row_Classes      : Integer_List;
-      Row_Classes_List : Integer_List_2D;
+      Row_Classes      : ML_Types.Integer_List;
+      Row_Classes_List : ML_Types.Integer_List_2D;
    begin
       --  L627
       for row in Y'Range loop
@@ -522,7 +528,8 @@ package body Label is
       for row in Row_Classes_List.First_Index ..
         Row_Classes_List.Last_Index loop
          declare
-            Row_Classes   : constant Integer_List := Row_Classes_List (row);
+            Row_Classes   : constant ML_Types.Integer_List :=
+                              Row_Classes_List (row);
             Inverse_Array : Integer_Array
               (1 .. Positive (Row_Classes.Length));
          begin
@@ -540,8 +547,9 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L586
    function Inverse_Binarize_Multiclass
-     (Y : Binary_Matrix ; Classes : Unbounded_List)
+     (Y : Binary_Matrix ; Classes : ML_Types.Unbounded_List)
       return Unbounded_String_Array_List is
+      use ML_Types;
       --          Routine_Name   :  constant String :=
       --                             "Label.Inverse_Binarize_Multiclass Unbounded_String_Array_List ";
       Inverse          : Unbounded_String_Array_List;
@@ -581,7 +589,7 @@ package body Label is
 
    --  L586
    function Inverse_Binarize_Multiclass
-     (Y_Prob : Binary_Matrix ; Classes : Unbounded_List)
+     (Y_Prob : Binary_Matrix ; Classes : ML_Types.Unbounded_List)
       return Unbounded_String_Matrix is
       use Classifier_Utilities;
       --          Routine_Name   :  constant String :=
@@ -605,7 +613,7 @@ package body Label is
 
    function Inverse_Binarize_Thresholding
      (Y       : Real_Float_Matrix; Output_Type : Multiclass_Utils.Y_Type;
-      Classes : Integer_List; Threshold : Float)
+      Classes : ML_Types.Integer_List; Threshold : Float)
       return Integer_Matrix is
       use Ada.Containers;
       use Multiclass_Utils;
@@ -935,10 +943,10 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    --  L416
-   function Label_Binarize (Y, Classes : Integer_List;
+   function Label_Binarize (Y, Classes : ML_Types.Integer_List;
                             Neg_Label  : Integer := 0;
                             Pos_Label  : Integer := 1) return Binary_Matrix is
-      Routine_Name  :  constant String := "Label.Label_Binarize Integer_List ";
+      Routine_Name  : constant String := "Label.Label_Binarize Integer_List ";
       Classes_Array : constant Integer_Array := To_Integer_Array (Classes);
       Y_Array       : constant Integer_Array := To_Integer_Array (Y);
       package Label_Binarize_Int is new Generic_Label_Binarize_Array
@@ -956,7 +964,8 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Label_Binarize (Y         : Binary_Matrix; Classes : Integer_List;
+   function Label_Binarize (Y         : Binary_Matrix;
+                            Classes   : ML_Types.Integer_List;
                             Neg_Label : Integer := 0) return Binary_Matrix is
       Routine_Name :  constant String := "Label.Label_Binarize Binary_Matrix ";
       Y_Int        : Integer_Matrix (Y'Range, Y'Range (2));
@@ -976,7 +985,7 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L416
    function Label_Binarize (Y         : Integer_Array_List;
-                            Classes   : Integer_List;
+                            Classes   : ML_Types.Integer_List;
                             Neg_Label : Integer := 0;
                             Pos_Label : Integer := 1) return Binary_Matrix is
       Routine_Name  :  constant String :=
@@ -1003,7 +1012,7 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L416
    function Label_Binarize (Y         : Integer_Matrix;
-                            Classes   : Integer_List;
+                            Classes   : ML_Types.Integer_List;
                             Neg_Label : Integer := 0;
                             Pos_Label : Integer := 1) return Binary_Matrix is
       Routine_Name  :  constant String := "Label.Label_Binarize Integer_Matrix ";
@@ -1025,7 +1034,7 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L416
    function Label_Binarize (Y         : Unbounded_String_Matrix;
-                            Classes   : Unbounded_List;
+                            Classes   : ML_Types.Unbounded_List;
                             Neg_Label : Integer := 0;
                             Pos_Label : Integer := 1) return Binary_Matrix is
       Routine_Name  :  constant String :=
@@ -1049,7 +1058,7 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L416
    function Label_Binarize (Y         : Unbounded_String_Array;
-                            Classes   : Unbounded_List;
+                            Classes   : ML_Types.Unbounded_List;
                             Neg_Label : Integer := 0;
                             Pos_Label : Integer := 1) return Binary_Matrix is
       Routine_Name  :  constant String :=
@@ -1092,7 +1101,7 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Transform (Self : Label_Binarizer; Y : Integer_List)
+   function Transform (Self : Label_Binarizer; Y : ML_Types.Integer_List)
                        return Binary_Matrix is
       --  Routine_Name : constant String := "Label.Transform Binarize ";
    begin
@@ -1103,9 +1112,11 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Transform (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
+   function Transform (Self : Label_Binarizer;
+                       Y    : ML_Types.Array_Of_Integer_Lists)
                        return Binary_Matrix is
-      use Integer_Package;
+      use ML_Types;
+      use ML_Types.Integer_Package;
       Routine_Name  : constant String := "Label.Transform Array_Of_Integer_Lists ";
       Y_Row         : Integer_List;
       Classes       : Integer_List;
@@ -1151,9 +1162,10 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform
-     (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
+     (Self : Label_Binarizer; Y : ML_Types.Array_Of_Integer_Lists)
       return Boolean_Matrix is
-      use Integer_Package;
+      use ML_Types;
+      use ML_Types.Integer_Package;
       Routine_Name  : constant String := "Label.Transform Array_Of_Integer_Lists ";
       Y_Row         : Integer_List;
       Classes       : Integer_List;
@@ -1218,7 +1230,7 @@ package body Label is
    function Transform (Y : Integer_Array_List) return Binary_Matrix is
       --  Routine_Name  : constant String :=
       --                    "Label.Transform Integer_Array_List ";
-      Class_Mapping : Integer_List;
+      Class_Mapping : ML_Types.Integer_List;
    begin
       return Transform_CM (Y, Class_Mapping);
 
@@ -1229,7 +1241,7 @@ package body Label is
    function Transform (Y : Integer_Matrix) return Binary_Matrix is
       --        Routine_Name : constant String :=
       --                         "Label.Transform Integer_Matrix ";
-      Class_Mapping :  Integer_List;
+      Class_Mapping :  ML_Types.Integer_List;
    begin
       return Transform_CM (Y, Class_Mapping);
 
@@ -1240,7 +1252,7 @@ package body Label is
    function Transform (Y : Unbounded_String_Array_List) return Binary_Matrix is
       --  Routine_Name  : constant String :=
       --                    "Label.Transform Unbounded_String_Array_List ";
-      Class_Mapping : Unbounded_List;
+      Class_Mapping : ML_Types.Unbounded_List;
    begin
       return Transform_CM (Y, Class_Mapping);
 
@@ -1250,8 +1262,8 @@ package body Label is
 
    function Transform_CM
      (Y             : Integer_Array_List;
-      Class_Mapping : in out Integer_List) return Binary_Matrix is
-      use Integer_Sorting;
+      Class_Mapping : in out ML_Types.Integer_List) return Binary_Matrix is
+      use ML_Types.Integer_Sorting;
       Routine_Name : constant String :=
                        "Label.Transform_CM Integer_Array_List ";
    begin
@@ -1306,9 +1318,9 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform_CM (Y             : Integer_Matrix;
-                          Class_Mapping : in out Integer_List)
+                          Class_Mapping : in out ML_Types.Integer_List)
                           return Binary_Matrix is
-      use Integer_Sorting;
+      use ML_Types.Integer_Sorting;
       --        Routine_Name : constant String :=
       --                         "Label.Transform_CM Integer_Matrix ";
       Found : Boolean := False;
@@ -1356,8 +1368,8 @@ package body Label is
 
    function Transform_CM
      (Y             : Unbounded_String_Array_List;
-      Class_Mapping : in out Unbounded_List) return Binary_Matrix is
-      use Unbounded_Sorting;
+      Class_Mapping : in out ML_Types.Unbounded_List) return Binary_Matrix is
+      use ML_Types.Unbounded_Sorting;
       Routine_Name : constant String :=
                        "Label.Transform_CM Unbounded_String_Array_List ";
    begin

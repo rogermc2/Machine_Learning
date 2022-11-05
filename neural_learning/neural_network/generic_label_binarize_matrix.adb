@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Generic_Array_Sort;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-with NL_Types;
+with ML_Types;
 --  with Printing;
 --  with Test_Support;
 
@@ -18,7 +18,7 @@ package body Generic_Label_Binarize_Matrix is
    function Binarize (Y                    : Y_Matrix_Type;
                       Classes              : Class_Array_Type;
                       Neg_Label, Pos_Label : Integer) return Binary_Matrix is
-      use NL_Types.Unbounded_Package;
+      use ML_Types.Unbounded_Package;
       Routine_Name :  constant String := "Generic_Label_Binarize.Binarize ";
       Class_Index  : Natural;
       Result       : Binary_Matrix (Y'Range, 1 .. Classes'Length) :=

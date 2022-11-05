@@ -213,7 +213,7 @@ package body Test_Support is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_List (Name  : String;
-                                 aList : NL_Types.Integer_List) is
+                                 aList : ML_Types.Integer_List) is
       Count : Integer := 1;
    begin
       Put_Line (Name & ": ");
@@ -232,8 +232,8 @@ package body Test_Support is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_Map
-     (Name : String; aMap : NL_Types.Integer_Label_Map) is
-      use NL_Types.Integer_Label_Map_Package;
+     (Name : String; aMap : ML_Types.Integer_Label_Map) is
+      use ML_Types.Integer_Label_Map_Package;
       Curs : Cursor := aMap.First;
       aKey : Integer;
    begin
@@ -377,7 +377,7 @@ package body Test_Support is
    --  ------------------------------------------------------------------------
 
    procedure Print_Unbound_List (Name : String;
-                                 UB   : NL_Types.Unbounded_List) is
+                                 UB   : ML_Types.Unbounded_List) is
       Count : Integer := 1;
    begin
       Put_Line (Name & ": ");

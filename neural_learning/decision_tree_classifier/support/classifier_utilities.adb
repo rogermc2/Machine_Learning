@@ -103,7 +103,7 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
-   function Arg_Max (Values : NL_Types.Integer_List) return Positive is
+   function Arg_Max (Values : ML_Types.Integer_List) return Positive is
       Max_Value  : Integer := Integer'First;
       Max_Index  : Positive := 1;
       Value      : Integer;
@@ -501,13 +501,13 @@ package body Classifier_Utilities is
    --  the order of List_A would be preserved.
    --  The Search_Sorted functions returns the indices where new elements in
    --  List_B should be inserted into List_A to keep List_A sorted.
-   function Search_Sorted_Integer_List (List_A, List_B : NL_Types.Integer_List)
-                                        return NL_Types.Integer_List is
-      use NL_Types.Integer_Package;
-      use NL_Types.Integer_Sorting;
+   function Search_Sorted_Integer_List (List_A, List_B : ML_Types.Integer_List)
+                                        return ML_Types.Integer_List is
+      use ML_Types.Integer_Package;
+      use ML_Types.Integer_Sorting;
       Item      : Integer;
       Pos_Found : Boolean;
-      theList   : NL_Types.Integer_List;
+      theList   : ML_Types.Integer_List;
    begin
       if not Is_Sorted (List_A) then
          raise Value_Error with
@@ -538,14 +538,14 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Search_Sorted_Float_List (List_A, List_B : NL_Types.Float_List)
-                                      return NL_Types.Integer_List is
+                                      return ML_Types.Integer_List is
       use NL_Types.Float_Package;
       use NL_Types.Float_Sorting;
       Routine_Name : constant String :=
                        "Classifier_Utilities.Search_Sorted_Float_List ";
       Item         : Float;
       Pos_Found    : Boolean;
-      theList      : NL_Types.Integer_List;
+      theList      : ML_Types.Integer_List;
    begin
       if not Is_Sorted (List_A) then
          raise Value_Error with
@@ -917,7 +917,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Float_List (I : NL_Types.Integer_List) return NL_Types.Float_List is
+   function To_Float_List (I : ML_Types.Integer_List) return NL_Types.Float_List is
       F_List : NL_Types.Float_List;
    begin
       for index in I.First_Index .. I.Last_Index loop
@@ -944,7 +944,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Float_List_2D (I : NL_Types.Integer_List_2D) return NL_Types.Float_List_2D is
+   function To_Float_List_2D (I : ML_Types.Integer_List_2D) return NL_Types.Float_List_2D is
       F2_List : NL_Types.Float_List_2D;
    begin
       for index in I.First_Index .. I.Last_Index loop
@@ -957,8 +957,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_List (Ints : Integer_Array) return NL_Types.Integer_List is
-      Values : NL_Types.Integer_List;
+   function To_Integer_List (Ints : Integer_Array) return ML_Types.Integer_List is
+      Values : ML_Types.Integer_List;
    begin
       for index in Ints'Range loop
          Values.Append (Ints (index));
@@ -971,11 +971,11 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_List (Ints : ML_Types.Value_Data_List)
-                             return NL_Types.Integer_List is
+                             return ML_Types.Integer_List is
       use Ada.Strings.Unbounded;
       use ML_Types;
       Item   : Value_Record;
-      Values : NL_Types.Integer_List;
+      Values : ML_Types.Integer_List;
    begin
       for index in Ints.First_Index .. Ints.Last_Index loop
          Item := Ints.Element (index);
@@ -1039,8 +1039,8 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_List_2D (Data : ML_Types.Value_Data_Lists_2D)
-                                return NL_Types.Integer_List_2D  is
-      I2_List : NL_Types.Integer_List_2D;
+                                return ML_Types.Integer_List_2D  is
+      I2_List : ML_Types.Integer_List_2D;
    begin
       for index in Data.First_Index .. Data.Last_Index loop
          I2_List.Append (To_Integer_List (Data (index)));
@@ -1223,15 +1223,14 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique (Nums : NL_Types.Integer_List)
-                    return NL_Types.Integer_List is
+   function Unique (Nums : ML_Types.Integer_List)
+                    return ML_Types.Integer_List is
       use Int_Sets;
-      use NL_Types;
-      use NL_Types.Integer_Package;
+      use ML_Types.Integer_Package;
       Unique_Set : Int_Sets.Set;
-      Int_Curs   : Integer_Package.Cursor := Nums.First;
+      Int_Curs   : ML_Types.Integer_Package.Cursor := Nums.First;
       Set_Curs   : Int_Sets.Cursor;
-      Nums_List  : Integer_List;
+      Nums_List  : ML_Types.Integer_List;
    begin
       while Has_Element (Int_Curs) loop
          Unique_Set.Include (Element (Int_Curs));

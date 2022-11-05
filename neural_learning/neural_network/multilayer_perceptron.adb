@@ -80,7 +80,7 @@ package body Multilayer_Perceptron is
                                X         : Real_Float_Matrix)
                                return Real_Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Layer_Units : Integer_List);
+                         Layer_Units : ML_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record;
    procedure Process_Batch (Self             : in out MLP_Classifier;
@@ -88,7 +88,7 @@ package body Multilayer_Perceptron is
                             Y                : Binary_Matrix;
                             Params           : in out Parameters_List;
                             Gradients        : in out Parameters_List;
-                            Batch_Slice      : Slice_Record;
+                            Batch_Slice      : NL_Types.Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float);
    procedure Update_No_Improvement_Count
@@ -251,8 +251,9 @@ package body Multilayer_Perceptron is
    --  is also set on clf.
    --  Implemented in Multilayer_Perceptron to avoid circular references
    function Check_Partial_Fit_First_Call
-     (Self : in out MLP_Classifier; Classes : Integer_List) return Boolean is
-      use Integer_Package;
+     (Self : in out MLP_Classifier; Classes : ML_Types.Integer_List)
+      return Boolean is
+      use ML_Types.Integer_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Check_Partial_Fit_First_Call ";
       Result       : Boolean := False;
@@ -312,7 +313,7 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L1054
-   function C_Init (Layer_Sizes         : Integer_List;
+   function C_Init (Layer_Sizes         : ML_Types.Integer_List;
                     Activation          : Base_Neural.Activation_Type :=
                       Base_Neural.Rect_LU_Activation;
                     Solver              : Solver_Type := Adam_Solver;
@@ -430,12 +431,12 @@ package body Multilayer_Perceptron is
       Routine_Name       : constant String :=
                              "Multilayer_Perceptron.Fit Binary Y ";
       Num_Features       : constant Positive := Positive (X'Length (2));
-      Hidden_Layer_Sizes : constant Integer_List :=
+      Hidden_Layer_Sizes : constant ML_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
       --  L394
       Y_Bin              : constant Binary_Matrix :=
                              Validate_Input (Self, Y, Incremental);
-      Layer_Units        : Integer_List;
+      Layer_Units        : ML_Types.Integer_List;
       Activations        : Real_Matrix_List;
       Gradients          : Parameters_List;
    begin
@@ -489,16 +490,16 @@ package body Multilayer_Perceptron is
                   X           : Real_Float_Matrix;
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
---        Routine_Name        : constant String :=
---                                "Multilayer_Perceptron.Fit Integer Y ";
+      --        Routine_Name        : constant String :=
+      --                                "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features        : constant Positive := Positive (X'Length (2));
-      Hidden_Layer_Sizes  : constant Integer_List :=
+      Hidden_Layer_Sizes  : constant ML_Types.Integer_List :=
                               Self.Parameters.Hidden_Layer_Sizes;
       --  L394  Y_Bin has dimensions num_samples x num_classes
       --  Validate_Input generates class columns from the Y columns
       Y_Bin               : constant Binary_Matrix :=
                               Validate_Input (Self, Y, Incremental);
-      Layer_Units         : Integer_List;
+      Layer_Units         : ML_Types.Integer_List;
       Activations         : Real_Matrix_List;
    begin
       --  L385
@@ -614,7 +615,7 @@ package body Multilayer_Perceptron is
       Continue          : Boolean := True;
       Early_Stopping    : Boolean := Self.Parameters.Early_Stopping;
       Batch_Size        : Positive;
-      Batches           : Slices_List;
+      Batches           : NL_Types.Slices_List;
       Accumulated_Loss  : Float := 0.0;
       Msg               : Unbounded_String;
       Is_Stopping       : Boolean := False;
@@ -729,7 +730,7 @@ package body Multilayer_Perceptron is
       end loop;
 
       Put_Line (Routine_Name & "Iteration" &Integer'Image (Self.Attributes.N_Iter) &
-                        ", loss = " & Float'Image (Self.Attributes.Loss));
+                  ", loss = " & Float'Image (Self.Attributes.Loss));
 
       --  L711
       if Early_Stopping then
@@ -928,7 +929,7 @@ package body Multilayer_Perceptron is
       use Maths;
       use Maths.Float_Math_Functions;
       use Base_Neural;
---        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
       Factor       : Float;
       Init_Bound   : Float;
@@ -963,7 +964,7 @@ package body Multilayer_Perceptron is
    --  ------------------------------------------------------------------------
    --  L320  BaseMultilayerPerceptron._initialize
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Layer_Units : Integer_List) is
+                         Layer_Units : ML_Types.Integer_List) is
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
@@ -1139,7 +1140,7 @@ package body Multilayer_Perceptron is
    --  Partial_Fit (X, Y)
    procedure  Partial_Fit
      (Self    : in out MLP_Classifier; X : Real_Float_Matrix;
-      Y       : Integer_Matrix; Classes : Integer_List) is
+      Y       : Integer_Matrix; Classes : ML_Types.Integer_List) is
       use Label;
       use Multiclass_Utils;
       LB           : Label_Binarizer;
@@ -1166,7 +1167,7 @@ package body Multilayer_Perceptron is
    --  Partial_Fit (X, Y)
    procedure  Partial_Fit
      (Self    : in out MLP_Classifier; X : Real_Float_Matrix;
-      Y       : Binary_Matrix; Classes : Integer_List) is
+      Y       : Binary_Matrix; Classes : ML_Types.Integer_List) is
       use Label;
       use Multiclass_Utils;
       LB           : Label_Binarizer (Type_Of_Target (Y));
@@ -1242,7 +1243,7 @@ package body Multilayer_Perceptron is
                             Y                : Binary_Matrix;
                             Params           : in out Parameters_List;
                             Gradients        : in out Parameters_List;
-                            Batch_Slice      : Slice_Record;
+                            Batch_Slice      : NL_Types.Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
       --        Routine_Name : constant String :=
@@ -1413,11 +1414,11 @@ package body Multilayer_Perceptron is
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Binary_Matrix;
                             Incremental : Boolean) return Binary_Matrix is
-      use Integer_Package;
+      use ML_Types.Integer_Package;
       use Multiclass_Utils;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Validate_Input Binary matrix ";
-      Classes      : Integer_List;
+      Classes      : ML_Types.Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
       if Self.Attributes.Classes.Is_Empty or else
@@ -1454,10 +1455,10 @@ package body Multilayer_Perceptron is
                             Y           : Integer_Matrix;
                             Incremental : Boolean) return Binary_Matrix is
       use Multiclass_Utils;
-      use Integer_Package;
+      use ML_Types.Integer_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Validate_Input Integer matrix ";
-      Classes      : Integer_List;
+      Classes      : ML_Types.Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
       if Self.Attributes.Classes.Is_Empty or else

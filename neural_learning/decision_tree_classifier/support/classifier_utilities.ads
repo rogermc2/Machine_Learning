@@ -14,7 +14,7 @@ package Classifier_Utilities is
    function Arg_Max (Values : NL_Types.Boolean_List) return Positive;
    function Arg_Max (Values : NL_Types.Float_List) return Positive;
    function Arg_Max (Values : Real_Float_Matrix) return Integer_Array;
-   function Arg_Max (Values : NL_Types.Integer_List) return Positive;
+   function Arg_Max (Values : ML_Types.Integer_List) return Positive;
    function Bin_Count (Numbers : NL_Types.Natural_List)
                        return NL_Types.Natural_List;
    function Bin_Count (Numbers : ML_Types.Value_Data_List)
@@ -42,10 +42,10 @@ package Classifier_Utilities is
                              return NL_Arrays_And_Matrices.Natural_Array;
    function Row_Max_Indices (Values : Real_Float_Matrix)
                              return NL_Arrays_And_Matrices.Natural_Array;
-   function Search_Sorted_Integer_List (List_A, List_B : NL_Types.Integer_List)
-                                        return NL_Types.Integer_List;
+   function Search_Sorted_Integer_List (List_A, List_B : ML_Types.Integer_List)
+                                        return ML_Types.Integer_List;
    function Search_Sorted_Float_List (List_A, List_B : NL_Types.Float_List)
-                                        return NL_Types.Integer_List;
+                                        return ML_Types.Integer_List;
    function Set_Diff (Values : Integer_Array; Uniques : Integer_Array)
                       return NL_Types.Natural_List;
    function Set_Diff (Values : Integer_Array; Uniques : Natural_Array)
@@ -60,17 +60,17 @@ package Classifier_Utilities is
                       return ML_Types.Value_Data_List;
    function To_Float_List (F : ML_Types.Value_Data_List)
                            return NL_Types.Float_List;
-   function To_Float_List (I : NL_Types.Integer_List)
+   function To_Float_List (I : ML_Types.Integer_List)
                            return NL_Types.Float_List;
    function To_Float_List_2D (Data : ML_Types.Value_Data_Lists_2D)
                               return NL_Types.Float_List_2D;
-   function To_Float_List_2D (I : NL_Types.Integer_List_2D)
+   function To_Float_List_2D (I : ML_Types.Integer_List_2D)
                               return NL_Types.Float_List_2D;
-   function To_Integer_List (Ints : Integer_Array) return NL_Types.Integer_List;
+   function To_Integer_List (Ints : Integer_Array) return ML_Types.Integer_List;
    function To_Integer_List (Ints : ML_Types.Value_Data_List)
-                             return NL_Types.Integer_List;
+                             return ML_Types.Integer_List;
    function To_Integer_List_2D (Data : ML_Types.Value_Data_Lists_2D)
-                                return NL_Types.Integer_List_2D;
+                                return ML_Types.Integer_List_2D;
    function To_Multi_Value_List (A : Multi_Value_Array)
                                  return ML_Types.Value_Data_Lists_2D;
    function To_Natural_List (A : Natural_Array) return NL_Types.Natural_List;
@@ -91,6 +91,6 @@ package Classifier_Utilities is
                               return ML_Types.Value_Data_Lists_2D;
    function Transpose (Values : ML_Types.Value_Data_Lists_2D)
                        return  ML_Types.Value_Data_Lists_2D;
-   function Unique (Nums : NL_Types.Integer_List) return NL_Types.Integer_List;
+   function Unique (Nums : ML_Types.Integer_List) return ML_Types.Integer_List;
 
 end Classifier_Utilities;
