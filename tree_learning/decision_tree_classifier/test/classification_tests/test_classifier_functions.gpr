@@ -1,6 +1,8 @@
 project Test_Classifier_Functions is
 
-   for Source_Dirs use ("src", "../../support", "../../../common", "../../src", "../../../export", "../../metrics", "../../../utils");
+   for Source_Dirs use ("src", "../../../export", "../../../common", "../../src", "../../../utils", "../../../../common", "../../../../tree_learning", "../../support", 
+      "../../../../../../Applications_Packages/plplot-5.15.0/bindings/ada", "../../metrics");
+   for Main use ("test_weight_functions");
    for Main use ("test_classifier");
    for Object_Dir use "obj";
    for Exec_Dir use ".";
