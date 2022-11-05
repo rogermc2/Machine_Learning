@@ -12,7 +12,5 @@ project Lesson_03 is
       for Default_Switches ("ada") use ("-gnatwkmru", "-gnatyclux");
    end Compiler;
 
-      end Linker;
-
 end Lesson_03;
 

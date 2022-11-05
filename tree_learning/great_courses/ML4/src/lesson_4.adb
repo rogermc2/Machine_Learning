@@ -10,7 +10,7 @@ with Classifier_Types;
 with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
---  with Graphviz_Exporter; with Load_ARFF_Data;
+--  with Graphviz_Exporter;
 with Openml_Ada;
 --  with Plotting;
 with Printing;
