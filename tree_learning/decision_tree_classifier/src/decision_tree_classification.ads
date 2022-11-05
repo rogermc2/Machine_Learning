@@ -47,7 +47,6 @@ package Decision_Tree_Classification is
          when Tree.Integer_Type =>  Min_Split         : Integer := 2;
          when Tree.Float_Type   => Min_Fraction_Split : Float := 2.0;
          when Tree.Enum_Type    => null;
-         when others    => null;
       end case;
    end record;
 
@@ -56,7 +55,6 @@ package Decision_Tree_Classification is
          when Tree.Integer_Type =>  Min_Leaf       : Integer := 1;
          when Tree.Float_Type => Min_Fraction_Leaf : Float := 1.0;
          when Tree.Enum_Type => null;
-         when others => null;
       end case;
    end record;
 

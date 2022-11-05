@@ -3,6 +3,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Dataset_Utilities;
+with ML_Types; use ML_Types;
 
 procedure Test_CSV_Reader is
    use Dataset_Utilities;
