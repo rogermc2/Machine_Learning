@@ -8,6 +8,7 @@ with Ada.Numerics.Generic_Real_Arrays;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package ML_Types is
+   pragma Preelaborate;
 
    Max_Features : constant Integer := 100;
    type Data_Type is (Integer_Type, Float_Type, Boolean_Type, UB_String_Type);
