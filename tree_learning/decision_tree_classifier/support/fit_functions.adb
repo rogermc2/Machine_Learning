@@ -20,7 +20,7 @@ package body Fit_Functions is
       use Param_Package;
       use Range_Package;
       use Classifier_Types.Float_Package;
-      X_Last  : Float := X.Last_Element;
+      X_Last  : constant Float := X.Last_Element;
       X_Min   : Float;
       X_Max   : Float;
       X_Slice : Float_List;

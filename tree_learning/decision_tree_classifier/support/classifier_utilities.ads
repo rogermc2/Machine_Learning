@@ -1,4 +1,6 @@
 
+with PLplot_Auxiliary;
+
 with Base_Decision_Tree;
 with Classifier_Types; use Classifier_Types;
 with ML_Types;
@@ -66,7 +68,7 @@ package Classifier_Utilities is
                                    return ML_Types.Value_Data_Lists_2D;
     function To_PL_Array (List_1D  : ML_Types.Value_Data_List;
                           Num_Rows : Positive)
-                         return ML_Types.Real_Float_Matrix;
+                         return PLplot_Auxiliary.Real_Matrix;
     function To_Value_2D_List (A : ML_Types.Value_Data_List)
                               return ML_Types.Value_Data_Lists_2D;
     function To_Value_2D_List (List_1D  : ML_Types.Value_Data_List;
