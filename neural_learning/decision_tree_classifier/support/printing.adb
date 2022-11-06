@@ -168,7 +168,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Float_List (Name : String; theList : Float_List) is
+   procedure Print_Float_List (Name : String; theList : NL_Types.Float_List) is
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
@@ -291,10 +291,10 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Array_Of_Integer_Lists
-     (Name  : String; theArray : Array_Of_Integer_Lists;
+     (Name  : String; theArray : ML_Types.Array_Of_Integer_Lists;
       Start : Integer := 1; Finish : Integer := 0) is
       Last  : Integer;
-      aList : Integer_List;
+      aList : ML_Types.Integer_List;
    begin
       if Finish > 0 then
          Last := Finish;
@@ -369,8 +369,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Indefinite_List (Name    : String;
-                                    theList : Indef_String_List) is
-      use  Indefinite_String_Package;
+                                    theList : ML_Types.Indef_String_List) is
+      use  ML_Types.Indefinite_String_Package;
       Curs : Cursor := theList.First;
    begin
       Put_Line (Name & ": ");
@@ -384,7 +384,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Integer_List (Name  : String; theList : Integer_List;
+   procedure Print_Integer_List (Name    : String;
+                                 theList : ML_Types.Integer_List;
                                  Start : Positive := 1; Last : Positive := 10)
    is
       Count : Integer := 1;
@@ -409,8 +410,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_List (Name    : String;
-                                 theList : Integer_DL_List) is
-      use Integer_DLL_Package;
+                                 theList : ML_Types.Integer_DL_List) is
+      use ML_Types.Integer_DLL_Package;
       Curs  : Cursor := theList.First;
       Count : Integer := 1;
    begin
@@ -452,7 +453,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Float_Lists_2D (Name  : String; Data : Float_List_2D;
+   procedure Print_Float_Lists_2D (Name  : String;
+                                   Data  : NL_Types.Float_List_2D;
                                    Start : Positive := 1;
                                    Last  : Positive := 10) is
       Stop  : Integer := Last;
@@ -472,7 +474,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Float_Lists_3D (Name : String;
-                                   Data : Float_List_3D) is
+                                   Data : NL_Types.Float_List_3D) is
    begin
       Put_Line (Name & ": ");
       for index in Data.First_Index .. Data.Last_Index loop
@@ -529,7 +531,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Natural_Lists_2D (Name : String; Data : Natural_Lists_2D) is
+   procedure Print_Natural_Lists_2D (Name : String;
+                                     Data : NL_Types.Natural_Lists_2D) is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
@@ -541,7 +544,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Natural_List (Name : String; theList : Natural_List) is
+   procedure Print_Natural_List (Name    : String;
+                                 theList : NL_Types.Natural_List) is
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
@@ -639,7 +643,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Slice (Name : String; theSlice : Slice_Record) is
+   procedure Print_Slice (Name : String; theSlice : NL_Types.Slice_Record) is
    begin
       Put_Line (Name & ": (" &Integer'Image (theSlice.First) & " ," &
                   Integer'Image (theSlice.Last) & ")");
@@ -648,9 +652,9 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Slices (Name  : String; theList : Slices_List;
+   procedure Print_Slices (Name  : String; theList : NL_Types.Slices_List;
                            Start : Positive := 1; Last : Positive := 10) is
-      Slice : Slice_Record;
+      Slice : NL_Types.Slice_Record;
       Count : Integer := 1;
       Stop  : Integer := Last;
    begin
@@ -674,8 +678,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Strings (Name : String; theList : String_List) is
-      use String_Package;
+   procedure Print_Strings (Name : String; theList : ML_Types.String_List) is
+      use ML_Types.String_Package;
       Curs  : Cursor := theList.First;
       Count : Integer := 1;
    begin
@@ -699,8 +703,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Strings (Name    : String;
-                            theList : Indef_String_List) is
-      use Indefinite_String_Package;
+                            theList : ML_Types.Indef_String_List) is
+      use ML_Types.Indefinite_String_Package;
       Curs  : Cursor := theList.First;
       Count : Integer := 1;
    begin
@@ -724,7 +728,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Strings (Name : String; theList : String_Vector) is
+   procedure Print_Strings (Name : String; theList : ML_Types.String_Vector) is
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
@@ -746,7 +750,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Unbounded_List (Name    : String;
-                                   theList : Unbounded_List) is
+                                   theList : ML_Types.Unbounded_List) is
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
@@ -793,8 +797,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_List (Name    : String;
-                                    theList : Value_Data_List) is
-      Value : Value_Record;
+                                    theList : ML_Types.Value_Data_List) is
+      Value : ML_Types.Value_Record;
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
@@ -819,7 +823,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_Lists_2D
-     (Name      : String; theList : Value_Data_Lists_2D;
+     (Name      : String; theList : ML_Types.Value_Data_Lists_2D;
       Num_Items : Positive := 1000) is
       Items : Positive;
    begin
@@ -850,7 +854,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_Lists_3D
-     (Name : String; theList : Value_Data_Lists_3D) is
+     (Name : String; theList : ML_Types.Value_Data_Lists_3D) is
    begin
       if Name'Length > 0 then
          Put_Line (Name & ":");
@@ -871,7 +875,8 @@ package body Printing is
    --  -------------------------------------------------------------
 
    procedure Print_Value_Record
-     (Name : String; Value : Value_Record) is
+     (Name : String; Value : ML_Types.Value_Record) is
+      use ML_Types;
    begin
       if Name'Length > 0 then
          Put_Line (Name & ":");

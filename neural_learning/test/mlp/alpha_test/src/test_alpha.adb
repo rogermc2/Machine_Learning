@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Load_Dataset;
 with Multilayer_Perceptron;
+with ML_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 with Printing;
@@ -29,7 +30,7 @@ procedure Test_Alpha is
    X             : Real_Float_Matrix (1 .. 100, 1 .. Data.Num_Features);
    Y             : Integer_Matrix (1 .. 100, 1 .. 1) :=
                      (others => (others => 0));
-   Layer_Sizes   : NL_Types.Integer_List;
+   Layer_Sizes   : ML_Types.Integer_List;
    Coeffs_Sum    : NL_Types.Float_List;
    Alpha_Vectors : NL_Types.Float_List_2D;
    aClassifier   : MLP_Classifier;
@@ -64,7 +65,7 @@ begin
    for alpha_value in Alpha_Values'Range loop
       aClassifier := C_Init
         (Alpha => Float (alpha_value), Random_State => 1,
-         Hidden_Layer_Sizes => Layer_Sizes);
+         Layer_Sizes => Layer_Sizes);
       Fit (aClassifier, X, Y);
 
       Coeffs_Sum.Clear;

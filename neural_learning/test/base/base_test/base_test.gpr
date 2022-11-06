@@ -1,6 +1,6 @@
 project Base_Test is
 
-   for Source_Dirs use ("src", "../../../neural_network", "../../../decision_tree_classifier/support", "../../../common", "../../../test");
+   for Source_Dirs use ("src", "../../../neural_network", "../../../decision_tree_classifier/support", "../../../common", "../../../test", "../../../../common");
    for Object_Dir use "obj";
    for Main use ("test_base");
    for Exec_Dir use ".";
