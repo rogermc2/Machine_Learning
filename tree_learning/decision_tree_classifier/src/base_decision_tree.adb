@@ -2,7 +2,7 @@
 --  DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Depth_First_Builder;
 with Best_First_Builder;
@@ -147,7 +147,6 @@ package body Base_Decision_Tree is
               (Builder, aClassifier.Attributes.Decision_Tree);
       end case;
 
-      Put_Line (Routine_Name & "L426");
       --  L426
       Prune_Tree (aClassifier);
 

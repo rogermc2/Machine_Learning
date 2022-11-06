@@ -69,7 +69,7 @@ package body Decision_Path_Tests is
       Routine_Name      : constant String :=
                             "Decision_Path_Tests.Test_Decision_Path_Hardcoded ";
       Iris_Data         : constant Multi_Output_Data_Record :=
-                            Load_Data ("src/iris.csv");
+                            Load_Data ("../../../datasets/iris.csv");
       X                 :  constant Value_Data_Lists_2D :=
                             Iris_Data.Feature_Values;
       Num_Samples       : constant Natural := Natural (X.Length);
@@ -135,7 +135,7 @@ package body Decision_Path_Tests is
                             "Decision_Path_Tests.Test_Decision_Path ";
       Exporter          : Graphviz_Exporter.DOT_Tree_Exporter;
       Iris_Data         : constant Multi_Output_Data_Record :=
-                            Load_Data ("src/iris.csv");
+                            Load_Data ("../../../datasets/iris.csv");
       X                 :  constant Value_Data_Lists_2D :=
                             Iris_Data.Feature_Values;
       Num_Samples       : constant Natural := Natural (X.Length);

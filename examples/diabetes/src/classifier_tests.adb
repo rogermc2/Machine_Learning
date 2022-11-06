@@ -26,7 +26,7 @@ package body Classifier_Tests is
       Routine_Name    : constant String :=
                           "Test_Diabetes.Test_Probability";
       Diabetes_Data   : constant Multi_Output_Data_Record :=
-                          Load_Data ("src/diabetes.csv");
+                          Load_Data ("../diabetes.csv");
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;

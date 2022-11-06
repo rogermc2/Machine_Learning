@@ -29,7 +29,7 @@ package body Diabetes_Tests is
       Routine_Name    : constant String :=
                             "Diabetes_Tests.Test_Diabetes_Overfit";
       Diabetes_Data   : constant Multi_Output_Data_Record :=
-                         Load_Data ("src/diabetes2.csv");
+                         Load_Data ("../../../datasets/diabetes.csv");
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;

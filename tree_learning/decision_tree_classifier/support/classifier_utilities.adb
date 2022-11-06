@@ -1,6 +1,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Ordered_Sets;
+--  with Ada.Directories;
 with Ada.Numerics.Elementary_Functions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -342,10 +343,13 @@ package body Classifier_Utilities is
 
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return ML_Types.Multi_Output_Data_Record is
+--        Routine_Name: constant String := "Classifier_Utilities.Load_Data ";
+--        Curr_Dir     : constant String := Ada.Directories.Current_Directory;
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;  -- Unbound string list
       Output_Data  : ML_Types.Multi_Output_Data_Record;
    begin
+--        Put_Line (Routine_Name & "Curr_Dir: " & Curr_Dir);
       Open (Data_File, In_File, File_Name);
       Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
       Close (Data_File);

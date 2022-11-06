@@ -21,11 +21,6 @@ package body Classifier_Tests is
    use Classifier_Types;
    use ML_Types;
 
-   --     type Clf_Criterions is (Gini, Entropy);
-   --     type Reg_Criterions is (Squared_Error, Absolute_Error,
-   --                             Friedman_Mse, Poisson);
-   --     type Clf_Trees is (Decision_Tree_Classifier, Extra_Tree_Classifier);
-   --     type Reg_Trees is (Decision_Tree_Regressor, Extra_Tree_Regressor);
    --  X_Array 6 rows (samples) x 1 column (outputs)
    Min_Split   : constant String := "2";
    X_Array     : constant Multi_Value_Array (1 .. 6, 1 .. 2) :=
@@ -121,7 +116,7 @@ package body Classifier_Tests is
       use Classifier_Types.Float_Package;
       Routine_Name   : constant String := "Classifier_Tests.Test_Iris";
       Iris_Data      : constant Multi_Output_Data_Record :=
-                         Load_Data ("src/iris.csv");
+                         Load_Data ("../../../datasets/iris.csv");
       theClassifier  : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter       : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -216,7 +211,7 @@ package body Classifier_Tests is
       Routine_Name  : constant String :=
                         "Classification_Tests.Test_Probability ";
       Iris_Data     : constant Multi_Output_Data_Record :=
-                        Load_Data ("src/iris.csv");
+                        Load_Data ("../../../datasets/iris.csv");
       theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;

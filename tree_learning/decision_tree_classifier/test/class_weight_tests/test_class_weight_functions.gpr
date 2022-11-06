@@ -1,7 +1,6 @@
 project Test_Class_Weight_Functions is
 
-   for Source_Dirs use ("src", "../../../export", "../../../common", "../../src", "../../../utils", "../../../../common", "../../../../tree_learning", "../../support", 
-      "../../../../../../Applications_Packages/plplot-5.15.0/bindings/ada");
+   for Source_Dirs use ("src", "../../../export", "../../../common", "../../src", "../../../utils", "../../../../common", "../../../../tree_learning", "../../support", "../../../common");
    for Main use ("test_weight_functions");
    for Object_Dir use "obj";
    for Exec_Dir use ".";
