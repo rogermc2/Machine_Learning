@@ -8,7 +8,6 @@ with Estimator;
 with ML_Types;
 with Base_Decision_Tree;
 with Encode_Utils;
-with Export_Types;
 with Node_Splitter;
 with Tree;
 with Weights;
@@ -19,15 +18,9 @@ package Printing is
 
     procedure Print_Boolean_Matrix (Name    : String;
                                     aMatrix : Estimator.Boolean_Matrix);
-    procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List);
-    procedure Print_Colours_List (Name    : String;
-                                  Colours : Export_Types.Colours_List);
     procedure Print_Criterion (Name : String;
                                Data : Criterion.Criterion_Class);
-    procedure Print_Integer_Colours_List
-      (Name : String; Colours : Export_Types.Integer_Colours_List);
     procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
-    procedure Print_Export_Map (Name : String; aMap : Export_Types.Export_Map);
     procedure Print_Float_Array (Name   : String; anArray : Float_Array;
                                  Start  : Integer := 1;
                                  Finish : Integer := 0);
@@ -55,7 +48,6 @@ package Printing is
                                        Cursors : Tree.Leaf_Cursor_Array);
     procedure Print_Node_Cursor_List (Name    : String;
                                       Cursors : Tree.Tree_Cursor_List);
-    procedure Print_RGB_Array (Name : String; anArray : Export_Types.RGB_Array);
     procedure Print_Split_Record (Name : String;
                                   Data : Node_Splitter.Split_Record);
     procedure Print_Stack_Record (Name : String;
