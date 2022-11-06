@@ -13,7 +13,7 @@ procedure Test_CSV_Reader is
 begin
    New_Line;
    Put_Line ("Test_CSV_Reader");
-   CSV_Reader ("iris.csv", Data);
+   CSV_Reader ("../iris.csv", Data);
 
    Curs := Data.First;
    while Has_Element (Curs) loop

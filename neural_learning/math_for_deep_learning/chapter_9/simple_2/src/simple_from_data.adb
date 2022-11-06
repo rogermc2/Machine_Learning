@@ -6,7 +6,7 @@ with Base;
 with Load_Dataset;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
+with ML_Types;
 with Test_Support; use Test_Support;
 
 procedure Simple_From_Data is
@@ -23,14 +23,14 @@ procedure Simple_From_Data is
                     Load_Dataset.Load_Labels ("../../../datasets/y_train.csv");
    Y_Test       : constant Integer_Matrix :=
                     Load_Dataset.Load_Labels ("../../../datasets/y_test.csv");
-   Layer_Sizes  : NL_Types.Integer_List;
+   Layer_Sizes  : ML_Types.Integer_List;
    MLP          : MLP_Classifier;
    Score        : Float;
 begin
    Put_Line (Routine_Name);
 
    Layer_Sizes.Append (5);
-   MLP := C_Init (Hidden_Layer_Sizes => Layer_Sizes, Verbose => False,
+   MLP := C_Init (Layer_Sizes => Layer_Sizes, Verbose => False,
                   Shuffle => True);
    Fit (MLP, X_Train, Y_Train);
 
