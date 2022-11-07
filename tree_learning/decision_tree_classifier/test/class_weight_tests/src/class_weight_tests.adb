@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Classifier_Types;
 with Classifier_Utilities; use Classifier_Utilities;
 with Encode_Utils;
-with Printing;
+with Tree_Printing;
 with Weights;
 
 package body Class_Weight_Tests is
@@ -52,7 +52,7 @@ package body Class_Weight_Tests is
          Put_Line ("Test_Compute_Class_Weight, Dot_Product: " &
                      Float'Image (Dot_Product)
                    & ", Y length: " & Integer'Image (Integer (Y.Length)));
-         Printing.Print_Weights ("Weights", Class_Weights);
+         Tree_Printing.Print_Weights ("Weights", Class_Weights);
       end if;
 
    end Test_Compute_Class_Weight;
@@ -71,8 +71,8 @@ package body Class_Weight_Tests is
         (Sample_Weights, Expected_Weights) then
          Put_Line ("passed.");
       else
-         Printing.Print_Weights ("Expected", Expected_Weights);
-         Printing.Print_Weights ("Weights", Sample_Weights);
+         Tree_Printing.Print_Weights ("Expected", Expected_Weights);
+         Tree_Printing.Print_Weights ("Weights", Sample_Weights);
       end if;
 
    end Test_Compute_Sample_Weight;

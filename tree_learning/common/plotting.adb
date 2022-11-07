@@ -5,7 +5,7 @@ with PLplot_Standard; use PLplot_Standard;
 
 with Maths;
 
-with Classifier_Utilities;
+with Plot_Utilities;
 
 package body Plotting is
 
@@ -19,7 +19,7 @@ package body Plotting is
         Put_Line (Routine_Name & "Num_Image_Rows: " &
                     Integer'Image (Num_Image_Rows));
         Put_Line (Routine_Name & "Plotting");
-        Image := Classifier_Utilities.To_PL_Array (Data, Num_Image_Rows);
+        Image := Plot_Utilities.To_PL_Array (Data, Num_Image_Rows);
         Plotting.Plot (Image);
     end Display_Image;
   

@@ -5,14 +5,14 @@ with Build_Utils;
 with Classifier_Types; use Classifier_Types;
 with Criterion;
 with Estimator;
-with ML_Types;
+--  with ML_Types;
 with Base_Decision_Tree;
 with Encode_Utils;
 with Node_Splitter;
 with Tree;
 with Weights;
 
-package Printing is
+package Tree_Printing is
 
     Print_Error : Exception;
 
@@ -25,12 +25,12 @@ package Printing is
                                  Start  : Integer := 1;
                                  Finish : Integer := 0);
     procedure Print_Float_List (Name  : String; theList : Float_List);
-    procedure Print_Indefinite_List (Name   : String;
-                                    theList : ML_Types.Indef_String_List);
-    procedure Print_Integer_List (Name : String;
-                                  theList : ML_Types.Integer_List);
-    procedure Print_Integer_List (Name : String;
-                                  theList : ML_Types.Integer_DL_List);
+--      procedure Print_Indefinite_List (Name   : String;
+--                                      theList : ML_Types.Indef_String_List);
+--      procedure Print_Integer_List (Name : String;
+--                                    theList : ML_Types.Integer_List);
+--      procedure Print_Integer_List (Name : String;
+--                                    theList : ML_Types.Integer_DL_List);
     procedure Print_Integer_List (Name : String; theList : Integer_List);
     procedure Print_Natural_Lists_2D (Name : String;
                                       Data : Natural_Lists_2D);
@@ -52,28 +52,28 @@ package Printing is
                                   Data : Node_Splitter.Split_Record);
     procedure Print_Stack_Record (Name : String;
                                   Data : Build_Utils.Stack_Record);
-    procedure Print_Strings (Name : String; theList : ML_Types.String_List);
-    procedure Print_Strings (Name    : String;
-                             theList : ML_Types.Indef_String_List);
+--      procedure Print_Strings (Name : String; theList : ML_Types.String_List);
+--      procedure Print_Strings (Name    : String;
+--                               theList : ML_Types.Indef_String_List);
     procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);
     procedure Print_Tree (Name : String; aTree : Tree.Tree_Class);
-    procedure Print_Unbounded_List (Name    : String;
-                                    theList : ML_Types.Unbounded_List);
+--      procedure Print_Unbounded_List (Name    : String;
+--                                      theList : ML_Types.Unbounded_List);
     procedure Print_Unbounded_Set (Name   : String;
                                    theSet : Encode_Utils.UB_String_Sets.Set);
     procedure Print_Value_List (Name : String; theList : Tree.Values_List);
-    procedure Print_Value_Data_List (Name    : String;
-                                     theList : ML_Types.Value_Data_List);
-    procedure Print_Value_Data_Lists_2D (Name      : String;
-                                         theList   : ML_Types.Value_Data_Lists_2D;
-                                         Num_Items : Positive := 1000);
-    procedure Print_Value_Data_Lists_3D (Name    : String;
-                                         theList : ML_Types.Value_Data_Lists_3D);
-    procedure Print_Value_Record (Name : String; Value : ML_Types.Value_Record);
+--      procedure Print_Value_Data_List (Name    : String;
+--                                       theList : ML_Types.Value_Data_List);
+--      procedure Print_Value_Data_Lists_2D (Name      : String;
+--                                           theList   : ML_Types.Value_Data_Lists_2D;
+--                                           Num_Items : Positive := 1000);
+--      procedure Print_Value_Data_Lists_3D (Name    : String;
+--                                           theList : ML_Types.Value_Data_Lists_3D);
+--      procedure Print_Value_Record (Name : String; Value : ML_Types.Value_Record);
     procedure Print_Weights (Name : String; Data : Weights.Weight_List);
     procedure Print_Weight_Lists_2D (Name : String;
                                      Data : Weights.Weight_Lists_2D);
     procedure Print_Weight_Lists_3D (Name : String;
                                      Data : Weights.Weight_Lists_3D);
 
-end Printing;
+end Tree_Printing;

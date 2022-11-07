@@ -13,6 +13,7 @@ with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with Printing;
 with Tree;
+with Tree_Printing;
 with Weights;
 
 procedure Lesson_3 is
@@ -20,6 +21,7 @@ procedure Lesson_3 is
    use ML_Types.String_Package;
    use Decision_Tree_Classification;
    use Printing;
+   use Tree_Printing;
    Routine_Name  : constant String := "Lesson_3";
    Min_Split     : constant String := "2";
    Data          : constant Multi_Output_Data_Record :=
@@ -55,7 +57,7 @@ begin
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
    Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
-   Printing.Print_Tree ("Diabetes Tree", aClassifier);
+   Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
    New_Line;
 

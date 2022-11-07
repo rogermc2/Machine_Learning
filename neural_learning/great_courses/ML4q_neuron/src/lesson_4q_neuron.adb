@@ -4,9 +4,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Base;
 with Base_Neural;
+with ML_Types;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
 
 with Support_4;
 
@@ -19,7 +19,7 @@ procedure Lesson_4Q_Neuron is
    Test_Size          : constant Positive := 1000;
    Train_Size         : constant Positive := 5000;
    aClassifier        : Multilayer_Perceptron.MLP_Classifier;
-   Hidden_Layer_Sizes : NL_Types.Integer_List;
+   Hidden_Layer_Sizes : ML_Types.Integer_List;
 begin
    Put_Line (Routine_Name);
    declare

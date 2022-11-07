@@ -11,8 +11,8 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Printing;
 with Tree;
+with Tree_Printing;
 with Weights;
 
 package body Decision_Path_Tests is
@@ -44,7 +44,7 @@ package body Decision_Path_Tests is
             Leaf_Indicator (index) := Node_List.Element (index_2);
          end loop;
       end loop;
-      Printing.Print_Natural_List (Routine_Name & "Leaves", Leaves);
+      Tree_Printing.Print_Natural_List (Routine_Name & "Leaves", Leaves);
 
       Put_Line (Routine_Name & "Leaf_Indicator");
       for index in 1 .. Integer (Leaf_Indicator'Length) loop

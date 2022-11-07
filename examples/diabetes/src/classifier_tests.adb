@@ -9,8 +9,8 @@ with Classifier_Utilities;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Printing;
 with Tree;
+with Tree_Printing;
 with Weights;
 
 package body Classifier_Tests is
@@ -21,8 +21,8 @@ package body Classifier_Tests is
    procedure Test_Diabetes  is
       use Classifier_Utilities;
       use Decision_Tree_Classification;
-      use Printing;
       use Classifier_Types.Float_Package;
+      use Tree_Printing;
       Routine_Name    : constant String :=
                           "Test_Diabetes.Test_Probability";
       Diabetes_Data   : constant Multi_Output_Data_Record :=

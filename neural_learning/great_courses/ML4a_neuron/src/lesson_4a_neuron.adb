@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Base;
 with Base_Neural;
+with ML_Types;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Test_Support; use Test_Support;
@@ -33,6 +34,7 @@ begin
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
+      Layer_Sizes   : ML_Types.Integer_List;
       Sample_Weight : Real_Float_Vector (1 .. 0);
    begin
       Print_Matrix_Dimensions ("Train X", Train_X);
@@ -40,7 +42,7 @@ begin
       Print_Matrix_Dimensions ("Test X", Test_X);
       Print_Matrix_Dimensions ("Test Y", Test_Y);
       --  default Hidden_Layer_Sizes is empty list
-      MLP := C_Init (Max_Iter => 10000,
+      MLP := C_Init (Layer_Sizes, Max_Iter => 10000,
                      Activation => Base_Neural.Identity_Activation,
                      Verbose => False, Shuffle => True);
 
