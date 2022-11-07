@@ -4,8 +4,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with ML_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
-with Encode_Utils;
-with Stochastic_Optimizers;
 
 package Printing is
 
@@ -43,8 +41,6 @@ package Printing is
                                  theList : ML_Types.Integer_DL_List);
    procedure Print_Integer_Matrix (Name  : String; aMatrix : Integer_Matrix;
                                    Start : Integer := 1; Finish : Integer := 0);
-   procedure Print_Integer_Set (Name   : String;
-                                theSet : Encode_Utils.Int_Sets.Set);
    procedure Print_Natural_Lists_2D (Name : String;
                                      Data : NL_Types.Natural_Lists_2D);
    procedure Print_Float_Lists_2D (Name  : String;
@@ -59,9 +55,6 @@ package Printing is
    procedure Print_Multi_Value_Array (Name    : String;
                                       anArray : Multi_Value_Array);
    procedure Print_Natural_List (Name : String; theList : NL_Types.Natural_List);
-   procedure Print_Parameters
-     (Name       : String; Params : Stochastic_Optimizers.Parameters_Record;
-      Rows_Start : Positive := 1; Rows_Last : Positive := 10);
    procedure Print_Real_Vector_List (Name        : String;
                                      Vector_List : Real_Vector_List);
    procedure Print_Slice (Name : String; theSlice : NL_Types.Slice_Record);
@@ -73,8 +66,6 @@ package Printing is
                             theList : ML_Types.Indef_String_List);
    procedure Print_Unbounded_List (Name    : String;
                                    theList : ML_Types.Unbounded_List);
-   procedure Print_Unbounded_Set (Name   : String;
-                                  theSet : Encode_Utils.UB_String_Sets.Set);
    procedure Print_Value_Data_List (Name    : String;
                                     theList : ML_Types.Value_Data_List);
    procedure Print_Value_Data_Lists_2D (Name      : String;
