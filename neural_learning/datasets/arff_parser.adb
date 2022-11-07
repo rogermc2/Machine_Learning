@@ -15,11 +15,11 @@ package body ARFF_Parser is
      (ARFF_Container : AR_Types.ARFF_Record;
       Col_Slice_X    : Integer_DL_List;
       Col_Slice_Y    : Integer_DL_List;
-      X              : out Float_List_2D;
+      X              : out NL_Types.Float_List_2D;
       Y              : out Integer_List);
    function Split_Columns
      (Arff_Data       : AR_Types.AR_Real_List_2D;
-      Include_Columns : Integer_DL_List) return Float_List_2D;
+      Include_Columns : Integer_DL_List) return NL_Types.Float_List_2D;
    function Split_Columns
      (Arff_Target     : AR_Types.AR_Integer_List_2D;
       Include_Columns : Integer_DL_List) return Integer_List;
@@ -31,7 +31,7 @@ package body ARFF_Parser is
       Target_Columns : String_List;
       Col_Slice_X    : Integer_DL_List;
       Col_Slice_Y    : Integer_DL_List;
-      X              : out Float_List_2D;
+      X              : out NL_Types.Float_List_2D;
       Y              : out Integer_List) is
       use Ada.Containers;
       use AR_Types;
@@ -95,7 +95,7 @@ package body ARFF_Parser is
      (ARFF_Container : AR_Types.ARFF_Record;
       Col_Slice_X    : Integer_DL_List;
       Col_Slice_Y    : Integer_DL_List;
-      X              : out Float_List_2D;
+      X              : out NL_Types.Float_List_2D;
       Y              : out Integer_List) is
 --        Routine_Name    : constant String := "ARFF_Parser.Convert_Arff_Data ";
    begin
@@ -153,13 +153,13 @@ package body ARFF_Parser is
    function Split_Columns
      (Arff_Data       : AR_Types.AR_Real_List_2D;
       Include_Columns : Integer_DL_List)
-      return Float_List_2D is
+      return NL_Types.Float_List_2D is
       use Integer_DLL_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
-      Data_New      : Float_List_2D;
+      Data_New      : NL_Types.Float_List_2D;
       Include_Curs  : Integer_DLL_Package.Cursor;
       Arff_Data_Row : AR_Types.AR_Real_List;  --  list of columns
-      New_Row       : Float_List;
+      New_Row       : NL_Types.Float_List;
    begin
       for row in Arff_Data.First_Index .. Arff_Data.Last_Index loop
          New_Row.Clear;

@@ -56,7 +56,7 @@ package body Openml_Ada is
       --        Shape        : Shape_Data) is
       use Ada.Containers;
       use AR_Types;
-      use Integer_DLL_Package;
+      use ML_Types.Integer_DLL_Package;
       use Attribute_Data_Package;
       use String_Package;
       Routine_Name       : constant String :=
@@ -67,8 +67,8 @@ package body Openml_Ada is
 --        Data_Cursor        : String_Package.Cursor := Data_Column_Names.First;
       Target_Cursor      : String_Package.Cursor := Target_Column_Names.First;
       Col_Name           : Unbounded_String;
-      Col_Slice_X        : Integer_DL_List;
-      Col_Slice_Y        : Integer_DL_List;
+      Col_Slice_X        : ML_Types.Integer_DL_List;
+      Col_Slice_Y        : ML_Types.Integer_DL_List;
       --        Num_Missing        : Integer;
       --        Return_Type        : ARFF_Return_Type;
       X                  : Float_List_2D;
