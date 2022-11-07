@@ -5,7 +5,6 @@ with ML_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 with Encode_Utils;
-with Export_Types;
 with Stochastic_Optimizers;
 
 package Printing is
@@ -21,15 +20,9 @@ package Printing is
      (Name : String; anArray : Boolean_Array);
    procedure Print_Boolean_Matrix (Name  : String; aMatrix : Boolean_Matrix;
                                    Start : Integer := 1; Finish : Integer := 0);
-   procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List);
-   procedure Print_Colours_List (Name    : String;
-                                 Colours : Export_Types.Colours_List);
-   procedure Print_Integer_Colours_List
-     (Name : String; Colours : Export_Types.Integer_Colours_List);
    procedure Print_Integer_Array
      (Name  : String; anArray : Integer_Array;
       Start : Integer := 1; Finish : Integer := 0);
-   procedure Print_Export_Map (Name : String; aMap : Export_Types.Export_Map);
    procedure Print_Float_Array (Name   : String; anArray : Real_Float_Vector;
                                 Start  : Integer := 1;
                                 Finish : Integer := 0);
@@ -71,7 +64,6 @@ package Printing is
       Rows_Start : Positive := 1; Rows_Last : Positive := 10);
    procedure Print_Real_Vector_List (Name        : String;
                                      Vector_List : Real_Vector_List);
-   procedure Print_RGB_Array (Name : String; anArray : Export_Types.RGB_Array);
    procedure Print_Slice (Name : String; theSlice : NL_Types.Slice_Record);
    procedure Print_Slices (Name  : String; theList : NL_Types.Slices_List;
                            Start : Positive := 1; Last : Positive := 10);
