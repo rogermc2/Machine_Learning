@@ -9,6 +9,7 @@ with Utils;
 
 with Classifier_Utilities;
 with Label;
+with ML_Types;
 --  with Test_Support;
 with Utilities;
 
@@ -354,14 +355,13 @@ package body Samples_Generator is
       --  from which the data was drawn
       Return_Distributions : Boolean := False)
        return Multilabel_Classification_Test_Data is
-      use NL_Types;
 --        Routine_Name : constant String :=
 --                         "Samples_Generator.Make_Multilabel_Classification ";
-      Cum_P_C_List : Float_List;
+      Cum_P_C_List : NL_Types.Float_List;
 
       --  Sample_Example returns one sample example word vector and Y vector
       function Sample_Example
-        (P_W_C_Ex : Real_Float_Matrix; Y_Gen : out Integer_List)
+        (P_W_C_Ex : Real_Float_Matrix; Y_Gen : out ML_Types.Integer_List)
            return Integer_Array is
          Routine_Name : constant String :=
                           "Samples_Generator.Make_Multilabel_Classification." &
@@ -372,7 +372,7 @@ package body Samples_Generator is
          Y_Size       : Natural := Num_Classes + 1;
          Prob         : NL_Types.Float_List;
          Num_Words    : Natural := 0;
-         Class        : Integer_List;
+         Class        : ML_Types.Integer_List;
       begin
          --  L403 pick a nonzero number of labels per document by rejection
          --  sampling
@@ -419,10 +419,11 @@ package body Samples_Generator is
          --                       Integer'Image (Num_Words));
 
          declare
+            use NL_Types;
             use Float_Package;
             use Float_Sorting;
             Words                                : Integer_Array (1 .. Num_Words);
-            Word_List                            : Integer_List;
+            Word_List                            : ML_Types.Integer_List;
             Cum_P_W_Sample                       : Float_Array (1 .. Num_Classes);
             Cum_Sample_List                      : Float_List;
             P_W_C_2                              : Real_Float_Matrix
@@ -510,9 +511,9 @@ package body Samples_Generator is
       Classification : Multilabel_Classification_Test_Data
         (N_Samples, N_Features, N_Classes, Return_Distributions);
       LB             : Label.Label_Binarizer;
-      Y              : Array_Of_Integer_Lists (1 .. N_Samples);
-      X_Indices      : Integer_List;
-      X_Ind_Ptr      : Array_Of_Integer_Lists (1 .. N_Samples);
+      Y              : ML_Types.Array_Of_Integer_Lists (1 .. N_Samples);
+      X_Indices      : ML_Types.Integer_List;
+      X_Ind_Ptr      : ML_Types.Array_Of_Integer_Lists (1 .. N_Samples);
    begin
       for index in P_C'Range loop
          P_C (index) := abs (Maths.Random_Float);
@@ -536,7 +537,7 @@ package body Samples_Generator is
          --           Put_Line (Routine_Name & "L436 sample_index:" &
          --                       Integer'Image (sample_index));
          declare
-            Sample_Y  : Integer_List;
+            Sample_Y  : ML_Types.Integer_List;
             --  L437
             Words     : constant Integer_Array :=
                           Sample_Example (P_W_C, Sample_Y);
