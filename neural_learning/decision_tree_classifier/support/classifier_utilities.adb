@@ -318,6 +318,7 @@ package body Classifier_Utilities is
 
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return ML_Types.Multi_Output_Data_Record is
+--        Routine_Name : constant String := "Classifier_Utilities.Load_Data ";
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
       Output_Data  : ML_Types.Multi_Output_Data_Record;

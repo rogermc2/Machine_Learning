@@ -31,7 +31,7 @@ procedure Lesson_3P2 is
    --     Correct       : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 begin
-   Put_Line ("Lesson 3");
+   Put_Line (Routine_Name);
    Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
    while Has_Element (Names_Cursor) loop
       Features.Append (Element (Names_Cursor));
@@ -45,8 +45,7 @@ begin
    Python.Initialize;
    Python.Execute_String ("import tree");
    Python.Execute_String ("from tree import base");
-   --     Base := Python.Import_File ("../../python/base");
-   Classes := Python.Import_File ("classes");
+   Classes := Python.Import_File ("tree.classes");
    Python.Execute_String ("from tree import classes");
    Put_Line ("Lesson 3 modules loaded");
 

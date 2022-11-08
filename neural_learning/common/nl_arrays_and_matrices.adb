@@ -833,7 +833,20 @@ package body NL_Arrays_And_Matrices is
             for row in Result'Range loop
                List_Row := List (row);
                for col in Result'Range (2) loop
-                  Result (row, col) := List_Row (col).Integer_Value;
+                  case List_Row (col).Value_Kind is
+                     when Boolean_Type =>
+                        if List_Row.Element (col).Boolean_Value then
+                           Result (row, col) := 1;
+                        else
+                           Result (row, col) := 0;
+                        end if;
+                     when Float_Type =>
+                        Result (row, col) :=
+                          Integer (List_Row.Element (col).Float_Value);
+                     when Integer_Type =>
+                        Result (row, col) := List_Row (col).Integer_Value;
+                     when UB_String_Type => Result (row, col) := 0;
+                  end case;
                end loop;
             end loop;
             return Result;
@@ -887,7 +900,7 @@ package body NL_Arrays_And_Matrices is
       Result : Integer_Matrix (IA'Range, 1 .. 1);
    begin
       for row in IA'Range loop
-               Result (row, 1) := IA (row);
+         Result (row, 1) := IA (row);
       end loop;
 
       return Result;
