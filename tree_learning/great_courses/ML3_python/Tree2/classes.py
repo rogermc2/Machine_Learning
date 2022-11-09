@@ -1,8 +1,8 @@
 
 from abc import ABCMeta
-from base import BaseEstimator
-from base import MultiOutputMixin
-from base import ClassifierMixin
+from Tree2.base import BaseEstimator
+from Tree2.base import MultiOutputMixin
+from Tree2.base import ClassifierMixin
 __all__ = [
            "BaseDecisionTree",
            "DecisionTreeClassifier",

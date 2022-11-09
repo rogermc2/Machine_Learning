@@ -59,28 +59,16 @@ begin
    Put_Line ("Lesson 3 load.py");
    Python.Execute_File ("load.py", Errors => Errors);
    Assert (not Errors, "Execute_File load.py failed");
-   Put_Line ("Lesson 3 file executed");
+   Put_Line ("Lesson 3 load.py file executed");
 
-   Python.Execute_Command ("print ('cwd: ', os.getcwd())", Errors => Errors);
-   Python.Execute_Command (Command => "os.listdir(os.getcwd())",
-                           Errors => Errors);
-   Assert (not Errors, "os.listdir(os.getcwd()) failed");
---
---     Python.Execute_Command ("import Tree2", Errors => Errors);
---     Put_Line ("Errors: " & Boolean'Image (Errors));
---     Assert (not Errors, "import Tree2 failed");
---     Put_Line ("Lesson 3 Tree imported");
---     Python.Execute_Command (Command => "cwd = os.path.join (cwd, 'Tree2')",
+--     Python.Execute_Command ("print ('cwd: ', os.getcwd())", Errors => Errors);
+--     Python.Execute_Command (Command => "os.listdir(os.getcwd())",
 --                             Errors => Errors);
---     Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
---     Python.Execute_Command (Command => "os.listdir(os.getcwd())", Errors => Errors);
---     Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
---     Python.Execute_Command ("import base", Errors => Errors);
---     Python.Execute_Command ("import classes", Errors => Errors);
+   Assert (not Errors, "os.listdir(os.getcwd()) failed");
 
---     Python.Execute_Command
---       ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)",
---        Errors => Errors);
+   Python.Execute_Command
+     ("clf = Tree2.classes.DecisionTreeClassifier(max_leaf_nodes = 3)",
+      Errors => Errors);
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
 --     Put_Line ("Lesson 3 fit");
