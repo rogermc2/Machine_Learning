@@ -10,13 +10,13 @@ with ML_Types;
 
 with Classifier_Utilities;
 --  with Graphviz_Exporter;
---  with Printing;
+--  with Tree_Printing;
 
 procedure Lesson_3P is
    use ML_Types;
    use ML_Types.String_Package;
 --     use Printing;
-   Routine_Name  : constant String := "Lesson_3P";
+   Routine_Name  : constant String := "Lesson_3P ";
    Data          : constant Multi_Output_Data_Record :=
                      Classifier_Utilities.Load_Data ("../diabetes.csv");
    Feature_Names : constant String_List := Data.Feature_Names;
@@ -56,10 +56,10 @@ begin
    Assert (not Errors, "os.chdir(cwd) failed");
    Python.Execute_Command ("print ('cwd: ', os.getcwd())", Errors => Errors);
 
-   Put_Line ("Lesson 3 load.py");
+--     Put_Line (Routine_Name & "load.py");
    Python.Execute_File ("load.py", Errors => Errors);
    Assert (not Errors, "Execute_File load.py failed");
-   Put_Line ("Lesson 3 load.py file executed");
+   Put_Line (Routine_Name & "load.py file executed");
 
 --     Python.Execute_Command ("print ('cwd: ', os.getcwd())", Errors => Errors);
 --     Python.Execute_Command (Command => "os.listdir(os.getcwd())",
@@ -69,14 +69,16 @@ begin
    Python.Execute_Command
      ("clf = Tree2.classes.DecisionTreeClassifier(max_leaf_nodes = 3)",
       Errors => Errors);
+   Assert (not Errors, "set clf failed");
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
---     Put_Line ("Lesson 3 fit");
---     Python.Execute_Command ("clf = fit(X_Data, Labels)", Errors => Errors);
-   --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
-   --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
+   Put_Line (Routine_Name & "fit");
+   Python.Execute_Command ("clf = fit(X_Data, Labels)", Errors => Errors);
+   Assert (not Errors, "fit failed");
+--        Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
+--        Tree_Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
-   Put_Line ("Lesson 3 competed.");
+   Put_Line (Routine_Name & "completed.");
    New_Line;
 
    --     for index in X_Data.First_Index .. X_Data.Last_Index loop
