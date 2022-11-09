@@ -12,11 +12,11 @@ with Classifier_Utilities;
 --  with Graphviz_Exporter;
 --  with Printing;
 
-procedure Lesson_3 is
+procedure Lesson_3P is
    use ML_Types;
    use ML_Types.String_Package;
 --     use Printing;
-   Routine_Name  : constant String := "Lesson_3";
+   Routine_Name  : constant String := "Lesson_3P";
    Data          : constant Multi_Output_Data_Record :=
                      Classifier_Utilities.Load_Data ("../diabetes.csv");
    Feature_Names : constant String_List := Data.Feature_Names;
@@ -33,7 +33,7 @@ procedure Lesson_3 is
    --     Correct       : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 begin
-   Put_Line ("Lesson 3");
+   Put_Line ("Lesson 3P");
    Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
    while Has_Element (Names_Cursor) loop
       Features.Append (Element (Names_Cursor));
@@ -51,7 +51,8 @@ begin
    Python.Execute_Command ("import os", Errors => Errors);
    Python.Execute_Command ("cwd = os.getcwd()", Errors => Errors);
    Assert (not Errors, "os.getcwd()");
-   Python.Execute_Command (Command => "os.chdir(os.path.join (cwd, 'src'))", Errors => Errors);
+   Python.Execute_Command (Command => "os.chdir(os.path.join (cwd, 'src'))",
+                           Errors => Errors);
    Assert (not Errors, "os.chdir(cwd) failed");
    Python.Execute_Command ("print ('cwd: ', os.getcwd())", Errors => Errors);
 
@@ -110,4 +111,4 @@ begin
    --       (Exporter, aClassifier.Attributes.Decision_Tree, Feature_Names => Features,
    --        Output_File_Name => To_Unbounded_String ("diabetes.dot"));
 
-end Lesson_3;
+end Lesson_3P;
