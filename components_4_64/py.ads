@@ -205,45 +205,35 @@ package Py is
    function Import_GetModule (Name : String) return Handle;
    function Sys_GetObject (Name : String) return Handle;
 -- function Sys_GetSizeOf (Object : Handle) return ssize_t;
+
 ------------------------------------------------------------------------
 -- Strings and bytes array
---
 -- As_String -- Get UTF-8 string
---
 --    Object - The string object
---
 -- Returns :
---
 --    UTF-8 encoded string
---
+
    function As_String (Object : Handle) return String;
---
+
 -- Byte{s|Array}_AsString -- Get bytes
---
 --    Object - Bytes object
---
 -- Note that strings are not bytes.  In order to get bytes from a string
 -- it must be encoded, e.g. as str.encode("Hello World!")
---
 -- Returns :
---
 --    The corresponding string or stream element array
---
+
    function ByteArray_AsString (Object : Handle) return String;
    function ByteArray_AsString (Object : Handle)
       return Stream_Element_Array;
    function Bytes_AsString (Object : Handle) return String;
    function Bytes_AsString (Object : Handle)
       return Stream_Element_Array;
---
+
 -- Byte{s|Array}_FromString -- Store bytes
---
 --    Value - A string or an array of stream elements
---
 -- Returns :
---
 --    A handle to the new object
---
+
    function ByteArray_FromString (Value : String) return Handle;
    function ByteArray_FromString (Value : Stream_Element_Array)
       return Handle;
@@ -254,15 +244,17 @@ package Py is
    function ByteArray_Size (Object : Handle) return ssize_t;
    function Bytes_Size (Object : Handle) return ssize_t;
    function Bytes_Type return Handle;
+
    function Unicode_DecodeFSDefault (Name : String) return Handle;
    function Unicode_FromString (Name : String) return Handle;
    function Unicode_GetLength (Object : Handle) return ssize_t;
    function Unicode_ReadChar (Object : Handle; Index : ssize_t)
       return Wide_Wide_Character;
    function Unicode_Type return Handle;
+
 ------------------------------------------------------------------------
 -- Dictionaries
---
+
 --  function Dict_Check (Dictionary : Handle; Exact : Boolean := False)
 --     return Boolean;
    procedure Dict_Clear (Dictionary : Handle);
@@ -419,9 +411,10 @@ package Py is
 --    The next iterator or an invalid handle at the end
 --
    function Iter_Next (Iterator : Handle) return Handle;
+
 ------------------------------------------------------------------------
 -- Lists
---
+
    procedure List_Append (List : Handle; Item : Handle);
    function List_AsTuple (List : Handle) return Handle;
 -- function List_Check (List : Handle; Exact : Boolean := False)
@@ -597,9 +590,10 @@ package Py is
    function Object_Type (Object : Handle) return Handle;
    function Type_IsSubtype (Sub, Super : Handle) return Boolean;
    function Type_Type return Handle;
+
 ------------------------------------------------------------------------
 -- Sequences
---
+
    function Sequence_Check (Sequence : Handle) return Boolean;
    function Sequence_Concat (Left, Right : Handle) return Handle;
    function Sequence_Count
@@ -647,9 +641,10 @@ package Py is
              );
    function Sequence_Size (Sequence : Handle) return ssize_t;
    function Sequence_Tuple (Sequence : Handle) return Handle;
+
 ------------------------------------------------------------------------
 -- Sets
---
+
    procedure Set_Add (Set : Handle; Item : Handle);
    procedure Set_Clear (Set : Handle);
    function Set_Contains (Set : Handle; Item : Handle) return Boolean;
@@ -659,6 +654,7 @@ package Py is
    function Set_Size (Set : Handle) return ssize_t;
 
    function Set_Type return Handle;
+
 ------------------------------------------------------------------------
 -- Time conversions between Ada and Python.  A Python object is provided
 -- by the datetime module. The type is datetime.datetime. For conversion
@@ -1497,10 +1493,10 @@ private
 
    function Quit (Data : System.Address) return int;
    pragma Convention (C, Quit);
+
 ------------------------------------------------------------------------
---
 -- Python DLL entry points
---
+
    type AddPendingCall_Ptr is access function
         (  Call : Pending_Call_Ptr;
            Data : System.Address
@@ -2643,56 +2639,47 @@ private
    type Object_Array is array (Argument_Position range <>) of Object;
 
    package Keyword_Tables is new Tables (Boolean);
-
    package Object_Tables is new Tables (Argument_Position);
 
    type Position_Array is
       array (Argument_Position range <>) of Positive;
    type Optional_Array is
       array (Argument_Position range <>) of Boolean;
---
+
 -- Argument_List -- List of Python keyword arguments. Note that the list
 --                  cannot  contain  reserved  keywords.   Use_Error  is
 -- propagated on an attempt to include a reserved keyword.
---
+
    type Argument_List (Length : Argument_Position) is record
       Keys     : Object_Tables.Table;        -- Key tp position map
       Offsets  : Position_Array (1..Length); -- Position to key map
       Optional : Optional_Array (1..Length); -- Optional flag
    end record;
---
+
 -- + -- Add a mandatory argument
---
    function "+" (Left : String) return Argument_List;
    function "+" (Left, Right : String) return Argument_List;
    function "+" (List : Argument_List; Key : String)
       return Argument_List;
---
+
 -- - -- Add an optional argument
---
    function "-" (Left : String) return Argument_List;
    function "-" (Left, Right : String) return Argument_List;
    function "-" (List : Argument_List; Key : String)
       return Argument_List;
---
+
 -- Parse -- Parsing keyed arguments
---
 --    Args     - The positional arguments tuple as passed to the caller
 --    Keywords - The keyed arguments dictionary
 --    List     - The parsed arguments
---
+
 -- Returns :
---
 --    Actual  arguments  in their order.  If a argument  is omitted  the
 --    result contains Null_Object in its position.
---
+
 -- Exceptions :
---
 --    Python_Error - An error in arguments and a Python exception is set
---
+
    function Parse
-            (  Args     : Object;
-               Keywords : Object;
-               List     : Argument_List
-            )  return Object_Array;
+            (Arg, Keywords : Object; List : Argument_List)  return Object_Array;
 end Py;
