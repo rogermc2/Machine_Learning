@@ -123,7 +123,11 @@ begin
 
 \begin_deeper
 \begin_layout LyX-Code
-Load -- Load library
+-- Load library
+\end_layout
+
+\begin_layout LyX-Code
+Load
 \end_layout
 
 \begin_layout LyX-Code
@@ -138,6 +142,7 @@ Initialize; -- Initialize environment
 declare
 \end_layout
 
+\begin_deeper
 \begin_layout LyX-Code
 GIL    : Global_Interpreter_Lock;
 \end_layout
@@ -154,10 +159,12 @@ Args   : Handle;
 Result : Handle;
 \end_layout
 
+\end_deeper
 \begin_layout LyX-Code
 begin
 \end_layout
 
+\begin_deeper
 \begin_layout LyX-Code
 -- Compile Python source and find the entry point in there
 \end_layout
@@ -187,6 +194,7 @@ Tuple_SetItem (Args, 0, Unicode_FromString ("Python"));
 Result := Object_CallObject (Hello, Args, True);
 \end_layout
 
+\end_deeper
 \begin_layout LyX-Code
 end;
 \end_layout
