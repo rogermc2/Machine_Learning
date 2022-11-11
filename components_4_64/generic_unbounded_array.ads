@@ -67,67 +67,50 @@ package Generic_Unbounded_Array is
    record
       Vector : Object_Array_Ptr := null;
    end record;
---
+
 -- Erase -- Delete all array items
---
 --    Container - The array
---
 -- This procedure makes Container empty.
---
    procedure Erase (Container : in out Unbounded_Array);
---
+
 -- Finalize -- Destructor
---
 --    Container - The array
 --
    procedure Finalize (Container : in out Unbounded_Array);
---
+
 -- Fetch -- Get an array element by its index
---
 --    Container - The array
 --    Index     - Of the element
---
 -- This  function  returns  the  element  corresponding to Index. If the
 -- container does not have it, the result is Null_Element.
---
 -- Returns :
---
 --    The element
---
    function Fetch
             (  Container : Unbounded_Array;
                Index     : Index_Type
             )  return Object_Type;
---
+
 -- Get -- Get an array element by its index
---
 --    Container - The array
 --    Index     - Of the element
---
 -- This  an  equivalent  to Container.Vector (Index). However, subscript
 -- checks cannot be suppressed for Get.
---
 -- Returns :
---
 --    The element
---
+
 -- Exceptions :
---
 --    Constraint_Error - Wrong index
---
+
    function Get
             (  Container : Unbounded_Array;
                Index     : Index_Type
             )  return Object_Type;
---
+
 -- Put -- Replace an array element by its index
---
 --    Container - The array
 --    Index     - Of the element
 --    Element   - To put in
---
 -- The array is expanded as necessary.
---
    procedure Put
              (  Container : in out Unbounded_Array;
                 Index     : Index_Type;
@@ -137,4 +120,5 @@ package Generic_Unbounded_Array is
 private
    pragma Inline (Fetch);
    pragma Inline (Get);
+
 end Generic_Unbounded_Array;

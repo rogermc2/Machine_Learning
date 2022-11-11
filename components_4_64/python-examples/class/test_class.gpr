@@ -6,12 +6,14 @@ project Test_Class is
    for Source_Dirs use (".", "../../../components_4_64", "../../os/pthreads");
    for Main use ("test_class.adb");
    for Source_Files use ("py-class.adb", "py-class.ads", "test_class.adb");
-   for Object_Dir use Components.Object_Dir_Path;
+   for Object_Dir use "obj";
    for Languages use ("Ada");
 
    package Binder is
       for Switches ("ada") use ("-E");
    end Binder;
+
+   for Exec_Dir use ".";
 
 end Test_Class;
 
