@@ -49,15 +49,14 @@ begin
       Args   : Handle;
       Result : Handle;
    begin
-      Code :=
-        Compile (  "import sample_module"                    & LF &
-                     "def Code():"                             & LF &
-                     "   s = sample_module.operation(1,b='?')" & LF &
-                     "   print(s)",
-                   "test.py");
+      Code := Compile ("import sample_module"                    & LF &
+                       "def Code():"                             & LF &
+                       "   s = sample_module.operation(1,b='?')" & LF &
+                       "   print(s)",
+                       "test.py");
       Args   := Tuple_New (0);
       Result := Object_CallObject (Code, Args, True);
-   end;
+   end;  --  declare block
 
    if Py.FinalizeEx < 0 then
       Put_Line ("Python finalization error");
@@ -67,4 +66,5 @@ begin
 exception
    when Error : others =>
       Put_Line ("Error: " & Exception_Information (Error));
+
 end Test_Module;
