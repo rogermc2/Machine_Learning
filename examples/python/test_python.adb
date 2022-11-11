@@ -116,6 +116,7 @@ procedure Test_Python is
             Put_Line ("Python GIL released by the thread");
          or terminate;
          end select;
+
       end loop;
 
    end Worker;
@@ -129,7 +130,6 @@ begin
    declare
       use Ada.Characters.Latin_1;
       use Py;
-      GIL    : Global_Interpreter_Lock;
       Hello  : Handle;
       Args   : Handle;
       Result : Handle;
@@ -145,7 +145,6 @@ begin
    declare
       use Ada.Directories;
       use Py;
-      GIL    : Global_Interpreter_Lock;
       Source : File_Type;
       Hello  : Handle;
       Args   : Handle;
@@ -155,20 +154,22 @@ begin
       Put_Line (Source, "def Hello(s):");
       Put_Line (Source, "   print (""Hello ""+s+'!')");
       Close (Source);
+
       Hello := Import ("hello.py", "Hello");
       Delete_File ("hello.py");
+
       Args := Tuple_New (1);
       Tuple_SetItem (Args, 0, Unicode_FromString ("Python"));
       Result := Object_CallObject (Hello, Args, True);
    end;  --  declare block
 
    declare
-      GIL   : Py.Global_Interpreter_Lock;
       State : Py.ThreadState;
    begin
       Put_Line ("Python GIL taken");
       State := Py.Eval_SaveThread;
       Put_Line ("Python GIL released");
+
       Worker.Engage;
       Worker.Disengage;
       Py.Eval_RestoreThread (State);
