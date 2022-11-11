@@ -1,0 +1,373 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 15mm
+\topmargin 10mm
+\rightmargin 10mm
+\bottommargin 10mm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Interfacing Python Language
+\end_layout
+
+\begin_layout Standard
+The package Py provides interfacing with the Python language.
+ 
+\end_layout
+
+\begin_layout Standard
+The bindings are dynamic so that they can be used on demand without imposing
+ a dependency on any external library.
+ 
+\end_layout
+
+\begin_layout Standard
+The following is a hello-world example in Python called from Ada program
+ using the bindings:
+\end_layout
+
+\begin_layout Standard
+File hello_python.adb:
+\end_layout
+
+\begin_layout LyX-Code
+with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
+\end_layout
+
+\begin_layout LyX-Code
+with Py; use Py;
+\end_layout
+
+\begin_layout LyX-Code
+procedure Hello_Python is
+\end_layout
+
+\begin_layout LyX-Code
+begin
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+Load -- Load library
+\end_layout
+
+\begin_layout LyX-Code
+(Load_Python_Library.Get_Python_Path & Load_Python_Library.Get_Default_Name);
+\end_layout
+
+\begin_layout LyX-Code
+Initialize; -- Initialize environment
+\end_layout
+
+\begin_layout LyX-Code
+declare
+\end_layout
+
+\begin_layout LyX-Code
+GIL    : Global_Interpreter_Lock;
+\end_layout
+
+\begin_layout LyX-Code
+Hello  : Handle;
+\end_layout
+
+\begin_layout LyX-Code
+Args   : Handle;
+\end_layout
+
+\begin_layout LyX-Code
+Result : Handle;
+\end_layout
+
+\begin_layout LyX-Code
+begin
+\end_layout
+
+\begin_layout LyX-Code
+-- Compile Python source and find the entry point in there
+\end_layout
+
+\begin_layout LyX-Code
+Hello := Compile ("def Hello(s):" & LF & " print (""Hello ""+s+'!')", "hello.py")
+; 
+\end_layout
+
+\begin_layout LyX-Code
+-- Create an argument list
+\end_layout
+
+\begin_layout LyX-Code
+Args := Tuple_New (1);
+\end_layout
+
+\begin_layout LyX-Code
+Tuple_SetItem (Args, 0, Unicode_FromString ("Python"));
+\end_layout
+
+\begin_layout LyX-Code
+-- Make a call to Hello
+\end_layout
+
+\begin_layout LyX-Code
+Result := Object_CallObject (Hello, Args, True);
+\end_layout
+
+\begin_layout LyX-Code
+end;
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+if FinalizeEx < 0 then -- Finalize environment
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+Put_Line ("Python finalization error");
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+end if;
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+end Hello_Python; 
+\end_layout
+
+\begin_layout Standard
+The naming conventions of the subprograms follow the names of the corresponding
+ function of the Python/C API with the prefix Py or Py_ removed.
+ 
+\end_layout
+
+\begin_layout Standard
+E.g.
+ the API function PyTuple_SetItem is named Tuple_SetItem in the bindings.
+ 
+\end_layout
+
+\begin_layout Standard
+The bindings provide high-level conversions to Python from Ada and back
+ with exception handling and reference counting.
+\end_layout
+
+\begin_layout Standard
+The private part of the package also provides direct bindings to Python
+ vectorized by the structure Links initialized when the Python dynamic library
+ is loaded.
+\end_layout
+
+\begin_layout Standard
+Therefore, Links.PyTuple_SetItem would be a direct API function call with
+ C arguments and C convention.
+\end_layout
+
+\begin_layout Standard
+Additionally the Python datetime capsule is automatically loaded and conversions
+ between the Python datetime.datetime objects and Ada.Calendar.Time are provided.
+\end_layout
+
+\begin_layout Section
+Initialization and finalization
+\end_layout
+
+\begin_layout Standard
+The bindings are dynamic and do not impose any dependency on Python libraries.
+\end_layout
+
+\begin_layout Standard
+Before anything else, a Python dynamic library must be loaded:
+\end_layout
+
+\begin_layout LyX-Code
+procedure Load (Name : String := "");
+\end_layout
+
+\begin_layout Standard
+The parameter Name specifies the library path.
+\end_layout
+
+\begin_layout Standard
+The child package Py.Load_Python_Library provides a helper function to search
+ for the Python installation:
+\end_layout
+
+\begin_layout LyX-Code
+function Get_Default_Name (Major : Natural := 7) return String;
+\end_layout
+
+\begin_layout Standard
+This function returns the default name of the Python dynamic library.
+ 
+\end_layout
+
+\begin_layout Standard
+The number n must be at least Major.
+\end_layout
+
+\begin_layout Standard
+If no library is found the result is libpython3.so.
+\end_layout
+
+\begin_layout LyX-Code
+function Get_Extension return String;
+\end_layout
+
+\begin_layout Standard
+This function returns the dynamic library extension, e.g.
+ "*.dll" or "*.so".
+\end_layout
+
+\begin_layout LyX-Code
+function Get_Python_Path (Major : Natural := 7) return String;
+\end_layout
+
+\begin_layout Standard
+This function returns the Python installation path following the directory
+ separator if not empty.
+ 
+\end_layout
+
+\begin_layout Standard
+The parameter Major specifies the minimal major version required, e.g.3.7 by
+ default.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+function Is_Loaded return Boolean;
+\end_layout
+
+\begin_layout Standard
+This function returns true if the Python dynamic library is loaded.
+\end_layout
+
+\begin_layout Standard
+After the library is loaded it must be initialized by the following procedure
+ from the package Py:
+\end_layout
+
+\begin_layout LyX-Code
+procedure Initialize;
+\end_layout
+
+\begin_layout Standard
+Before unloading the library it must be finalized:
+\end_layout
+
+\begin_layout LyX-Code
+function FinalizeEx return int;
+\end_layout
+
+\begin_layout Standard
+This function from the package Py returns negative value on errors.
+\end_layout
+
+\begin_layout Standard
+The Python bindings frame is as follows:
+\end_layout
+
+\begin_layout Enumerate
+Load in order to load the Python dynamic library.
+\end_layout
+
+\begin_layout Enumerate
+Load custom modules into the Python environment.
+\end_layout
+
+\begin_layout Enumerate
+Initialize to make the Python environment ready.
+\end_layout
+
+\begin_layout Enumerate
+Calling other subprograms from the bindings while taking the Global Interpreter
+ Lock .
+\end_layout
+
+\begin_layout Enumerate
+FinalizeEx to finalize the Python environment and free any resources allocated
+ by it.
+\end_layout
+
+\end_body
+\end_document
