@@ -114,7 +114,9 @@ procedure Test_Python is
             end;  --  declare block
 
             Put_Line ("Python GIL released by the thread");
-         or terminate;
+
+         or
+            terminate;
          end select;
 
       end loop;

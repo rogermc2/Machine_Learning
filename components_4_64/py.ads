@@ -43,26 +43,24 @@ package Py is
    procedure Load (Name : String := "");
    type ssize_t is new ptrdiff_t;
    type hash_t  is new ssize_t;
---
+
 -- Python Global Interpreter Lock (GIL)
---
 -- The  object  takes  GIL upon  initialization  and  releases  it  when
 -- finalized.  All calls must be done  under the lock except  explicitly
 -- stated in Python documentation.
---
    type Global_Interpreter_Lock is
       new Ada.Finalization.Limited_Controlled with private;
    procedure Finalize (Lock : in out Global_Interpreter_Lock);
    procedure Initialize (Lock : in out Global_Interpreter_Lock);
---
+
 -- Handle -- To Python object. Maintains a reference count automatically
 --           increased on assignment and decreased on finalization
---
    type Handle is new Ada.Finalization.Controlled with private;
    function No_Value return Handle;
    procedure Check_Handle (Object : Handle);
    procedure Invalidate (Object : in out Handle);
    function Is_Valid (Object : Handle) return Boolean;
+
 ------------------------------------------------------------------------
 -- General Python template is
 --
@@ -172,9 +170,8 @@ package Py is
                 No_Error    : out Boolean;
                 Decorator   : String := Character'Val (13) &
                                         Character'Val (10) &
-                                        "   "
-             );
---
+                                        "   ");
+
 -- Import_ExecCodeModuleEx -- Import module from compiled code
 --
 --    Name - The module name
@@ -2681,5 +2678,5 @@ private
 --    Python_Error - An error in arguments and a Python exception is set
 
    function Parse
-            (Arg, Keywords : Object; List : Argument_List)  return Object_Array;
+            (Args, Keywords : Object; List : Argument_List)  return Object_Array;
 end Py;

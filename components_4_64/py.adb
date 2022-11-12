@@ -2579,10 +2579,7 @@ package body Py is
    --  -------------------------------------------------------------------------
 
    function Parse
-     (  Args     : Object;
-        Keywords : Object;
-        List     : Argument_List
-       )  return Object_Array is
+     (Args, Keywords : Object; List : Argument_List) return Object_Array is
       use Object_Tables;
 
       procedure Error (Message : String) is
