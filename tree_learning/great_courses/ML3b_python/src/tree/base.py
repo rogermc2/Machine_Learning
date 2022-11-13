@@ -3,36 +3,32 @@
 # Author: Gael Varoquaux <gael.varoquaux@normalesup.org>
 # License: BSD 3 clause
 
-#import copy
-#import warnings
-#from collections import defaultdict
-#import platform
-#import inspect
-#import re
-#
-#import numpy as np
-#
-#from . import __version__
-#from ._config import get_config
-#from .utils import _IS_32BIT
-#from .utils._tags import (
-#    _DEFAULT_TAGS,
-#)
-#from .utils.validation import check_X_y
-#from .utils.validation import check_array
-#from .utils.validation import _check_y
-#from .utils.validation import _num_features
-#from .utils.validation import _check_feature_names_in
-#from .utils.validation import _generate_get_feature_names_out
-#from .utils.validation import check_is_fitted
-#from .utils._estimator_html_repr import estimator_html_repr
-#from .utils.validation import _get_feature_names
+# import copy
+# import warnings
+# from collections import defaultdict
+# import platform
+# import inspect
+# import re
+
+# import numpy as np
+
+# from . import __version__
+# from ._config import get_config
+# from .utils import _IS_32BIT
+# from .utils._tags import (_DEFAULT_TAGS,)
+# from .utils.validation import check_X_y
+from tree.validation import check_array
+# from .utils.validation import _check_y
+# from .utils.validation import _num_features
+# from .utils.validation import _check_feature_names_in
+# from .utils.validation import _generate_get_feature_names_out
+# from .utils.validation import check_is_fitted
+# from .utils._estimator_html_repr import estimator_html_repr
+from tree.validation import _get_feature_names
 
 
 def clone(estimator, *, safe=True):
-    #Construct a new unfitted estimator with the same parameters.
-
-   
+    # Construct a new unfitted estimator with the same parameters.   
     estimator_type = type(estimator)
     # XXX: not handling dictionaries
     if estimator_type in (list, tuple, set, frozenset):
@@ -43,9 +39,9 @@ def clone(estimator, *, safe=True):
         else:
             if isinstance(estimator, type):
                 raise TypeError(
-                    "Cannot clone object. "
-                    + "You should provide an instance of "
-                    + "scikit-learn estimator instead of a class."
+                    "Cannot clone object. " +
+                    "You should provide an instance of " +
+                    "scikit-learn estimator instead of a class."
                 )
             else:
                 raise TypeError(
@@ -69,7 +65,8 @@ def clone(estimator, *, safe=True):
         if param1 is not param2:
             raise RuntimeError(
                 "Cannot clone object %s, as the constructor "
-                "either does not set or modifies parameter %s" % (estimator, name)
+                "either does not set or modifies parameter %s"
+                % (estimator, name)
             )
     return new_object
 
@@ -112,12 +109,10 @@ def _pprint(params, offset=0, printer=repr):
 
 class BaseEstimator:
     """Base class for all estimators in scikit-learn.
-
     All estimators should specify all the parameters that can be set
     at the class level in their ``__init__`` as explicit keyword
     arguments (no ``*args`` or ``**kwargs``).
     """
-
     @classmethod
     def _get_param_names(cls):
         """Get parameter names for the estimator"""
@@ -362,14 +357,11 @@ class BaseEstimator:
 
     def _check_feature_names(self, X, *, reset):
         """Set or check the `feature_names_in_` attribute.
-
         .. versionadded:: 1.0
-
         Parameters
         ----------
         X : {ndarray, dataframe} of shape (n_samples, n_features)
             The input samples.
-
         reset : bool
             Whether to reset the `feature_names_in_` attribute.
             If False, the input will be checked for consistency with
@@ -379,14 +371,13 @@ class BaseEstimator:
                call to `partial_fit`. All other methods that validate `X`
                should set `reset=False`.
         """
-
         if reset:
             feature_names_in = _get_feature_names(X)
             if feature_names_in is not None:
                 self.feature_names_in_ = feature_names_in
             elif hasattr(self, "feature_names_in_"):
-                # Delete the attribute when the estimator is fitted on a new dataset
-                # that has no feature names.
+                # Delete the attribute when the estimator is fitted on a new
+                #  dataset that has no feature names.
                 delattr(self, "feature_names_in_")
             return
 
@@ -398,10 +389,9 @@ class BaseEstimator:
             return
 
         if X_feature_names is not None and fitted_feature_names is None:
-            warnings.warn(
-                f"X has feature names, but {self.__class__.__name__} was fitted without"
-                " feature names"
-            )
+            warnings.warn(f"X has feature names,"
+                          " but {self.__class__.__name__} was fitted"
+                          " without feature names")
             return
 
         if X_feature_names is None and fitted_feature_names is not None:
@@ -416,14 +406,15 @@ class BaseEstimator:
             fitted_feature_names != X_feature_names
         ):
             message = (
-                "The feature names should match those that were "
-                "passed during fit. Starting version 1.2, an error will be raised.\n"
-            )
+                "The feature names should match those that were passed during"
+                " fit. Starting version 1.2, an error will be raised.\n")
             fitted_feature_names_set = set(fitted_feature_names)
             X_feature_names_set = set(X_feature_names)
 
-            unexpected_names = sorted(X_feature_names_set - fitted_feature_names_set)
-            missing_names = sorted(fitted_feature_names_set - X_feature_names_set)
+            unexpected_names = sorted
+            (X_feature_names_set - fitted_feature_names_set)
+            missing_names = sorted
+            (fitted_feature_names_set - X_feature_names_set)
 
             def add_names(names):
                 output = ""
