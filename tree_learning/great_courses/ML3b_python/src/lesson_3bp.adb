@@ -6,13 +6,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 with GNATCOLL.Scripts;        use GNATCOLL.Scripts;
 with GNATCOLL.Scripts.Python; use GNATCOLL.Scripts.Python;
 
-procedure Lesson_3AP is
-   Routine_Name  : constant String := "Lesson_3AP ";
-   Repository    : constant Scripts_Repository := new Scripts_Repository_Record;
-   Python        : Python_Scripting := null;
-   Errors        : Boolean;
+procedure Lesson_3BP is
+   Routine_Name : constant String := "Lesson_3BP ";
+   Repository   : constant Scripts_Repository := new Scripts_Repository_Record;
+   Python       : Python_Scripting := null;
+   Errors       : Boolean;
 begin
-   Put_Line ("Lesson 3A Python");
+   Put_Line ("Lesson 3B Python");
 
    Register_Python_Scripting (Repo => Repository, Module => "Test");
    --  Python_Name = "python"
@@ -30,4 +30,4 @@ begin
    Python.Destroy;
    Unregister_Python_Scripting (Repository);
 
-end Lesson_3AP;
+end Lesson_3BP;

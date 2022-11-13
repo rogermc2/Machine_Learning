@@ -18,8 +18,8 @@ feats = data[0]
 feats = feats.replace('\n', '')
 feats = feats.split(",")
 
-print ("Features:")
-print (feats)
+#print ("Features:")
+#print (feats)
 
 feats = feats[0:(len(feats)-1)]
 dat = []
@@ -33,7 +33,7 @@ for i in range(1, len(data)):
     dat = dat + [csvline]
 
 print ("Number of samples: ", len(dat))
-print ("Samples row 15: ", dat[15])
+#print ("Samples row 15: ", dat[15])
 
 clf = tree.classes.DecisionTreeClassifier(max_leaf_nodes=3)
 clf = clf.fit(dat, labels)
