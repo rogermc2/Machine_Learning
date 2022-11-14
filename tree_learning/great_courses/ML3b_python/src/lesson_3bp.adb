@@ -18,7 +18,7 @@ begin
    --  Python_Name = "python"
    Python := Python_Scripting (Lookup_Scripting_Language (Repository,
                                Python_Name));
-   Python.Execute_File ("src/load_diabetes1.py", Errors => Errors);
+   Python.Execute_File ("src/load_diabetes.py", Errors => Errors);
    Assert (not Errors, "Execute_File load_diabetes.py failed");
    New_Line;
    Put_Line (Routine_Name & "load_diabetes.py file executed");
