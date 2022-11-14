@@ -1,9 +1,7 @@
 
 import os
 import sys
-
-import tree
-from tree import classes
+import sikit-learn
 
 sys.path.insert(0, '..')
 
