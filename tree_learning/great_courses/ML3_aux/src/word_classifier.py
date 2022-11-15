@@ -51,3 +51,19 @@ def featurenames():
         # in word at all
         vector = vector + ["word contains " + let + "?"]
     return(vector)
+
+# Putting together the data set:
+
+dat = []
+labs = []
+words = []
+pros = []
+for file in ["ie", "ei"]:
+    with open(file+".txt", "r") as f:
+        data = f.readlines()
+        for line in data:
+            wordline = line.split()
+            dat = dat + [features(wordline)]
+            labs = labs + [["ie" in wordline[0]]]
+            words = words + [wordline[0]]
+            pros = pros + [wordline[1]]
