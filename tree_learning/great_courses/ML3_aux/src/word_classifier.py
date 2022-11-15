@@ -1,36 +1,35 @@
-# Define some auxillary functions
+from sklearn import tree
+import matplotlib
+from matplotlib import pyplot
 
 def features(wordline):
     vector = []
-    if "ie" in wordline[0]: loc = wordline[0].index("ie")
-    else: loc = wordline[0].index("ei")
+    if "ie" in wordline[0]: pos = wordline[0].index("ie")
+    else: pos = wordline[0].index("ei")
     # pronounced as one syllable
-    vector = vector + [wordline[1][loc] == '-' or wordline[1][loc+1] == '-']
+    vector = vector + [wordline[1][pos] == '-' or wordline[1][pos+1] == '-']
     # silent
-    vector = vector + [wordline[1][loc] == '-' and wordline[1][loc+1] == '-']
+    vector = vector + [wordline[1][pos] == '-' and wordline[1][pos+1] == '-']
     # two syllables
-    vector = vector + [wordline[1][loc] != '-' and wordline[1][loc+1] != '-']
+    vector = vector + [wordline[1][pos] != '-' and wordline[1][pos+1] != '-']
     # pronunciation
-    #    for pro in ["--", "-I", "A-", "E-", "I-", "e-", "ei", "i-", "iA", "iI", "ix", "x-", "-E",
-    #                "-a", "-e", "-x", "-y", "AE", "Ai", "Ax", "Ix", "Y-", "iE", "ii", "y-", "yE",
-    #                "yI", "ye", "yx"]:
     # two syllable pronunciation
-    for pro in ["ei", "iA", "iI", "ix", "AE", "Ai", "Ax", "Ix", "iE", "ii", "yE", "yI", "ye", "yx"]:
-        vector = vector + [wordline[1][loc:(loc+2)] == pro]
+    for pronounce in ["ei", "iA", "iI", "ix", "AE", "Ai", "Ax", "Ix", "iE", "ii", "yE", "yI", "ye", "yx"]:
+        vector = vector + [wordline[1][pos:(pos+2)] == pronounce]
     # two syllable pronunciation
-    for pro in ["I", "A", "E", "e", "i", "x", "a", "y", "Y"]:
-        vector = vector + [wordline[1][loc:(loc+2)] == pro+"-" or wordline[1][loc:(loc+2)] == "-"+pro]
-    for let in "abcdefghijklmnopqrstuvwxyz":
+    for pronounce in ["I", "A", "E", "e", "i", "x", "a", "y", "Y"]:
+        vector = vector + [wordline[1][pos:(pos+2)] == pronounce+"-" or wordline[1][pos:(pos+2)] == "-"+pronounce]
+    for letter in "abcdefghijklmnopqrstuvwxyz":
         # immediate preceeding, before
-        if loc > 0: vector = vector + [wordline[0][loc-1] == let]
+        if pos > 0: vector = vector + [wordline[0][pos-1] == letter]
         else: vector = vector + [False]
-        vector = vector + [let in wordline[0][0:loc]]
+        vector = vector + [letter in wordline[0][0:pos]]
         # immediate following, after
-        if loc < len(wordline[0])-2: vector = vector + [wordline[0][loc+2] == let]
+        if pos < len(wordline[0])-2: vector = vector + [wordline[0][pos+2] == letter]
         else: vector = vector + [False]
-        vector = vector + [let in wordline[0][(loc+2):]]
+        vector = vector + [letter in wordline[0][(pos+2):]]
         # in word at all
-        vector = vector + [let in wordline[0][(loc+2):]]
+        vector = vector + [letter in wordline[0][(pos+2):]]
     return(vector)
 
 def featurenames():
@@ -53,9 +52,9 @@ def featurenames():
     return(vector)
 
 # Putting together the data set:
-
+# Combine these functions to load the data into multiple lists
 dat = []
-labs = []
+labels = []
 words = []
 pros = []
 for file in ["ie", "ei"]:
@@ -64,6 +63,22 @@ for file in ["ie", "ei"]:
         for line in data:
             wordline = line.split()
             dat = dat + [features(wordline)]
-            labs = labs + [["ie" in wordline[0]]]
+            labels = labels + [["ie" in wordline[0]]]
             words = words + [wordline[0]]
             pros = pros + [wordline[1]]
+# Train the decision tree classifer using eight decision rules and calculate the number of words that are correct with this model.
+# Set up the learner and run it on the data then compute the accuracy and print it
+clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)
+clf = clf.fit(dat, labels)
+
+correct = 0
+for i in range(len(words)):
+    if clf.predict([features([words[i], pros[i]])]) == labels[i]: correct = correct + 1
+print("Number of correct words: ", correct)
+
+feats = featurenames()
+tree.plot_tree (clf, feature_names=feats,
+                class_names=["ei","ie"], filled=True, rounded=True)
+pyplot.show()
+
+# Draw the tree!
