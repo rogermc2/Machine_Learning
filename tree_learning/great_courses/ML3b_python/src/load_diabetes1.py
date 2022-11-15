@@ -1,8 +1,8 @@
 
 import os
-import sys
 from sklearn import tree
-import graphviz 
+import matplotlib
+from matplotlib import pyplot
 
 sys.path.insert(0, '..')
 
@@ -40,4 +40,8 @@ clf = clf.fit(dat, labels)
 correct = 0
 for i in range(len(dat)):
     if clf.predict([dat[i]]) == labels[i]: correct = correct + 1
-print (100.0* correct / len(dat))
+print ("Score: ", 100.0* correct / len(dat))
+
+tree.plot_tree (clf)
+pyplot.show()
+
