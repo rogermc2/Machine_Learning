@@ -5,7 +5,6 @@ with ML_Types;
 
 package Word_Classification is
 
-   function Get_Features (aLine : Unbounded_String)
-                          return ML_Types.Unbounded_List;
+   procedure Build_Dataset (IE_Data, EI_Data : ML_Types.Unbounded_List);
 
 end Word_Classification;

@@ -61,7 +61,9 @@ for file in ["ie", "ei"]:
     with open(file+".txt", "r") as f:
         data = f.readlines()
         for line in data:
+            # line.split() splits at spaces
             wordline = line.split()
+            print ("split line", wordline)
             dat = dat + [features(wordline)]
             labels = labels + [["ie" in wordline[0]]]
             words = words + [wordline[0]]

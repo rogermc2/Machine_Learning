@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 package body Aux_Utils is
 
    function Load_Data (File_Name : String)
-                       return ML_Types.Unbounded_List is
+                          return ML_Types.Unbounded_List is
       Routine_Name : constant String := "Aux_Utils.Load_Data ";
       Data_File    : File_Type;
       Data         : ML_Types.Unbounded_List;
@@ -24,7 +24,7 @@ package body Aux_Utils is
    exception
       when others =>
          Put_Line (Routine_Name & "failed.");
-      return Data;
+         return Data;
 
    end Load_Data;
 

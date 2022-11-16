@@ -62,6 +62,7 @@ for file in ["ie", "ei"]:
         data = f.readlines()
         for line in data:
             wordline = line.split()
+            print ("wordline: ", wordline)
             dat = dat + [features(wordline)]
             labels = labels + [["ie" in wordline[0]]]
             words = words + [wordline[0]]
