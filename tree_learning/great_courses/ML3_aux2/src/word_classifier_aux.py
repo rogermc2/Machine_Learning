@@ -10,6 +10,7 @@ def features(wordline):
     vector = vector + [wordline[1][pos] == '-' or wordline[1][pos+1] == '-']
     # silent
     vector = vector + [wordline[1][pos] == '-' and wordline[1][pos+1] == '-']
+    print ("pos", pos, "  vector: ", vector)
     # two syllables
     vector = vector + [wordline[1][pos] != '-' and wordline[1][pos+1] != '-']
     # pronunciation
