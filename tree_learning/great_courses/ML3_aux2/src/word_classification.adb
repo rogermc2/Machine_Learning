@@ -142,14 +142,17 @@ package body Word_Classification is
       Curs         : constant Cursor := Word_Line.First;
       aWord        : constant String := To_String (Element (Curs));
       Code         : constant String := To_String (Element (Next (Curs)));
-      Pos          : Natural;
+      Pos          : Natural := Index (aWord, "ie");
       Minus_Char   : constant String := "-";
       Two_Chars    : String2;
       Vector       : NL_Types.Boolean_List;
    begin
       --       Put_Line (Routine_Name & "aWord '" & aWord & "'");
       --       Put_Line (Routine_Name & "Code '" & Code & "'");
-      Pos := Index (aWord, "ie");
+      if Pos = 0 then
+         Pos := Index (aWord, "ei");
+      end if;
+
       if Pos > 0 then
          --  pronounced as one syllable
          Vector.Append (Code (Pos) = '-' or Code (Pos + 1) = '-');
@@ -194,8 +197,9 @@ package body Word_Classification is
                end loop;
             end if;
          end loop;
+
       else
-         Put_Line (Routine_Name & "aWord '" & aWord & "' doesn't contain ie");
+         Put_Line (Routine_Name & "Word_Line has neither ie or ei.");
       end if;
 
       return Vector;

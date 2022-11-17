@@ -29,8 +29,8 @@ procedure Lesson_3_Aux2 is
    Data         : NL_Types.Boolean_List_2D;
    Errors       : Boolean;
 begin
-   Put_Line ("Lesson 3 Aux2");Build_Dataset
-     (IE_Data, EI_Data, Labels, Words, Pronounce, Data);
+   Put_Line ("Lesson 3 Aux2");
+   Build_Dataset (IE_Data, EI_Data, Labels, Words, Pronounce, Data);
 
    Register_Python_Scripting (Repo => Repository, Module => "Test");
    --  Python_Name = "python"
