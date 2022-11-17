@@ -8,8 +8,10 @@ with GNATCOLL.Scripts;        use GNATCOLL.Scripts;
 with GNATCOLL.Scripts.Python; use GNATCOLL.Scripts.Python;
 
 with ML_Types;
+with NL_Types;
 
 with Aux_Utils;
+with Word_Classification; use Word_Classification;
 
 procedure Lesson_3_Aux2 is
    Routine_Name : constant String := "Lesson_3_Aux2 ";
@@ -21,9 +23,14 @@ procedure Lesson_3_Aux2 is
                     Aux_Utils.Load_Data (File_IE);
    EI_Data      : constant ML_Types.Unbounded_List :=
                     Aux_Utils.Load_Data (File_EI);
+   Labels       : ML_Types.Unbounded_List;
+   Words        : ML_Types.Unbounded_List;
+   Pronounce    : ML_Types.Unbounded_List;
+   Data         : NL_Types.Boolean_List_2D;
    Errors       : Boolean;
 begin
-   Put_Line ("Lesson 3 Aux2");
+   Put_Line ("Lesson 3 Aux2");Build_Dataset
+     (IE_Data, EI_Data, Labels, Words, Pronounce, Data);
 
    Register_Python_Scripting (Repo => Repository, Module => "Test");
    --  Python_Name = "python"

@@ -1,10 +1,8 @@
 
 with Ada.Strings.Fixed;
---  with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Utilities;
-
-with NL_Types;
 
 package body Word_Classification is
 
@@ -23,25 +21,34 @@ package body Word_Classification is
 
    --  -------------------------------------------------------------------------
 
-   procedure Build_Dataset (IE_Data, EI_Data : ML_Types.Unbounded_List) is
+   procedure Build_Data (theData   : ML_Types.Unbounded_List;
+                         Labels, Words,
+                         Pronounce : in out ML_Types.Unbounded_List;
+                         Data      : in out NL_Types.Boolean_List_2D) is
       use ML_Types.String_Package;
+      Routine_Name : constant String := "Word_Classification.Build_Data ";
       Curs      : Cursor;
       aLine     : Unbounded_String;
       Word_Line : ML_Types.String_List;
       Features  : NL_Types.Boolean_List;
-      Labels    : ML_Types.Unbounded_List;
-      Words     : ML_Types.Unbounded_List;
-      Pronounce : ML_Types.Unbounded_List;
-      Data      : NL_Types.Boolean_List_2D;
    begin
-      for index in IE_Data.First_Index .. IE_Data.Last_Index loop
-         aLine := IE_Data (index);
+      for index in theData.First_Index .. theData.Last_Index loop
+         aLine := theData (index);
          Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
+         Put_Line (Routine_Name & "Word_Line length" &
+                     Integer'Image (Integer (Word_Line.Length)));
+         Put_Line (Routine_Name & "Word_Line 1: " &
+                     To_String (Word_Line.First_Element));
          Features := Get_Features (Word_Line);
+
+         Put_Line (Routine_Name & "Features set");
          Data.Append (Features);
          Curs := Word_Line.First;
+         Put_Line (Routine_Name & "Curs set");
          Words.Append (Element (Curs));
+         Put_Line (Routine_Name & " Words Appended");
          Pronounce.Append (Element (Next (Curs)));
+         Put_Line (Routine_Name & "Pronounce Appended");
          declare
             aWord : constant String := To_String (Words.Last_Element);
          begin
@@ -50,17 +57,33 @@ package body Word_Classification is
             end if;
          end;
 
-         aLine := EI_Data (index);
-         Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
       end loop;
+
+   exception
+      when others =>
+         Put_Line (Routine_Name & "error");
+
+   end Build_Data;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Build_Dataset
+     (IE_Data, EI_Data : ML_Types.Unbounded_List;
+      Labels, Words, Pronounce : out ML_Types.Unbounded_List;
+      Data : out NL_Types.Boolean_List_2D) is
+
+   begin
+      Build_Data (IE_Data, Labels, Words, Pronounce, Data);
+      Build_Data (EI_Data, Labels, Words, Pronounce, Data);
 
    end Build_Dataset;
 
    --  -------------------------------------------------------------------------
 
    function Feature_Names return ML_Types.Unbounded_List is
-      theLetter : String (1 .. 1);
-      Vector    : ML_Types.Unbounded_List;
+      Routine_Name : constant String := "Word_Classification.Feature_Names ";
+      theLetter    : String (1 .. 1);
+      Vector       : ML_Types.Unbounded_List;
    begin
       Vector.Append (To_Unbounded_String ("one syllable?"));
       Vector.Append (To_Unbounded_String ("silent?"));
@@ -68,12 +91,12 @@ package body Word_Classification is
 
       for pronounce in Two_Syllable'Range loop
          Vector.Append (To_Unbounded_String ("sounds like " &
-                        String (Two_Syllable (pronounce)) & "?"));
+                          String (Two_Syllable (pronounce)) & "?"));
       end loop;
 
       for pronounce in One_Syllable'Range loop
          Vector.Append (To_Unbounded_String ("sounds like " &
-                        String (One_Syllable (pronounce)) & "?"));
+                          String (One_Syllable (pronounce)) & "?"));
       end loop;
 
       for letter in LC_Index loop
@@ -94,6 +117,11 @@ package body Word_Classification is
 
       return Vector;
 
+   exception
+      when others =>
+         Put_Line (Routine_Name & "error");
+      return Vector;
+
    end Feature_Names;
 
    --  -------------------------------------------------------------------------
@@ -104,6 +132,7 @@ package body Word_Classification is
                           return NL_Types.Boolean_List is
       use Ada.Strings.Fixed;
       use ML_Types.String_Package;
+      Routine_Name : constant String := "Word_Classification.Get_Features ";
       Curs         : constant Cursor := Word_Line.First;
       aWord        : constant String := To_String (Element (Curs));
       Code         : constant String := To_String (Element (Next (Curs)));
@@ -112,6 +141,7 @@ package body Word_Classification is
       Two_Chars    : String2;
       Vector       : NL_Types.Boolean_List;
    begin
+      Put_Line (Routine_Name);
       Pos := Index (aWord, "ie");
       --  pronounced as one syllable
       Vector.Append (Code (Pos) = '-' or Code (Pos + 1) = '-');
@@ -157,6 +187,11 @@ package body Word_Classification is
          end if;
       end loop;
 
+      return Vector;
+
+   exception
+      when others =>
+         Put_Line (Routine_Name & "error");
       return Vector;
 
    end Get_Features;
