@@ -1,6 +1,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Handling;
+with Ada.Characters.Latin_1;
 with Ada.Containers;
 with Ada.Strings.Fixed;
 
@@ -229,8 +230,8 @@ package body Utilities is
 
    procedure Permute (anArray : in out NL_Arrays_And_Matrices.Float_Array) is
       Array_Length  : constant Positive := Positive (anArray'Length);
-      Index_2      : Natural;
-      Rand         : Positive;
+      Index_2       : Natural;
+      Rand          : Positive;
    begin
       if Array_Length > 1 then
          for row in anArray'Range loop
@@ -254,8 +255,8 @@ package body Utilities is
 
    procedure Permute (anArray : in out Integer_Array) is
       Array_Length  : constant Positive := Positive (anArray'Length);
-      Index_2      : Natural;
-      Rand         : Positive;
+      Index_2       : Natural;
+      Rand          : Positive;
    begin
       if Array_Length > 1 then
          for row in anArray'Range loop
@@ -626,46 +627,45 @@ package body Utilities is
 
    function Split_String_On_Spaces (aString : String) return String_List is
       use Ada.Strings;
-      Pattern    : constant String := " ";
-      Last       : constant Integer := aString'Last;
-      Last_Char  : constant Character := aString (Last);
-      UB_String  : Unbounded_String;
-      Split_List : String_List;
+      Routine_Name : constant String := "Utilities.Split_String_On_Spaces ";
+      HT_String    : constant String (1 .. 1) :=
+                       (1 => Ada.Characters.Latin_1.HT);
+      Last_Char    : constant Integer := aString'Last;
+      A_Index      : Integer := 1;
+      B_Index      : Integer := aString'First;
+      Split_List   : String_List;
    begin
-      if Character'Pos (Last_Char) < 32 then
-         UB_String :=
-           To_Unbounded_String (aString (aString'First .. Last - 1));
-      else
-         UB_String := To_Unbounded_String (aString);
+      while B_Index < aString'Last and A_Index > 0 loop
+         A_Index :=
+           Fixed.Index (aString (B_Index .. Last_Char), " ");
+         if A_Index = 0 then
+            A_Index :=
+              Fixed.Index (aString (B_Index .. Last_Char),
+                           HT_String);
+         end if;
+
+         Put_Line (Routine_Name & "A and B indices:" & Integer'Image (A_Index)
+                   & "," & Integer'Image (B_Index));
+         Split_List.Append
+           (To_Unbounded_String (aString (B_Index .. A_Index - 1)));
+         B_Index := A_Index + 1;
+         while aString (B_Index) = ' ' loop
+            B_Index := B_Index + 1;
+         end loop;
+      end loop;
+
+      --  process last string
+      if B_Index < Last_Char then
+         Split_List.Append
+           (To_Unbounded_String (aString (B_Index .. Last_Char)));
       end if;
 
-      declare
-         String_2 : constant String := To_String (UB_String);
-         Last_2   : constant Integer := String_2'Last;
-         A_Index  : Integer;
-         B_Index  : Integer := String_2'First;
-      begin
-         for index in String_2'First .. Fixed.Count (String_2, Pattern) loop
-            A_Index :=
-              Fixed.Index (String_2 (B_Index .. Last_2), Pattern);
-            --  process string slice in any way
-            Split_List.Append
-              (To_Unbounded_String (String_2 (B_Index .. A_Index - 1)));
-            B_Index := A_Index + 1;
-            while Element (UB_String, B_Index) = ' ' loop
-               B_Index := B_Index + 1;
-            end loop;
-         end loop;
-         --  process last string
-         Split_List.Append
-           (To_Unbounded_String (String_2 (B_Index .. Last_2)));
-      end;
       return Split_List;
 
    end Split_String_On_Spaces;
 
    --  -------------------------------------------------------------------------
-  --  Swap swaps matrix rows
+   --  Swap swaps matrix rows
    procedure Swap (Data : in out Binary_Matrix; L, R : Positive) is
       Val : Natural;
    begin
