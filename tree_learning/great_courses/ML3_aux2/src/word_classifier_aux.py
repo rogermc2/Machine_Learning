@@ -1,4 +1,4 @@
-from sklearn import tree
+# from sklearn import tree
 import matplotlib
 from matplotlib import pyplot
 
@@ -68,7 +68,7 @@ for file in ["ie", "ei"]:
             pros = pros + [wordline[1]]
 # Train the decision tree classifer using eight decision rules and calculate the number of words that are correct with this model.
 # Set up the learner and run it on the data then compute the accuracy and print it
-clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)
+# clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)
 clf = clf.fit(dat, labels)
 
 correct = 0

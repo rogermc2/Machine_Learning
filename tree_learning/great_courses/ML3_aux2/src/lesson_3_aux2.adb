@@ -36,7 +36,11 @@ begin
    --  Python_Name = "python"
    Python := Python_Scripting (Lookup_Scripting_Language (Repository,
                                Python_Name));
---     Put_Line (Routine_Name & "Current_Directory: " & Current_Directory);
+   --     Put_Line (Routine_Name & "Current_Directory: " & Current_Directory);
+   Python.Execute_Command
+     ("from sklearn import tree", Errors => Errors);
+   Python.Execute_Command
+     ("clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)", Errors => Errors);
    Python.Execute_File ("src/word_classifier_aux.py", Errors => Errors);
    Assert (not Errors, "Execute_File word_classifier_aux.py failed");
    New_Line;
