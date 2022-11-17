@@ -26,7 +26,7 @@ package body Word_Classification is
                          Pronounce : in out ML_Types.Unbounded_List;
                          Data      : in out NL_Types.Boolean_List_2D) is
       use ML_Types.String_Package;
---        use ML_Types.Unbounded_Package;
+      --        use ML_Types.Unbounded_Package;
       Routine_Name : constant String := "Word_Classification.Build_Data ";
       Curs         : Cursor;
       aLine        : Unbounded_String;
@@ -36,23 +36,23 @@ package body Word_Classification is
       for index in theData.First_Index .. theData.Last_Index loop
          aLine := theData (index);
          Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
-         Put_Line (Routine_Name & "Word_Line length" &
-                     Integer'Image (Integer (Word_Line.Length)));
+         --           Put_Line (Routine_Name & "Word_Line length" &
+         --                       Integer'Image (Integer (Word_Line.Length)));
          Curs := Word_Line.First;
-         Put_Line (Routine_Name & "Word_Line 1: '" &
-                     To_String (Word_Line.First_Element) & "'");
-         Put_Line (Routine_Name & "Word_Line 2: '" &
-                     To_String (Word_Line (Next (Curs))) & "'");
+--           Put_Line (Routine_Name & "Word_Line 1: '" &
+--                       To_String (Word_Line.First_Element) & "'");
+--           Put_Line (Routine_Name & "Word_Line 2: '" &
+--                       To_String (Word_Line (Next (Curs))) & "'");
          Features := Get_Features (Word_Line);
 
---           Put_Line (Routine_Name & "Features set");
+         --           Put_Line (Routine_Name & "Features set");
          Data.Append (Features);
          Curs := Word_Line.First;
---           Put_Line (Routine_Name & "Curs set");
+         --           Put_Line (Routine_Name & "Curs set");
          Words.Append (Element (Curs));
---           Put_Line (Routine_Name & " Words Appended");
+         --           Put_Line (Routine_Name & " Words Appended");
          Pronounce.Append (Element (Next (Curs)));
---           Put_Line (Routine_Name & "Pronounce Appended");
+         --           Put_Line (Routine_Name & "Pronounce Appended");
          declare
             aWord : constant String := To_String (Words.Last_Element);
          begin
@@ -147,8 +147,8 @@ package body Word_Classification is
       Two_Chars    : String2;
       Vector       : NL_Types.Boolean_List;
    begin
-     Put_Line (Routine_Name & "aWord '" & aWord & "'");
-     Put_Line (Routine_Name & "Code '" & Code & "'");
+      --       Put_Line (Routine_Name & "aWord '" & aWord & "'");
+      --       Put_Line (Routine_Name & "Code '" & Code & "'");
       Pos := Index (aWord, "ie");
       if Pos > 0 then
          --  pronounced as one syllable
