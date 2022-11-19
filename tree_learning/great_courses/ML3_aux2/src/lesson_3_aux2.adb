@@ -32,7 +32,12 @@ begin
    Put_Line ("Lesson 3 Aux2");
    Build_Dataset (IE_Data, EI_Data, Labels, Words, Pronounce, Data);
 
-   Register_Python_Scripting (Repo => Repository, Module => "Test");
+   --  Register_Python_Scripting causes all commands and classes to be added
+   --  to the specified module.
+   --  Program_Name is the name of the program registering Python scripting.
+   --  The interpreter will resove run-time libraries relative to this executable.
+   Register_Python_Scripting (Repo => Repository, Module => "Lesson_3",
+                              Program_Name => "Lesson_3_Aux2");
    --  Python_Name = "python"
    Python := Python_Scripting (Lookup_Scripting_Language (Repository,
                                Python_Name));
