@@ -7,6 +7,10 @@ package body Aux_Utils is
    --  To return a list to the scripting language:
    procedure Handler (Data : in out Callback_Data'Class; Cmd : String) is
       aWord : constant String := "value";
+      --  A List_Instance represents a list passed as parameter.
+      --  Set_Nth_Arg will append to the list if the given index is outside of the
+      --  current range of the list.
+      --  Get_Script returns the scripting language that created Data
       List  : List_Instance := New_List (Get_Script (Data));
    begin
       Set_Nth_Arg (List, 1, Cmd);
