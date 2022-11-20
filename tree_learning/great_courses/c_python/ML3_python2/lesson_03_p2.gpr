@@ -1,0 +1,28 @@
+project Lesson_03_P2 is
+
+   type Operating_System_Type is
+      ("high_sierra", "ventura");
+   Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
+   for Source_Dirs use ("src", "../../../python", "../../../../neural_learning/common", "../../../../neural_learning/decision_tree_classifier/support", "../../../../neural_learning/utils", "../../../../common", "../../../python/Tree2");
+   for Object_Dir use "obj";
+   for Main use ("lesson_3p2.adb");
+   for Exec_Dir use ".";
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnat12", "-gnatw.Tkmru", "-gnatyclux");
+   end Compiler;
+
+   package Linker is
+
+      case Operating_System is
+
+         when "high_sierra" =>
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
+
+         when "ventura" =>
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
+      end case;
+   end Linker;
+
+end Lesson_03_P2;
+
