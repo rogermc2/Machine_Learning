@@ -11,55 +11,60 @@ package body Python is
    --  the second index defines the row).
    --     package Integer_Matrices is new Matrices (Integer, Integer);
 
-   procedure Py_SetProgramName (Name : Interfaces.C.char_array);
-   pragma Import (C, Py_SetProgramName, "Py_SetProgramName");
+   pragma Warnings (Off, "function ""PyCheck_Tuple"" is not referenced");
+   function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
+   pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
+   
+   procedure Py_DecRef (Obj : PyObject);
+   pragma Import (C, Py_DecRef, "Py_DecRef");
+          
+   pragma Warnings (Off, "procedure ""Py_IncRef"" is not referenced");
+   procedure Py_IncRef (Obj : PyObject);
+   pragma Import (C, Py_IncRef, "Py_IncRef");
 
    procedure Py_Initialize;
    pragma Import (C, Py_Initialize, "Py_Initialize");
 
-   procedure Py_Finalize;
-   pragma Import (C, Py_Finalize, "Py_Finalize");
-    
-   function PyRun_SimpleString (Command : Interfaces.C.char_array)
-                                return Interfaces.C.int;
-   pragma Import (C, PyRun_SimpleString, "PyRun_SimpleString");
-    
-   pragma Warnings (Off, "procedure ""Py_IncRef"" is not referenced");
-   procedure Py_IncRef (Obj : PyObject);
-   pragma Import (C, Py_IncRef, "Py_IncRef");
-    
-   procedure Py_DecRef (Obj : PyObject);
-   pragma Import (C, Py_DecRef, "Py_DecRef");
-    
    function PyInt_AsLong (I : PyObject) return Interfaces.C.long;
    pragma Import (C, PyInt_AsLong, "PyLong_AsLong");
-      
-   function PyString_FromString (Str : Interfaces.C.char_array)
-                                 return PyObject;
-   pragma Import (C, PyString_FromString, "PyUnicode_FromString");
-    
-   function PyImport_Import (Obj : PyObject) return PyObject;
-   pragma Import (C, PyImport_Import, "PyImport_Import");
+   
+   pragma Warnings (Off, "procedure ""PyErr_Print"" is not referenced");
+   procedure PyErr_Print;
+   pragma Import (C, PyErr_Print, "PyErr_Print");
+   
+   procedure Py_Finalize;
+   pragma Import (C, Py_Finalize, "Py_Finalize");
    
    function PyObject_GetAttrString
      (Obj : PyObject; Name : Interfaces.C.char_array) return PyObject;
-   pragma Import (C, PyObject_GetAttrString, "PyObject_GetAttrString");
+   pragma Import (C, PyObject_GetAttrString, "PyObject_GetAttrString");  
    
-   function PyObject_CallObject (Obj : PyObject; Args : PyObject)
-                                 return PyObject;
-   pragma Import (C, PyObject_CallObject, "PyObject_CallObject");
+   function PyImport_Import (Obj : PyObject) return PyObject;
+   pragma Import (C, PyImport_Import, "PyImport_Import");
    
    pragma Warnings (Off, "function ""PyList_Check"" is not referenced");
    function PyList_Check (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyList_Check, "PyList_Check");
    
-   pragma Warnings (Off, "function ""PyCheck_Tuple"" is not referenced");
-   function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
-   pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
+   function PyObject_CallObject (Obj : PyObject; Args : PyObject)
+                                 return PyObject;
+   pragma Import (C, PyObject_CallObject, "PyObject_CallObject");
    
-   pragma Warnings (Off, "procedure ""PyErr_Print"" is not referenced");
-   procedure PyErr_Print;
-   pragma Import (C, PyErr_Print, "PyErr_Print");
+   pragma Warnings (Off, "function ""PyParse_Tuple"" is not referenced");
+   function PyParse_Tuple (Args : PyObject; Index : Interfaces.C.char_array; Obj : PyObject)
+             return Interfaces.C.int;  --  returns Boolean
+   pragma Import (C, PyParse_Tuple, "PyArg_ParseTuple");
+     
+   function PyRun_SimpleString (Command : Interfaces.C.char_array)
+                                return Interfaces.C.int;
+   pragma Import (C, PyRun_SimpleString, "PyRun_SimpleString");
+   
+   procedure Py_SetProgramName (Name : Interfaces.C.char_array);
+   pragma Import (C, Py_SetProgramName, "Py_SetProgramName");
+    
+   function PyString_FromString (Str : Interfaces.C.char_array)
+                                 return PyObject;
+   pragma Import (C, PyString_FromString, "PyUnicode_FromString");
    
    pragma Warnings (Off, "procedure ""PySys_SetPath"" is not referenced");
    procedure PySys_SetPath (Path : Interfaces.C.char_array);
@@ -87,7 +92,9 @@ package body Python is
       --  http://stackoverflow.com/questions/13422206/how-to-load-a-custom-python-module-in-c
 
       Execute_String ("import sys");
+      Execute_String ("import os");
       Execute_String ("sys.path.append('.')");
+      Execute_String ("sys.path.append('./src')");
       Execute_String ("sys.path.append('../..')");
       Execute_String ("sys.path.append('../../python')");
       Execute_String ("sys.path.append('../../tree')");
@@ -116,18 +123,28 @@ package body Python is
     
    function Import_File (File_Name : String) return Module is
       use type System.Address;
-      PyFileName : constant PyObject :=
-                     PyString_FromString (Interfaces.C.To_C (File_Name));
-      M          : constant PyObject := PyImport_Import (PyFileName);  
+      Routine_Name : constant String := "Python.Import_File ";
+      PyFileName   : constant PyObject :=
+        PyString_FromString (Interfaces.C.To_C (File_Name));
    begin
-      Py_DecRef (PyFileName);
-      if M = System.Null_Address then
-         --  PyErr_Print;
-         raise Interpreter_Error with "Cannot load module from file " &
-           File_Name;
-      end if;
+      Execute_String ("cwd = os.getcwd()");
+      Execute_String ("print ('cwd: ', os.getcwd())");
+      Execute_String ("print ('cwd files: ', os.listdir(os.getcwd()))");
+      Execute_String ("os.path.join (cwd, 'src')");
+      Execute_String ("print ('Path: ', sys.path)");
+      declare
+         M  : constant PyObject := PyImport_Import (PyFileName); 
+      begin
+         Py_DecRef (PyFileName);
+         if M = System.Null_Address then
+            --  PyErr_Print;
+            raise Interpreter_Error with Routine_Name &
+              "cannot load module from file " & File_Name;
+         end if;
        
-      return Module (M);
+         return Module (M);
+      end;
+      
    end Import_File;
    
    --  -------------------------------------------------------------------------
