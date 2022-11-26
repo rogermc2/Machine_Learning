@@ -1,3 +1,4 @@
+import sys
 from sklearn import tree
 import matplotlib
 from matplotlib import pyplot
@@ -63,7 +64,6 @@ for file in ["ie", "ei"]:
         for line in data:
             # line.split() splits at spaces
             wordline = line.split()
-            print ("split line", wordline)
             dat = dat + [features(wordline)]
             labels = labels + [["ie" in wordline[0]]]
             words = words + [wordline[0]]
@@ -79,8 +79,8 @@ for i in range(len(words)):
 print("Number of correct words: ", correct)
 
 feats = featurenames()
+# Draw the tree!
 tree.plot_tree (clf, feature_names=feats,
                 class_names=["ei","ie"], filled=True, rounded=True)
 pyplot.show()
-
-# Draw the tree!
+print()

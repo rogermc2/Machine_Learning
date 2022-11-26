@@ -1,5 +1,7 @@
 with Interfaces.C;
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with API_Binding;
 --  with Matrices;
 
@@ -52,7 +54,7 @@ package body Python is
    
    pragma Warnings (Off, "function ""PyParse_Tuple"" is not referenced");
    function PyParse_Tuple (Args : PyObject; Index : Interfaces.C.char_array; Obj : PyObject)
-             return Interfaces.C.int;  --  returns Boolean
+                           return Interfaces.C.int;  --  returns Boolean
    pragma Import (C, PyParse_Tuple, "PyArg_ParseTuple");
      
    function PyRun_SimpleString (Command : Interfaces.C.char_array)
@@ -125,7 +127,7 @@ package body Python is
       use type System.Address;
       Routine_Name : constant String := "Python.Import_File ";
       PyFileName   : constant PyObject :=
-        PyString_FromString (Interfaces.C.To_C (File_Name));
+                       PyString_FromString (Interfaces.C.To_C (File_Name));
    begin
       Execute_String ("cwd = os.getcwd()");
       Execute_String ("print ('cwd: ', os.getcwd())");
@@ -137,9 +139,11 @@ package body Python is
       begin
          Py_DecRef (PyFileName);
          if M = System.Null_Address then
-            --  PyErr_Print;
+            Put ("PyErr: ");
+            PyErr_Print;
             raise Interpreter_Error with Routine_Name &
-              "cannot load module from file " & File_Name;
+              "cannot load module from file " & File_Name &
+              " or " & File_Name & " is not a module";
          end if;
        
          return Module (M);
