@@ -1,4 +1,4 @@
-# from sklearn import tree
+from sklearn import tree
 import matplotlib
 from matplotlib import pyplot
 

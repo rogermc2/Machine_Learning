@@ -11,6 +11,7 @@ procedure Lesson_3_Aux is
    Python       : Python_Scripting := null;
    Errors       : Boolean;
 begin
+   New_Line;
    Put_Line ("Lesson 3 Aux");
 
    Register_Python_Scripting (Repo => Repository, Module => "Test");

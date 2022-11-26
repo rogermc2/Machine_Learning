@@ -1,11 +1,13 @@
 
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Directories; use Ada.Directories;
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
 with NL_Types;
+
+with Python;
 
 with Aux_Utils;
 with Word_Classification; use Word_Classification;
@@ -22,18 +24,18 @@ procedure Lesson_3_Aux2 is
    Words        : ML_Types.Unbounded_List;
    Pronounce    : ML_Types.Unbounded_List;
    Data         : NL_Types.Boolean_List_2D;
-   Errors       : Boolean;
+   Classifier   : Python.Module;
 begin
+   New_Line;
    Put_Line ("Lesson 3 Aux2");
    Build_Dataset (IE_Data, EI_Data, Labels, Words, Pronounce, Data);
 
    --     Put_Line (Routine_Name & "Current_Directory: " & Current_Directory);
-   Python.Execute_Command
-     ("from sklearn import tree", Errors => Errors);
-   Python.Execute_Command
-     ("clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)", Errors => Errors);
-   Python.Execute_File ("src/word_classifier_aux.py", Errors => Errors);
-   Assert (not Errors, "Execute_File word_classifier_aux.py failed");
+   Python.Initialize;
+--     Python.Execute_String ("from sklearn import tree");
+--     Python.Execute_String
+--       ("clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)");
+   Classifier := Python.Import_File ("word_classifier_aux.py");
    New_Line;
    Put_Line (Routine_Name & "word_classifier_aux.py file executed");
 
@@ -41,7 +43,6 @@ begin
    Put_Line (Routine_Name & "completed.");
    New_Line;
 
-   Python.Destroy;
-   Unregister_Python_Scripting (Repository);
+   Python.Finalize;
 
 end Lesson_3_Aux2;
