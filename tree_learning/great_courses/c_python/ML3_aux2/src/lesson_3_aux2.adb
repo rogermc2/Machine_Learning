@@ -35,9 +35,9 @@ begin
 --     Python.Execute_String ("from sklearn import tree");
 --     Python.Execute_String
 --       ("clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)");
-   Classifier := Python.Import_File ("word_classifier_aux.py");
-   New_Line;
-   Put_Line (Routine_Name & "word_classifier_aux.py file executed");
+   Classifier := Python.Import_File ("word_classifier_aux");
+   Put_Line (Routine_Name & "word_classifier_aux module imported");
+   Python.Close_Module (Classifier);
 
    Put_Line ("----------------------------------------------");
    Put_Line (Routine_Name & "completed.");

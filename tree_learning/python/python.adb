@@ -130,10 +130,11 @@ package body Python is
                        PyString_FromString (Interfaces.C.To_C (File_Name));
    begin
       Execute_String ("cwd = os.getcwd()");
-      Execute_String ("print ('cwd: ', os.getcwd())");
-      Execute_String ("print ('cwd files: ', os.listdir(os.getcwd()))");
-      Execute_String ("os.path.join (cwd, 'src')");
-      Execute_String ("print ('Path: ', sys.path)");
+      Execute_String ("os.path.join (cwd, '/src/py_package')");
+      Execute_String ("os.chdir(cwd + '/src/py_package')");
+--        Execute_String ("print ('cwd: ', os.getcwd())");
+--        Execute_String ("print ('cwd files: ', os.listdir(os.getcwd()))");
+--        Execute_String ("print ('Path: ', sys.path)");
       declare
          M  : constant PyObject := PyImport_Import (PyFileName); 
       begin
