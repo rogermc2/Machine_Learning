@@ -261,9 +261,48 @@ package body Python is
                    A, B : Integer_Matrix) is
       use API_Binding;
       F           : constant PyObject := Get_Symbol (M, Function_Name);
-      AB_Pointers : constant API_Pointers := API_2D (A, B);
-      A_Pointers  : constant API_Int_Pointer_Array := Get_A_Ptrs (AB_Pointers);
-      B_Pointers  : constant API_Int_Pointer_Array := Get_B_Ptrs (AB_Pointers);
+      AB_Pointers : constant API_Pointers := API_Integer_2D (A, B);
+      A_Pointers  : constant API_Int_Pointer_Array :=
+                      Get_A_Int_Ptrs (AB_Pointers);
+      B_Pointers  : constant API_Int_Pointer_Array :=
+                      Get_B_Int_Ptrs (AB_Pointers);
+      
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              A_Ptrs : API_Int_Pointer_Array;
+                              B_Ptrs : API_Int_Pointer_Array) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("oo"), A_Pointers, B_Pointers);
+                              
+      PyResult := Call_Object (F, Function_Name, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+   
+   procedure Call (M    : Module; Function_Name : String;
+                   Data : NL_Types.Boolean_List_2D;
+                   Labels, Words, Pronounce : ML_Types.Unbounded_List) is
+      use API_Binding;
+      F             : constant PyObject := Get_Symbol (M, Function_Name);
+      ABCD_Pointers : constant API_Pointers :=
+                        API_4D (Data, Labels, Words, Pronounce);
+      A_Pointers    : constant API_Int_Pointer_Array :=
+                        Get_A_Ptrs (ABCD_Pointers);
+      B_Pointers    : constant API_Int_Pointer_Array :=
+                        Get_B_Ptrs (ABCD_Pointers);
+      C_Pointers    : constant API_Int_Pointer_Array :=
+                        Get_C_Ptrs (ABCD_Pointers);
+      D_Pointers    : constant API_Int_Pointer_Array :=
+                        Get_D_Ptrs (ABCD_Pointers);
       
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               A_Ptrs : API_Int_Pointer_Array;

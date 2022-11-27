@@ -1,6 +1,6 @@
 from sklearn import tree
 
-def word_classifier_aux (dat, labels, words, features):
+def word_classifier_aux (dat, labels, words, pros, features):
 # Train the decision tree classifer using eight decision rules and calculate the number of words that are correct with this model.
 # Set up the learner and run it on the data then compute the accuracy and print it
     clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)

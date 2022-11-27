@@ -169,6 +169,8 @@ package NL_Arrays_And_Matrices is
                    return Integer_Matrix;
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                                return Boolean_Array;
+   function To_Boolean_Matrix (List : NL_Types.Boolean_List_2D)
+                               return Boolean_Matrix;
    function To_Boolean_Matrix (IM : Integer_Matrix) return Boolean_Matrix;
    function To_Integer_Array (List : ML_Types.Integer_List)
                                return Integer_Array;

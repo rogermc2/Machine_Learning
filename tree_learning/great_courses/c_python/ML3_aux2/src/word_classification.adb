@@ -21,10 +21,10 @@ package body Word_Classification is
 
    --  -------------------------------------------------------------------------
 
-   procedure Build_Data (theData   : ML_Types.Unbounded_List;
+   procedure Build_Data (Data_In      : ML_Types.Unbounded_List;
+                         Data_Out     : out NL_Types.Boolean_List_2D;
                          Labels, Words,
-                         Pronounce : in out ML_Types.Unbounded_List;
-                         Data      : in out NL_Types.Boolean_List_2D) is
+                         Pronounce    : out ML_Types.Unbounded_List) is
       use ML_Types.String_Package;
       --        use ML_Types.Unbounded_Package;
       Routine_Name : constant String := "Word_Classification.Build_Data ";
@@ -33,8 +33,8 @@ package body Word_Classification is
       Word_Line    : ML_Types.String_List;  --  Unbounded string list
       Features     : NL_Types.Boolean_List;
    begin
-      for index in theData.First_Index .. theData.Last_Index loop
-         aLine := theData (index);
+      for index in Data_In.First_Index .. Data_In.Last_Index loop
+         aLine := Data_In (index);
          Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
          --           Put_Line (Routine_Name & "Word_Line length" &
          --                       Integer'Image (Integer (Word_Line.Length)));
@@ -46,7 +46,7 @@ package body Word_Classification is
          Features := Get_Features (Word_Line);
 
          --           Put_Line (Routine_Name & "Features set");
-         Data.Append (Features);
+         Data_Out.Append (Features);
          Curs := Word_Line.First;
          --           Put_Line (Routine_Name & "Curs set");
          Words.Append (Element (Curs));
@@ -75,11 +75,11 @@ package body Word_Classification is
    procedure Build_Dataset
      (IE_Data, EI_Data         : ML_Types.Unbounded_List;
       Labels, Words, Pronounce : out ML_Types.Unbounded_List;
-      Data                     : out NL_Types.Boolean_List_2D) is
+      Data                    : out NL_Types.Boolean_List_2D) is
 
    begin
-      Build_Data (IE_Data, Labels, Words, Pronounce, Data);
-      Build_Data (EI_Data, Labels, Words, Pronounce, Data);
+      Build_Data (IE_Data, Data, Labels, Words, Pronounce);
+      Build_Data (EI_Data, Data, Labels, Words, Pronounce);
 
    end Build_Dataset;
 

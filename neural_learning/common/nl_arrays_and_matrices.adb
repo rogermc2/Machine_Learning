@@ -702,6 +702,25 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Boolean_Matrix (List : NL_Types.Boolean_List_2D)
+                               return Boolean_Matrix is
+      List_1D : NL_Types.Boolean_List;
+      Result  : Boolean_Matrix (1 .. Integer (List.Length),
+                                1 .. Integer (List.First_Element.Length));
+   begin
+      for row in Result'Range loop
+         List_1D := List (row);
+         for col in Result'Range (2) loop
+            Result (row, col) := List_1D (col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end To_Boolean_Matrix;
+
+   --  ------------------------------------------------------------------------
+
    function To_Boolean_Matrix (IM : Integer_Matrix) return Boolean_Matrix is
       Result : Boolean_Matrix (IM'Range, IM'Range (2));
    begin
