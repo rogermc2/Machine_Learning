@@ -27,10 +27,14 @@ package API_Binding is
 private
    type API_Boolean_Array is array (Natural range <>)
      of aliased Interfaces.C.int;
+   pragma Convention (C, API_Boolean_Array);
    type API_Int_Array is array (Natural range <>)
      of aliased Interfaces.C.int;
+   pragma Convention (C, API_Int_Array);
+
    type API_Unbounded_Array is array (Natural range <>)
      of aliased Ada.Strings.Unbounded.Unbounded_String;
+   pragma Convention (C, API_Unbounded_Array);
 
    package API_Int_Pointers is new Interfaces.C.Pointers
      (Index => Natural, Element => Interfaces.C.int,
@@ -38,6 +42,7 @@ private
 
    type API_Int_Pointer_Array is array (Integer range <>)
      of API_Int_Pointers.Pointer;
+   pragma Convention (C, API_Int_Pointer_Array);
 
    type API_Pointers (Ptrs_Length : Integer) is record
       A_Ptrs : API_Int_Pointer_Array (1 .. Ptrs_Length);
@@ -45,14 +50,17 @@ private
    end record;
 
    package API_Unbound_Pointers is new Interfaces.C.Pointers
-     (Index => Natural, Element => Interfaces.C.char_array,
+     (Index => Natural, Element => Interfaces.C.char,
       Element_Array => API_Unbounded_Array,
-      Default_Terminator => Interfaces.C.To_C (""));
+      Default_Terminator => Interfaces.C.nul);
 
    type API_Boolean_Pointer_Array is array (Integer range <>)
      of API_Int_Pointers.Pointer;
+   pragma Convention (C, API_Boolean_Pointer_Array);
+
    type API_Unbound_Pointer_Array is array (Integer range <>)
      of API_Unbound_Pointers.Pointer;
+   pragma Convention (C, API_Unbound_Pointer_Array);
 
    type API_4D_Pointers (Ptrs_Length : Integer) is record
       A_Ptrs : API_Boolean_Pointer_Array (1 .. Ptrs_Length);
