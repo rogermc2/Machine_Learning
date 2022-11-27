@@ -1,9 +1,12 @@
 
 with Interfaces.C;
 
+with Ada.Strings.Unbounded;
+
 package body API_Binding is
 
    function API_Integer_2D (A, B : Integer_Matrix) return API_Pointers is
+      use Interfaces.C;
       First_A_Col : constant Integer := A'First (2);
       First_B_Col : constant Integer := B'First (2);
       A_Value     : aliased Integer;
@@ -12,7 +15,7 @@ package body API_Binding is
    begin
       for row in A'range loop
          A_Value := A (row, First_A_Col);
-         Pointers.A_Ptrs (row) := A_Value'Unchecked_Access;
+         Pointers.A_Ptrs (row) := int (A_Value)'Unchecked_Access;
       end loop;
 
       for row in B'range loop
