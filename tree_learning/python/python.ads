@@ -1,8 +1,8 @@
 
 with System;
 
---  with ML_Types;
---  with NL_Types;
+with ML_Types;
+with NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Python is
@@ -28,9 +28,9 @@ package Python is
                    return Integer;
    procedure Call (M    : Module; Function_Name : String;
                     A, B : Integer_Matrix);
---     procedure Call (M    : Module; Function_Name : String;
---                     Data : NL_Types.Boolean_List_2D;
---                     Labels, Words, Pronounce : ML_Types.Unbounded_List);
+   procedure Call (M    : Module; Function_Name : String;
+                   Data : NL_Types.Boolean_List_2D;
+                   Labels, Words, Pronounce : ML_Types.Unbounded_List);
    --  ...
    
 private
