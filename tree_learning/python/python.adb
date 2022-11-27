@@ -297,7 +297,7 @@ package body Python is
                         API_4D (Data, Labels, Words, Pronounce);
       A_Pointers    : constant API_Int_Pointer_Array :=
                         Get_A_Ptrs (ABCD_Pointers);
-      B_Pointers    : constant API_Int_Pointer_Array :=
+      B_Pointers    : constant API_4D_Pointers :=
                         Get_B_Ptrs (ABCD_Pointers);
       C_Pointers    : constant API_Int_Pointer_Array :=
                         Get_C_Ptrs (ABCD_Pointers);

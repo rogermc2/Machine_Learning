@@ -65,7 +65,7 @@ package body API_Binding is
 
    end API_4D;
 
-   --  -------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------------------------------------------------------------
 
    function Get_A_Int_Ptrs (Ptrs : API_Pointers) return API_Int_Pointer_Array is
    begin
@@ -73,46 +73,45 @@ package body API_Binding is
 
    end Get_A_Int_Ptrs;
 
-   --  -------------------------------------------------------------------------
-
+   --  ------------------------------------------------------------------------------------------------------------------------------
    function Get_B_Int_Ptrs (Ptrs : API_Pointers) return API_Int_Pointer_Array is
    begin
       return Ptrs.B_Ptrs;
 
    end Get_B_Int_Ptrs;
 
-   --  -------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------------------------------------------------------------
 
-   function Get_A_Ptrs (Ptrs : API_4D_Pointers) return API_Int_Pointer_Array is
+   function Get_A_Ptrs (Ptrs : API_4D_Pointers) return API_Boolean_Pointer_Array is
    begin
       return Ptrs.A_Ptrs;
 
    end Get_A_Ptrs;
 
-   --  -------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------------------------------------------------------------
 
-   function Get_B_Ptrs (Ptrs : API_4D_Pointers) return API_Int_Pointer_Array is
+   function Get_B_Ptrs (Ptrs : API_4D_Pointers) return API_Unbound_Pointer_Array is
    begin
       return Ptrs.B_Ptrs;
 
    end Get_B_Ptrs;
 
-   --  -------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------------------------------------------------------------
 
-   function Get_C_Ptrs (Ptrs : API_4D_Pointers) return API_Int_Pointer_Array is
+   function Get_C_Ptrs (Ptrs : API_4D_Pointers) return API_Unbound_Pointer_Array is
    begin
       return Ptrs.C_Ptrs;
 
    end Get_C_Ptrs;
 
-   --  -------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------------------------------------------------------------
 
-   function Get_D_Ptrs (Ptrs : API_4D_Pointers) return API_Int_Pointer_Array is
+   function Get_D_Ptrs (Ptrs : API_4D_Pointers) return API_Unbound_Pointer_Array is
    begin
       return Ptrs.D_Ptrs;
 
    end Get_D_Ptrs;
 
-   --  -------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------------------------------------------------------------
 
 end API_Binding;

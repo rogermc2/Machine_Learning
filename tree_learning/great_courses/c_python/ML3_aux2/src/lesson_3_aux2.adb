@@ -34,7 +34,7 @@ begin
 --     Python.Execute_String
 --       ("clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)");
    Classifier := Python.Import_File ("word_classifier_aux");
-   Python.Call (Classifier, Data, Labels, Words, Pronounce);
+   Python.Call (Classifier, "word_classifier_aux", Data, Labels, Words, Pronounce);
    Put_Line (Routine_Name & "word_classifier_aux module imported");
    Python.Close_Module (Classifier);
 
