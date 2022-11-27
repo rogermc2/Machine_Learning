@@ -1,8 +1,8 @@
 
 with Interfaces.C.Pointers;
 
-with ML_Types;
-with NL_Types;
+--  with ML_Types;
+--  with NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package API_Binding is
@@ -13,8 +13,8 @@ package API_Binding is
    type API_Unbound_Pointer_Array (<>)  is private;
 
    function API_Integer_2D (A, B : Integer_Matrix) return API_Pointers;
-   function API_4D (A : NL_Types.Boolean_List_2D;
-                    B, C, D : ML_Types.Unbounded_List) return API_Pointers;
+--     function API_4D (A : NL_Types.Boolean_List_2D;
+--                      B, C, D : ML_Types.Unbounded_List) return API_Pointers;
    function Get_A_Int_Ptrs (Ptrs : API_Pointers) return API_Int_Pointer_Array;
    function Get_B_Int_Ptrs (Ptrs : API_Pointers) return API_Int_Pointer_Array;
    function Get_A_Ptrs (Ptrs : API_4D_Pointers) return API_Boolean_Pointer_Array;
@@ -23,29 +23,30 @@ package API_Binding is
    function Get_D_Ptrs (Ptrs : API_4D_Pointers) return API_Unbound_Pointer_Array;
 
 private
-   type API_Boolean_Array is array (Integer range <>)
+   type API_Boolean_Array is array (Natural range <>)
      of aliased Interfaces.C.int;
-   type API_Integer_Array is array (Integer range <>)
-     of aliased Interfaces.C.int;
-   type API_Unbounded_Array is array (Integer range <>)
+   type API_Integer_Array is array (Natural range <>)
+     of aliased Integer;
+   type API_Unbounded_Array is array (Natural range <>)
      of aliased Interfaces.C.char;
 
    package API_Int_Pointers is new Interfaces.C.Pointers
-     (Index => Integer, Element => Interfaces.C.int,
+     (Index => Natural, Element => Integer,
       Element_Array => API_Integer_Array,
       Default_Terminator => 0);
 
-   package API_Unbound_Pointers is new Interfaces.C.Pointers
-     (Index => Integer, Element => Interfaces.C.char,
-      Element_Array => API_Unbounded_Array,
-      Default_Terminator => Interfaces.C.nul);
-
-   type API_Int_Pointer_Array is array (Integer range <>) of API_Int_Pointers.Pointer;
+   type API_Int_Pointer_Array is array (Integer range <>)
+     of API_Int_Pointers.Pointer;
 
    type API_Pointers (Ptrs_Length : Integer) is record
       A_Ptrs : API_Int_Pointer_Array (1 .. Ptrs_Length);
       B_Ptrs : API_Int_Pointer_Array (1 .. Ptrs_Length);
    end record;
+
+   package API_Unbound_Pointers is new Interfaces.C.Pointers
+     (Index => Natural, Element => Interfaces.C.char,
+      Element_Array => API_Unbounded_Array,
+      Default_Terminator => Interfaces.C.nul);
 
    type API_Boolean_Pointer_Array is array (Integer range <>)  of API_Int_Pointers.Pointer;
    type API_Unbound_Pointer_Array is array (Integer range <>)  of API_Unbound_Pointers.Pointer;
