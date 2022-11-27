@@ -6,21 +6,21 @@ with Interfaces.C;
 package body API_Binding is
 
    function API_Integer_2D (A, B : Integer_Matrix) return API_Pointers is
-      --        use Interfaces.C;
+      use Interfaces.C;
       --        type Integer_Ptr is access Integer;
       First_A_Col : constant Integer := A'First (2);
       First_B_Col : constant Integer := B'First (2);
-      A_Value     : aliased Integer;
-      B_Value     : aliased Integer;
+      A_Value     : aliased int;
+      B_Value     : aliased int;
       Pointers    : API_Pointers (A'Length);  -- record of A and B pointer lists
    begin
       for row in A'range loop
-         A_Value := A (row, First_A_Col);
+         A_Value := int (A (row, First_A_Col));
          Pointers.A_Ptrs (row) := A_Value'Unchecked_Access;
       end loop;
 
       for row in B'range loop
-         B_Value := B (row, First_B_Col);
+         B_Value := int (B (row, First_B_Col));
          Pointers.B_Ptrs (row) := B_Value'Unchecked_Access;
       end loop;
 
@@ -32,16 +32,14 @@ package body API_Binding is
 
    function API_4D (A       : NL_Types.Boolean_List_2D;
                     B, C, D : ML_Types.Unbounded_List) return API_4D_Pointers is
+      use Interfaces.C;
       use  Ada.Strings.Unbounded;
       --        First_A_Col : constant NL_Types.Boolean_List := A'First (2);
       A_Matrix    : constant Boolean_Matrix := To_Boolean_Matrix (A);
-      A_Value     : aliased Integer;
+      A_Value     : aliased int;
       B_Array     : constant Unbounded_String_Array := To_Unbound_Array (B);
       C_Array     : constant Unbounded_String_Array := To_Unbound_Array (C);
       D_Array     : constant Unbounded_String_Array := To_Unbound_Array (D);
-      B_Value     : aliased Unbounded_String;
-      C_Value     : aliased Unbounded_String;
-      D_Value     : aliased Unbounded_String;
       Pointers    : API_4D_Pointers (Integer (A.Length));
    begin
       for row in A_Matrix'Range loop
@@ -54,12 +52,18 @@ package body API_Binding is
       end loop;
 
       for row in B_Array'Range loop
-         B_Value := B_Array (row);
-         Pointers.B_Ptrs (row) := B_Value'Unchecked_Access;
-         C_Value := C_Array (row);
-         Pointers.C_Ptrs (row) := C_Value'Unchecked_Access;
-         D_Value := D_Array (row);
-         Pointers.D_Ptrs (row) := D_Value'Unchecked_Access;
+         declare
+            B_Value     : aliased char_array :=
+                            To_C (To_String (B_Array (row)));
+            C_Value     : aliased char_array :=
+                            To_C (To_String (C_Array (row)));
+            D_Value     : aliased char_array :=
+                            To_C (To_String (D_Array (row)));
+         begin
+            Pointers.B_Ptrs (row) := B_Value'Unchecked_Access;
+            Pointers.C_Ptrs (row) := C_Value'Unchecked_Access;
+            Pointers.D_Ptrs (row) := D_Value'Unchecked_Access;
+         end;
       end loop;
 
       return Pointers;

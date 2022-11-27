@@ -26,16 +26,15 @@ package API_Binding is
 
 private
    type API_Boolean_Array is array (Natural range <>)
-     of aliased Integer;
-   type API_Integer_Array is array (Natural range <>)
-     of aliased Integer;
+     of aliased Interfaces.C.int;
+   type API_Int_Array is array (Natural range <>)
+     of aliased Interfaces.C.int;
    type API_Unbounded_Array is array (Natural range <>)
      of aliased Ada.Strings.Unbounded.Unbounded_String;
 
    package API_Int_Pointers is new Interfaces.C.Pointers
-     (Index => Natural, Element => Integer,
-      Element_Array => API_Integer_Array,
-      Default_Terminator => 0);
+     (Index => Natural, Element => Interfaces.C.int,
+      Element_Array => API_Int_Array, Default_Terminator => 0);
 
    type API_Int_Pointer_Array is array (Integer range <>)
      of API_Int_Pointers.Pointer;
@@ -46,9 +45,9 @@ private
    end record;
 
    package API_Unbound_Pointers is new Interfaces.C.Pointers
-     (Index => Natural, Element => Ada.Strings.Unbounded.Unbounded_String,
+     (Index => Natural, Element => Interfaces.C.char_array,
       Element_Array => API_Unbounded_Array,
-      Default_Terminator => Ada.Strings.Unbounded.To_Unbounded_String (""));
+      Default_Terminator => Interfaces.C.To_C (""));
 
    type API_Boolean_Pointer_Array is array (Integer range <>)
      of API_Int_Pointers.Pointer;
