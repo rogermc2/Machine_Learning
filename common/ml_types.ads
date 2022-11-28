@@ -2,6 +2,7 @@
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Multiway_Trees;
+with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Numerics.Generic_Real_Arrays;
@@ -51,6 +52,10 @@ package ML_Types is
    package Character_Package is new Ada.Containers.Vectors
      (Positive, Character);
    subtype Character_List is Character_Package.Vector;
+
+   package Bounded_Strings_Package is new Ada.Containers.Indefinite_Vectors
+     (Positive, String);
+   subtype Bounded_String_List is Bounded_Strings_Package.Vector;
 
    package Unbounded_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_String);

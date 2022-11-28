@@ -1,9 +1,15 @@
 
 with Interfaces.C;
+with Interfaces.C.Strings;
 
 --  with Ada.Strings.Unbounded;
 
 package body API_Binding is
+
+   type String_Access is access String;
+   type String_Access_Array is array (Positive range <>) of String_Access;
+
+   --  -------------------------------------------------------------------------
 
    function API_Integer_2D (A, B : Integer_Matrix) return API_Pointers is
       use Interfaces.C;
@@ -31,40 +37,41 @@ package body API_Binding is
    --  -------------------------------------------------------------------------
 
    function API_4D (A       : NL_Types.Boolean_List_2D;
-                    B, C, D : ML_Types.Unbounded_List) return API_4D_Pointers is
+                    B, C, D : ML_Types.Bounded_String_List)
+                    return API_4D_Pointers is
       use Interfaces.C;
+      use  Interfaces.C.Strings;
       use  Ada.Strings.Unbounded;
       --        First_A_Col : constant NL_Types.Boolean_List := A'First (2);
       A_Matrix    : constant Boolean_Matrix := To_Boolean_Matrix (A);
-      A_Value     : aliased int;
-      B_Array     : constant Unbounded_String_Array := To_Unbound_Array (B);
-      C_Array     : constant Unbounded_String_Array := To_Unbound_Array (C);
-      D_Array     : constant Unbounded_String_Array := To_Unbound_Array (D);
+      A_Values    : aliased array
+        (1 .. A_Matrix'Length * A_Matrix'Length (2)) of aliased int;
+      AV_Index    : Natural;
+      B_Ptrs      : String_Access_Array (B.First_Index .. B.Last_Index);
+      C_Ptrs      : String_Access_Array (C.First_Index .. C.Last_Index);
+      D_Ptrs      : String_Access_Array (D.First_Index .. D.Last_Index);
       Pointers    : API_4D_Pointers (Integer (A.Length));
    begin
       for row in A_Matrix'Range loop
-         if A_Matrix (row, 1) then
-            A_Value := 1;
-         else
-            A_Value := 0;
-         end if;
-         Pointers.A_Ptrs (row) := A_Value'Unchecked_Access;
+         for col in A_Matrix'Range (2) loop
+            AV_Index := (row - 1) * A_Matrix'Length + col;
+            if A_Matrix (row, col) then
+               A_Values (AV_Index) := 1;
+            else
+               A_Values (AV_Index) := 0;
+            end if;
+         end loop;
+         AV_Index := row * A_Matrix'Length;
+         Pointers.A_Ptrs (row) := A_Values (AV_Index)'Unchecked_Access;
       end loop;
 
-      for row in B_Array'Range loop
-         declare
-            B_Value     : aliased char_array :=
-                            To_C (To_String (B_Array (row)));
-            C_Value     : aliased char_array :=
-                            To_C (To_String (C_Array (row)));
-            D_Value     : aliased char_array :=
-                            To_C (To_String (D_Array (row)));
-         begin
-            Pointers.B_Ptrs (row) := B_Value'Unchecked_Access;
-            Pointers.C_Ptrs (row) := C_Value'Unchecked_Access;
-            Pointers.D_Ptrs (row) := D_Value'Unchecked_Access;
-         end;
+      for row in B_Ptrs'Range loop
+            B_Ptrs (row) := New_String (B (row));
+            C_Ptrs (row) := New_String (C (row));
+            D_Ptrs (row) := New_String (D (row));
       end loop;
+
+      Pointers.B_Ptrs := B_Ptrs;
 
       return Pointers;
 

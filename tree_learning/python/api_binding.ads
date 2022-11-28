@@ -16,7 +16,8 @@ package API_Binding is
 
    function API_Integer_2D (A, B : Integer_Matrix) return API_Pointers;
    function API_4D (A : NL_Types.Boolean_List_2D;
-                    B, C, D : ML_Types.Unbounded_List) return API_4D_Pointers;
+                    B, C, D : ML_Types.Bounded_String_List)
+                    return API_4D_Pointers;
    function Get_A_Int_Ptrs (Ptrs : API_Pointers) return API_Int_Pointer_Array;
    function Get_B_Int_Ptrs (Ptrs : API_Pointers) return API_Int_Pointer_Array;
    function Get_A_Ptrs (Ptrs : API_4D_Pointers) return API_Boolean_Pointer_Array;
