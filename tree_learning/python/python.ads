@@ -29,6 +29,9 @@ package Python is
    procedure Call (M    : Module; Function_Name : String;
                     A, B : Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
+                   Data   : NL_Types.Boolean_List_2D;
+                   Labels : ML_Types.Bounded_String_List);
+   procedure Call (M    : Module; Function_Name : String;
                    Data : NL_Types.Boolean_List_2D;
                    Labels, Words, Pronounce : ML_Types.Bounded_String_List);
    --  ...

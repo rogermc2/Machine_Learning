@@ -174,6 +174,23 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
+   procedure Call_Object (F : PyObject; Function_Name : String;
+                         PyParams : PyObject) is
+      PyResult : PyObject;
+      use type System.Address;
+   begin
+      PyResult := PyObject_CallObject (F, PyParams);
+      if PyResult = System.Null_Address then
+         Put ("Python.Call_Object ");
+         PyErr_Print;
+         raise Interpreter_Error with "Python.Call_Object, operation " &
+           Function_Name & " failed";
+      end if;
+      
+   end Call_Object;     
+   
+   --  -------------------------------------------------------------------------
+
    function Call_Object (F        : PyObject; Function_Name : String;
                          PyParams : PyObject) return PyObject is
       PyResult : PyObject;
@@ -280,6 +297,37 @@ package body Python is
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
+
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+   
+   procedure Call (M      : Module; Function_Name : String;
+                   Data   : NL_Types.Boolean_List_2D;
+                   Labels : ML_Types.Bounded_String_List) is
+      use API_Binding;
+      Routine_Name  : constant String := "Python.Call 2 ";
+      F             : constant PyObject := Get_Symbol (M, Function_Name);
+      AB_Pointers : constant API_2D_Pointers := API_2D (Data, Labels);
+      A_Pointers    : constant API_Boolean_Pointer_Array :=
+                        Get_A_Ptrs (AB_Pointers);
+      B_Pointers    : constant Char_Ptr_Array := Get_B_Ptrs (AB_Pointers);
+      
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              A_Ptrs  : API_Boolean_Pointer_Array;
+                              B_Ptrs  : Char_Ptr_Array)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      PyParams : PyObject;
+   begin
+      Put_Line (Routine_Name);
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("oooo"), A_Pointers, B_Pointers);
+      Put_Line (Routine_Name & "PyParams set");
+                              
+      Call_Object (F, Function_Name, PyParams);
+      Put_Line (Routine_Name & "PyResult set");
+      Py_DecRef (PyParams);
 
    end Call;
    
