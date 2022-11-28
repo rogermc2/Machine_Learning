@@ -12,7 +12,7 @@ package API_Binding is
    type API_Boolean_Pointer_Array (<>) is private;
    type API_Int_Pointer_Array (<>)  is private;
    type API_Pointers (Ptrs_Length : Integer)  is private;
-   type API_4D_Pointers (Ptrs_Length : Integer) is private;
+   type API_4D_Pointers (A_Length, B_Length, C_Length, D_Length : Integer) is private;
    type API_Unbound_Pointer_Array (<>) is private;
    type Char_Ptr_Array (<>) is private;
 
@@ -68,11 +68,11 @@ private
      of API_Unbound_Pointers.Pointer;
    pragma Convention (C, API_Unbound_Pointer_Array);
 
-   type API_4D_Pointers (Ptrs_Length : Integer) is record
-      A_Ptrs : API_Boolean_Pointer_Array (1 .. Ptrs_Length);
-      B_Ptrs : Char_Ptr_Array (1 .. Ptrs_Length);
-      C_Ptrs : Char_Ptr_Array (1 .. Ptrs_Length);
-      D_Ptrs : Char_Ptr_Array (1 .. Ptrs_Length);
+   type API_4D_Pointers (A_Length, B_Length, C_Length, D_Length  : Integer) is record
+      A_Ptrs : API_Boolean_Pointer_Array (1 .. A_Length);
+      B_Ptrs : Char_Ptr_Array (1 .. B_Length);
+      C_Ptrs : Char_Ptr_Array (1 .. C_Length);
+      D_Ptrs : Char_Ptr_Array (1 .. D_Length);
    end record;
 
 end API_Binding;

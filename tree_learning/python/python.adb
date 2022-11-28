@@ -7,10 +7,6 @@ with API_Binding;
 package body Python is
 
    subtype PyObject is System.Address;
-   
-   --  this matrix is column-major (i.e. the first index defines the column,
-   --  the second index defines the row).
-   --     package Integer_Matrices is new Matrices (Integer, Integer);
 
    pragma Warnings (Off, "function ""PyCheck_Tuple"" is not referenced");
    function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
@@ -290,6 +286,7 @@ package body Python is
    procedure Call (M                        : Module; Function_Name : String;
                    Data                     : NL_Types.Boolean_List_2D;
                    Labels, Words, Pronounce : ML_Types.Bounded_String_List) is
+      use Interfaces.C;
       use API_Binding;
       Routine_Name  : constant String := "Python.Call 4 ";
       F             : constant PyObject := Get_Symbol (M, Function_Name);
@@ -318,7 +315,10 @@ package body Python is
       Put_Line (Routine_Name & "PyParams set");
                               
       PyResult := Call_Object (F, Function_Name, PyParams);
+      Put_Line (Routine_Name & "PyResult set");
       Result := PyInt_AsLong (PyResult);
+      Put_Line (Routine_Name & "Number of correct words:" &
+                  long'Image (Result));
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 

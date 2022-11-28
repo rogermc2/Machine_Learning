@@ -10,4 +10,4 @@ def word_classifier_aux (dat, labels, words, pros, features):
     for i in range(len(words)):
         if clf.predict([features([words[i], pros[i]])]) == labels[i]: correct = correct + 1
     print("Number of correct words: ", correct)
-
+    return (correct)

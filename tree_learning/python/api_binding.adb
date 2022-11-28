@@ -47,7 +47,8 @@ package body API_Binding is
       B_Ptrs   : Char_Ptr_Array (B.First_Index .. B.Last_Index);
       C_Ptrs   : Char_Ptr_Array (C.First_Index .. C.Last_Index);
       D_Ptrs   : Char_Ptr_Array (D.First_Index .. D.Last_Index);
-      Pointers : API_4D_Pointers (Integer (A.Length));
+      Pointers : API_4D_Pointers (A_Values'Length, B_Ptrs'Length,
+                                  C_Ptrs'Length, D_Ptrs'Length);
    begin
       Put_Line (Routine_Name);
       for row in A_Matrix'Range loop
@@ -96,9 +97,7 @@ package body API_Binding is
 
    function Get_A_Ptrs (Ptrs : API_4D_Pointers) return
      API_Boolean_Pointer_Array is
-      Routine_Name  : constant String := "Python.Call 4 ";
    begin
-      Put_Line (Routine_Name);
       return Ptrs.A_Ptrs;
 
    end Get_A_Ptrs;
