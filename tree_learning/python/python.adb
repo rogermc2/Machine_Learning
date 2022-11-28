@@ -3,7 +3,6 @@ with Interfaces.C;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with API_Binding;
---  with Matrices;
 
 package body Python is
 
@@ -132,9 +131,9 @@ package body Python is
       Execute_String ("cwd = os.getcwd()");
       Execute_String ("os.path.join (cwd, '/src/py_package')");
       Execute_String ("os.chdir(cwd + '/src/py_package')");
---        Execute_String ("print ('cwd: ', os.getcwd())");
---        Execute_String ("print ('cwd files: ', os.listdir(os.getcwd()))");
---        Execute_String ("print ('Path: ', sys.path)");
+      --        Execute_String ("print ('cwd: ', os.getcwd())");
+      --        Execute_String ("print ('cwd files: ', os.listdir(os.getcwd()))");
+      --        Execute_String ("print ('Path: ', sys.path)");
       declare
          M  : constant PyObject := PyImport_Import (PyFileName); 
       begin
@@ -288,36 +287,35 @@ package body Python is
    
    --  -------------------------------------------------------------------------
    
-   procedure Call (M    : Module; Function_Name : String;
-                   Data : NL_Types.Boolean_List_2D;
-                   Labels, Words, Pronounce : ML_Types.Unbounded_List) is
+   procedure Call (M                        : Module; Function_Name : String;
+                   Data                     : NL_Types.Boolean_List_2D;
+                   Labels, Words, Pronounce : ML_Types.Bounded_String_List) is
       use API_Binding;
+      Routine_Name  : constant String := "Python.Call 4 ";
       F             : constant PyObject := Get_Symbol (M, Function_Name);
       ABCD_Pointers : constant API_4D_Pointers :=
                         API_4D (Data, Labels, Words, Pronounce);
       A_Pointers    : constant API_Boolean_Pointer_Array :=
                         Get_A_Ptrs (ABCD_Pointers);
-      B_Pointers    : constant API_Unbound_Pointer_Array :=
-                        Get_B_Ptrs (ABCD_Pointers);
-      C_Pointers    : constant API_Unbound_Pointer_Array :=
-                        Get_C_Ptrs (ABCD_Pointers);
-      D_Pointers    : constant API_Unbound_Pointer_Array :=
-                        Get_D_Ptrs (ABCD_Pointers);
+      B_Pointers    : constant Char_Ptr_Array := Get_B_Ptrs (ABCD_Pointers);
+      C_Pointers    : constant Char_Ptr_Array := Get_C_Ptrs (ABCD_Pointers);
+      D_Pointers    : constant Char_Ptr_Array := Get_D_Ptrs (ABCD_Pointers);
       
-      function Py_BuildValue (Format : Interfaces.C.char_array;
-                              A_Ptrs : API_Boolean_Pointer_Array;
-                              B_Ptrs : API_Unbound_Pointer_Array;
-                              C_Ptrs : API_Unbound_Pointer_Array;
-                              D_Ptrs : API_Unbound_Pointer_Array) return PyObject;
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              A_Ptrs  : API_Boolean_Pointer_Array;
+                              B_Ptrs, C_Ptrs,
+                              D_Ptrs  : Char_Ptr_Array)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
+      Put_Line (Routine_Name);
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("oooo"), A_Pointers, B_Pointers,
                        C_Pointers, D_Pointers);
+      Put_Line (Routine_Name & "PyParams set");
                               
       PyResult := Call_Object (F, Function_Name, PyParams);
       Result := PyInt_AsLong (PyResult);

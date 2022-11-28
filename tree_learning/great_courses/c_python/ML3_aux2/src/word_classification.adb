@@ -24,9 +24,8 @@ package body Word_Classification is
    procedure Build_Data (Data_In      : ML_Types.Unbounded_List;
                          Data_Out     : out NL_Types.Boolean_List_2D;
                          Labels, Words,
-                         Pronounce    : out ML_Types.Unbounded_List) is
+                         Pronounce    : out ML_Types.Bounded_String_List) is
       use ML_Types.String_Package;
-      --        use ML_Types.Unbounded_Package;
       Routine_Name : constant String := "Word_Classification.Build_Data ";
       Curs         : Cursor;
       aLine        : Unbounded_String;
@@ -49,15 +48,15 @@ package body Word_Classification is
          Data_Out.Append (Features);
          Curs := Word_Line.First;
          --           Put_Line (Routine_Name & "Curs set");
-         Words.Append (Element (Curs));
+         Words.Append (To_String (Element (Curs)));
          --           Put_Line (Routine_Name & " Words Appended");
-         Pronounce.Append (Element (Next (Curs)));
+         Pronounce.Append (To_String (Element (Next (Curs))));
          --           Put_Line (Routine_Name & "Pronounce Appended");
          declare
-            aWord : constant String := To_String (Words.Last_Element);
+            aWord : constant String := Words.Last_Element;
          begin
             if Ada.Strings.Fixed.Index (aWord, "ie") > 0 then
-               Labels.Append (To_Unbounded_String (aWord));
+               Labels.Append (aWord);
             end if;
          end;
 
@@ -74,7 +73,7 @@ package body Word_Classification is
 
    procedure Build_Dataset
      (IE_Data, EI_Data         : ML_Types.Unbounded_List;
-      Labels, Words, Pronounce : out ML_Types.Unbounded_List;
+      Labels, Words, Pronounce : out ML_Types.Bounded_String_List;
       Data                    : out NL_Types.Boolean_List_2D) is
 
    begin

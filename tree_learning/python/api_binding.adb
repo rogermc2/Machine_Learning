@@ -1,7 +1,7 @@
 
 with Interfaces.C;
 
---  with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body API_Binding is
 
@@ -12,7 +12,6 @@ package body API_Binding is
 
    function API_Integer_2D (A, B : Integer_Matrix) return API_Pointers is
       use Interfaces.C;
-      --        type Integer_Ptr is access Integer;
       First_A_Col : constant Integer := A'First (2);
       First_B_Col : constant Integer := B'First (2);
       A_Value     : aliased int;
@@ -40,15 +39,17 @@ package body API_Binding is
                     return API_4D_Pointers is
       use Interfaces.C;
       use  Interfaces.C.Strings;
-      A_Matrix    : constant Boolean_Matrix := To_Boolean_Matrix (A);
-      A_Values    : aliased array
+      Routine_Name : constant String := "API_Binding.API_4D ";
+      A_Matrix : constant Boolean_Matrix := To_Boolean_Matrix (A);
+      A_Values : aliased array
         (1 .. A_Matrix'Length * A_Matrix'Length (2)) of aliased int;
-      AV_Index    : Natural;
-      B_Ptrs      : Char_Ptr_Array (B.First_Index .. B.Last_Index);
-      C_Ptrs      : Char_Ptr_Array (C.First_Index .. C.Last_Index);
-      D_Ptrs      : Char_Ptr_Array (D.First_Index .. D.Last_Index);
-      Pointers    : API_4D_Pointers (Integer (A.Length));
+      AV_Index : Natural;
+      B_Ptrs   : Char_Ptr_Array (B.First_Index .. B.Last_Index);
+      C_Ptrs   : Char_Ptr_Array (C.First_Index .. C.Last_Index);
+      D_Ptrs   : Char_Ptr_Array (D.First_Index .. D.Last_Index);
+      Pointers : API_4D_Pointers (Integer (A.Length));
    begin
+      Put_Line (Routine_Name);
       for row in A_Matrix'Range loop
          for col in A_Matrix'Range (2) loop
             AV_Index := (row - 1) * A_Matrix'Length + col;
@@ -93,8 +94,11 @@ package body API_Binding is
 
    --  ------------------------------------------------------------------------------------------------------------------------------
 
-   function Get_A_Ptrs (Ptrs : API_4D_Pointers) return API_Boolean_Pointer_Array is
+   function Get_A_Ptrs (Ptrs : API_4D_Pointers) return
+     API_Boolean_Pointer_Array is
+      Routine_Name  : constant String := "Python.Call 4 ";
    begin
+      Put_Line (Routine_Name);
       return Ptrs.A_Ptrs;
 
    end Get_A_Ptrs;

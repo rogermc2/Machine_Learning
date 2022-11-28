@@ -30,7 +30,7 @@ package Python is
                     A, B : Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
                    Data : NL_Types.Boolean_List_2D;
-                   Labels, Words, Pronounce : ML_Types.Unbounded_List);
+                   Labels, Words, Pronounce : ML_Types.Bounded_String_List);
    --  ...
    
 private

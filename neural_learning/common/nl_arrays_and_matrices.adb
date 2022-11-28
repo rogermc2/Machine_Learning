@@ -1,6 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -708,9 +708,10 @@ package body NL_Arrays_And_Matrices is
       Result  : Boolean_Matrix (1 .. Integer (List.Length),
                                 1 .. Integer (List.First_Element.Length));
    begin
+      Put_Line ("To_Boolean_Matrix");
       for row in Result'Range loop
          List_1D := List (row);
-         for col in Result'Range (2) loop
+         for col in List_1D.First_Index .. List_1D.Last_Index loop
             Result (row, col) := List_1D (col);
          end loop;
       end loop;
