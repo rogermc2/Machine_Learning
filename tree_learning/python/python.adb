@@ -181,8 +181,10 @@ package body Python is
    begin
       PyResult := PyObject_CallObject (F, PyParams);
       if PyResult = System.Null_Address then
-         raise Interpreter_Error with "Operation " & Function_Name &
-           " did not return expected result";
+         Put ("Python.Call_Object ");
+         PyErr_Print;
+         raise Interpreter_Error with "Python.Call_Object, operation " &
+           Function_Name &" did not return expected result";
       end if;
       
       return PyResult;
