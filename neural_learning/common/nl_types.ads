@@ -88,6 +88,8 @@ package NL_Types is
    subtype Boolean_List is Boolean_Package.Vector;
    package Boolean_Sorting is new Boolean_Package.Generic_Sorting ("<");
 
+   type Boolean_Array_Of_Lists is array (Integer range <>) of Boolean_List;
+
    use Boolean_Package;
    package Boolean_Package_2D is new
      Ada.Containers.Vectors (Positive, Boolean_List);

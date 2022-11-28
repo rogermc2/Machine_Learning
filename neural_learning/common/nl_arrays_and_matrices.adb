@@ -702,11 +702,51 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Boolean_Array_Of_Lists (List : NL_Types.Boolean_List_2D)
+                              return NL_Types.Boolean_Array_Of_Lists is
+      use NL_Types;
+   begin
+      if not List.Is_Empty then
+         declare
+            Result : Boolean_Array_Of_Lists
+              (List.First_Index .. List.Last_Index);
+         begin
+            for row in Result'Range loop
+               Result (row) := List (row);
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Boolean_Array_Of_Lists (1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
+
+   end To_Boolean_Array_Of_Lists;
+
+   --  ------------------------------------------------------------------------
+
    function To_Boolean_Matrix (List : NL_Types.Boolean_List_2D)
                                return Boolean_Matrix is
+      function Length_2 return Positive is
+         Row_Length : Positive;
+         Max        : Positive := 1;
+      begin
+         for row in List.First_Index .. List.Last_Index loop
+            Row_Length := Positive (List (row).Length);
+            if Row_Length > Max then
+               Max := Row_Length;
+            end if;
+         end loop;
+         return Max;
+      end Length_2;
+
       List_1D : NL_Types.Boolean_List;
-      Result  : Boolean_Matrix (1 .. Integer (List.Length),
-                                1 .. Integer (List.First_Element.Length));
+      Result  : Boolean_Matrix
+        (1 .. Integer (List.Length), 1 .. Length_2) :=
+                  (others => (others => False));
    begin
       Put_Line ("To_Boolean_Matrix");
       for row in Result'Range loop
