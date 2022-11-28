@@ -308,7 +308,7 @@ package body Python is
       use API_Binding;
       Routine_Name  : constant String := "Python.Call 2 ";
       F             : constant PyObject := Get_Symbol (M, Function_Name);
-      AB_Pointers : constant API_2D_Pointers := API_2D (Data, Labels);
+      AB_Pointers   : constant API_2D_Pointers := API_2D (Data, Labels);
       A_Pointers    : constant API_Boolean_Pointer_Array :=
                         Get_A_Ptrs (AB_Pointers);
       B_Pointers    : constant Char_Ptr_Array := Get_B_Ptrs (AB_Pointers);
@@ -322,7 +322,7 @@ package body Python is
    begin
       Put_Line (Routine_Name);
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("oooo"), A_Pointers, B_Pointers);
+        Py_BuildValue (Interfaces.C.To_C ("oo"), A_Pointers, B_Pointers);
       Put_Line (Routine_Name & "PyParams set");
                               
       Call_Object (F, Function_Name, PyParams);
