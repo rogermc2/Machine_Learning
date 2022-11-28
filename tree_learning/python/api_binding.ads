@@ -1,5 +1,6 @@
 
 with Interfaces.C.Pointers;
+with Interfaces.C.Strings;
 
 with Ada.Strings.Unbounded;
 
@@ -12,7 +13,8 @@ package API_Binding is
    type API_Int_Pointer_Array (<>)  is private;
    type API_Pointers (Ptrs_Length : Integer)  is private;
    type API_4D_Pointers (Ptrs_Length : Integer) is private;
-   type API_Unbound_Pointer_Array (<>)  is private;
+   type API_Unbound_Pointer_Array (<>) is private;
+   type Char_Ptr_Array (<>) is private;
 
    function API_Integer_2D (A, B : Integer_Matrix) return API_Pointers;
    function API_4D (A : NL_Types.Boolean_List_2D;
@@ -21,11 +23,14 @@ package API_Binding is
    function Get_A_Int_Ptrs (Ptrs : API_Pointers) return API_Int_Pointer_Array;
    function Get_B_Int_Ptrs (Ptrs : API_Pointers) return API_Int_Pointer_Array;
    function Get_A_Ptrs (Ptrs : API_4D_Pointers) return API_Boolean_Pointer_Array;
-   function Get_B_Ptrs (Ptrs : API_4D_Pointers) return API_Unbound_Pointer_Array;
-   function Get_C_Ptrs (Ptrs : API_4D_Pointers) return API_Unbound_Pointer_Array;
-   function Get_D_Ptrs (Ptrs : API_4D_Pointers) return API_Unbound_Pointer_Array;
+   function Get_B_Ptrs (Ptrs : API_4D_Pointers) return Char_Ptr_Array;
+   function Get_C_Ptrs (Ptrs : API_4D_Pointers) return Char_Ptr_Array;
+   function Get_D_Ptrs (Ptrs : API_4D_Pointers) return Char_Ptr_Array;
 
 private
+   type Char_Ptr_Array is array (Integer range <>) of
+     Interfaces.C.Strings.chars_ptr;
+
    type API_Boolean_Array is array (Natural range <>)
      of aliased Interfaces.C.int;
    pragma Convention (C, API_Boolean_Array);
@@ -65,9 +70,9 @@ private
 
    type API_4D_Pointers (Ptrs_Length : Integer) is record
       A_Ptrs : API_Boolean_Pointer_Array (1 .. Ptrs_Length);
-      B_Ptrs : API_Unbound_Pointer_Array (1 .. Ptrs_Length);
-      C_Ptrs : API_Unbound_Pointer_Array (1 .. Ptrs_Length);
-      D_Ptrs : API_Unbound_Pointer_Array (1 .. Ptrs_Length);
+      B_Ptrs : Char_Ptr_Array (1 .. Ptrs_Length);
+      C_Ptrs : Char_Ptr_Array (1 .. Ptrs_Length);
+      D_Ptrs : Char_Ptr_Array (1 .. Ptrs_Length);
    end record;
 
 end API_Binding;
