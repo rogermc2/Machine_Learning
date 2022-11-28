@@ -1,4 +1,3 @@
-
 project Lesson_03_Aux2 is
 
    type Operating_System_Type is
@@ -8,6 +7,7 @@ project Lesson_03_Aux2 is
    for Object_Dir use "obj";
    for Main use ("lesson_3_aux2.adb");
    for Exec_Dir use ".";
+   for Languages use ("Ada");
 
    package Compiler is
       for Default_Switches ("ada") use ("-gnatwkmru", "-gnatyclux");
@@ -16,15 +16,14 @@ project Lesson_03_Aux2 is
    package Linker is
 
       case Operating_System is
+
          when "high_sierra" =>
-            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.0/Frameworks/Python.framework/Versions/3.11/lib", "-lpython3.11");
 
          when "ventura" =>
-            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.0/Frameworks/Python.framework/Versions/3.11/lib", "-lpython3.11");
       end case;
    end Linker;
-
-   for Languages use ("Ada");
 
 end Lesson_03_Aux2;
 

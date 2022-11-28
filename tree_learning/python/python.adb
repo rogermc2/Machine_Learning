@@ -47,6 +47,13 @@ package body Python is
                                  return PyObject;
    pragma Import (C, PyObject_CallObject, "PyObject_CallObject");
    
+   --  args is a C array consisting of the positional arguments followed by the
+   --  values of the keyword arguments which can be NULL if there are no arguments
+   function PyObject_VectorCall (Obj : PyObject; Args : PyObject;
+                                 Key_Words : PyObject := System.Null_Address)
+                                 return PyObject;
+   pragma Import (C, PyObject_VectorCall, "PyObject_Vectorcall");
+   
    pragma Warnings (Off, "function ""PyParse_Tuple"" is not referenced");
    function PyParse_Tuple (Args : PyObject; Index : Interfaces.C.char_array; Obj : PyObject)
                            return Interfaces.C.int;  --  returns Boolean
@@ -175,9 +182,9 @@ package body Python is
    --  -------------------------------------------------------------------------
     
    procedure Call_Object (F : PyObject; Function_Name : String;
-                         PyParams : PyObject) is
-      PyResult : PyObject;
+                          PyParams : PyObject) is
       use type System.Address;
+      PyResult : PyObject;
    begin
       PyResult := PyObject_CallObject (F, PyParams);
       if PyResult = System.Null_Address then
@@ -193,8 +200,8 @@ package body Python is
 
    function Call_Object (F        : PyObject; Function_Name : String;
                          PyParams : PyObject) return PyObject is
-      PyResult : PyObject;
       use type System.Address;
+      PyResult : PyObject; 
    begin
       PyResult := PyObject_CallObject (F, PyParams);
       if PyResult = System.Null_Address then
@@ -209,6 +216,24 @@ package body Python is
    end Call_Object;     
    
    --  -------------------------------------------------------------------------
+   
+   procedure Vector_Call_Object (F : PyObject; Function_Name : String;
+                                 PyParams : PyObject) is
+      use type System.Address;
+      PyResult : PyObject;
+   begin
+      PyResult := PyObject_VectorCall (F, PyParams);
+      if PyResult = System.Null_Address then
+         Put ("Python.Vector_Call_Object ");
+         PyErr_Print;
+         raise Interpreter_Error with "Python.Vector_Call_Object, operation " &
+           Function_Name & " failed";
+      end if;
+      
+   end Vector_Call_Object;     
+   
+   --  -------------------------------------------------------------------------
+
    --  public operations
    
    procedure Call (M : Module; Function_Name : String) is
@@ -325,7 +350,7 @@ package body Python is
         Py_BuildValue (Interfaces.C.To_C ("oo"), A_Pointers, B_Pointers);
       Put_Line (Routine_Name & "PyParams set");
                               
-      Call_Object (F, Function_Name, PyParams);
+      Vector_Call_Object (F, Function_Name, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       Py_DecRef (PyParams);
 

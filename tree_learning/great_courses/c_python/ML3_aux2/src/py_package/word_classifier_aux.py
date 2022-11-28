@@ -1,3 +1,4 @@
+import sklearn
 from sklearn import tree
 
 def word_classifier_aux (dat, labels):
@@ -10,4 +11,4 @@ def word_classifier_aux (dat, labels):
 #    for i in range(len(words)):
 #        if clf.predict([features([words[i], pros[i]])]) == labels[i]: correct = correct + 1
 #    print("Number of correct words: ", correct)
-#    return (correct)
+
