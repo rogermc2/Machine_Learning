@@ -184,7 +184,7 @@ package body Python is
          Put ("Python.Call_Object ");
          PyErr_Print;
          raise Interpreter_Error with "Python.Call_Object, operation " &
-           Function_Name &" did not return expected result";
+           Function_Name & " failed";
       end if;
       
       return PyResult;
