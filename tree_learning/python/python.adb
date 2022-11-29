@@ -12,6 +12,9 @@ package body Python is
    function PyArray_SimpleNewFromData (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyArray_SimpleNewFromData, "PyArray_SimpleNewFromData");
 
+   function PyBytes_AsString (Text : Interfaces.C.char_array) return PyObject;
+   pragma Import (C, PyBytes_AsString, "PyBytes_AsString");
+   
    function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
    
@@ -93,6 +96,12 @@ package body Python is
     
    --  -------------------------------------------------------------------------
     
+   function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject;
+   function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
+   function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject;
+   
+   --  -------------------------------------------------------------------------
+   
    procedure Initialize (Program_Name : String := "") is
       use  Interfaces.C;
    begin
@@ -315,6 +324,7 @@ package body Python is
       use API_Binding;
       Routine_Name  : constant String := "Python.Call 2 ";
       F             : constant PyObject := Get_Symbol (M, Function_Name);
+      Data_Tuple    : constant PyObject := To_Tuple (Data);
       AB_Pointers   : constant API_2D_Pointers := API_2D (Data, Labels);
       A_Pointers    : constant API_Boolean_Pointer_Array :=
                         Get_A_Ptrs (AB_Pointers);
@@ -426,6 +436,53 @@ package body Python is
             PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
          end loop;
          PyTuple_SetItem (Result, int (row), Item);
+      end loop;
+
+      return Result;
+      
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject is
+      use Interfaces.C;
+      Row_Size   : int;
+      Long_Value : long;
+      Item       : PyObject;
+      Result     : PyObject := PyTuple_New (int (Data.Length));
+   begin
+      for row in Data.First_Index .. Data.Last_Index loop
+         Row_Size := int (Data (row).Length);
+         Item := PyTuple_New (Row_Size);
+         for col in Data (row).First_Index .. Data (row).Last_Index loop
+            if Data (row) (col) then
+               Long_Value := 1;
+            else
+               Long_Value := 0;
+            end if;
+            PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
+         end loop;
+         PyTuple_SetItem (Result, int (row), Item);
+      end loop;
+
+      return Result;
+      
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject is
+      use Interfaces.C;
+      Row_Size   : int;
+      Result     : PyObject := PyTuple_New (int (Data.Length));
+   begin
+      for row in Data.First_Index .. Data.Last_Index loop
+            declare
+               Text : constant char_array := To_C (Data (row));
+               Item : constant PyObject := PyBytes_AsString (Text);
+            begin
+            PyTuple_SetItem (Result, int (row), Item);
+            end;
       end loop;
 
       return Result;
