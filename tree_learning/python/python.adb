@@ -46,6 +46,9 @@ package body Python is
                              Item : Interfaces.C.Int);
    pragma Import (C, PyList_SetItem, "PyList_SetItem");  
    
+   function PyLong_FromLong (Val : Interfaces.C.long) return PyObject;
+   pragma Import (C, PyLong_FromLong, "PyLong_FromLong");
+   
    function PyObject_GetAttrString
      (Obj : PyObject; Name : Interfaces.C.char_array) return PyObject;
    pragma Import (C, PyObject_GetAttrString, "PyObject_GetAttrString");  
@@ -56,10 +59,10 @@ package body Python is
    
    --  args is a C array consisting of the positional arguments followed by the
    --  values of the keyword arguments which can be NULL if there are no arguments
---     function PyObject_VectorCall (Obj       : PyObject; Args : PyObject;
---                                   Key_Words : PyObject := System.Null_Address)
---                                   return PyObject;
---     pragma Import (C, PyObject_VectorCall, "PyObject_Vectorcall");
+   --     function PyObject_VectorCall (Obj       : PyObject; Args : PyObject;
+   --                                   Key_Words : PyObject := System.Null_Address)
+   --                                   return PyObject;
+   --     pragma Import (C, PyObject_VectorCall, "PyObject_Vectorcall");
    
    function PyParse_Tuple (Args : PyObject; Index : Interfaces.C.char_array; Obj : PyObject)
                            return Interfaces.C.int;  --  returns Boolean
@@ -78,6 +81,13 @@ package body Python is
    
    procedure PySys_SetPath (Path : Interfaces.C.char_array);
    pragma Import (C, PySys_SetPath, "PySys_SetPath");
+   
+   function PyTuple_New (Length : Interfaces.C.int) return PyObject;
+   pragma Import (C, PyTuple_New, "PyTuple_New");
+   
+   procedure PyTuple_SetItem (Tuple : PyObject; Pos : Interfaces.C.int;
+                              Item : PyObject);
+   pragma Import (C, PyTuple_SetItem, "PyTuple_SetItem");
    
    pragma Warnings (On);
     
@@ -377,18 +387,21 @@ package body Python is
    --  -------------------------------------------------------------------------
    
    function Convert_Big_Array (Data : Boolean_Array) return PyObject is
+      use System;
       use Interfaces.C;
       Py_List : PyObject := PyList_New (Data'Length);
       Py_Item : Int;
-   begin
-      for index in Data'Range loop
-         if Data (index) then
-            Py_Item := 1;
-         else
-             Py_Item := 0;
-         end if;
-         PyList_SetItem (Py_List, int (index), Py_Item);
-      end loop;
+   begin 
+      if Py_List /= Null_Address then
+         for index in Data'Range loop
+            if Data (index) then
+               Py_Item := 1;
+            else
+               Py_Item := 0;
+            end if;
+            PyList_SetItem (Py_List, int (index), Py_Item);
+         end loop;
+      end if;
       
       return Py_List;
       
@@ -396,4 +409,29 @@ package body Python is
 
    --  -------------------------------------------------------------------------
    
+   function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
+      use Interfaces.C;
+      Row_Size   : int;
+      Value      : Integer;
+      Long_Value : long;
+      Item       : PyObject;
+      Result     : PyObject := PyTuple_New (int (Data.Length));
+   begin
+      for row in Data.First_Index .. Data.Last_Index loop
+         Row_Size := int (Data (row).Length);
+         Item := PyTuple_New (Row_Size);
+         for col in Data (row).First_Index .. Data (row).Last_Index loop
+            Value := Data (row) (col);
+            Long_Value := long (Value);
+            PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
+         end loop;
+         PyTuple_SetItem (Result, int (row), Item);
+      end loop;
+
+      return Result;
+      
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
 end Python;
