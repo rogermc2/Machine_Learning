@@ -1,5 +1,6 @@
 with Interfaces.C;
 
+with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with API_Binding;
@@ -15,6 +16,9 @@ package body Python is
    function PyBytes_AsString (Text : Interfaces.C.char_array) return PyObject;
    pragma Import (C, PyBytes_AsString, "PyBytes_AsString");
    
+   function PyBytes_FromString (Text : Interfaces.C.char_array) return PyObject;
+   pragma Import (C, PyBytes_FromString, "PyBytes_FromString");
+
    function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
    
@@ -420,6 +424,7 @@ package body Python is
    
    function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
       use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
       Row_Size   : int;
       Value      : Integer;
       Long_Value : long;
@@ -439,12 +444,18 @@ package body Python is
 
       return Result;
       
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise Interpreter_Error;
+         
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
 
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject is
       use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Boolean_List_2D ";
       Row_Size   : int;
       Long_Value : long;
       Item       : PyObject;
@@ -465,6 +476,11 @@ package body Python is
       end loop;
 
       return Result;
+       
+  exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" &  Exception_Message (E));
+         raise Interpreter_Error;
       
    end To_Tuple;
 
@@ -472,19 +488,25 @@ package body Python is
 
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject is
       use Interfaces.C;
-      Row_Size   : int;
-      Result     : PyObject := PyTuple_New (int (Data.Length));
+      Routine_Name : constant String := "Python.To_Tuple Bounded_String_List ";
+      Result       : PyObject := PyTuple_New (int (Data.Length));
    begin
       for row in Data.First_Index .. Data.Last_Index loop
-         declare
+         Put_Line (Routine_Name & "row" & Integer'Image (row));         declare
             Text : constant char_array := To_C (Data (row));
-            Item : constant PyObject := PyBytes_AsString (Text);
+            Item : constant PyObject := PyBytes_FromString (Text);
          begin
+            Put_Line (Routine_Name & "Data (row)): " & Data (row));
             PyTuple_SetItem (Result, int (row), Item);
          end;
       end loop;
 
       return Result;
+   
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise Interpreter_Error;
       
    end To_Tuple;
 
