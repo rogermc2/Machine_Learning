@@ -5,17 +5,19 @@ with Ada.Text_IO; use Ada.Text_IO;
 with API_Binding;
 
 package body Python is
-
    subtype PyObject is System.Address;
+   
+   pragma Warnings (Off);
+   
+   function PyArray_SimpleNewFromData (Obj : PyObject) return Interfaces.C.Int;
+   pragma Import (C, PyArray_SimpleNewFromData, "PyArray_SimpleNewFromData");
 
-   pragma Warnings (Off, "function ""PyCheck_Tuple"" is not referenced");
    function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
    
    procedure Py_DecRef (Obj : PyObject);
    pragma Import (C, Py_DecRef, "Py_DecRef");
           
-   pragma Warnings (Off, "procedure ""Py_IncRef"" is not referenced");
    procedure Py_IncRef (Obj : PyObject);
    pragma Import (C, Py_IncRef, "Py_IncRef");
 
@@ -25,23 +27,28 @@ package body Python is
    function PyInt_AsLong (I : PyObject) return Interfaces.C.long;
    pragma Import (C, PyInt_AsLong, "PyLong_AsLong");
    
-   pragma Warnings (Off, "procedure ""PyErr_Print"" is not referenced");
    procedure PyErr_Print;
    pragma Import (C, PyErr_Print, "PyErr_Print");
    
    procedure Py_Finalize;
    pragma Import (C, Py_Finalize, "Py_Finalize");
+      
+   function PyImport_Import (Obj : PyObject) return PyObject;
+   pragma Import (C, PyImport_Import, "PyImport_Import");
+   
+   function PyList_Check (Obj : PyObject) return Interfaces.C.Int;
+   pragma Import (C, PyList_Check, "PyList_Check");
+   
+   function PyList_New (Length : Interfaces.C.int) return PyObject;
+   pragma Import (C, PyList_New, "PyList_New");
+   
+   procedure PyList_SetItem (List : PyObject; Position : Interfaces.C.int;
+                             Item : Interfaces.C.Int);
+   pragma Import (C, PyList_SetItem, "PyList_SetItem");  
    
    function PyObject_GetAttrString
      (Obj : PyObject; Name : Interfaces.C.char_array) return PyObject;
    pragma Import (C, PyObject_GetAttrString, "PyObject_GetAttrString");  
-   
-   function PyImport_Import (Obj : PyObject) return PyObject;
-   pragma Import (C, PyImport_Import, "PyImport_Import");
-   
-   pragma Warnings (Off, "function ""PyList_Check"" is not referenced");
-   function PyList_Check (Obj : PyObject) return Interfaces.C.Int;
-   pragma Import (C, PyList_Check, "PyList_Check");
    
    function PyObject_CallObject (Obj : PyObject; Args : PyObject)
                                  return PyObject;
@@ -49,12 +56,11 @@ package body Python is
    
    --  args is a C array consisting of the positional arguments followed by the
    --  values of the keyword arguments which can be NULL if there are no arguments
-   function PyObject_VectorCall (Obj : PyObject; Args : PyObject;
-                                 Key_Words : PyObject := System.Null_Address)
-                                 return PyObject;
-   pragma Import (C, PyObject_VectorCall, "PyObject_Vectorcall");
+--     function PyObject_VectorCall (Obj       : PyObject; Args : PyObject;
+--                                   Key_Words : PyObject := System.Null_Address)
+--                                   return PyObject;
+--     pragma Import (C, PyObject_VectorCall, "PyObject_Vectorcall");
    
-   pragma Warnings (Off, "function ""PyParse_Tuple"" is not referenced");
    function PyParse_Tuple (Args : PyObject; Index : Interfaces.C.char_array; Obj : PyObject)
                            return Interfaces.C.int;  --  returns Boolean
    pragma Import (C, PyParse_Tuple, "PyArg_ParseTuple");
@@ -70,9 +76,10 @@ package body Python is
                                  return PyObject;
    pragma Import (C, PyString_FromString, "PyUnicode_FromString");
    
-   pragma Warnings (Off, "procedure ""PySys_SetPath"" is not referenced");
    procedure PySys_SetPath (Path : Interfaces.C.char_array);
    pragma Import (C, PySys_SetPath, "PySys_SetPath");
+   
+   pragma Warnings (On);
     
    --  -------------------------------------------------------------------------
     
@@ -181,23 +188,6 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
-   procedure Call_Object (F : PyObject; Function_Name : String;
-                          PyParams : PyObject) is
-      use type System.Address;
-      PyResult : PyObject;
-   begin
-      PyResult := PyObject_CallObject (F, PyParams);
-      if PyResult = System.Null_Address then
-         Put ("Python.Call_Object ");
-         PyErr_Print;
-         raise Interpreter_Error with "Python.Call_Object, operation " &
-           Function_Name & " failed";
-      end if;
-      
-   end Call_Object;     
-   
-   --  -------------------------------------------------------------------------
-
    function Call_Object (F        : PyObject; Function_Name : String;
                          PyParams : PyObject) return PyObject is
       use type System.Address;
@@ -214,26 +204,8 @@ package body Python is
       return PyResult;
       
    end Call_Object;     
-   
+ 
    --  -------------------------------------------------------------------------
-   
-   procedure Vector_Call_Object (F : PyObject; Function_Name : String;
-                                 PyParams : PyObject) is
-      use type System.Address;
-      PyResult : PyObject;
-   begin
-      PyResult := PyObject_VectorCall (F, PyParams);
-      if PyResult = System.Null_Address then
-         Put ("Python.Vector_Call_Object ");
-         PyErr_Print;
-         raise Interpreter_Error with "Python.Vector_Call_Object, operation " &
-           Function_Name & " failed";
-      end if;
-      
-   end Vector_Call_Object;     
-   
-   --  -------------------------------------------------------------------------
-
    --  public operations
    
    procedure Call (M : Module; Function_Name : String) is
@@ -344,15 +316,18 @@ package body Python is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       PyParams : PyObject;
+      Result   : PyObject;
    begin
       Put_Line (Routine_Name);
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("oo"), A_Pointers, B_Pointers);
       Put_Line (Routine_Name & "PyParams set");
                               
-      Vector_Call_Object (F, Function_Name, PyParams);
+      Result := Call_Object (F, Function_Name, PyParams);
+      PyErr_Print;
       Put_Line (Routine_Name & "PyResult set");
       Py_DecRef (PyParams);
+      Py_DecRef (Result);
 
    end Call;
    
@@ -399,6 +374,26 @@ package body Python is
 
    end Call;
    
+   --  -------------------------------------------------------------------------
+   
+   function Convert_Big_Array (Data : Boolean_Array) return PyObject is
+      use Interfaces.C;
+      Py_List : PyObject := PyList_New (Data'Length);
+      Py_Item : Int;
+   begin
+      for index in Data'Range loop
+         if Data (index) then
+            Py_Item := 1;
+         else
+             Py_Item := 0;
+         end if;
+         PyList_SetItem (Py_List, int (index), Py_Item);
+      end loop;
+      
+      return Py_List;
+      
+   end Convert_Big_Array;
+
    --  -------------------------------------------------------------------------
    
 end Python;

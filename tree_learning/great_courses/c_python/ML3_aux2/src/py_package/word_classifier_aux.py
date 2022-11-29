@@ -1,4 +1,4 @@
-import sklearn
+
 from sklearn import tree
 
 def word_classifier_aux (dat, labels):
