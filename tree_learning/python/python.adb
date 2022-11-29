@@ -89,7 +89,7 @@ package body Python is
    pragma Import (C, PyTuple_New, "PyTuple_New");
    
    procedure PyTuple_SetItem (Tuple : PyObject; Pos : Interfaces.C.int;
-                              Item : PyObject);
+                              Item  : PyObject);
    pragma Import (C, PyTuple_SetItem, "PyTuple_SetItem");
    
    pragma Warnings (On);
@@ -321,18 +321,17 @@ package body Python is
    procedure Call (M      : Module; Function_Name : String;
                    Data   : NL_Types.Boolean_List_2D;
                    Labels : ML_Types.Bounded_String_List) is
-      use API_Binding;
       Routine_Name  : constant String := "Python.Call 2 ";
       F             : constant PyObject := Get_Symbol (M, Function_Name);
       Data_Tuple    : constant PyObject := To_Tuple (Data);
-      AB_Pointers   : constant API_2D_Pointers := API_2D (Data, Labels);
-      A_Pointers    : constant API_Boolean_Pointer_Array :=
-                        Get_A_Ptrs (AB_Pointers);
-      B_Pointers    : constant Char_Ptr_Array := Get_B_Ptrs (AB_Pointers);
+      Labels_Tuple  : constant PyObject := To_Tuple (Labels);
+      --        AB_Pointers   : constant API_2D_Pointers := API_2D (Data, Labels);
+      --        A_Pointers    : constant API_Boolean_Pointer_Array :=
+      --                          Get_A_Ptrs (AB_Pointers);
+      --        B_Pointers    : constant Char_Ptr_Array := Get_B_Ptrs (AB_Pointers);
       
-      function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              A_Ptrs  : API_Boolean_Pointer_Array;
-                              B_Ptrs  : Char_Ptr_Array)  return PyObject;
+      function Py_BuildValue (Format        : Interfaces.C.char_array;
+                              Data, Labels  : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       PyParams : PyObject;
@@ -340,7 +339,7 @@ package body Python is
    begin
       Put_Line (Routine_Name);
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("oo"), A_Pointers, B_Pointers);
+        Py_BuildValue (Interfaces.C.To_C ("oo"), Data_Tuple, Labels_Tuple);
       Put_Line (Routine_Name & "PyParams set");
                               
       Result := Call_Object (F, Function_Name, PyParams);
@@ -477,12 +476,12 @@ package body Python is
       Result     : PyObject := PyTuple_New (int (Data.Length));
    begin
       for row in Data.First_Index .. Data.Last_Index loop
-            declare
-               Text : constant char_array := To_C (Data (row));
-               Item : constant PyObject := PyBytes_AsString (Text);
-            begin
+         declare
+            Text : constant char_array := To_C (Data (row));
+            Item : constant PyObject := PyBytes_AsString (Text);
+         begin
             PyTuple_SetItem (Result, int (row), Item);
-            end;
+         end;
       end loop;
 
       return Result;
