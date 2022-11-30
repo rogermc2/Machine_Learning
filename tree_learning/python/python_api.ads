@@ -60,6 +60,9 @@ package Python_API is
                                  return PyObject;
    pragma Import (C, PyObject_CallObject, "PyObject_CallObject");
    
+   function PyObject_Repr (Obj : PyObject) return PyObject;
+   pragma Import (C, PyObject_Repr, "PyObject_Repr");
+   
    function PyObject_String (Obj : PyObject) return PyObject;
    pragma Import (C, PyObject_String, "PyObject_Str");
    
@@ -95,4 +98,7 @@ package Python_API is
                               Item  : PyObject);
    pragma Import (C, PyTuple_SetItem, "PyTuple_SetItem");
 
+   function PyTuple_Size (Tuple : PyObject) return Interfaces.C.int;
+   pragma Import (C, PyTuple_Size, "PyTuple_Size");
+   
 end Python_API;
