@@ -402,7 +402,7 @@ package body Python is
    function Convert_Big_Array (Data : Boolean_Array) return PyObject is
       use System;
       use Interfaces.C;
-      Py_List : PyObject := PyList_New (Data'Length);
+      Py_List : constant PyObject := PyList_New (Data'Length);
       Py_Item : Int;
    begin 
       if Py_List /= Null_Address then
@@ -429,7 +429,7 @@ package body Python is
       Value      : Integer;
       Long_Value : long;
       Item       : PyObject;
-      Result     : PyObject := PyTuple_New (int (Data.Length));
+      Result     : constant PyObject := PyTuple_New (int (Data.Length));
    begin
       for row in Data.First_Index .. Data.Last_Index loop
          Row_Size := int (Data (row).Length);
@@ -459,7 +459,7 @@ package body Python is
       Row_Size   : int;
       Long_Value : long;
       Item       : PyObject;
-      Result     : PyObject := PyTuple_New (int (Data.Length));
+      Result     : constant PyObject := PyTuple_New (int (Data.Length));
    begin
       for row in Data.First_Index .. Data.Last_Index loop
          Row_Size := int (Data (row).Length);
@@ -489,7 +489,7 @@ package body Python is
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Bounded_String_List ";
-      Result       : PyObject := PyTuple_New (int (Data.Length));
+      Result       : constant PyObject := PyTuple_New (int (Data.Length));
    begin
       for row in Data.First_Index .. Data.Last_Index loop
          Put_Line (Routine_Name & "row" & Integer'Image (row));         declare
