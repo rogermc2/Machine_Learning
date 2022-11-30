@@ -125,9 +125,8 @@ package body Python is
    function Call_Object (M        : Module; Function_Name : String;
                          PyParams : PyObject) return PyObject is
       use type System.Address;
-      type String_Ptr is access String;
       package String_Ptr_Conversion is new
-        System.Address_To_Access_Conversions (System.Address);
+        System.Address_To_Access_Conversions (String);
       Routine_Name : constant String := "Python.Call_Object ";
       F            : constant PyObject := Get_Symbol (M, Function_Name);
       PyResult     : PyObject;
@@ -136,13 +135,13 @@ package body Python is
       declare
          subtype Ptr_To_String is String_Ptr_Conversion.Object_Pointer;
          Py_String    : constant PyObject := PyObject_String (PyParams);
-         SP           : Ptr_To_String :=
+         SP           : constant Ptr_To_String :=
                           String_Ptr_Conversion.To_Pointer (Py_String);
          theString    : constant String := SP.all;
       begin
-         null;
+         Put_Line (Routine_Name & "theString: " & theString);
       end;
-      --        Put_Line (Routine_Name & "theString: " & theString); 
+      
       PyResult := PyObject_CallObject (F, PyParams);
       
       if PyResult = System.Null_Address then
