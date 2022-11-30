@@ -139,7 +139,7 @@ package body Python is
                           String_Ptr_Conversion.To_Pointer (Py_String);
          theString    : constant String := SP.all;
       begin
-         Put_Line (Routine_Name & "theString: " & theString);
+         Put_Line (Routine_Name & "theString: '" & theString & "'");
       end;
       
       PyResult := PyObject_CallObject (F, PyParams);
@@ -258,13 +258,15 @@ package body Python is
       Data_Tuple    : constant PyObject := To_Tuple (Data);
       Labels_Tuple  : constant PyObject := To_Tuple (Labels);
       
-      function Py_BuildValue (Format        : Interfaces.C.char_array;
-                              Data, Labels  : PyObject)  return PyObject;
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1, T2  : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       PyParams : PyObject;
       Result   : PyObject;
    begin
+        Put_Line (Routine_Name & "Data size" &
+                    Integer'Image (Integer (Data.Length)));
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("oo"), Data_Tuple, Labels_Tuple);
       Put_Line (Routine_Name & "PyParams set");
