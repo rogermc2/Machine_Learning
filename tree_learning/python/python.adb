@@ -8,7 +8,7 @@ with Python_API; use Python_API;
 
 package body Python is
      
-   function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject;
+--     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject;
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject;
    
@@ -119,9 +119,10 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
-   function Call_Object (F        : PyObject; Function_Name : String;
+   function Call_Object (M        : Module; Function_Name : String;
                          PyParams : PyObject) return PyObject is
       use type System.Address;
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
       PyResult : PyObject; 
    begin
       PyResult := PyObject_CallObject (F, PyParams);
@@ -151,7 +152,6 @@ package body Python is
     
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer is
-      F : constant PyObject := Get_Symbol (M, Function_Name);
       
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               A      : Interfaces.C.int) return PyObject;
@@ -163,7 +163,7 @@ package body Python is
    begin
       PyParams := Py_BuildValue (Interfaces.C.To_C ("(i)"),
                                  Interfaces.C.int (A));
-      PyResult := Call_Object (F, Function_Name, PyParams);
+      PyResult := Call_Object (M, Function_Name, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -176,7 +176,6 @@ package body Python is
  
    function Call (M : Module; Function_Name : String;
                   A : Integer; B : Integer) return Integer is
-      F : constant PyObject := Get_Symbol (M, Function_Name);
       
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               A      : Interfaces.C.int;
@@ -189,7 +188,7 @@ package body Python is
    begin
       PyParams := Py_BuildValue (Interfaces.C.To_C ("ii"), Interfaces.C.int (A),
                                  Interfaces.C.int (B));
-      PyResult := Call_Object (F, Function_Name, PyParams);
+      PyResult := Call_Object (M, Function_Name, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -202,7 +201,6 @@ package body Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : Integer_Matrix) is
       use API_Binding;
-      F           : constant PyObject := Get_Symbol (M, Function_Name);
       AB_Pointers : constant API_Pointers := API_Integer_2D (A, B);
       A_Pointers  : constant API_Int_Pointer_Array :=
                       Get_A_Int_Ptrs (AB_Pointers);
@@ -221,7 +219,7 @@ package body Python is
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("oo"), A_Pointers, B_Pointers);
                               
-      PyResult := Call_Object (F, Function_Name, PyParams);
+      PyResult := Call_Object (M, Function_Name, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -234,13 +232,8 @@ package body Python is
                    Data   : NL_Types.Boolean_List_2D;
                    Labels : ML_Types.Bounded_String_List) is
       Routine_Name  : constant String := "Python.Call 2 ";
-      F             : constant PyObject := Get_Symbol (M, Function_Name);
       Data_Tuple    : constant PyObject := To_Tuple (Data);
       Labels_Tuple  : constant PyObject := To_Tuple (Labels);
-      --        AB_Pointers   : constant API_2D_Pointers := API_2D (Data, Labels);
-      --        A_Pointers    : constant API_Boolean_Pointer_Array :=
-      --                          Get_A_Ptrs (AB_Pointers);
-      --        B_Pointers    : constant Char_Ptr_Array := Get_B_Ptrs (AB_Pointers);
       
       function Py_BuildValue (Format        : Interfaces.C.char_array;
                               Data, Labels  : PyObject)  return PyObject;
@@ -249,14 +242,14 @@ package body Python is
       PyParams : PyObject;
       Result   : PyObject;
    begin
-      Put_Line (Routine_Name);
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("oo"), Data_Tuple, Labels_Tuple);
       Put_Line (Routine_Name & "PyParams set");
                               
-      Result := Call_Object (F, Function_Name, PyParams);
-      PyErr_Print;
+      Result := Call_Object (M, Function_Name, PyParams);
       Put_Line (Routine_Name & "PyResult set");
+      Put (Routine_Name & "Py error message: ");
+      PyErr_Print;
       Py_DecRef (PyParams);
       Py_DecRef (Result);
 
@@ -270,7 +263,6 @@ package body Python is
       use Interfaces.C;
       use API_Binding;
       Routine_Name  : constant String := "Python.Call 4 ";
-      F             : constant PyObject := Get_Symbol (M, Function_Name);
       ABCD_Pointers : constant API_4D_Pointers :=
                         API_4D (Data, Labels, Words, Pronounce);
       A_Pointers    : constant API_Boolean_Pointer_Array :=
@@ -295,7 +287,7 @@ package body Python is
                        C_Pointers, D_Pointers);
       Put_Line (Routine_Name & "PyParams set");
                               
-      PyResult := Call_Object (F, Function_Name, PyParams);
+      PyResult := Call_Object (M, Function_Name, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       Result := PyInt_AsLong (PyResult);
       Put_Line (Routine_Name & "Number of correct words:" &
@@ -307,57 +299,57 @@ package body Python is
    
    --  -------------------------------------------------------------------------
    
-   function Convert_Big_Array (Data : Boolean_Array) return PyObject is
-      use System;
-      use Interfaces.C;
-      Py_List : constant PyObject := PyList_New (Data'Length);
-      Py_Item : Int;
-   begin 
-      if Py_List /= Null_Address then
-         for index in Data'Range loop
-            if Data (index) then
-               Py_Item := 1;
-            else
-               Py_Item := 0;
-            end if;
-            PyList_SetItem (Py_List, int (index), Py_Item);
-         end loop;
-      end if;
-      
-      return Py_List;
-      
-   end Convert_Big_Array;
+--     function Convert_Big_Array (Data : Boolean_Array) return PyObject is
+--        use System;
+--        use Interfaces.C;
+--        Py_List : constant PyObject := PyList_New (Data'Length);
+--        Py_Item : Int;
+--     begin 
+--        if Py_List /= Null_Address then
+--           for index in Data'Range loop
+--              if Data (index) then
+--                 Py_Item := 1;
+--              else
+--                 Py_Item := 0;
+--              end if;
+--              PyList_SetItem (Py_List, int (index), Py_Item);
+--           end loop;
+--        end if;
+--        
+--        return Py_List;
+--        
+--     end Convert_Big_Array;
 
    --  -------------------------------------------------------------------------
    
-   function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
-      use Interfaces.C;
-      Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
-      Row_Size   : int;
-      Value      : Integer;
-      Long_Value : long;
-      Item       : PyObject;
-      Result     : constant PyObject := PyTuple_New (int (Data.Length));
-   begin
-      for row in Data.First_Index .. Data.Last_Index loop
-         Row_Size := int (Data (row).Length);
-         Item := PyTuple_New (Row_Size);
-         for col in Data (row).First_Index .. Data (row).Last_Index loop
-            Value := Data (row) (col);
-            Long_Value := long (Value);
-            PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
-         end loop;
-         PyTuple_SetItem (Result, int (row), Item);
-      end loop;
-
-      return Result;
-      
-   exception
-      when E : others =>
-         Put_Line (Routine_Name & "error" & Exception_Message (E));
-         raise Interpreter_Error;
-         
-   end To_Tuple;
+--     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
+--        use Interfaces.C;
+--        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
+--        Row_Size   : int;
+--        Value      : Integer;
+--        Long_Value : long;
+--        Item       : PyObject;
+--        Result     : constant PyObject := PyTuple_New (int (Data.Length));
+--     begin
+--        for row in Data.First_Index .. Data.Last_Index loop
+--           Row_Size := int (Data (row).Length);
+--           Item := PyTuple_New (Row_Size);
+--           for col in Data (row).First_Index .. Data (row).Last_Index loop
+--              Value := Data (row) (col);
+--              Long_Value := long (Value);
+--              PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
+--           end loop;
+--           PyTuple_SetItem (Result, int (row), Item);
+--        end loop;
+--  
+--        return Result;
+--        
+--     exception
+--        when E : others =>
+--           Put_Line (Routine_Name & "error" & Exception_Message (E));
+--           raise Interpreter_Error;
+--           
+--     end To_Tuple;
 
    --  -------------------------------------------------------------------------
 
@@ -400,11 +392,10 @@ package body Python is
       Result       : constant PyObject := PyTuple_New (int (Data.Length));
    begin
       for row in Data.First_Index .. Data.Last_Index loop
-         Put_Line (Routine_Name & "row" & Integer'Image (row));         declare
+         declare
             Text : constant char_array := To_C (Data (row));
             Item : constant PyObject := PyBytes_FromString (Text);
          begin
-            Put_Line (Routine_Name & "Data (row)): " & Data (row));
             PyTuple_SetItem (Result, int (row), Item);
          end;
       end loop;
