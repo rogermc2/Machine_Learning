@@ -1,3 +1,5 @@
+with System.Address_To_Access_Conversions;
+
 with Interfaces.C;
 
 with Ada.Exceptions; use Ada.Exceptions;
@@ -9,7 +11,7 @@ with Python_API; use Python_API;
 
 package body Python is
      
---     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject;
+   --     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject;
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject;
    
@@ -122,17 +124,25 @@ package body Python is
     
    function Call_Object (M        : Module; Function_Name : String;
                          PyParams : PyObject) return PyObject is
-      use type System.Address; 
+      use type System.Address;
       type String_Ptr is access String;
-      function To_String_Ptr is new Ada.Unchecked_Conversion
-        (System.Address, String_Ptr);
+      package String_Ptr_Conversion is new
+        System.Address_To_Access_Conversions (System.Address);
       Routine_Name : constant String := "Python.Call_Object ";
       F            : constant PyObject := Get_Symbol (M, Function_Name);
       PyResult     : PyObject;
-      Py_String    : PyObject := PyObject_String (PyParams);
-      SP           : String_Ptr := To_String_Ptr (A);
-      theString    : Interfaces.C.char_array := Py_String;
    begin
+      Put_Line (Routine_Name);
+      declare
+         subtype Ptr_To_String is String_Ptr_Conversion.Object_Pointer;
+         Py_String    : constant PyObject := PyObject_String (PyParams);
+         SP           : Ptr_To_String :=
+                          String_Ptr_Conversion.To_Pointer (Py_String);
+         theString    : constant String := SP.all;
+      begin
+         null;
+      end;
+      --        Put_Line (Routine_Name & "theString: " & theString); 
       PyResult := PyObject_CallObject (F, PyParams);
       
       if PyResult = System.Null_Address then
@@ -144,10 +154,10 @@ package body Python is
       
       return PyResult;
       
---     exception
---        when E : others =>
---           Put_Line (Routine_Name & "error: " & Exception_Message (E));
---           raise Interpreter_Error;
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error: " & Exception_Message (E));
+         raise Interpreter_Error;
       
    end Call_Object;     
  
@@ -313,67 +323,95 @@ package body Python is
    
    --  -------------------------------------------------------------------------
    
---     function Convert_Big_Array (Data : Boolean_Array) return PyObject is
---        use System;
---        use Interfaces.C;
---        Py_List : constant PyObject := PyList_New (Data'Length);
---        Py_Item : Int;
---     begin 
---        if Py_List /= Null_Address then
---           for index in Data'Range loop
---              if Data (index) then
---                 Py_Item := 1;
---              else
---                 Py_Item := 0;
---              end if;
---              PyList_SetItem (Py_List, int (index), Py_Item);
---           end loop;
---        end if;
---        
---        return Py_List;
---        
---     end Convert_Big_Array;
+   --     function Convert_Big_Array (Data : Boolean_Array) return PyObject is
+   --        use System;
+   --        use Interfaces.C;
+   --        Py_List : constant PyObject := PyList_New (Data'Length);
+   --        Py_Item : Int;
+   --     begin 
+   --        if Py_List /= Null_Address then
+   --           for index in Data'Range loop
+   --              if Data (index) then
+   --                 Py_Item := 1;
+   --              else
+   --                 Py_Item := 0;
+   --              end if;
+   --              PyList_SetItem (Py_List, int (index), Py_Item);
+   --           end loop;
+   --        end if;
+   --        
+   --        return Py_List;
+   --        
+   --     end Convert_Big_Array;
 
    --  -------------------------------------------------------------------------
+  
+   procedure Pointers_Example is
+
+      package String_Ptrs is
+        new System.Address_To_Access_Conversions (String);
+      --  Instantiate a package to convert access types to/from addresses.
+      --  This creates a string access type called Object_Pointer.
+
+      five : aliased String := "5";
+      --  Five is aliased because it will be using access types on it
+
+      String_Pointer : String_Ptrs.Object_Pointer := five'unchecked_access;
+      --  Unchecked_access needed because five is local to main program.
+      --  If it was global, we could use 'access.
+      --  This is an Ada access all type
+
+      String_Address : System.Address := Five'Address;
+      --  This is an address in memory, a C pointer
+      --  Addresses can be found with the 'address attribute.
+      --  This is the equivalent of a C pointe
+   begin
+      String_Pointer := String_Ptrs.To_Pointer (String_Address);
+      String_Address := String_Ptrs.To_Address (String_Pointer);
+      --  Convert between Ada and C pointer types.
+
+   end Pointers_Example;
    
---     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
---        use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
---        Row_Size   : int;
---        Value      : Integer;
---        Long_Value : long;
---        Item       : PyObject;
---        Result     : constant PyObject := PyTuple_New (int (Data.Length));
---     begin
---        for row in Data.First_Index .. Data.Last_Index loop
---           Row_Size := int (Data (row).Length);
---           Item := PyTuple_New (Row_Size);
---           for col in Data (row).First_Index .. Data (row).Last_Index loop
---              Value := Data (row) (col);
---              Long_Value := long (Value);
---              PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
---           end loop;
---           PyTuple_SetItem (Result, int (row), Item);
---        end loop;
---  
---        return Result;
---        
---     exception
---        when E : others =>
---           Put_Line (Routine_Name & "error" & Exception_Message (E));
---           raise Interpreter_Error;
---           
---     end To_Tuple;
+   --  -------------------------------------------------------------------------
+
+   --     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
+   --        use Interfaces.C;
+   --        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
+   --        Row_Size   : int;
+   --        Value      : Integer;
+   --        Long_Value : long;
+   --        Item       : PyObject;
+   --        Result     : constant PyObject := PyTuple_New (int (Data.Length));
+   --     begin
+   --        for row in Data.First_Index .. Data.Last_Index loop
+   --           Row_Size := int (Data (row).Length);
+   --           Item := PyTuple_New (Row_Size);
+   --           for col in Data (row).First_Index .. Data (row).Last_Index loop
+   --              Value := Data (row) (col);
+   --              Long_Value := long (Value);
+   --              PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
+   --           end loop;
+   --           PyTuple_SetItem (Result, int (row), Item);
+   --        end loop;
+   --  
+   --        return Result;
+   --        
+   --     exception
+   --        when E : others =>
+   --           Put_Line (Routine_Name & "error" & Exception_Message (E));
+   --           raise Interpreter_Error;
+   --           
+   --     end To_Tuple;
 
    --  -------------------------------------------------------------------------
 
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Boolean_List_2D ";
-      Row_Size   : int;
-      Long_Value : long;
-      Item       : PyObject;
-      Result     : constant PyObject := PyTuple_New (int (Data.Length));
+      Row_Size     : int;
+      Long_Value   : long;
+      Item         : PyObject;
+      Result       : constant PyObject := PyTuple_New (int (Data.Length));
    begin
       for row in Data.First_Index .. Data.Last_Index loop
          Row_Size := int (Data (row).Length);
@@ -391,7 +429,7 @@ package body Python is
 
       return Result;
        
-  exception
+   exception
       when E : others =>
          Put_Line (Routine_Name & "error" &  Exception_Message (E));
          raise Interpreter_Error;
