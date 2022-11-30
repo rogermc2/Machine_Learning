@@ -5,9 +5,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body API_Binding is
 
---     type String_Access is access String;
---     type String_Access_Array is array (Positive range <>) of String_Access;
-
    --  -------------------------------------------------------------------------
 
    function API_Integer_2D (A, B : Integer_Matrix) return API_Pointers is
