@@ -2,6 +2,7 @@ with Interfaces.C;
 
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Unchecked_Conversion;
 
 with API_Binding;
 with Python_API; use Python_API;
@@ -121,19 +122,32 @@ package body Python is
     
    function Call_Object (M        : Module; Function_Name : String;
                          PyParams : PyObject) return PyObject is
-      use type System.Address;
-      F        : constant PyObject := Get_Symbol (M, Function_Name);
-      PyResult : PyObject; 
+      use type System.Address; 
+      type String_Ptr is access String;
+      function To_String_Ptr is new Ada.Unchecked_Conversion
+        (System.Address, String_Ptr);
+      Routine_Name : constant String := "Python.Call_Object ";
+      F            : constant PyObject := Get_Symbol (M, Function_Name);
+      PyResult     : PyObject;
+      Py_String    : PyObject := PyObject_String (PyParams);
+      SP           : String_Ptr := To_String_Ptr (A);
+      theString    : Interfaces.C.char_array := Py_String;
    begin
       PyResult := PyObject_CallObject (F, PyParams);
+      
       if PyResult = System.Null_Address then
-         Put ("Python.Call_Object ");
+         Put_Line (Routine_Name & "Python error: ");
          PyErr_Print;
-         raise Interpreter_Error with "Python.Call_Object, operation " &
+         raise Interpreter_Error with Routine_Name & "operation " &
            Function_Name & " failed";
       end if;
       
       return PyResult;
+      
+--     exception
+--        when E : others =>
+--           Put_Line (Routine_Name & "error: " & Exception_Message (E));
+--           raise Interpreter_Error;
       
    end Call_Object;     
  

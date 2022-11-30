@@ -60,6 +60,9 @@ package Python_API is
                                  return PyObject;
    pragma Import (C, PyObject_CallObject, "PyObject_CallObject");
    
+   function PyObject_String (Obj : PyObject) return PyObject;
+   pragma Import (C, PyObject_String, "PyObject_Str");
+   
    --  args is a C array consisting of the positional arguments followed by the
    --  values of the keyword arguments which can be NULL if there are no arguments
    --     function PyObject_VectorCall (Obj       : PyObject; Args : PyObject;
