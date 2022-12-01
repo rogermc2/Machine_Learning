@@ -1,7 +1,9 @@
-with System.Address_To_Access_Conversions;
+--  with System.Address_Image;
+--  with System.Address_To_Access_Conversions;
 
 with Interfaces.C;
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
@@ -125,28 +127,49 @@ package body Python is
     
    function Call_Object (M        : Module; Function_Name : String;
                          PyParams : PyObject) return PyObject is
-      use type System.Address;
-      package String_Ptr_Conversion is new
-        System.Address_To_Access_Conversions (String);
+      use System;
+--        use type System.Address;
+--        package String_Ptr_Conversion is new
+--          System.Address_To_Access_Conversions (String);
       Routine_Name : constant String := "Python.Call_Object ";
       F            : constant PyObject := Get_Symbol (M, Function_Name);
       PyResult     : PyObject;
    begin
       Put_Line (Routine_Name);
-      declare
-         subtype Ptr_To_String is String_Ptr_Conversion.Object_Pointer;
-         PyParams_Rep : constant PyObject := PyObject_Repr (PyParams);
-         Py_String    : constant PyObject := PyObject_String (PyParams_Rep);
-         SP           : constant Ptr_To_String :=
-                          String_Ptr_Conversion.To_Pointer (Py_String);
-         theString    : constant String := SP.all;
-      begin
-         Put_Line (Routine_Name & "theString: '" & theString & "'");
-      end;
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+      Assert (F /= Null_Address, Routine_Name & "F is null");
+      Put_Line (Routine_Name & "PyParams size" &
+                  Interfaces.C.int'Image (PyTuple_Size (PyParams)));
+      Put_Line (Routine_Name & "F size: " &
+                  Interfaces.C.size_t'Image (PyObject_Size (F)));
+--        declare
+--           subtype Ptr_To_String is String_Ptr_Conversion.Object_Pointer;
+--           PyParams_Size : constant Interfaces.c.size_t :=
+--                             PyObject_Size (PyParams);
+--           PyParams_Rep  : constant PyObject := PyObject_Repr (PyParams);
+--           Py_String     : constant PyObject := PyObject_String (PyParams_Rep);
+--           SP            : constant Ptr_To_String :=
+--                             String_Ptr_Conversion.To_Pointer (Py_String);
+--           theString     : constant String := SP.all;
+--        begin
+--            Put_Line (Routine_Name & "PyParams_Size: " &
+--                          Interfaces.c.size_t'Image (PyParams_Size));
+--           if PyParams_Rep = System.Null_Address then
+--              Put_Line (Routine_Name & "PyParams_Rep is null");
+--           elsif Py_String = System.Null_Address then
+--              Put_Line (Routine_Name & "Py_String is null");
+--           else
+--              Put_Line (Routine_Name & "SP: " &
+--                          System.Address_Image (SP.all'address));
+--              Put_Line (Routine_Name & "theString: '" & theString & "'");
+--           end if;
+--        end;
       
+      Put_Line (Routine_Name & "Setting PyResult");
       PyResult := PyObject_CallObject (F, PyParams);
+      Put_Line (Routine_Name & "PyResult set");
       
-      if PyResult = System.Null_Address then
+      if PyResult = Null_Address then
          Put_Line (Routine_Name & "Python error: ");
          PyErr_Print;
          raise Interpreter_Error with Routine_Name & "operation " &
@@ -256,30 +279,34 @@ package body Python is
    procedure Call (M      : Module; Function_Name : String;
                    Data   : NL_Types.Boolean_List_2D;
                    Labels : ML_Types.Bounded_String_List) is
+      use System;
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
       
-      Routine_Name : constant String := "Python.Call 2 ";
-      Data_Tuple   : PyObject;
-      Labels_Tuple : PyObject;
-      PyParams     : PyObject;
-      Result       : PyObject;
+      Routine_Name  : constant String := "Python.Call 2 ";
+      Data_Tuple    : PyObject;
+      Labels_Tuple  : PyObject;
+      PyParams      : PyObject;
+      Result        : PyObject;
    begin
-        Put_Line (Routine_Name & "Data size" &
-                    Integer'Image (Integer (Data.Length)));
+      Put_Line (Routine_Name & "Data size" &
+                 Integer'Image (Integer (Data.Length)));
       To_Tuple (Data, Data_Tuple);
+      Assert (Data_Tuple /= Null_Address, Routine_Name & "Data_Tuple is null");
       To_Tuple (Labels, Labels_Tuple);
+      Assert (Labels_Tuple /= Null_Address, Routine_Name &
+                "Labels_Tuple is null");
       Put_Line (Routine_Name & "Data_Tuple size" &
                   Interfaces.C.int'Image (PyTuple_Size (Data_Tuple)));
       Put_Line (Routine_Name & "Labels_Tuple size" &
                   Interfaces.C.int'Image (PyTuple_Size (Labels_Tuple)));   
       
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("oo"), Data_Tuple, Labels_Tuple);
---        Put_Line (Routine_Name & "PyParams size" &
---                    Interfaces.C.int'Image (PyTuple_Size (PyParams)));  
-      Put_Line (Routine_Name & "PyParams set");
+        Py_BuildValue (Interfaces.C.To_C ("OO"), Data_Tuple, Labels_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+      Put_Line (Routine_Name & "PyParams size" &
+                  Interfaces.C.size_t'Image (PyObject_Size (PyParams)));  
                               
       Result := Call_Object (M, Function_Name, PyParams);
       Put_Line (Routine_Name & "PyResult set");
@@ -359,31 +386,31 @@ package body Python is
 
    --  -------------------------------------------------------------------------
   
-   procedure Pointers_Example is
-
-      package String_Ptrs is
-        new System.Address_To_Access_Conversions (String);
-      --  Instantiate a package to convert access types to/from addresses.
-      --  This creates a string access type called Object_Pointer.
-
-      five : aliased String := "5";
-      --  Five is aliased because it will be using access types on it
-
-      String_Pointer : String_Ptrs.Object_Pointer := five'unchecked_access;
-      --  Unchecked_access needed because five is local to main program.
-      --  If it was global, we could use 'access.
-      --  This is an Ada access all type
-
-      String_Address : System.Address := Five'Address;
-      --  This is an address in memory, a C pointer
-      --  Addresses can be found with the 'address attribute.
-      --  This is the equivalent of a C pointe
-   begin
-      String_Pointer := String_Ptrs.To_Pointer (String_Address);
-      String_Address := String_Ptrs.To_Address (String_Pointer);
-      --  Convert between Ada and C pointer types.
-
-   end Pointers_Example;
+--     procedure Pointers_Example is
+--  
+--        package String_Ptrs is
+--          new System.Address_To_Access_Conversions (String);
+--        --  Instantiate a package to convert access types to/from addresses.
+--        --  This creates a string access type called Object_Pointer.
+--  
+--        five : aliased String := "5";
+--        --  Five is aliased because it will be using access types on it
+--  
+--        String_Pointer : String_Ptrs.Object_Pointer := five'unchecked_access;
+--        --  Unchecked_access needed because five is local to main program.
+--        --  If it was global, we could use 'access.
+--        --  This is an Ada access all type
+--  
+--        String_Address : System.Address := Five'Address;
+--        --  This is an address in memory, a C pointer
+--        --  Addresses can be found with the 'address attribute.
+--        --  This is the equivalent of a C pointe
+--     begin
+--        String_Pointer := String_Ptrs.To_Pointer (String_Address);
+--        String_Address := String_Ptrs.To_Address (String_Pointer);
+--        --  Convert between Ada and C pointer types.
+--  
+--     end Pointers_Example;
    
    --  -------------------------------------------------------------------------
 

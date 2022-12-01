@@ -60,6 +60,9 @@ package Python_API is
                                  return PyObject;
    pragma Import (C, PyObject_CallObject, "PyObject_CallObject");
    
+   function PyObject_Size (Obj : PyObject) return Interfaces.C.size_t;
+   pragma Import (C, PyObject_Size, "PyObject_Size");
+   
    function PyObject_Repr (Obj : PyObject) return PyObject;
    pragma Import (C, PyObject_Repr, "PyObject_Repr");
    
