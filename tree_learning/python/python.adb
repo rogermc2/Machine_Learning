@@ -1,5 +1,5 @@
---  with System.Address_Image;
---  with System.Address_To_Access_Conversions;
+
+--  Based on inspirel_ada-python_demo
 
 with Interfaces.C;
 
@@ -36,9 +36,6 @@ package body Python is
        
       Py_Initialize;
       
-      --  Below: workaround for the following issue:
-      --  http://stackoverflow.com/questions/13422206/how-to-load-a-custom-python-module-in-c
-
       Execute_String ("import sys");
       Execute_String ("import os");
       Execute_String ("sys.path.append('.')");
@@ -46,9 +43,6 @@ package body Python is
       Execute_String ("sys.path.append('../..')");
       Execute_String ("sys.path.append('../../python')");
       Execute_String ("sys.path.append('../../tree')");
-      --        Execute_String
-      --          ("sys.path.append('/Applications_Packages/scikit-learn/sklearn/tree')");
-      --        PySys_SetPath (To_C ("Applications_Packages/scikit-learn/sklearn/tree"));
       
    end Initialize;
     
@@ -108,14 +102,16 @@ package body Python is
    --  -------------------------------------------------------------------------   
    --  helpers for use from all overloaded Call subprograms
    
-   procedure Get_Symbol (M : Module; Function_Name : String; F : out PyObject) is
-      Routine_Name : constant String := "Python.Call_Object ";
+   procedure Get_Symbol (M : Module; Function_Name : String;
+                         F : out PyObject) is
+      Routine_Name : constant String := "Python.Get_Symbol ";
       PyModule     : constant PyObject := PyObject (M);
       use type System.Address;
    begin
       F := PyObject_GetAttrString (PyModule, Interfaces.C.To_C (Function_Name));
       Put_Line (Routine_Name & "F size: " &
-                  Interfaces.C.size_t'Image (PyObject_Size (F)));
+                  Interfaces.C.int'Image (PyObject_Size (F)));
+      Py_DecRef (PyModule);
       if F = System.Null_Address then
          Put_Line (Routine_Name & "Py error:");
          PyErr_Print;
@@ -140,8 +136,8 @@ package body Python is
       Assert (F /= Null_Address, Routine_Name & "F is null");
       Put_Line (Routine_Name & "PyParams size" &
                   Interfaces.C.int'Image (PyTuple_Size (PyParams)));
-      Put_Line (Routine_Name & "F size: " &
-                  Interfaces.C.size_t'Image (PyObject_Size (F)));
+--        Put_Line (Routine_Name & "F size: " &
+--                    Interfaces.C.size_t'Image (PyObject_Size (F)));
       
       Put_Line (Routine_Name & "Setting PyResult");
       PyResult := PyObject_CallObject (F, PyParams);
@@ -172,6 +168,7 @@ package body Python is
    begin
       Get_Symbol (M, Function_Name, F);
       Result := PyObject_CallObject (F, System.Null_Address);
+      Py_DecRef (F);
       Py_DecRef (Result);
    end Call;
 
@@ -285,7 +282,7 @@ package body Python is
         Py_BuildValue (Interfaces.C.To_C ("OO"), Data_Tuple, Labels_Tuple);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
       Put_Line (Routine_Name & "PyParams size" &
-                  Interfaces.C.size_t'Image (PyObject_Size (PyParams)));  
+                  Interfaces.C.int'Image (PyObject_Size (PyParams)));  
                               
       Result := Call_Object (M, Function_Name, PyParams);
       Put_Line (Routine_Name & "PyResult set");

@@ -52,6 +52,9 @@ package Python_API is
    function PyLong_FromLong (Val : Interfaces.C.long) return PyObject;
    pragma Import (C, PyLong_FromLong, "PyLong_FromLong");
    
+   function PyObject_GetAttr (Obj, Name : PyObject) return PyObject;
+   pragma Import (C, PyObject_GetAttr, "PyObject_GetAttr");  
+
    function PyObject_GetAttrString
      (Obj : PyObject; Name : Interfaces.C.char_array) return PyObject;
    pragma Import (C, PyObject_GetAttrString, "PyObject_GetAttrString");  
@@ -60,7 +63,7 @@ package Python_API is
                                  return PyObject;
    pragma Import (C, PyObject_CallObject, "PyObject_CallObject");
    
-   function PyObject_Size (Obj : PyObject) return Interfaces.C.size_t;
+   function PyObject_Size (Obj : PyObject) return Interfaces.C.int;
    pragma Import (C, PyObject_Size, "PyObject_Size");
    
    function PyObject_Repr (Obj : PyObject) return PyObject;
