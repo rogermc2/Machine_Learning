@@ -104,13 +104,21 @@ package body Python is
    
    procedure Get_Symbol (M : Module; Function_Name : String;
                          F : out PyObject) is
+      use System;
+      use Interfaces.C;
       Routine_Name : constant String := "Python.Get_Symbol ";
       PyModule     : constant PyObject := PyObject (M);
       use type System.Address;
    begin
-      F := PyObject_GetAttrString (PyModule, Interfaces.C.To_C (Function_Name));
+      Assert (Address (M) /= Null_Address, Routine_Name & "called with M null");
+      F := PyObject_GetAttrString (PyModule, To_C (Function_Name));
       Put_Line (Routine_Name & "F size: " &
-                  Interfaces.C.int'Image (PyObject_Size (F)));
+                  int'Image (PyObject_Size (F)));
+      Put_Line (Routine_Name & "PyCallable_Check (F):" & int'Image (PyCallable_Check (F)));
+      if PyObject_Size (F) = -1 then
+         Put_Line (Routine_Name & "Py PyObject_Size failed:");
+         PyErr_Print;
+      end if;
       Py_DecRef (PyModule);
       if F = System.Null_Address then
          Put_Line (Routine_Name & "Py error:");
@@ -136,10 +144,7 @@ package body Python is
       Assert (F /= Null_Address, Routine_Name & "F is null");
       Put_Line (Routine_Name & "PyParams size" &
                   Interfaces.C.int'Image (PyTuple_Size (PyParams)));
---        Put_Line (Routine_Name & "F size: " &
---                    Interfaces.C.size_t'Image (PyObject_Size (F)));
-      
-      Put_Line (Routine_Name & "Setting PyResult");
+      Put_Line (Routine_Name & "F size: " & Interfaces.C.int'Image (PyObject_Size (F)));
       PyResult := PyObject_CallObject (F, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       

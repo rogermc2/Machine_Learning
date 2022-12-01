@@ -30,6 +30,9 @@ package Python_API is
    function PyInt_AsLong (I : PyObject) return Interfaces.C.long;
    pragma Import (C, PyInt_AsLong, "PyLong_AsLong");
    
+   function PyCallable_Check (Obj : PyObject) return Interfaces.C.Int;
+   pragma Import (C, PyCallable_Check, "PyCallable_Check");
+   
    procedure PyErr_Print;
    pragma Import (C, PyErr_Print, "PyErr_Print");
    
