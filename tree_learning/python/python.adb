@@ -128,9 +128,6 @@ package body Python is
    function Call_Object (M        : Module; Function_Name : String;
                          PyParams : PyObject) return PyObject is
       use System;
---        use type System.Address;
---        package String_Ptr_Conversion is new
---          System.Address_To_Access_Conversions (String);
       Routine_Name : constant String := "Python.Call_Object ";
       F            : constant PyObject := Get_Symbol (M, Function_Name);
       PyResult     : PyObject;
@@ -142,28 +139,6 @@ package body Python is
                   Interfaces.C.int'Image (PyTuple_Size (PyParams)));
       Put_Line (Routine_Name & "F size: " &
                   Interfaces.C.size_t'Image (PyObject_Size (F)));
---        declare
---           subtype Ptr_To_String is String_Ptr_Conversion.Object_Pointer;
---           PyParams_Size : constant Interfaces.c.size_t :=
---                             PyObject_Size (PyParams);
---           PyParams_Rep  : constant PyObject := PyObject_Repr (PyParams);
---           Py_String     : constant PyObject := PyObject_String (PyParams_Rep);
---           SP            : constant Ptr_To_String :=
---                             String_Ptr_Conversion.To_Pointer (Py_String);
---           theString     : constant String := SP.all;
---        begin
---            Put_Line (Routine_Name & "PyParams_Size: " &
---                          Interfaces.c.size_t'Image (PyParams_Size));
---           if PyParams_Rep = System.Null_Address then
---              Put_Line (Routine_Name & "PyParams_Rep is null");
---           elsif Py_String = System.Null_Address then
---              Put_Line (Routine_Name & "Py_String is null");
---           else
---              Put_Line (Routine_Name & "SP: " &
---                          System.Address_Image (SP.all'address));
---              Put_Line (Routine_Name & "theString: '" & theString & "'");
---           end if;
---        end;
       
       Put_Line (Routine_Name & "Setting PyResult");
       PyResult := PyObject_CallObject (F, PyParams);
