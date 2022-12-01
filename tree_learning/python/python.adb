@@ -110,14 +110,19 @@ package body Python is
    
    function Get_Symbol (M : Module; Function_Name : String)
                         return PyObject is
-      PyModule : constant PyObject := PyObject (M);
-      F        : constant PyObject := PyObject_GetAttrString
+      Routine_Name : constant String := "Python.Call_Object ";
+      PyModule     : constant PyObject := PyObject (M);
+      F            : constant PyObject := PyObject_GetAttrString
         (PyModule, Interfaces.C.To_C (Function_Name));
       use type System.Address;
    begin
+      Put_Line (Routine_Name & "F size: " &
+                  Interfaces.C.size_t'Image (PyObject_Size (F)));
       if F = System.Null_Address then
-         --  PyErr_Print;
-         raise Interpreter_Error with "Cannot find function " & Function_Name;
+         Put_Line (Routine_Name & "Py error:");
+         PyErr_Print;
+         raise Interpreter_Error with Routine_Name & "Cannot find function " &
+           Function_Name;
       end if;
       
       return F;
