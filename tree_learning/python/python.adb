@@ -108,14 +108,12 @@ package body Python is
    --  -------------------------------------------------------------------------   
    --  helpers for use from all overloaded Call subprograms
    
-   function Get_Symbol (M : Module; Function_Name : String)
-                        return PyObject is
+   procedure Get_Symbol (M : Module; Function_Name : String; F : out PyObject) is
       Routine_Name : constant String := "Python.Call_Object ";
       PyModule     : constant PyObject := PyObject (M);
-      F            : constant PyObject := PyObject_GetAttrString
-        (PyModule, Interfaces.C.To_C (Function_Name));
       use type System.Address;
    begin
+      F := PyObject_GetAttrString (PyModule, Interfaces.C.To_C (Function_Name));
       Put_Line (Routine_Name & "F size: " &
                   Interfaces.C.size_t'Image (PyObject_Size (F)));
       if F = System.Null_Address then
@@ -125,7 +123,6 @@ package body Python is
            Function_Name;
       end if;
       
-      return F;
    end Get_Symbol;
    
    --  -------------------------------------------------------------------------
@@ -134,11 +131,12 @@ package body Python is
                          PyParams : PyObject) return PyObject is
       use System;
       Routine_Name : constant String := "Python.Call_Object ";
-      F            : constant PyObject := Get_Symbol (M, Function_Name);
+      F            : PyObject;
       PyResult     : PyObject;
    begin
       Put_Line (Routine_Name);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+      Get_Symbol (M, Function_Name, F);
       Assert (F /= Null_Address, Routine_Name & "F is null");
       Put_Line (Routine_Name & "PyParams size" &
                   Interfaces.C.int'Image (PyTuple_Size (PyParams)));
@@ -169,9 +167,10 @@ package body Python is
    --  public operations
    
    procedure Call (M : Module; Function_Name : String) is
-      F      : constant PyObject := Get_Symbol (M, Function_Name);
+      F      : PyObject;
       Result : PyObject;
    begin
+      Get_Symbol (M, Function_Name, F);
       Result := PyObject_CallObject (F, System.Null_Address);
       Py_DecRef (Result);
    end Call;
