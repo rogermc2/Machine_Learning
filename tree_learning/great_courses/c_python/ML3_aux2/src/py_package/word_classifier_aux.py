@@ -2,9 +2,12 @@
 from sklearn import tree
 
 def word_classifier_aux (dat, labels):
-#    data = list (dat)
-#    lab = list (labels)
+    print(dat[0])
+    print(labels[0])
+#    print("dat type: ", type(dat))
     print("word_classifier_aux")
+#    print("dat length: ", len(dat))
+#    print("labels length: ", len(labels))
     print("word_classifier_aux 2")
 # Train the decision tree classifer using eight decision rules and calculate the number of words that are correct with this model.
 # Set up the learner and run it on the data then compute the accuracy and print it

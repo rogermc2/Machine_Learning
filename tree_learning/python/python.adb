@@ -101,61 +101,42 @@ package body Python is
 
    --  -------------------------------------------------------------------------   
    --  helpers for use from all overloaded Call subprograms
-   
-   procedure Get_Symbol (M : Module; Function_Name : String;
-                         F : out PyObject) is
-      use System;
-      use Interfaces.C;
+   function Get_Symbol (M : in Module; Function_Name : in String)
+                        return PyObject is
+      use type System.Address;
       Routine_Name : constant String := "Python.Get_Symbol ";
       PyModule     : constant PyObject := PyObject (M);
-      use type System.Address;
+      --  PyObject_GetAttrString retrieves the attribute named Function_Name
+      --  from the object PyModule. 
+      F            : constant PyObject := PyObject_GetAttrString
+        (PyModule, Interfaces.C.To_C (Function_Name));
    begin
-      Assert (Address (M) /= Null_Address, Routine_Name & "called with M null");
-      F := PyObject_GetAttrString (PyModule, To_C (Function_Name));
-      Put_Line (Routine_Name & "F size: " &
-                  int'Image (PyObject_Size (F)));
-      Assert (PyCallable_Check (F) = 1, Routine_Name & "Function F is not callable");
-      
-      if PyObject_Size (F) = -1 then
-         Put_Line (Routine_Name & "Py PyObject_Size failed:");
-         PyErr_Print;
-      end if;
       Py_DecRef (PyModule);
       if F = System.Null_Address then
-         Put_Line (Routine_Name & "Py error:");
+         Put_Line (Routine_Name & "Python error message:");
          PyErr_Print;
-         raise Interpreter_Error with Routine_Name & "Cannot find function " &
-           Function_Name;
+         raise Interpreter_Error with "Cannot find function " & Function_Name;
       end if;
+      
+      return F;
       
    end Get_Symbol;
    
    --  -------------------------------------------------------------------------
     
-   function Call_Object (M        : Module; Function_Name : String;
-                         PyParams : PyObject) return PyObject is
-      use System;
+   function Call_Object (F        : in PyObject; Function_Name : in String;
+                         PyParams : in PyObject) return PyObject is
+      use type System.Address;
       Routine_Name : constant String := "Python.Call_Object ";
-      Num_Args     : constant Interfaces.C.int := PyTuple_Size (PyParams);
-      F            : PyObject;
       PyResult     : PyObject;
    begin
-      Put_Line (Routine_Name);
-      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
-      Get_Symbol (M, Function_Name, F);
-      Assert (F /= Null_Address, Routine_Name & "F is null");
-      Put_Line (Routine_Name & "PyParams size" & 
-                  Interfaces.C.int'Image (Num_Args));
-      Put_Line (Routine_Name & "F size: " &
-                  Interfaces.C.int'Image (PyObject_Size (F)));
+      Put_Line (Routine_Name & "PyParams size" &
+                  Interfaces.C.int'Image (PyObject_Size (PyParams)));  
       PyResult := PyObject_CallObject (F, PyParams);
-      Put_Line (Routine_Name & "PyResult set");
-      
-      if PyResult = Null_Address then
-         Put_Line (Routine_Name & "Python error: ");
+      if PyResult = System.Null_Address then
+         Put_Line (Routine_Name & "Python error message:");
          PyErr_Print;
-         raise Interpreter_Error with Routine_Name & "operation " &
-           Function_Name & " failed";
+         raise Interpreter_Error with "Operation " & Function_Name & " did not return expected result";
       end if;
       
       return PyResult;
@@ -174,7 +155,7 @@ package body Python is
       F      : PyObject;
       Result : PyObject;
    begin
-      Get_Symbol (M, Function_Name, F);
+      F := Get_Symbol (M, Function_Name);
       Result := PyObject_CallObject (F, System.Null_Address);
       Py_DecRef (F);
       Py_DecRef (Result);
@@ -189,13 +170,14 @@ package body Python is
                               A      : Interfaces.C.int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
       PyParams := Py_BuildValue (Interfaces.C.To_C ("(i)"),
                                  Interfaces.C.int (A));
-      PyResult := Call_Object (M, Function_Name, PyParams);
+      PyResult := Call_Object (F, Function_Name, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -214,13 +196,14 @@ package body Python is
                               B      : Interfaces.C.int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
       PyParams := Py_BuildValue (Interfaces.C.To_C ("ii"), Interfaces.C.int (A),
                                  Interfaces.C.int (B));
-      PyResult := Call_Object (M, Function_Name, PyParams);
+      PyResult := Call_Object (F, Function_Name, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -244,6 +227,7 @@ package body Python is
                               B_Ptrs : API_Int_Pointer_Array) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
@@ -251,7 +235,7 @@ package body Python is
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("oo"), A_Pointers, B_Pointers);
                               
-      PyResult := Call_Object (M, Function_Name, PyParams);
+      PyResult := Call_Object (F, Function_Name, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -269,6 +253,7 @@ package body Python is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
       
       Routine_Name  : constant String := "Python.Call 2 ";
+      F             : constant PyObject := Get_Symbol (M, Function_Name);
       Data_Tuple    : PyObject;
       Labels_Tuple  : PyObject;
       PyParams      : PyObject;
@@ -292,7 +277,7 @@ package body Python is
       Put_Line (Routine_Name & "PyParams size" &
                   Interfaces.C.int'Image (PyObject_Size (PyParams)));  
                               
-      Result := Call_Object (M, Function_Name, PyParams);
+      Result := Call_Object (F, Function_Name, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       Put (Routine_Name & "Py error message: ");
       PyErr_Print;
@@ -325,6 +310,7 @@ package body Python is
                               D_Ptrs  : Char_Ptr_Array)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
@@ -335,7 +321,7 @@ package body Python is
                        C_Pointers, D_Pointers);
       Put_Line (Routine_Name & "PyParams set");
                               
-      PyResult := Call_Object (M, Function_Name, PyParams);
+      PyResult := Call_Object (F, Function_Name, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       Result := PyInt_AsLong (PyResult);
       Put_Line (Routine_Name & "Number of correct words:" &
