@@ -114,7 +114,8 @@ package body Python is
       F := PyObject_GetAttrString (PyModule, To_C (Function_Name));
       Put_Line (Routine_Name & "F size: " &
                   int'Image (PyObject_Size (F)));
-      Put_Line (Routine_Name & "PyCallable_Check (F):" & int'Image (PyCallable_Check (F)));
+      Assert (PyCallable_Check (F) = 1, Routine_Name & "Function F is not callable");
+      
       if PyObject_Size (F) = -1 then
          Put_Line (Routine_Name & "Py PyObject_Size failed:");
          PyErr_Print;
