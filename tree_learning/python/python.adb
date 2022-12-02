@@ -136,6 +136,7 @@ package body Python is
                          PyParams : PyObject) return PyObject is
       use System;
       Routine_Name : constant String := "Python.Call_Object ";
+      Num_Args     : constant Interfaces.C.int := PyTuple_Size (PyParams);
       F            : PyObject;
       PyResult     : PyObject;
    begin
@@ -143,9 +144,10 @@ package body Python is
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
       Get_Symbol (M, Function_Name, F);
       Assert (F /= Null_Address, Routine_Name & "F is null");
-      Put_Line (Routine_Name & "PyParams size" &
-                  Interfaces.C.int'Image (PyTuple_Size (PyParams)));
-      Put_Line (Routine_Name & "F size: " & Interfaces.C.int'Image (PyObject_Size (F)));
+      Put_Line (Routine_Name & "PyParams size" & 
+                  Interfaces.C.int'Image (Num_Args));
+      Put_Line (Routine_Name & "F size: " &
+                  Interfaces.C.int'Image (PyObject_Size (F)));
       PyResult := PyObject_CallObject (F, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       
