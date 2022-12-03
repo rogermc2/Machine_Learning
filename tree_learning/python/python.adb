@@ -124,8 +124,7 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
-   function Call_Object (F        : in PyObject; Function_Name : in String;
-                         PyParams : in PyObject) return PyObject is
+   function Call_Object (F, PyParams : in PyObject) return PyObject is
       use type System.Address;
       Routine_Name : constant String := "Python.Call_Object ";
       PyResult     : PyObject;
@@ -133,18 +132,20 @@ package body Python is
       Put_Line (Routine_Name & "PyParams size" &
                   Interfaces.C.int'Image (PyObject_Size (PyParams)));  
       PyResult := PyObject_CallObject (F, PyParams);
+      Put_Line (Routine_Name & "PyResult set");
+      
       if PyResult = System.Null_Address then
          Put_Line (Routine_Name & "Python error message:");
          PyErr_Print;
-         raise Interpreter_Error with "Operation " & Function_Name & " did not return expected result";
+         raise Interpreter_Error with Routine_Name & "failed.";
       end if;
       
       return PyResult;
       
    exception
       when E : others =>
-         Put_Line (Routine_Name & "error: " & Exception_Message (E));
-         raise Interpreter_Error;
+         raise Interpreter_Error with Routine_Name & "exception: " &
+           Exception_Message (E);
       
    end Call_Object;     
  
@@ -177,7 +178,7 @@ package body Python is
    begin
       PyParams := Py_BuildValue (Interfaces.C.To_C ("(i)"),
                                  Interfaces.C.int (A));
-      PyResult := Call_Object (F, Function_Name, PyParams);
+      PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -203,7 +204,7 @@ package body Python is
    begin
       PyParams := Py_BuildValue (Interfaces.C.To_C ("ii"), Interfaces.C.int (A),
                                  Interfaces.C.int (B));
-      PyResult := Call_Object (F, Function_Name, PyParams);
+      PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -235,7 +236,7 @@ package body Python is
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("oo"), A_Pointers, B_Pointers);
                               
-      PyResult := Call_Object (F, Function_Name, PyParams);
+      PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -277,7 +278,7 @@ package body Python is
       Put_Line (Routine_Name & "PyParams size" &
                   Interfaces.C.int'Image (PyObject_Size (PyParams)));  
                               
-      Result := Call_Object (F, Function_Name, PyParams);
+      Result := Call_Object (F, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       Put (Routine_Name & "Py error message: ");
       PyErr_Print;
@@ -321,7 +322,7 @@ package body Python is
                        C_Pointers, D_Pointers);
       Put_Line (Routine_Name & "PyParams set");
                               
-      PyResult := Call_Object (F, Function_Name, PyParams);
+      PyResult := Call_Object (F, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       Result := PyInt_AsLong (PyResult);
       Put_Line (Routine_Name & "Number of correct words:" &
