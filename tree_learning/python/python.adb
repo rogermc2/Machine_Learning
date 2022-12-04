@@ -124,14 +124,18 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
-   function Call_Object (F, PyParams : in PyObject) return PyObject is
+   function Call_Object (PyFunc, PyParams : in PyObject) return PyObject is
+      use Interfaces.C;
       use type System.Address;
       Routine_Name : constant String := "Python.Call_Object ";
       PyResult     : PyObject;
    begin
       Put_Line (Routine_Name & "PyParams size" &
                   Interfaces.C.int'Image (PyObject_Size (PyParams)));  
-      PyResult := PyObject_CallObject (F, PyParams);
+      Assert (PyFunc /= System.Null_Address, "");  
+      Assert (PyCallable_Check (PyFunc) /= 0, ""); 
+      Assert (PyParams /= System.Null_Address, "");  
+      PyResult := PyObject_CallObject (PyFunc, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       
       if PyResult = System.Null_Address then
@@ -254,7 +258,7 @@ package body Python is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
       
       Routine_Name  : constant String := "Python.Call 2 ";
-      F             : constant PyObject := Get_Symbol (M, Function_Name);
+      PyFunc        : constant PyObject := Get_Symbol (M, Function_Name);
       Data_Tuple    : PyObject;
       Labels_Tuple  : PyObject;
       PyParams      : PyObject;
@@ -278,7 +282,7 @@ package body Python is
       Put_Line (Routine_Name & "PyParams size" &
                   Interfaces.C.int'Image (PyObject_Size (PyParams)));  
                               
-      Result := Call_Object (F, PyParams);
+      Result := Call_Object (PyFunc, PyParams);
       Put_Line (Routine_Name & "PyResult set");
       Put (Routine_Name & "Py error message: ");
       PyErr_Print;
