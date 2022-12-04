@@ -258,15 +258,16 @@ package body Python is
                               T1, T2  : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
       
-      Routine_Name  : constant String := "Python.Call 2 ";
-      PyFunc        : constant PyObject := Get_Symbol (M, Function_Name);
-      Data_Tuple    : PyObject;
-      Labels_Tuple  : PyObject;
-      PyParams      : PyObject;
-      Result        : PyObject;
+      Routine_Name : constant String := "Python.Call 2 ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      Data_Tuple   : PyObject;
+      Labels_Tuple : PyObject;
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+      Result       : aliased Interfaces.C.long;
    begin
       Put_Line (Routine_Name & "Data size" &
-                 Integer'Image (Integer (Data.Length)));
+                  Integer'Image (Integer (Data.Length)));
       To_Tuple (Data, Data_Tuple);
       Assert (Data_Tuple /= Null_Address, Routine_Name & "Data_Tuple is null");
       To_Tuple (Labels, Labels_Tuple);
@@ -280,17 +281,20 @@ package body Python is
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), Data_Tuple, Labels_Tuple);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
-      Put_Line (Routine_Name & "PyParams size" &
-                  Interfaces.C.int'Image (PyObject_Size (PyParams)));  
                               
-      Result := Call_Object (PyFunc, PyParams);
+      PyResult := Call_Object (PyFunc, PyParams);
       Put_Line (Routine_Name & "PyResult set");
-      Put (Routine_Name & "Py error message: ");
-      PyErr_Print;
-      Py_DecRef (PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+      Result := PyInt_AsLong (PyResult);
+      Put_Line (Routine_Name & "PyResult checked");
+      
+--        Py_DecRef (PyParams);
       Py_DecRef (Data_Tuple);
       Py_DecRef (Labels_Tuple);
-      Py_DecRef (Result);
+      --        Py_DecRef (Result);
 
    end Call;
    
@@ -363,31 +367,31 @@ package body Python is
 
    --  -------------------------------------------------------------------------
   
---     procedure Pointers_Example is
---  
---        package String_Ptrs is
---          new System.Address_To_Access_Conversions (String);
---        --  Instantiate a package to convert access types to/from addresses.
---        --  This creates a string access type called Object_Pointer.
---  
---        five : aliased String := "5";
---        --  Five is aliased because it will be using access types on it
---  
---        String_Pointer : String_Ptrs.Object_Pointer := five'unchecked_access;
---        --  Unchecked_access needed because five is local to main program.
---        --  If it was global, we could use 'access.
---        --  This is an Ada access all type
---  
---        String_Address : System.Address := Five'Address;
---        --  This is an address in memory, a C pointer
---        --  Addresses can be found with the 'address attribute.
---        --  This is the equivalent of a C pointe
---     begin
---        String_Pointer := String_Ptrs.To_Pointer (String_Address);
---        String_Address := String_Ptrs.To_Address (String_Pointer);
---        --  Convert between Ada and C pointer types.
---  
---     end Pointers_Example;
+   --     procedure Pointers_Example is
+   --  
+   --        package String_Ptrs is
+   --          new System.Address_To_Access_Conversions (String);
+   --        --  Instantiate a package to convert access types to/from addresses.
+   --        --  This creates a string access type called Object_Pointer.
+   --  
+   --        five : aliased String := "5";
+   --        --  Five is aliased because it will be using access types on it
+   --  
+   --        String_Pointer : String_Ptrs.Object_Pointer := five'unchecked_access;
+   --        --  Unchecked_access needed because five is local to main program.
+   --        --  If it was global, we could use 'access.
+   --        --  This is an Ada access all type
+   --  
+   --        String_Address : System.Address := Five'Address;
+   --        --  This is an address in memory, a C pointer
+   --        --  Addresses can be found with the 'address attribute.
+   --        --  This is the equivalent of a C pointe
+   --     begin
+   --        String_Pointer := String_Ptrs.To_Pointer (String_Address);
+   --        String_Address := String_Ptrs.To_Address (String_Pointer);
+   --        --  Convert between Ada and C pointer types.
+   --  
+   --     end Pointers_Example;
    
    --  -------------------------------------------------------------------------
 
@@ -422,7 +426,7 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
-   procedure To_Tuple (Data : NL_Types.Boolean_List_2D;
+   procedure To_Tuple (Data     : NL_Types.Boolean_List_2D;
                        Tuple_2D : out PyObject) is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Boolean_List_2D ";
