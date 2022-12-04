@@ -135,8 +135,6 @@ package body Python is
       Assert (PyCallable_Check (PyFunc) /= 0, ""); 
       Assert (PyParams /= System.Null_Address, "");  
       PyResult := PyObject_CallObject (PyFunc, PyParams);
-      New_Line;
-      Put_Line (Routine_Name & "PyResult set");
       
       if PyResult = System.Null_Address then
          Put_Line (Routine_Name & "Python error message:");
@@ -285,18 +283,15 @@ package body Python is
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
                               
       PyResult := Call_Object (PyFunc, PyParams);
-      Put_Line (Routine_Name & "PyResult set");
       if PyResult = System.Null_Address then
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
       end if;
       Result := PyInt_AsLong (PyResult);
-      Put_Line (Routine_Name & "PyResult checked");
+      Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
       
---        Py_DecRef (PyParams);
       Py_DecRef (Data_Tuple);
       Py_DecRef (Labels_Tuple);
-      --        Py_DecRef (Result);
 
    end Call;
    
