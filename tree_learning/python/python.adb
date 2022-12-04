@@ -14,9 +14,8 @@ with Python_API; use Python_API;
 package body Python is
      
    --     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject;
-   procedure To_Tuple (Data : NL_Types.Boolean_List_2D; Tuple_2D: out PyObject);
-   procedure To_Tuple (Data  : ML_Types.Bounded_String_List;
-                       Tuple : out PyObject);
+   function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
+   function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject;
    
    --  -------------------------------------------------------------------------
    
@@ -158,13 +157,16 @@ package body Python is
    --  public operations
    
    procedure Call (M : Module; Function_Name : String) is
-      F      : PyObject;
-      Result : PyObject;
+      Func     : PyObject;
+      PyResult : PyObject;
+      Result   : Interfaces.C.long;
    begin
-      F := Get_Symbol (M, Function_Name);
-      Result := PyObject_CallObject (F, System.Null_Address);
-      Py_DecRef (F);
-      Py_DecRef (Result);
+      Func := Get_Symbol (M, Function_Name);
+      PyResult := PyObject_CallObject (Func, System.Null_Address);
+      Result := PyInt_AsLong (PyResult);
+      Put_Line ("Python.Call 1 Result:" & Interfaces.C.long'Image (Result));
+      Py_DecRef (Func);
+      
    end Call;
 
    --  -------------------------------------------------------------------------
@@ -268,9 +270,9 @@ package body Python is
    begin
       Put_Line (Routine_Name & "Data size" &
                   Integer'Image (Integer (Data.Length)));
-      To_Tuple (Data, Data_Tuple);
+      Data_Tuple := To_Tuple (Data);
       Assert (Data_Tuple /= Null_Address, Routine_Name & "Data_Tuple is null");
-      To_Tuple (Labels, Labels_Tuple);
+      Labels_Tuple := To_Tuple (Labels);
       Assert (Labels_Tuple /= Null_Address, Routine_Name &
                 "Labels_Tuple is null");
       Put_Line (Routine_Name & "Data_Tuple size" &
@@ -426,12 +428,12 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
-   procedure To_Tuple (Data     : NL_Types.Boolean_List_2D;
-                       Tuple_2D : out PyObject) is
+   function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Boolean_List_2D ";
       Row_Size     : int;
       Long_Value   : long;
+      Tuple_2D     : PyObject;
       Tuple        : PyObject;
       Py_Row       : int := -1;
       Py_Col       : int := -1;
@@ -454,8 +456,9 @@ package body Python is
          end loop;
          
          PyTuple_SetItem (Tuple_2D, Py_Row, Tuple);
-         Py_DecRef (Tuple);
       end loop;
+      
+      return Tuple_2D;
        
    exception
       when E : others =>
@@ -466,23 +469,24 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
-   procedure To_Tuple (Data : ML_Types.Bounded_String_List;
-                       Tuple: out PyObject) is
+   function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Bounded_String_List ";
-      Py_Row       : int := -1;
+      Tuple        : PyObject;
+      Py_Index     : int := -1;
    begin
       Tuple := PyTuple_New (int (Data.Length));
       for row in Data.First_Index .. Data.Last_Index loop
-         Py_Row := Py_Row + 1;
+         Py_Index := Py_Index + 1;
          declare
             Text : constant char_array := To_C (Data (row));
             Item : constant PyObject := PyBytes_FromString (Text);
          begin
-            PyTuple_SetItem (Tuple, Py_Row, Item);
-            Py_DecRef (Item);
+            PyTuple_SetItem (Tuple, Py_Index, Item);
          end;
       end loop;
+      
+      return Tuple;
 
    exception
       when E : others =>
