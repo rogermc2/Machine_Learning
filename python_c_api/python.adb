@@ -14,6 +14,7 @@ with Python_API; use Python_API;
 package body Python is
      
    --     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject;
+   function To_Tuple (Data : NL_Types.Boolean_List) return PyObject;
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject;
    
@@ -128,9 +129,7 @@ package body Python is
       use type System.Address;
       Routine_Name : constant String := "Python.Call_Object ";
       PyResult     : PyObject;
-   begin
-      Put_Line (Routine_Name & "PyParams size" &
-                  Interfaces.C.int'Image (PyObject_Size (PyParams)));  
+   begin 
       Assert (PyFunc /= System.Null_Address, "");  
       Assert (PyCallable_Check (PyFunc) /= 0, ""); 
       Assert (PyParams /= System.Null_Address, "");  
@@ -266,17 +265,17 @@ package body Python is
       PyResult     : PyObject;
       Result       : aliased Interfaces.C.long;
    begin
-      Put_Line (Routine_Name & "Data size" &
-                  Integer'Image (Integer (Data.Length)));
+--        Put_Line (Routine_Name & "Data size" &
+--                    Integer'Image (Integer (Data.Length)));
       Data_Tuple := To_Tuple (Data);
       Assert (Data_Tuple /= Null_Address, Routine_Name & "Data_Tuple is null");
       Labels_Tuple := To_Tuple (Labels);
       Assert (Labels_Tuple /= Null_Address, Routine_Name &
                 "Labels_Tuple is null");
-      Put_Line (Routine_Name & "Data_Tuple size" &
-                  Interfaces.C.int'Image (PyTuple_Size (Data_Tuple)));
-      Put_Line (Routine_Name & "Labels_Tuple size" &
-                  Interfaces.C.int'Image (PyTuple_Size (Labels_Tuple)));   
+--        Put_Line (Routine_Name & "Data_Tuple size" &
+--                    Interfaces.C.int'Image (PyTuple_Size (Data_Tuple)));
+--        Put_Line (Routine_Name & "Labels_Tuple size" &
+--                    Interfaces.C.int'Image (PyTuple_Size (Labels_Tuple)));   
       
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), Data_Tuple, Labels_Tuple);
@@ -287,6 +286,7 @@ package body Python is
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
       end if;
+      
       Result := PyInt_AsLong (PyResult);
       Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
       
@@ -297,102 +297,55 @@ package body Python is
    
    --  -------------------------------------------------------------------------
    
-   procedure Call (M              : Module; Function_Name : String;
-                   Data           : NL_Types.Boolean_List_2D;
-                   Labels, Words,
-                   Pronounce      : ML_Types.Bounded_String_List) is
-      use Interfaces.C;
-      use API_Binding;
-      Routine_Name  : constant String := "Python.Call 4 ";
-      ABCD_Pointers : constant API_4D_Pointers :=
-                        API_4D (Data, Labels, Words, Pronounce);
-      A_Pointers    : constant API_Boolean_Pointer_Array :=
-                        Get_A_Ptrs (ABCD_Pointers);
-      B_Pointers    : constant Char_Ptr_Array := Get_B_Ptrs (ABCD_Pointers);
-      C_Pointers    : constant Char_Ptr_Array := Get_C_Ptrs (ABCD_Pointers);
-      D_Pointers    : constant Char_Ptr_Array := Get_D_Ptrs (ABCD_Pointers);
-      
+   procedure Call (M      : Module; Function_Name : String;
+                   Data   : NL_Types.Boolean_List_2D;
+                   Labels : NL_Types.Boolean_List) is
+      use System;
       function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              A_Ptrs  : API_Boolean_Pointer_Array;
-                              B_Ptrs, C_Ptrs,
-                              D_Ptrs  : Char_Ptr_Array)  return PyObject;
+                              T1, T2  : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      Func     : constant PyObject := Get_Symbol (M, Function_Name);
-      PyParams : PyObject;
-      PyResult : PyObject;
-      Result   : aliased Interfaces.C.long;
+      
+      Routine_Name : constant String := "Python.Call 2 ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      Data_Tuple   : PyObject;
+      Labels_Tuple : PyObject;
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+      Result       : aliased Interfaces.C.long;
    begin
-      Put_Line (Routine_Name);
+--        Put_Line (Routine_Name & "Data size" &
+--                    Integer'Image (Integer (Data.Length)));
+      Data_Tuple := To_Tuple (Data);
+      Assert (Data_Tuple /= Null_Address, Routine_Name & "Data_Tuple is null");
+      Labels_Tuple := To_Tuple (Labels);
+      Assert (Labels_Tuple /= Null_Address, Routine_Name &
+                "Labels_Tuple is null");
+--        Put_Line (Routine_Name & "Data_Tuple size" &
+--                    Interfaces.C.int'Image (PyTuple_Size (Data_Tuple)));
+--        Put_Line (Routine_Name & "Labels_Tuple size" &
+--                    Interfaces.C.int'Image (PyTuple_Size (Labels_Tuple)));   
+      
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("oooo"), A_Pointers, B_Pointers,
-                       C_Pointers, D_Pointers);
-      Put_Line (Routine_Name & "PyParams set");
+        Py_BuildValue (Interfaces.C.To_C ("OO"), Data_Tuple, Labels_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
                               
-      PyResult := Call_Object (Func, PyParams);
-      Put_Line (Routine_Name & "PyResult set");
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+      
       Result := PyInt_AsLong (PyResult);
-      Put_Line (Routine_Name & "Number of correct words:" &
-                  long'Image (Result));
-      Py_DecRef (PyParams);
-      Py_DecRef (PyResult);
+      Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
+      
+      Py_DecRef (Data_Tuple);
+      Py_DecRef (Labels_Tuple);
 
    end Call;
    
    --  -------------------------------------------------------------------------
    
-   --     function Convert_Big_Array (Data : Boolean_Array) return PyObject is
-   --        use System;
-   --        use Interfaces.C;
-   --        Py_List : constant PyObject := PyList_New (Data'Length);
-   --        Py_Item : Int;
-   --     begin 
-   --        if Py_List /= Null_Address then
-   --           for index in Data'Range loop
-   --              if Data (index) then
-   --                 Py_Item := 1;
-   --              else
-   --                 Py_Item := 0;
-   --              end if;
-   --              PyList_SetItem (Py_List, int (index), Py_Item);
-   --           end loop;
-   --        end if;
-   --        
-   --        return Py_List;
-   --        
-   --     end Convert_Big_Array;
-
-   --  -------------------------------------------------------------------------
-  
-   --     procedure Pointers_Example is
-   --  
-   --        package String_Ptrs is
-   --          new System.Address_To_Access_Conversions (String);
-   --        --  Instantiate a package to convert access types to/from addresses.
-   --        --  This creates a string access type called Object_Pointer.
-   --  
-   --        five : aliased String := "5";
-   --        --  Five is aliased because it will be using access types on it
-   --  
-   --        String_Pointer : String_Ptrs.Object_Pointer := five'unchecked_access;
-   --        --  Unchecked_access needed because five is local to main program.
-   --        --  If it was global, we could use 'access.
-   --        --  This is an Ada access all type
-   --  
-   --        String_Address : System.Address := Five'Address;
-   --        --  This is an address in memory, a C pointer
-   --        --  Addresses can be found with the 'address attribute.
-   --        --  This is the equivalent of a C pointe
-   --     begin
-   --        String_Pointer := String_Ptrs.To_Pointer (String_Address);
-   --        String_Address := String_Ptrs.To_Address (String_Pointer);
-   --        --  Convert between Ada and C pointer types.
-   --  
-   --     end Pointers_Example;
-   
-   --  -------------------------------------------------------------------------
-
-   --     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
+--         function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
    --        use Interfaces.C;
    --        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
    --        Row_Size   : int;
@@ -420,6 +373,34 @@ package body Python is
    --           raise Interpreter_Error;
    --           
    --     end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : NL_Types.Boolean_List) return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
+      Tuple_2D     : constant PyObject := PyTuple_New (int (Data.Length));
+      Long_Value   : long;
+      Py_Index     : int := -1;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         Py_Index := Py_Index + 1;
+         if Data (index) then
+            Long_Value := 1;
+         else
+            Long_Value := 0;
+         end if;
+         PyTuple_SetItem (Tuple_2D, Py_Index, PyLong_FromLong (Long_Value));
+      end loop;
+      
+      return Tuple_2D;
+
+   exception
+      when E : others =>
+         raise Interpreter_Error with Routine_Name & "error" &
+           Exception_Message (E);
+      
+   end To_Tuple;
 
    --  -------------------------------------------------------------------------
 

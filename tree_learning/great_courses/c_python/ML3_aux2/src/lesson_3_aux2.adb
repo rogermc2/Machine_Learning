@@ -21,21 +21,18 @@ procedure Lesson_3_Aux2 is
    EI_Data      : constant ML_Types.Unbounded_List :=
                     Aux_Utils.Load_Data (File_EI);
    Data         : NL_Types.Boolean_List_2D;
-   Labels       : ML_Types.Bounded_String_List;
+   Labels       : NL_Types.Boolean_List;
    Words        : ML_Types.Bounded_String_List;
    Pronounce    : ML_Types.Bounded_String_List;
    Classifier   : Python.Module;
 begin
    New_Line;
-   Put_Line ("Lesson 3 Aux2");
-   Build_Dataset (IE_Data, EI_Data, Labels, Words, Pronounce, Data);
+   Build_Dataset (IE_Data, EI_Data, Words, Pronounce, Data, Labels);
    Put_Line (Routine_Name & "Dataset built");
-   Put_Line (Routine_Name & "Data (1) length: " &
-               Integer'Image (Integer (Data (1).Length)));
 
    Python.Initialize;
    Classifier := Python.Import_File ("word_classifier_aux");
-   Put_Line (Routine_Name & "Classifier set");
+--     Put_Line (Routine_Name & "Classifier set");
    Python.Call (Classifier, "word_classifier_aux", Data, Labels);
    Put_Line (Routine_Name & "word_classifier_aux module imported");
    Python.Close_Module (Classifier);
