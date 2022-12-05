@@ -5,13 +5,23 @@ def word_classifier_aux (dat, labels):
     data_tuple_list = list (dat)
     data_lists = list(map(list, dat))
     label_list=[]
-    for item in range(0, len(labels)):
+    for item in range(0, len(labels) - 1):
         label_list = label_list + [[labels [item]]]
     
     print("data_tuple_list length: ", len(data_tuple_list))
     print("data_tuple_list [1][0:20]: ", data_tuple_list [1][0:20])
+    print("data_tuple_list [-1][0:20]: ", data_tuple_list [-1][0:20])
     print("data_lists length: ", len(data_lists))
-    print("data_lists [1][0:20]: ", data_lists [1][0:20])
+#    print("data_lists [1][0:20]: ", data_lists [1][0:20])
+#    print("data_lists [-1][0:20]: ", data_lists [-1][0:20])
+#    print("dat [0] length: ", len(dat [0]))
+#    print("dat [1] length: ", len(dat [1]))
+#    print("data_tuple_list [0] length: ", len(data_lists [0]))
+#    print("data_tuple_list [1] length: ", len(data_lists [1]))
+#    print("data_lists [0] length: ", len(data_lists [0]))
+#    print("data_lists [1] length: ", len(data_lists [1]))
+#    print("data_lists [-1] length: ", len(data_lists [-1]))
+#    print("data_lists [-2] length: ", len(data_lists [-2]))
     
     print("label_list length: ", len(label_list))
     print("label_list: ", label_list [0:5])
@@ -20,7 +30,7 @@ def word_classifier_aux (dat, labels):
 # Set up the learner and run it on the data then compute the accuracy and print it
     clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)
     print("clf set")
-#    clf = clf.fit(data_lists, label_list)
+    clf = clf.fit(data_lists, label_list)
 
 #    correct = 0
 #    for i in range(len(words)):

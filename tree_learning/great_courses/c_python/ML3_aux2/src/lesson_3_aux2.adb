@@ -30,6 +30,8 @@ begin
    Put_Line ("Lesson 3 Aux2");
    Build_Dataset (IE_Data, EI_Data, Labels, Words, Pronounce, Data);
    Put_Line (Routine_Name & "Dataset built");
+   Put_Line (Routine_Name & "Data (1) length: " &
+               Integer'Image (Integer (Data (1).Length)));
 
    Python.Initialize;
    Classifier := Python.Import_File ("word_classifier_aux");

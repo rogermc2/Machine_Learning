@@ -1,4 +1,5 @@
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -38,13 +39,15 @@ package body Word_Classification is
          --           Put_Line (Routine_Name & "Word_Line length" &
          --                       Integer'Image (Integer (Word_Line.Length)));
          Curs := Word_Line.First;
---           Put_Line (Routine_Name & "Word_Line 1: '" &
---                       To_String (Word_Line.First_Element) & "'");
---           Put_Line (Routine_Name & "Word_Line 2: '" &
---                       To_String (Word_Line (Next (Curs))) & "'");
+         --           Put_Line (Routine_Name & "Word_Line 1: '" &
+         --                       To_String (Word_Line.First_Element) & "'");
+         --           Put_Line (Routine_Name & "Word_Line 2: '" &
+         --                       To_String (Word_Line (Next (Curs))) & "'");
          Features := Get_Features (Word_Line);
 
-         --           Put_Line (Routine_Name & "Features set");
+--           Put_Line (Routine_Name & "Features length: " &
+--                       Integer'Image (Integer (Features.Length)));
+
          Data_Out.Append (Features);
          Curs := Word_Line.First;
          --           Put_Line (Routine_Name & "Curs set");
@@ -61,6 +64,10 @@ package body Word_Classification is
          end;
 
       end loop;
+--        Put_Line (Routine_Name & "Data_Out (1) length: " &
+--                    Integer'Image (Integer (Data_Out (1).Length)));
+--        Put_Line (Routine_Name & "Data_Out (1) length: " &
+--                    Integer'Image (Integer (Data_Out (2).Length)));
 
    exception
       when others =>
@@ -139,67 +146,75 @@ package body Word_Classification is
       use ML_Types.String_Package;
       Routine_Name : constant String := "Word_Classification.Get_Features ";
       Curs         : constant Cursor := Word_Line.First;
+      --  aWord is wordline[0]
       aWord        : constant String := To_String (Element (Curs));
+      --  Code is wordline[1]
       Code         : constant String := To_String (Element (Next (Curs)));
       Pos          : Natural := Index (aWord, "ie");
       Minus_Char   : constant String := "-";
+      Has_Letter   : Boolean;
       Two_Chars    : String2;
       Vector       : NL_Types.Boolean_List;
    begin
-      --       Put_Line (Routine_Name & "aWord '" & aWord & "'");
-      --       Put_Line (Routine_Name & "Code '" & Code & "'");
+--        Put_Line (Routine_Name & "Word_Line length:" &
+--                    Integer'Image (Integer(Word_Line.Length)));
+--        Put_Line (Routine_Name & "aWord '" & aWord & "'");
+--        Put_Line (Routine_Name & "Code '" & Code & "'");
       if Pos = 0 then
          Pos := Index (aWord, "ei");
       end if;
 
-      if Pos > 0 then
-         --  pronounced as one syllable
-         Vector.Append (Code (Pos) = '-' or Code (Pos + 1) = '-');
-         --  silent
-         Vector.Append (Code (Pos) = '-' and Code (Pos + 1) = '-');
-         --  two syllable
-         Vector.Append (Code (Pos) /= '-' and Code (Pos + 1) /= '-');
+      Assert (Pos > 0, Routine_Name & "Word_Line has neither ie or ei.");
+      --  pronounced as one syllable
+      Vector.Append (Code (Pos) = '-' or Code (Pos + 1) = '-');
+      --  silent
+      Vector.Append (Code (Pos) = '-' and Code (Pos + 1) = '-');
+      --  two syllable
+      Vector.Append (Code (Pos) /= '-' and Code (Pos + 1) /= '-');
 
-         for pronounce in Two_Syllable'Range loop
-            Two_Chars := String2 (Code (Pos ..Pos + 1));
-            Vector.Append (Two_Chars = Two_Syllable (pronounce));
+      for pronounce in Two_Syllable'Range loop
+         Two_Chars := String2 (Code (Pos ..Pos + 1));
+         Vector.Append (Two_Chars = Two_Syllable (pronounce));
+      end loop;
+
+      for pronounce in One_Syllable'Range loop
+         declare
+            Two_Chars : constant String := Code (Pos ..Pos + 1);
+         begin
+            Vector.Append
+              (Two_Chars = String (One_Syllable (pronounce)) & Minus_Char);
+         end;
+      end loop;
+
+      for letter in LC_Index loop
+         --  immediate preceeding, before
+         if Pos = 1 then
+            Vector.Append (False);
+         else
+            Vector.Append (aWord (Pos - 1) = Character (letter));
+         end if;
+
+         Has_Letter := False;
+         for let in 1 .. Pos loop
+            Has_Letter := Has_Letter or aWord (let) = Character (letter);
          end loop;
+         Vector.Append (Has_Letter);
 
-         for pronounce in One_Syllable'Range loop
-            declare
-               Two_Chars : constant String := Code (Pos ..Pos + 1);
-            begin
-               Vector.Append
-                 (Two_Chars = String (One_Syllable (pronounce)) & Minus_Char);
-            end;
+         --  immediate following, after
+         if Pos > aWord'Last - 2 then
+            Vector.Append (False);
+         else
+            Vector.Append (aWord (Pos + 2) = Character (letter));
+         end if;
+            --  in word at all
+         Has_Letter := False;
+         for let in Pos + 2 .. aWord'Last loop
+            Has_Letter := Has_Letter or aWord (let) = Character (letter);
          end loop;
-
-         for letter in LC_Index loop
-            --  immediate preceeding, before
-            if Pos = 1 then
-               Vector.Append (False);
-            else
-               Vector.Append (aWord (Pos - 1) = Character (letter));
-            end if;
-
-            --  immediate following, after
-            if Pos > aWord'Last - 2 then
-               Vector.Append (False);
-            else
-               Vector.Append (aWord (Pos + 2) = Character (letter));
-               for index in Pos + 2 .. aWord'Last loop
-                  Vector.Append (aWord (index) = Character (letter));
-               end loop;
-               --  in word at all
-               for index in Pos + 2 .. aWord'Last loop
-                  Vector.Append (aWord (index) = Character (letter));
-               end loop;
-            end if;
-         end loop;
-
-      else
-         Put_Line (Routine_Name & "Word_Line has neither ie or ei.");
-      end if;
+         Vector.Append (Has_Letter);
+      end loop;
+--        Put_Line (Routine_Name & "Vector length: " &
+--                    Integer'Image (Integer (Vector.Length)));
 
       return Vector;
 
