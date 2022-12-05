@@ -17,9 +17,6 @@ package body Word_Classification is
                     ("ei", "iA", "iI", "ix", "AE", "Ai", "Ax", "Ix", "iE",
                      "ii", "yE", "yI", "ye", "yx");
 
-   function Get_Features (Word_Line : ML_Types.String_List)
-                          return NL_Types.Boolean_List;
-
    --  -------------------------------------------------------------------------
 
    procedure Build_Data (Data_In          : ML_Types.Unbounded_List;

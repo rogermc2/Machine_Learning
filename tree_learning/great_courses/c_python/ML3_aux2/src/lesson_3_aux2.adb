@@ -1,7 +1,7 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Directories; use Ada.Directories;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
@@ -24,7 +24,9 @@ procedure Lesson_3_Aux2 is
    Labels       : NL_Types.Boolean_List;
    Words        : ML_Types.Bounded_String_List;
    Pronounce    : ML_Types.Bounded_String_List;
+   Word_Line    : ML_Types.String_List;
    Classifier   : Python.Module;
+   Test         : NL_Types.Boolean_List;
 begin
    New_Line;
    Build_Dataset (IE_Data, EI_Data, Words, Pronounce, Data, Labels);
@@ -37,7 +39,10 @@ begin
    Put_Line (Routine_Name & "word_classifier_aux module imported");
 
    for index in Words.First_Index .. Words.Last_Index loop
-      null;
+      Word_Line.Clear;
+      Word_Line.Append (To_Unbounded_String (Words (index)));
+      Word_Line.Append (To_Unbounded_String (Pronounce (index)));
+      Test := Get_Features (Word_Line);
    end loop;
    Python.Close_Module (Classifier);
 

@@ -12,5 +12,7 @@ package Word_Classification is
       Data             : out NL_Types.Boolean_List_2D;
       Labels           : out NL_Types.Boolean_List);
    function Feature_Names return ML_Types.Unbounded_List;
+   function Get_Features (Word_Line : ML_Types.String_List)
+                          return NL_Types.Boolean_List;
 
 end Word_Classification;
