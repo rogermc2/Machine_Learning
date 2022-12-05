@@ -20,10 +20,10 @@ def word_classifier_aux (dat, labels):
     clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)
     clf = clf.fit(data_lists, label_list)
 
-    correct = 0
+#    correct = 0
 #    for i in range(len(words)):
 #        if clf.predict([features([words[i], pros[i]])]) == labels[i]: correct = correct + 1
 #    print("Number of correct words: ", correct)
 #    print("word_classifier_aux end")
-    return correct
+    return 0
 

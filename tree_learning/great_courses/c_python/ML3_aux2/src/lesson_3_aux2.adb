@@ -35,6 +35,10 @@ begin
 --     Put_Line (Routine_Name & "Classifier set");
    Python.Call (Classifier, "word_classifier_aux", Data, Labels);
    Put_Line (Routine_Name & "word_classifier_aux module imported");
+
+   for index in Words.First_Index .. Words.Last_Index loop
+      null;
+   end loop;
    Python.Close_Module (Classifier);
 
    Put_Line ("----------------------------------------------");
