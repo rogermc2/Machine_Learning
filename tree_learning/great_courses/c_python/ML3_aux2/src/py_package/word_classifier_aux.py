@@ -18,8 +18,8 @@ def word_classifier_aux (dat, labels):
 
 # Train the decision tree classifer using eight decision rules and calculate the number of words that are correct with this model.
 # Set up the learner and run it on the data then compute the accuracy and print it
-#    clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)
-#    print("clf set")
+    clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)
+    print("clf set")
 #    clf = clf.fit(data_lists, label_list)
 
 #    correct = 0
