@@ -259,23 +259,21 @@ package body Python is
       
       Routine_Name : constant String := "Python.Call 2 ";
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
-      Data_Tuple   : PyObject;
-      Labels_Tuple : PyObject;
+      Data_Tuple   : constant PyObject := To_Tuple (Data);
+      Labels_Tuple : constant PyObject := To_Tuple (Labels);
       PyParams     : PyObject;
       PyResult     : PyObject;
       Result       : aliased Interfaces.C.long;
    begin
---        Put_Line (Routine_Name & "Data size" &
---                    Integer'Image (Integer (Data.Length)));
-      Data_Tuple := To_Tuple (Data);
+      --        Put_Line (Routine_Name & "Data size" &
+      --                    Integer'Image (Integer (Data.Length)));
       Assert (Data_Tuple /= Null_Address, Routine_Name & "Data_Tuple is null");
-      Labels_Tuple := To_Tuple (Labels);
       Assert (Labels_Tuple /= Null_Address, Routine_Name &
                 "Labels_Tuple is null");
---        Put_Line (Routine_Name & "Data_Tuple size" &
---                    Interfaces.C.int'Image (PyTuple_Size (Data_Tuple)));
---        Put_Line (Routine_Name & "Labels_Tuple size" &
---                    Interfaces.C.int'Image (PyTuple_Size (Labels_Tuple)));   
+      --        Put_Line (Routine_Name & "Data_Tuple size" &
+      --                    Interfaces.C.int'Image (PyTuple_Size (Data_Tuple)));
+      --        Put_Line (Routine_Name & "Labels_Tuple size" &
+      --                    Interfaces.C.int'Image (PyTuple_Size (Labels_Tuple)));   
       
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), Data_Tuple, Labels_Tuple);
@@ -297,36 +295,37 @@ package body Python is
    
    --  -------------------------------------------------------------------------
    
-   procedure Call (M      : Module; Function_Name : String;
-                   Data   : NL_Types.Boolean_List_2D;
-                   Labels : NL_Types.Boolean_List) is
+   procedure Call (M            : Module; Function_Name : String;
+                   Data         : NL_Types.Boolean_List_2D;
+                   Labels, Test : NL_Types.Boolean_List) is
       use System;
-      function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              T1, T2  : PyObject)  return PyObject;
+      function Py_BuildValue (Format      : Interfaces.C.char_array;
+                              T1, T2, T3  : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
       
       Routine_Name : constant String := "Python.Call 2 ";
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
-      Data_Tuple   : PyObject;
-      Labels_Tuple : PyObject;
+      Data_Tuple   : constant PyObject := To_Tuple (Data);
+      Labels_Tuple : constant PyObject := To_Tuple (Labels);
+      Test_Tuple   : constant PyObject := To_Tuple (Test);
       PyParams     : PyObject;
       PyResult     : PyObject;
       Result       : aliased Interfaces.C.long;
    begin
---        Put_Line (Routine_Name & "Data size" &
---                    Integer'Image (Integer (Data.Length)));
-      Data_Tuple := To_Tuple (Data);
+      --        Put_Line (Routine_Name & "Data size" &
+      --                    Integer'Image (Integer (Data.Length)));
       Assert (Data_Tuple /= Null_Address, Routine_Name & "Data_Tuple is null");
-      Labels_Tuple := To_Tuple (Labels);
       Assert (Labels_Tuple /= Null_Address, Routine_Name &
                 "Labels_Tuple is null");
---        Put_Line (Routine_Name & "Data_Tuple size" &
---                    Interfaces.C.int'Image (PyTuple_Size (Data_Tuple)));
---        Put_Line (Routine_Name & "Labels_Tuple size" &
---                    Interfaces.C.int'Image (PyTuple_Size (Labels_Tuple)));   
+      Assert (Test_Tuple /= Null_Address, Routine_Name & "Test_Tuple is null");
+      --        Put_Line (Routine_Name & "Data_Tuple size" &
+      --                    Interfaces.C.int'Image (PyTuple_Size (Data_Tuple)));
+      --        Put_Line (Routine_Name & "Labels_Tuple size" &
+      --                    Interfaces.C.int'Image (PyTuple_Size (Labels_Tuple)));   
       
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("OO"), Data_Tuple, Labels_Tuple);
+        Py_BuildValue (Interfaces.C.To_C ("OOO"), Data_Tuple, Labels_Tuple,
+                       Test_Tuple);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
                               
       PyResult := Call_Object (PyFunc, PyParams);
@@ -345,7 +344,7 @@ package body Python is
    
    --  -------------------------------------------------------------------------
    
---         function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
+   --         function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
    --        use Interfaces.C;
    --        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
    --        Row_Size   : int;

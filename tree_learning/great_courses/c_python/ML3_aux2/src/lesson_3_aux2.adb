@@ -31,19 +31,19 @@ begin
    New_Line;
    Build_Dataset (IE_Data, EI_Data, Words, Pronounce, Data, Labels);
    Put_Line (Routine_Name & "Dataset built");
-
-   Python.Initialize;
-   Classifier := Python.Import_File ("word_classifier_aux");
---     Put_Line (Routine_Name & "Classifier set");
-   Python.Call (Classifier, "word_classifier_aux", Data, Labels);
-   Put_Line (Routine_Name & "word_classifier_aux module imported");
-
    for index in Words.First_Index .. Words.Last_Index loop
       Word_Line.Clear;
       Word_Line.Append (To_Unbounded_String (Words (index)));
       Word_Line.Append (To_Unbounded_String (Pronounce (index)));
       Test := Get_Features (Word_Line);
    end loop;
+
+   Python.Initialize;
+   Classifier := Python.Import_File ("word_classifier_aux");
+--     Put_Line (Routine_Name & "Classifier set");
+   Python.Call (Classifier, "word_classifier_aux", Data, Labels, Test);
+   Put_Line (Routine_Name & "word_classifier_aux module imported");
+
    Python.Close_Module (Classifier);
 
    Put_Line ("----------------------------------------------");
