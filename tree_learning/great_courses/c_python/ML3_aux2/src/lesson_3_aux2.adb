@@ -32,8 +32,9 @@ begin
    Put_Line (Routine_Name & "Dataset built");
 
    Python.Initialize;
+--     Python.Execute_String ("from sklearn import tree");
 --     Python.Execute_String
---       ("clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)");
+--       ("clf = sklearn.tree.DecisionTreeClassifier(max_leaf_nodes=8)");
    Classifier := Python.Import_File ("word_classifier_aux");
    Put_Line (Routine_Name & "Classifier set");
    Python.Call (Classifier, "word_classifier_aux", Data, Labels);
