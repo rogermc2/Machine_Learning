@@ -295,9 +295,10 @@ package body Python is
    
    --  -------------------------------------------------------------------------
    
-   procedure Call (M            : Module; Function_Name : String;
-                   Data         : NL_Types.Boolean_List_2D;
-                   Labels, Test : NL_Types.Boolean_List) is
+   procedure Call (M      : Module; Function_Name : String;
+                   Data   : NL_Types.Boolean_List_2D;
+                   Labels : NL_Types.Boolean_List;
+                   Test   : NL_Types.Boolean_List_2D) is
       use System;
       function Py_BuildValue (Format      : Interfaces.C.char_array;
                               T1, T2, T3  : PyObject)  return PyObject;

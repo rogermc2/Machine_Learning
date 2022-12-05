@@ -31,9 +31,10 @@ package Python is
    procedure Call (M      : Module; Function_Name : String;
                    Data   : NL_Types.Boolean_List_2D;
                    Labels : ML_Types.Bounded_String_List);
-   procedure Call (M            : Module; Function_Name : String;
-                   Data         : NL_Types.Boolean_List_2D;
-                   Labels, Test : NL_Types.Boolean_List);
+   procedure Call (M      : Module; Function_Name : String;
+                   Data   : NL_Types.Boolean_List_2D;
+                   Labels : NL_Types.Boolean_List;
+                   Test   : NL_Types.Boolean_List_2D);
    --  ...
    
 private
