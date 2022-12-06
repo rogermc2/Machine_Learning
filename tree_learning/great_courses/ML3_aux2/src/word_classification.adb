@@ -26,7 +26,6 @@ package body Word_Classification is
                          Words, Pronounce : out ML_Types.Bounded_String_List) is
       use ML_Types.String_Package;
       Routine_Name : constant String := "Word_Classification.Build_Data ";
-      Curs         : Cursor;
       aLine        : Unbounded_String;
       Word_Line    : ML_Types.String_List;  --  Unbounded string list
       Features     : NL_Types.Boolean_List;
@@ -34,16 +33,14 @@ package body Word_Classification is
       for index in Data_In.First_Index .. Data_In.Last_Index loop
          aLine := Data_In (index);
          Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
-         Curs := Word_Line.First;
          Features := Get_Features (Word_Line);
          Data_Out.Append (Features);
 
-         Curs := Word_Line.First;
-         Words.Append (To_String (Element (Curs)));
-         Pronounce.Append (To_String (Element (Next (Curs))));
          Labels.Append
-           (Ada.Strings.Fixed.Index (Words.Last_Element, "ie") > 0 );
-
+           (Ada.Strings.Fixed.Index
+              (To_String (Word_Line.First_Element), "ie") > 0 );
+         Words.Append (To_String (Word_Line.First_Element));
+         Pronounce.Append (To_String (Word_Line.Last_Element));
       end loop;
 
    exception
