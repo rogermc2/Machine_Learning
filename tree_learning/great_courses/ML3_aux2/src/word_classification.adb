@@ -1,5 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -33,19 +34,10 @@ package body Word_Classification is
       for index in Data_In.First_Index .. Data_In.Last_Index loop
          aLine := Data_In (index);
          Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
-         --           Put_Line (Routine_Name & "Word_Line length" &
-         --                       Integer'Image (Integer (Word_Line.Length)));
          Curs := Word_Line.First;
-         --           Put_Line (Routine_Name & "Word_Line 1: '" &
-         --                       To_String (Word_Line.First_Element) & "'");
-         --           Put_Line (Routine_Name & "Word_Line 2: '" &
-         --                       To_String (Word_Line (Next (Curs))) & "'");
          Features := Get_Features (Word_Line);
-
---           Put_Line (Routine_Name & "Features length: " &
---                       Integer'Image (Integer (Features.Length)));
-
          Data_Out.Append (Features);
+
          Curs := Word_Line.First;
          Words.Append (To_String (Element (Curs)));
          Pronounce.Append (To_String (Element (Next (Curs))));
@@ -53,10 +45,6 @@ package body Word_Classification is
            (Ada.Strings.Fixed.Index (Words.Last_Element, "ie") > 0 );
 
       end loop;
---        Put_Line (Routine_Name & "Data_Out (1) length: " &
---                    Integer'Image (Integer (Data_Out (1).Length)));
---        Put_Line (Routine_Name & "Data_Out (1) length: " &
---                    Integer'Image (Integer (Data_Out (2).Length)));
 
    exception
       when others =>
@@ -90,6 +78,7 @@ package body Word_Classification is
       Vector.Append (To_Unbounded_String ("silent?"));
       Vector.Append (To_Unbounded_String ("two syllables?"));
 
+      --  two syllable pronunciation
       for pronounce in Two_Syllable'Range loop
          Vector.Append (To_Unbounded_String ("sounds like " &
                           String (Two_Syllable (pronounce)) & "?"));
@@ -132,6 +121,7 @@ package body Word_Classification is
    --  such as the number of sylables and pronounciation
    function Get_Features (Word_Line : ML_Types.String_List)
                           return NL_Types.Boolean_List is
+      use Ada.Containers;
       use Ada.Strings.Fixed;
       use ML_Types.String_Package;
       Routine_Name : constant String := "Word_Classification.Get_Features ";
@@ -161,20 +151,22 @@ package body Word_Classification is
       Vector.Append (Code (Pos) = '-' and Code (Pos + 1) = '-');
       --  two syllable
       Vector.Append (Code (Pos) /= '-' and Code (Pos + 1) /= '-');
-
+      --  Vector length 3
       for pronounce in Two_Syllable'Range loop
-         Two_Chars := String2 (Code (Pos ..Pos + 1));
+         Two_Chars := String2 (Code (Pos .. Pos + 1));
          Vector.Append (Two_Chars = Two_Syllable (pronounce));
       end loop;
 
+      --  Vector length 3 + 14 = 17
       for pronounce in One_Syllable'Range loop
          declare
-            Two_Chars : constant String := Code (Pos ..Pos + 1);
+            Two_Chars : constant String := Code (Pos .. Pos + 1);
          begin
             Vector.Append
               (Two_Chars = String (One_Syllable (pronounce)) & Minus_Char);
          end;
       end loop;
+      --  Vector length 17 + 9 = 26
 
       for letter in LC_Index loop
          --  immediate preceeding, before
@@ -196,16 +188,24 @@ package body Word_Classification is
          else
             Vector.Append (aWord (Pos + 2) = Character (letter));
          end if;
-            --  in word at all
+
+         Has_Letter := False;
+         for let in Pos + 2 .. aWord'Last loop
+            Has_Letter := Has_Letter or aWord (let) = Character (letter);
+         end loop;
+         Vector.Append (Has_Letter);
+
+         --  in word at all
          Has_Letter := False;
          for let in Pos + 2 .. aWord'Last loop
             Has_Letter := Has_Letter or aWord (let) = Character (letter);
          end loop;
          Vector.Append (Has_Letter);
       end loop;
---        Put_Line (Routine_Name & "Vector length: " &
---                    Integer'Image (Integer (Vector.Length)));
 
+      --  Vector length 26 + 5 * 26 = 156
+      Assert (Vector.Length = 156, Routine_Name & "invalid ector length: " &
+                  Count_Type'Image (Vector.Length) & " should be 156");
       return Vector;
 
    exception

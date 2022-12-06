@@ -34,16 +34,16 @@ begin
    New_Line;
    Build_Dataset (IE_Data, EI_Data, Words, Pronounce, Data, Labels);
    Put_Line (Routine_Name & "Dataset built");
-   Put_Line (Routine_Name & "Words length: " &
-               Integer'Image (Integer(Words.Length)));
+--     Put_Line (Routine_Name & "Words length: " &
+--                 Integer'Image (Integer(Words.Length)));
    for index in Words.First_Index .. Words.Last_Index loop
       Word_Line.Clear;
       Word_Line.Append (To_Unbounded_String (Words (index)));
       Word_Line.Append (To_Unbounded_String (Pronounce (index)));
       Test.Append (Word_Line);
    end loop;
-   Put_Line (Routine_Name & "Test length: " &
-               Integer'Image (Integer (Test.Length)));
+--     Put_Line (Routine_Name & "Test length: " &
+--                 Integer'Image (Integer (Test.Length)));
 
    Test_Cursor := Test.First;
    while Has_Element (Test_Cursor) loop
@@ -52,6 +52,10 @@ begin
    end loop;
    Put_Line (Routine_Name & "Test_Features length: " &
                Integer'Image (Integer (Test_Features.Length)));
+   Put_Line (Routine_Name & "Test_Features 1 length: " &
+               Integer'Image (Integer (Test_Features.First_Element.Length)));
+   Put_Line (Routine_Name & "Test_Features 1 length: " &
+               Integer'Image (Integer (Test_Features.Last_Element.Length)));
 
    Python.Initialize;
    Classifier := Python.Import_File ("word_classifier_aux");
