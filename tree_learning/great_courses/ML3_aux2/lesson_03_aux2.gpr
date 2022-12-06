@@ -3,7 +3,7 @@ project Lesson_03_Aux2 is
    type Operating_System_Type is
       ("high_sierra", "ventura");
    Operating_System : Operating_System_Type := external ("Operating_System", "ventura");
-   for Source_Dirs use ("src", "../../../neural_learning/common", "../../common", "../../decision_tree_classifier/support", "../../decision_tree_classifier/src", "../../utils", "../../../common", "../../python", "../../../python_c_api");
+   for Source_Dirs use ("src", "../../../neural_learning/common", "../../common", "../../decision_tree_classifier/support", "../../decision_tree_classifier/src", "../../utils", "../../../common", "../../../python_c_api");
    for Object_Dir use "obj";
    for Main use ("lesson_3_aux2.adb");
    for Exec_Dir use ".";

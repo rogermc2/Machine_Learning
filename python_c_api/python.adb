@@ -8,12 +8,13 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
-with API_Binding;
 with Python_API; use Python_API;
 
 package body Python is
      
    --     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject;
+   function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Matrix) 
+                      return PyObject;
    function To_Tuple (Data : NL_Types.Boolean_List) return PyObject;
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject;
@@ -193,8 +194,8 @@ package body Python is
    
    -- --------------------------------------------------------------------------
  
-   function Call (M : Module; Function_Name : String;
-                  A : Integer; B : Integer) return Integer is
+   function Call (M : Module; Function_Name : String; A, B : Integer)
+                  return Integer is
       
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               A      : Interfaces.C.int;
@@ -219,26 +220,21 @@ package body Python is
    --  -------------------------------------------------------------------------
     
    procedure Call (M    : Module; Function_Name : String;
-                   A, B : Integer_Matrix) is
-      use API_Binding;
-      AB_Pointers : constant API_Pointers := API_Integer_2D (A, B);
-      A_Pointers  : constant API_Int_Pointer_Array :=
-                      Get_A_Int_Ptrs (AB_Pointers);
-      B_Pointers  : constant API_Int_Pointer_Array :=
-                      Get_B_Int_Ptrs (AB_Pointers);
+                   A, B : NL_Arrays_And_Matrices.Integer_Matrix) is
       
-      function Py_BuildValue (Format : Interfaces.C.char_array;
-                              A_Ptrs : API_Int_Pointer_Array;
-                              B_Ptrs : API_Int_Pointer_Array) return PyObject;
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1, T2  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("oo"), A_Pointers, B_Pointers);
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
                               
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
@@ -331,7 +327,39 @@ package body Python is
    end Call;
    
    --  -------------------------------------------------------------------------
+     
+   function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Matrix) 
+                      return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      Num_Cols     : constant Positive := Data'Length (2);
+      Row_Size     : constant int := int (Num_Cols);
+      Value        : Integer;
+      Long_Value   : long;
+      Item         : PyObject;
+      Result       : constant PyObject := PyTuple_New (int (Data'Length));
+   begin
+      for row in Data'Range loop
+         Item := PyTuple_New (Row_Size);
+         for col in Data'Range (2) loop
+            Value := Data (row, col);
+            Long_Value := long (Value);
+            PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
+         end loop;
+         PyTuple_SetItem (Result, int (row), Item);
+      end loop;
    
+      return Result;
+         
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise Interpreter_Error;
+            
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    --         function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
    --        use Interfaces.C;
    --        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
