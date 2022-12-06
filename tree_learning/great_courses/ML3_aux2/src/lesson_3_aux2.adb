@@ -14,36 +14,33 @@ with Word_Classification; use Word_Classification;
 
 procedure Lesson_3_Aux2 is
    use ML_Types.String_List_Package;
-   Routine_Name : constant String := "Lesson_3_Aux2 ";
-   File_IE      : constant String := "ie.txt";
-   File_EI      : constant String := "ei.txt";
-   IE_Data      : constant ML_Types.Unbounded_List :=
-                    Aux_Utils.Load_Data (File_IE);
-   EI_Data      : constant ML_Types.Unbounded_List :=
-                    Aux_Utils.Load_Data (File_EI);
-   Data         : NL_Types.Boolean_List_2D;
-   Labels       : NL_Types.Boolean_List;
-   Words        : ML_Types.Bounded_String_List;
-   Pronounce    : ML_Types.Bounded_String_List;
-   Word_Line    : ML_Types.String_List;
-   Classifier   : Python.Module;
-   Test         : ML_Types.String_Multi_List;
+   Routine_Name  : constant String := "Lesson_3_Aux2 ";
+   File_IE       : constant String := "ie.txt";
+   File_EI       : constant String := "ei.txt";
+   IE_Data       : constant ML_Types.Unbounded_List :=
+                     Aux_Utils.Load_Data (File_IE);
+   EI_Data       : constant ML_Types.Unbounded_List :=
+                     Aux_Utils.Load_Data (File_EI);
+   Data          : NL_Types.Boolean_List_2D;
+   Labels        : NL_Types.Boolean_List;
+   Words         : ML_Types.Bounded_String_List;
+   Pronounce     : ML_Types.Bounded_String_List;
+   Word_Line     : ML_Types.String_List;
+   Classifier    : Python.Module;
+   Test          : ML_Types.String_Multi_List;
    Test_Features : NL_Types.Boolean_List_2D;
    Test_Cursor   : Cursor;
 begin
    New_Line;
    Build_Dataset (IE_Data, EI_Data, Words, Pronounce, Data, Labels);
    Put_Line (Routine_Name & "Dataset built");
---     Put_Line (Routine_Name & "Words length: " &
---                 Integer'Image (Integer(Words.Length)));
+
    for index in Words.First_Index .. Words.Last_Index loop
       Word_Line.Clear;
       Word_Line.Append (To_Unbounded_String (Words (index)));
       Word_Line.Append (To_Unbounded_String (Pronounce (index)));
       Test.Append (Word_Line);
    end loop;
---     Put_Line (Routine_Name & "Test length: " &
---                 Integer'Image (Integer (Test.Length)));
 
    Test_Cursor := Test.First;
    while Has_Element (Test_Cursor) loop
@@ -54,8 +51,6 @@ begin
                Integer'Image (Integer (Test_Features.Length)));
    Put_Line (Routine_Name & "Test_Features 1 length: " &
                Integer'Image (Integer (Test_Features.First_Element.Length)));
-   Put_Line (Routine_Name & "Test_Features 1 length: " &
-               Integer'Image (Integer (Test_Features.Last_Element.Length)));
 
    Python.Initialize;
    Classifier := Python.Import_File ("word_classifier_aux");
