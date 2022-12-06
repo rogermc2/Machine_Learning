@@ -14,7 +14,7 @@ procedure Lesson_3P2 is
    use ML_Types.String_Package;
    Routine_Name  : constant String := "Lesson_3P2";
    Data          : constant Multi_Output_Data_Record :=
-                     Classifier_Utilities.Load_Data ("../../diabetes.csv");
+                     Classifier_Utilities.Load_Data ("../diabetes.csv");
    Feature_Names : constant String_List := Data.Feature_Names;
    X_Data_List   : constant Value_Data_Lists_2D := Data.Feature_Values;
    Labels_List   : constant Value_Data_Lists_2D := Data.Label_Values;
