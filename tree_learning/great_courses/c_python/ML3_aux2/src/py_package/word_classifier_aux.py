@@ -26,7 +26,10 @@ def word_classifier_aux (dat, labels, test):
 
     correct = 0
     for i in range(len(label_list)):
-        if clf.predict([test_list][i]) == label_list[i]: correct = correct + 1
+        item = [test_list][i]
+        lab = label_list[i]
+        if clf.predict(item) == lab:
+            correct = correct + 1
 #        if clf.predict([features([words[i], pros[i]])]) == labels[i]: correct = correct + 1
     print("Number of correct words: ", correct)
     print("word_classifier_aux end")
