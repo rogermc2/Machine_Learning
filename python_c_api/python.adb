@@ -289,10 +289,10 @@ package body Python is
    
    --  -------------------------------------------------------------------------
    
-   procedure Call (M      : Module; Function_Name : String;
-                   A   : NL_Types.Boolean_List_2D;
+   procedure Call (M : Module; Function_Name : String;
+                   A : NL_Types.Boolean_List_2D;
                    B : NL_Types.Boolean_List;
-                   C   : NL_Types.Boolean_List_2D) is
+                   C : NL_Types.Boolean_List_2D) is
       use System;
       function Py_BuildValue (Format      : Interfaces.C.char_array;
                               T1, T2, T3  : PyObject)  return PyObject;
@@ -377,7 +377,7 @@ package body Python is
          else
             Long_Value := 0;
          end if;
-         PyTuple_SetItem (Tuple_2D, Py_Index, PyLong_FromLong (Long_Value));
+         PyTuple_SetItem (Tuple_2D, Py_Index, PyBool_FromLong (Long_Value));
       end loop;
       
       return Tuple_2D;
@@ -415,7 +415,7 @@ package body Python is
             end if;
             
             Py_Col := Py_Col + 1;
-            PyTuple_SetItem (Tuple, Py_Col, PyLong_FromLong (Long_Value));
+            PyTuple_SetItem (Tuple, Py_Col, PyBool_FromLong (Long_Value));
          end loop;
          
          PyTuple_SetItem (Tuple_2D, Py_Row, Tuple);

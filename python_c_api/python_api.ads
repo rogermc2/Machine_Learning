@@ -9,12 +9,18 @@ package Python_API is
    function PyArray_SimpleNewFromData (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyArray_SimpleNewFromData, "PyArray_SimpleNewFromData");
 
+   function PyBool_FromLong (Val : Interfaces.C.long) return PyObject;
+   pragma Import (C, PyBool_FromLong, "PyBool_FromLong");
+   
    function PyBytes_AsString (Text : Interfaces.C.char_array) return PyObject;
    pragma Import (C, PyBytes_AsString, "PyBytes_AsString");
    
    function PyBytes_FromString (Text : Interfaces.C.char_array) return PyObject;
    pragma Import (C, PyBytes_FromString, "PyBytes_FromString");
 
+   function PyCallable_Check (Obj : PyObject) return Interfaces.C.Int;
+   pragma Import (C, PyCallable_Check, "PyCallable_Check");
+   
    function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
    
@@ -29,9 +35,6 @@ package Python_API is
 
    function PyInt_AsLong (I : PyObject) return Interfaces.C.long;
    pragma Import (C, PyInt_AsLong, "PyLong_AsLong");
-   
-   function PyCallable_Check (Obj : PyObject) return Interfaces.C.Int;
-   pragma Import (C, PyCallable_Check, "PyCallable_Check");
    
    procedure PyErr_Print;
    pragma Import (C, PyErr_Print, "PyErr_Print");

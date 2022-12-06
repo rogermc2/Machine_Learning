@@ -18,10 +18,17 @@ def word_classifier_aux (dat, labels, test):
 
     correct = 0
     for i in range(len(label_list)):
-        item = test_list[i]
+        features = [list (test_list[i])]
         lab = label_list[i]
-        if clf.predict(item).any() == lab:
+#        print("features: ", features [0][0:8])
+#        print("lab: ", lab)
+#        print("clf.predict(features): ", clf.predict(features))
+        if clf.predict(features) == lab:
             correct = correct + 1
+        else:
+            print("lab: ", lab)
+            print("clf.predict(features): ", clf.predict(features))
+            print("incorrect")
 #        if clf.predict([features([words[i], pros[i]])]) == labels[i]: correct = correct + 1
     print("Number of correct words: ", correct)
     print("word_classifier_aux end")
