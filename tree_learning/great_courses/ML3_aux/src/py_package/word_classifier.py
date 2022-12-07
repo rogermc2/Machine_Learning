@@ -80,7 +80,7 @@ print("Number of correct words: ", correct)
 
 feats = featurenames()
 # Draw the tree!
-tree.plot_tree (clf, feature_names=feats,
-                class_names=["ei","ie"], filled=True, rounded=True)
+tree.plot_tree (clf, feature_names=feats, class_names=["ei","ie"], filled=True,
+                rounded=True, fontsize=8)
 pyplot.show()
 print()

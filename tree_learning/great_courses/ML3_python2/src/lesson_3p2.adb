@@ -42,9 +42,13 @@ begin
    New_Line;
 
    Python.Initialize;
+   Put_Line ("Lesson 3 python initialized");
    Python.Execute_String ("import tree");
+   Put_Line ("Lesson 3 tree imported");
    Python.Execute_String ("from tree import base");
+   Put_Line ("Lesson 3 base imported");
    Classes := Python.Import_File ("tree.classes");
+   Put_Line ("Lesson 3 Classes loaded");
    Python.Execute_String ("from tree import classes");
    Put_Line ("Lesson 3 modules loaded");
 

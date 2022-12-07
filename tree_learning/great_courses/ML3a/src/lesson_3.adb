@@ -14,14 +14,14 @@ procedure Lesson_3 is
    use Utilities;
    use ML_Types;
 
-   Data_File    : File_Type;
+   Data_File : File_Type;
 begin
    Put_Line ("Lesson 3 ");
    Open (Data_File, In_File, "../diabetes.csv");
    declare
-      Row_Data     : Rows_Vector;
-      Data         : Data_Record;
-      Weight_Data  : Weights.Weight_List;
+      Row_Data    : Rows_Vector;
+      Data        : Data_Record;
+      Weight_Data : Weights.Weight_List;
    begin
       Put_Line ("Feature Names:");
       Utilities.Load_CSV_Data (Data_File, Row_Data);
