@@ -134,8 +134,6 @@ package body Word_Classification is
    begin
       Assert (Word_Line.Length = 2, Routine_Name & "invalid Word_Line length:" &
                   Count_Type'Image (Word_Line.Length));
---        Put_Line (Routine_Name & "aWord '" & aWord & "'");
---        Put_Line (Routine_Name & "Code '" & Code & "'");
       if Pos = 0 then
          Pos := Index (aWord, "ei");
       end if;
@@ -148,6 +146,7 @@ package body Word_Classification is
       --  two syllable
       Vector.Append (Code (Pos) /= '-' and Code (Pos + 1) /= '-');
       --  Vector length 3
+      --  two syllable pronunciation
       for pronounce in Two_Syllable'Range loop
          Two_Chars := String2 (Code (Pos .. Pos + 1));
          Vector.Append (Two_Chars = Two_Syllable (pronounce));
@@ -159,7 +158,8 @@ package body Word_Classification is
             Two_Chars : constant String := Code (Pos .. Pos + 1);
          begin
             Vector.Append
-              (Two_Chars = String (One_Syllable (pronounce)) & Minus_Char);
+              (Two_Chars = String (One_Syllable (pronounce)) & Minus_Char or
+               Two_Chars = Minus_Char & String (One_Syllable (pronounce)));
          end;
       end loop;
       --  Vector length 17 + 9 = 26
