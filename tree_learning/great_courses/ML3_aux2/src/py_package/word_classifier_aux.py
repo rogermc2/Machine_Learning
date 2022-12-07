@@ -37,8 +37,9 @@ def word_classifier_aux (dat, labels, features, feat_names):
 #        if clf.predict([features([words[i], pros[i]])]) == labels[i]: correct = correct + 1
     print("Number of correct words: ", correct)
     # Draw the tree!
-    tree.plot_tree (clf, feature_names=feat_names,
-                    class_names=["ei","ie"], filled=True, rounded=True)
+#    pyplot.rcParams["font.size"] = "100"
+    tree.plot_tree (clf, feature_names=feat_names, class_names=["ei","ie"], filled=True,
+                    rounded=True, fontsize=8)
     pyplot.show()
     print()
     print("word_classifier_aux end")
