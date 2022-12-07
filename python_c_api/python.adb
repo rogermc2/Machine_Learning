@@ -384,16 +384,21 @@ package body Python is
       Value        : Integer;
       Long_Value   : long;
       Item         : PyObject;
+      Py_Row       : int := -1;
+      Py_Col       : int := -1;
       Result       : constant PyObject := PyTuple_New (int (Data'Length));
    begin
       for row in Data'Range loop
          Item := PyTuple_New (Row_Size);
+         Py_Row := Py_Row + 1;
+         Py_Col := -1;
          for col in Data'Range (2) loop
+            Py_Col := Py_Col + 11;
             Value := Data (row, col);
             Long_Value := long (Value);
-            PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
+            PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (Long_Value));
          end loop;
-         PyTuple_SetItem (Result, int (row), Item);
+         PyTuple_SetItem (Result, Py_Row, Item);
       end loop;
    
       return Result;
@@ -404,37 +409,6 @@ package body Python is
          raise Interpreter_Error;
             
    end To_Tuple;
-
-   --  -------------------------------------------------------------------------
-
-   --         function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject is
-   --        use Interfaces.C;
-   --        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
-   --        Row_Size   : int;
-   --        Value      : Integer;
-   --        Long_Value : long;
-   --        Item       : PyObject;
-   --        Result     : constant PyObject := PyTuple_New (int (Data.Length));
-   --     begin
-   --        for row in Data.First_Index .. Data.Last_Index loop
-   --           Row_Size := int (Data (row).Length);
-   --           Item := PyTuple_New (Row_Size);
-   --           for col in Data (row).First_Index .. Data (row).Last_Index loop
-   --              Value := Data (row) (col);
-   --              Long_Value := long (Value);
-   --              PyTuple_SetItem (Item, int (col), PyLong_FromLong (Long_Value));
-   --           end loop;
-   --           PyTuple_SetItem (Result, int (row), Item);
-   --        end loop;
-   --  
-   --        return Result;
-   --        
-   --     exception
-   --        when E : others =>
-   --           Put_Line (Routine_Name & "error" & Exception_Message (E));
-   --           raise Interpreter_Error;
-   --           
-   --     end To_Tuple;
 
    --  -------------------------------------------------------------------------
 
@@ -483,13 +457,13 @@ package body Python is
          Py_Row := Py_Row + 1;
          Py_Col := -1;
          for col in Data (row).First_Index .. Data (row).Last_Index loop
+            Py_Col := Py_Col + 1;
             if Data (row) (col) then
                Long_Value := 1;
             else
                Long_Value := 0;
             end if;
             
-            Py_Col := Py_Col + 1;
             PyTuple_SetItem (Tuple, Py_Col, PyBool_FromLong (Long_Value));
          end loop;
          
@@ -518,7 +492,7 @@ package body Python is
          Py_Index := Py_Index + 1;
          declare
             Text : constant char_array := To_C (Data (row));
-            Item : constant PyObject := PyBytes_FromString (Text);
+            Item : constant PyObject := PyString_FromString (Text);
          begin
             PyTuple_SetItem (Tuple, Py_Index, Item);
          end;
@@ -547,7 +521,7 @@ package body Python is
          Py_Index := Py_Index + 1;
          declare
             Text : constant char_array := To_C (To_String (Data (row)));
-            Item : constant PyObject := PyBytes_FromString (Text);
+            Item : constant PyObject := PyString_FromString (Text);
          begin
             PyTuple_SetItem (Tuple, Py_Index, Item);
          end;
