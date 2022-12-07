@@ -1,6 +1,5 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
---  with Ada.Directories; use Ada.Directories;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -10,7 +9,7 @@ with NL_Types;
 with Python;
 
 with Aux_Utils;
-with Tree_Printing;
+--  with Tree_Printing;
 with Word_Classification; use Word_Classification;
 
 procedure Lesson_3_Aux2 is
@@ -48,17 +47,11 @@ begin
       Test_Features.Append (Get_Features (Element (Test_Cursor)));
       Next (Test_Cursor);
    end loop;
-   Put_Line (Routine_Name & "Test_Features length: " &
-               Integer'Image (Integer (Test_Features.Length)));
-   Put_Line (Routine_Name & "Test_Features 1 length: " &
-               Integer'Image (Integer (Test_Features.First_Element.Length)));
-   Tree_Printing.Print_Unbounded_List (Routine_Name & "Feature_Names", Feature_Names);
 
    Python.Initialize;
    Classifier := Python.Import_File ("word_classifier_aux");
    Python.Call (Classifier, "word_classifier_aux", Data, Labels, Test_Features,
                 Feature_Names);
-   Put_Line (Routine_Name & "word_classifier_aux module imported");
 
    Python.Close_Module (Classifier);
 

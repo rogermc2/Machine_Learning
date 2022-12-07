@@ -22,19 +22,33 @@ package body Tree_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Boolean_List (Name  : String;
-                                 aList : NL_Types.Boolean_List) is
+   procedure Print_Boolean_List
+     (Name   : String; aList : NL_Types.Boolean_List;
+      Start  : Integer := 1; Finish : Integer := 0) is
+      Last  : Integer;
       Count : Integer := 1;
    begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (aList.Length);
+      end if;
+
       Put_Line (Name & ": ");
-      for Index in aList.First_Index .. aList.Last_Index loop
-         Put (Boolean'Image (aList.Element (Index)) & "   ");
-         Count := Count + 1;
-         if Count > 10 then
-            New_Line;
-            Count := 1;
-         end if;
-      end loop;
+      if Start >= aList.First_Index and then Finish <= aList.Last_Index then
+         for Index in Start .. Last loop
+            Put (Boolean'Image (aList.Element (Index)) & "   ");
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+
+      else
+         Put_Line
+           ("Print_Boolean_List called with invalid start or finish index.");
+      end if;
       New_Line;
 
    end Print_Boolean_List;
@@ -153,7 +167,8 @@ package body Tree_Printing is
             end if;
          end loop;
       else
-         Put_Line ("Print_Float_Array called with invalid start or finish index.");
+         Put_Line
+           ("Print_Float_Array called with invalid start or finish index.");
       end if;
       New_Line;
 
@@ -477,10 +492,10 @@ package body Tree_Printing is
 
    --  -------------------------------------------------------------------------
 
-    procedure Print_Unbounded_List (Name    : String;
-                                    theList : ML_Types.Unbounded_List) is
+   procedure Print_Unbounded_List (Name    : String;
+                                   theList : ML_Types.Unbounded_List) is
       Count : Integer := 1;
-    begin
+   begin
       Put_Line (Name & ": ");
       for Index in theList.First_Index .. theList.Last_Index loop
          Put (Integer'Image (Index) & ": " &
@@ -492,7 +507,7 @@ package body Tree_Printing is
          end if;
       end loop;
       New_Line;
-    end Print_Unbounded_List;
+   end Print_Unbounded_List;
 
    --  ------------------------------------------------------------------------
 

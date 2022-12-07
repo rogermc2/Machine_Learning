@@ -22,9 +22,9 @@ package body Word_Classification is
    --  -------------------------------------------------------------------------
 
    procedure Build_Data (Data_In          : ML_Types.Unbounded_List;
-                         Data_Out         : out NL_Types.Boolean_List_2D;
-                         Labels           : out NL_Types.Boolean_List;
-                         Words, Pronounce : out ML_Types.Bounded_String_List) is
+                         Data_Out         : in out NL_Types.Boolean_List_2D;
+                         Labels           : in out NL_Types.Boolean_List;
+                         Words, Pronounce : in out ML_Types.Bounded_String_List) is
       use ML_Types.String_Package;
       Routine_Name : constant String := "Word_Classification.Build_Data ";
       aLine        : Unbounded_String;
@@ -36,10 +36,6 @@ package body Word_Classification is
          Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
          Features := Get_Features (Word_Line);
          Data_Out.Append (Features);
---           if index = 31 then
---              Tree_Printing.Print_Boolean_List (Routine_Name & "Features 31",
---                                                Features);
---           end if;
          Labels.Append
            (Ada.Strings.Fixed.Index
               (To_String (Word_Line.First_Element), "ie") > 0 );

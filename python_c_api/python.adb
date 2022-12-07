@@ -338,7 +338,7 @@ package body Python is
                               T1, T2, T3, T4 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
       
-      Routine_Name : constant String := "Python.Call 2 ";
+      Routine_Name : constant String := "Python.Call 4 ";
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
       B_Tuple      : constant PyObject := To_Tuple (B);
@@ -365,7 +365,6 @@ package body Python is
       end if;
       
       Result := PyInt_AsLong (PyResult);
-      Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
       
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
