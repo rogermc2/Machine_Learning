@@ -32,9 +32,11 @@ package Python is
                    A : NL_Types.Boolean_List_2D;
                    B : ML_Types.Bounded_String_List);
    procedure Call (M : Module; Function_Name : String;
-                   A : NL_Types.Boolean_List_2D;
-                   B : NL_Types.Boolean_List;
+                   A : NL_Types.Boolean_List_2D; B : NL_Types.Boolean_List;
                    C : NL_Types.Boolean_List_2D);
+   procedure Call (M : Module; Function_Name : String;
+                   A : NL_Types.Boolean_List_2D; B : NL_Types.Boolean_List;
+                   C : NL_Types.Boolean_List_2D; D : ML_Types.Unbounded_List);
    --  ...
    
 private

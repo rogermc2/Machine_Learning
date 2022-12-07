@@ -5,6 +5,7 @@ with Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
@@ -18,6 +19,7 @@ package body Python is
    function To_Tuple (Data : NL_Types.Boolean_List) return PyObject;
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject;
+   function To_Tuple (Data : ML_Types.Unbounded_List) return PyObject;
    
    --  -------------------------------------------------------------------------
    
@@ -328,6 +330,51 @@ package body Python is
    
    --  -------------------------------------------------------------------------
      
+   procedure Call (M : Module; Function_Name : String;
+                   A : NL_Types.Boolean_List_2D; B : NL_Types.Boolean_List;
+                   C : NL_Types.Boolean_List_2D; D : ML_Types.Unbounded_List) is
+      use System;
+      function Py_BuildValue (Format         : Interfaces.C.char_array;
+                              T1, T2, T3, T4 : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+      
+      Routine_Name : constant String := "Python.Call 2 ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      C_Tuple      : constant PyObject := To_Tuple (C);
+      D_Tuple      : constant PyObject := To_Tuple (D);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+      Result       : aliased Interfaces.C.long;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
+      Assert (C_Tuple /= Null_Address, Routine_Name & "C_Tuple is null");
+      Assert (D_Tuple /= Null_Address, Routine_Name & "D_Tuple is null");
+      
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOOO"),
+                       A_Tuple, B_Tuple, C_Tuple, D_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+                              
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+      
+      Result := PyInt_AsLong (PyResult);
+      Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
+      
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (C_Tuple);
+
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+     
    function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject is
       use Interfaces.C;
@@ -471,6 +518,35 @@ package body Python is
          Py_Index := Py_Index + 1;
          declare
             Text : constant char_array := To_C (Data (row));
+            Item : constant PyObject := PyBytes_FromString (Text);
+         begin
+            PyTuple_SetItem (Tuple, Py_Index, Item);
+         end;
+      end loop;
+      
+      return Tuple;
+
+   exception
+      when E : others =>
+         raise Interpreter_Error with Routine_Name & "error" &
+           Exception_Message (E);
+      
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : ML_Types.Unbounded_List) return PyObject is
+      use Interfaces.C;
+      use Ada.Strings.Unbounded;
+      Routine_Name : constant String := "Python.To_Tuple Unbounded_List ";
+      Tuple        : PyObject;
+      Py_Index     : int := -1;
+   begin
+      Tuple := PyTuple_New (int (Data.Length));
+      for row in Data.First_Index .. Data.Last_Index loop
+         Py_Index := Py_Index + 1;
+         declare
+            Text : constant char_array := To_C (To_String (Data (row)));
             Item : constant PyObject := PyBytes_FromString (Text);
          begin
             PyTuple_SetItem (Tuple, Py_Index, Item);

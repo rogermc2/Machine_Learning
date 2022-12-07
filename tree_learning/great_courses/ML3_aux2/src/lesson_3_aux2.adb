@@ -30,6 +30,7 @@ procedure Lesson_3_Aux2 is
    Test          : ML_Types.String_Multi_List;
    Test_Features : NL_Types.Boolean_List_2D;
    Test_Cursor   : Cursor;
+--     Feat_Names    : ML_Types.Unbounded_List;
 begin
    New_Line;
    Build_Dataset (IE_Data, EI_Data, Words, Pronounce, Data, Labels);
@@ -54,7 +55,8 @@ begin
 
    Python.Initialize;
    Classifier := Python.Import_File ("word_classifier_aux");
-   Python.Call (Classifier, "word_classifier_aux", Data, Labels, Test_Features);
+   Python.Call (Classifier, "word_classifier_aux", Data, Labels, Test_Features,
+                Feature_Names);
    Put_Line (Routine_Name & "word_classifier_aux module imported");
 
    Python.Close_Module (Classifier);

@@ -4,7 +4,7 @@ with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Tree_Printing;
+--  with Tree_Printing;
 with Utilities;
 
 package body Word_Classification is
@@ -36,10 +36,10 @@ package body Word_Classification is
          Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
          Features := Get_Features (Word_Line);
          Data_Out.Append (Features);
-         if index = 31 then
-            Tree_Printing.Print_Boolean_List (Routine_Name & "Features 31",
-                                              Features);
-         end if;
+--           if index = 31 then
+--              Tree_Printing.Print_Boolean_List (Routine_Name & "Features 31",
+--                                                Features);
+--           end if;
          Labels.Append
            (Ada.Strings.Fixed.Index
               (To_String (Word_Line.First_Element), "ie") > 0 );
