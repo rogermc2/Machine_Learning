@@ -10,6 +10,7 @@ with NL_Types;
 with Python;
 
 with Aux_Utils;
+with Tree_Printing;
 with Word_Classification; use Word_Classification;
 
 procedure Lesson_3_Aux2 is
@@ -30,7 +31,6 @@ procedure Lesson_3_Aux2 is
    Test          : ML_Types.String_Multi_List;
    Test_Features : NL_Types.Boolean_List_2D;
    Test_Cursor   : Cursor;
---     Feat_Names    : ML_Types.Unbounded_List;
 begin
    New_Line;
    Build_Dataset (IE_Data, EI_Data, Words, Pronounce, Data, Labels);
@@ -52,6 +52,7 @@ begin
                Integer'Image (Integer (Test_Features.Length)));
    Put_Line (Routine_Name & "Test_Features 1 length: " &
                Integer'Image (Integer (Test_Features.First_Element.Length)));
+   Tree_Printing.Print_Unbounded_List (Routine_Name & "Feature_Names", Feature_Names);
 
    Python.Initialize;
    Classifier := Python.Import_File ("word_classifier_aux");

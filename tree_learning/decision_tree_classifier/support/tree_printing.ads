@@ -7,6 +7,7 @@ with Criterion;
 with Estimator;
 with Base_Decision_Tree;
 with Encode_Utils;
+with ML_Types;
 with NL_Types;
 with Node_Splitter;
 with Tree;
@@ -58,8 +59,8 @@ package Tree_Printing is
 --                               theList : ML_Types.Indef_String_List);
     procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);
     procedure Print_Tree (Name : String; aTree : Tree.Tree_Class);
---      procedure Print_Unbounded_List (Name    : String;
---                                      theList : ML_Types.Unbounded_List);
+    procedure Print_Unbounded_List (Name    : String;
+                                    theList : ML_Types.Unbounded_List);
     procedure Print_Unbounded_Set (Name   : String;
                                    theSet : Encode_Utils.UB_String_Sets.Set);
     procedure Print_Value_List (Name : String; theList : Tree.Values_List);

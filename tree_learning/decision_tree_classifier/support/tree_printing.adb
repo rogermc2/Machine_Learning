@@ -477,6 +477,25 @@ package body Tree_Printing is
 
    --  -------------------------------------------------------------------------
 
+    procedure Print_Unbounded_List (Name    : String;
+                                    theList : ML_Types.Unbounded_List) is
+      Count : Integer := 1;
+    begin
+      Put_Line (Name & ": ");
+      for Index in theList.First_Index .. theList.Last_Index loop
+         Put (Integer'Image (Index) & ": " &
+                To_String (theList.Element (Index)) & "   ");
+         Count := Count + 1;
+         if Count > 4 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+    end Print_Unbounded_List;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Unbounded_Set (Name   : String;
                                   theSet : Encode_Utils.UB_String_Sets.Set) is
       use Encode_Utils;
