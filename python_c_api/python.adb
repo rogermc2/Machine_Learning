@@ -12,14 +12,6 @@ with Ada.Unchecked_Conversion;
 with Python_API; use Python_API;
 
 package body Python is
-     
-   --     function To_Tuple (Data : ML_Types.Integer_List_2D) return PyObject;
-   function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Matrix) 
-                      return PyObject;
-   function To_Tuple (Data : NL_Types.Boolean_List) return PyObject;
-   function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
-   function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject;
-   function To_Tuple (Data : ML_Types.Unbounded_List) return PyObject;
    
    --  -------------------------------------------------------------------------
    
@@ -153,6 +145,169 @@ package body Python is
       
    end Call_Object;     
  
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Matrix) 
+                      return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      Num_Cols     : constant Positive := Data'Length (2);
+      Row_Size     : constant int := int (Num_Cols);
+      Value        : Integer;
+      Long_Value   : long;
+      Item         : PyObject;
+      Py_Row       : int := -1;
+      Py_Col       : int := -1;
+      Result       : constant PyObject := PyTuple_New (int (Data'Length));
+   begin
+      for row in Data'Range loop
+         Item := PyTuple_New (Row_Size);
+         Py_Row := Py_Row + 1;
+         Py_Col := -1;
+         for col in Data'Range (2) loop
+            Py_Col := Py_Col + 11;
+            Value := Data (row, col);
+            Long_Value := long (Value);
+            PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (Long_Value));
+         end loop;
+         PyTuple_SetItem (Result, Py_Row, Item);
+      end loop;
+   
+      return Result;
+         
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise Interpreter_Error;
+            
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : NL_Types.Boolean_List) return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
+      Tuple_2D     : constant PyObject := PyTuple_New (int (Data.Length));
+      Long_Value   : long;
+      Py_Index     : int := -1;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         Py_Index := Py_Index + 1;
+         if Data (index) then
+            Long_Value := 1;
+         else
+            Long_Value := 0;
+         end if;
+         PyTuple_SetItem (Tuple_2D, Py_Index, PyBool_FromLong (Long_Value));
+      end loop;
+      
+      return Tuple_2D;
+
+   exception
+      when E : others =>
+         raise Interpreter_Error with Routine_Name & "error" &
+           Exception_Message (E);
+      
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Boolean_List_2D ";
+      Row_Size     : int;
+      Long_Value   : long;
+      Tuple_2D     : PyObject;
+      Tuple        : PyObject;
+      Py_Row       : int := -1;
+      Py_Col       : int := -1;
+   begin
+      Tuple_2D := PyTuple_New (int (Data.Length));
+      for row in Data.First_Index .. Data.Last_Index loop
+         Row_Size := int (Data (row).Length);
+         Tuple := PyTuple_New (Row_Size);
+         Py_Row := Py_Row + 1;
+         Py_Col := -1;
+         for col in Data (row).First_Index .. Data (row).Last_Index loop
+            Py_Col := Py_Col + 1;
+            if Data (row) (col) then
+               Long_Value := 1;
+            else
+               Long_Value := 0;
+            end if;
+            
+            PyTuple_SetItem (Tuple, Py_Col, PyBool_FromLong (Long_Value));
+         end loop;
+         
+         PyTuple_SetItem (Tuple_2D, Py_Row, Tuple);
+      end loop;
+      
+      return Tuple_2D;
+       
+   exception
+      when E : others =>
+         raise Interpreter_Error with Routine_Name & "error" &
+           Exception_Message (E);
+      
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Bounded_String_List ";
+      Tuple        : PyObject;
+      Py_Index     : int := -1;
+   begin
+      Tuple := PyTuple_New (int (Data.Length));
+      for row in Data.First_Index .. Data.Last_Index loop
+         Py_Index := Py_Index + 1;
+         declare
+            Text : constant char_array := To_C (Data (row));
+            Item : constant PyObject := PyString_FromString (Text);
+         begin
+            PyTuple_SetItem (Tuple, Py_Index, Item);
+         end;
+      end loop;
+      
+      return Tuple;
+
+   exception
+      when E : others =>
+         raise Interpreter_Error with Routine_Name & "error" &
+           Exception_Message (E);
+      
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : ML_Types.Unbounded_List) return PyObject is
+      use Interfaces.C;
+      use Ada.Strings.Unbounded;
+      Routine_Name : constant String := "Python.To_Tuple Unbounded_List ";
+      Tuple        : PyObject;
+      Py_Index     : int := -1;
+   begin
+      Tuple := PyTuple_New (int (Data.Length));
+      for row in Data.First_Index .. Data.Last_Index loop
+         Py_Index := Py_Index + 1;
+         declare
+            Text : constant char_array := To_C (To_String (Data (row)));
+            Item : constant PyObject := PyString_FromString (Text);
+         begin
+            PyTuple_SetItem (Tuple, Py_Index, Item);
+         end;
+      end loop;
+      
+      return Tuple;
+
+   exception
+      when E : others =>
+         raise Interpreter_Error with Routine_Name & "error" &
+           Exception_Message (E);
+      
+   end To_Tuple;
+
    --  -------------------------------------------------------------------------
    --  public operations
    
@@ -374,167 +529,4 @@ package body Python is
    
    --  -------------------------------------------------------------------------
      
-   function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Matrix) 
-                      return PyObject is
-      use Interfaces.C;
-      Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
-      Num_Cols     : constant Positive := Data'Length (2);
-      Row_Size     : constant int := int (Num_Cols);
-      Value        : Integer;
-      Long_Value   : long;
-      Item         : PyObject;
-      Py_Row       : int := -1;
-      Py_Col       : int := -1;
-      Result       : constant PyObject := PyTuple_New (int (Data'Length));
-   begin
-      for row in Data'Range loop
-         Item := PyTuple_New (Row_Size);
-         Py_Row := Py_Row + 1;
-         Py_Col := -1;
-         for col in Data'Range (2) loop
-            Py_Col := Py_Col + 11;
-            Value := Data (row, col);
-            Long_Value := long (Value);
-            PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (Long_Value));
-         end loop;
-         PyTuple_SetItem (Result, Py_Row, Item);
-      end loop;
-   
-      return Result;
-         
-   exception
-      when E : others =>
-         Put_Line (Routine_Name & "error" & Exception_Message (E));
-         raise Interpreter_Error;
-            
-   end To_Tuple;
-
-   --  -------------------------------------------------------------------------
-
-   function To_Tuple (Data : NL_Types.Boolean_List) return PyObject is
-      use Interfaces.C;
-      Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
-      Tuple_2D     : constant PyObject := PyTuple_New (int (Data.Length));
-      Long_Value   : long;
-      Py_Index     : int := -1;
-   begin
-      for index in Data.First_Index .. Data.Last_Index loop
-         Py_Index := Py_Index + 1;
-         if Data (index) then
-            Long_Value := 1;
-         else
-            Long_Value := 0;
-         end if;
-         PyTuple_SetItem (Tuple_2D, Py_Index, PyBool_FromLong (Long_Value));
-      end loop;
-      
-      return Tuple_2D;
-
-   exception
-      when E : others =>
-         raise Interpreter_Error with Routine_Name & "error" &
-           Exception_Message (E);
-      
-   end To_Tuple;
-
-   --  -------------------------------------------------------------------------
-
-   function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject is
-      use Interfaces.C;
-      Routine_Name : constant String := "Python.To_Tuple Boolean_List_2D ";
-      Row_Size     : int;
-      Long_Value   : long;
-      Tuple_2D     : PyObject;
-      Tuple        : PyObject;
-      Py_Row       : int := -1;
-      Py_Col       : int := -1;
-   begin
-      Tuple_2D := PyTuple_New (int (Data.Length));
-      for row in Data.First_Index .. Data.Last_Index loop
-         Row_Size := int (Data (row).Length);
-         Tuple := PyTuple_New (Row_Size);
-         Py_Row := Py_Row + 1;
-         Py_Col := -1;
-         for col in Data (row).First_Index .. Data (row).Last_Index loop
-            Py_Col := Py_Col + 1;
-            if Data (row) (col) then
-               Long_Value := 1;
-            else
-               Long_Value := 0;
-            end if;
-            
-            PyTuple_SetItem (Tuple, Py_Col, PyBool_FromLong (Long_Value));
-         end loop;
-         
-         PyTuple_SetItem (Tuple_2D, Py_Row, Tuple);
-      end loop;
-      
-      return Tuple_2D;
-       
-   exception
-      when E : others =>
-         raise Interpreter_Error with Routine_Name & "error" &
-           Exception_Message (E);
-      
-   end To_Tuple;
-
-   --  -------------------------------------------------------------------------
-
-   function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject is
-      use Interfaces.C;
-      Routine_Name : constant String := "Python.To_Tuple Bounded_String_List ";
-      Tuple        : PyObject;
-      Py_Index     : int := -1;
-   begin
-      Tuple := PyTuple_New (int (Data.Length));
-      for row in Data.First_Index .. Data.Last_Index loop
-         Py_Index := Py_Index + 1;
-         declare
-            Text : constant char_array := To_C (Data (row));
-            Item : constant PyObject := PyString_FromString (Text);
-         begin
-            PyTuple_SetItem (Tuple, Py_Index, Item);
-         end;
-      end loop;
-      
-      return Tuple;
-
-   exception
-      when E : others =>
-         raise Interpreter_Error with Routine_Name & "error" &
-           Exception_Message (E);
-      
-   end To_Tuple;
-
-   --  -------------------------------------------------------------------------
-
-   function To_Tuple (Data : ML_Types.Unbounded_List) return PyObject is
-      use Interfaces.C;
-      use Ada.Strings.Unbounded;
-      Routine_Name : constant String := "Python.To_Tuple Unbounded_List ";
-      Tuple        : PyObject;
-      Py_Index     : int := -1;
-   begin
-      Tuple := PyTuple_New (int (Data.Length));
-      for row in Data.First_Index .. Data.Last_Index loop
-         Py_Index := Py_Index + 1;
-         declare
-            Text : constant char_array := To_C (To_String (Data (row)));
-            Item : constant PyObject := PyString_FromString (Text);
-         begin
-            PyTuple_SetItem (Tuple, Py_Index, Item);
-         end;
-      end loop;
-      
-      return Tuple;
-
-   exception
-      when E : others =>
-         raise Interpreter_Error with Routine_Name & "error" &
-           Exception_Message (E);
-      
-   end To_Tuple;
-
-   --  -------------------------------------------------------------------------
-
 end Python;
