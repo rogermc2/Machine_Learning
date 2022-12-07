@@ -22,6 +22,25 @@ package body Tree_Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Boolean_List (Name  : String;
+                                 aList : NL_Types.Boolean_List) is
+      Count : Integer := 1;
+   begin
+      Put_Line (Name & ": ");
+      for Index in aList.First_Index .. aList.Last_Index loop
+         Put (Boolean'Image (aList.Element (Index)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Boolean_List;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Criterion (Name : String;
                               Data : Criterion.Criterion_Class) is
       use Criterion;

@@ -5,9 +5,9 @@ with Build_Utils;
 with Classifier_Types; use Classifier_Types;
 with Criterion;
 with Estimator;
---  with ML_Types;
 with Base_Decision_Tree;
 with Encode_Utils;
+with NL_Types;
 with Node_Splitter;
 with Tree;
 with Weights;
@@ -18,6 +18,7 @@ package Tree_Printing is
 
     procedure Print_Boolean_Matrix (Name    : String;
                                     aMatrix : Estimator.Boolean_Matrix);
+    procedure Print_Boolean_List (Name : String; aList : NL_Types.Boolean_List);
     procedure Print_Criterion (Name : String;
                                Data : Criterion.Criterion_Class);
     procedure Print_Integer_Array (Name : String; anArray : Integer_Array);

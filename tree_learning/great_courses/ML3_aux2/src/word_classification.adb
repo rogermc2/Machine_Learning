@@ -4,6 +4,7 @@ with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Tree_Printing;
 with Utilities;
 
 package body Word_Classification is
@@ -35,7 +36,10 @@ package body Word_Classification is
          Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
          Features := Get_Features (Word_Line);
          Data_Out.Append (Features);
-
+         if index = 31 then
+            Tree_Printing.Print_Boolean_List (Routine_Name & "Features 31",
+                                              Features);
+         end if;
          Labels.Append
            (Ada.Strings.Fixed.Index
               (To_String (Word_Line.First_Element), "ie") > 0 );
@@ -122,19 +126,18 @@ package body Word_Classification is
       use Ada.Strings.Fixed;
       use ML_Types.String_Package;
       Routine_Name : constant String := "Word_Classification.Get_Features ";
-      Curs         : constant Cursor := Word_Line.First;
       --  aWord is wordline[0]
-      aWord        : constant String := To_String (Element (Curs));
+      aWord        : constant String := To_String (Word_Line.First_Element);
       --  Code is wordline[1]
-      Code         : constant String := To_String (Element (Next (Curs)));
+      Code         : constant String := To_String (Word_Line.Last_Element);
       Pos          : Natural := Index (aWord, "ie");
       Minus_Char   : constant String := "-";
       Has_Letter   : Boolean;
       Two_Chars    : String2;
       Vector       : NL_Types.Boolean_List;
    begin
---        Put_Line (Routine_Name & "Word_Line length:" &
---                    Integer'Image (Integer(Word_Line.Length)));
+      Assert (Word_Line.Length = 2, Routine_Name & "invalid Word_Line length:" &
+                  Count_Type'Image (Word_Line.Length));
 --        Put_Line (Routine_Name & "aWord '" & aWord & "'");
 --        Put_Line (Routine_Name & "Code '" & Code & "'");
       if Pos = 0 then
@@ -199,7 +202,6 @@ package body Word_Classification is
          end loop;
          Vector.Append (Has_Letter);
       end loop;
-
       --  Vector length 26 + 5 * 26 = 156
       Assert (Vector.Length = 156, Routine_Name & "invalid ector length: " &
                   Count_Type'Image (Vector.Length) & " should be 156");
