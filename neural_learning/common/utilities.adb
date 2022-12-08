@@ -23,43 +23,41 @@ package body Utilities is
       Label_Type    : Data_Type := Get_Data_Type (Data.Label);
       Data_Changed  : Boolean := False;
    begin
-      if Rows.Length < 2 then
-         raise Utilities_Exception with
-           "Utilities.Check_Rows called with empty rows vector";
-      else
-         for index in 1 .. Num_Features loop
-            Feature_Types (index) := Get_Data_Type (Data.Features (index));
-         end loop;
+      Assert (Rows.Length > 1,
+              "Utilities.Check_Rows called with empty rows vector");
 
-         for row in
-           Integer'Succ (Rows.First_Index) .. Rows.Last_Index loop
-            Data := Rows.Element (Integer (row));
-            Data_Changed := False;
-            for col in Class_Range range 1 .. Num_Features loop
-               if Get_Data_Type (Data.Features (col)) = Float_Type and then
-                 Feature_Types (col) = Integer_Type then
-                  Data.Features (col) := Data.Features (col) & ".0";
-                  Feature_Types (col) := Float_Type;
-                  Data_Changed := True;
-               elsif
-                 Get_Data_Type (Data.Features (col)) = Integer_Type and then
-                 Feature_Types (col) = Float_Type then
-                  Data.Features (col) := Data.Features (col) & ".0";
-                  Data_Changed := True;
-               end if;
-            end loop;
+      for index in 1 .. Num_Features loop
+         Feature_Types (index) := Get_Data_Type (Data.Features (index));
+      end loop;
 
-            if Get_Data_Type (Data.Label) = Float_Type and then
-              Label_Type = Integer_Type then
-               Data.Label := Data.Label & ".0";
-               Label_Type := Float_Type;
+      for row in
+        Integer'Succ (Rows.First_Index) .. Rows.Last_Index loop
+         Data := Rows.Element (Integer (row));
+         Data_Changed := False;
+         for col in Class_Range range 1 .. Num_Features loop
+            if Get_Data_Type (Data.Features (col)) = Float_Type and then
+              Feature_Types (col) = Integer_Type then
+               Data.Features (col) := Data.Features (col) & ".0";
+               Feature_Types (col) := Float_Type;
+               Data_Changed := True;
+            elsif
+              Get_Data_Type (Data.Features (col)) = Integer_Type and then
+              Feature_Types (col) = Float_Type then
+               Data.Features (col) := Data.Features (col) & ".0";
                Data_Changed := True;
             end if;
-            if Data_Changed then
-               Rows.Replace_Element (row, Data);
-            end if;
          end loop;
-      end if;
+
+         if Get_Data_Type (Data.Label) = Float_Type and then
+           Label_Type = Integer_Type then
+            Data.Label := Data.Label & ".0";
+            Label_Type := Float_Type;
+            Data_Changed := True;
+         end if;
+         if Data_Changed then
+            Rows.Replace_Element (row, Data);
+         end if;
+      end loop;
 
    end Check_Rows;
 
@@ -772,66 +770,64 @@ package body Utilities is
       end Add_To_Set;
 
    begin
-      if Rows.Length < 2 then
-         raise Utilities_Exception with
-           "Utilities.Unique_Values called with empty rows vector";
-      else
-         for index in Class_Range range
-           Class_Range'Succ (Class_Range (Rows.First_Index)) ..
-             Class_Range (Rows.Last_Index) loop
-            Data := Rows.Element (Integer (index));
-            for col in Class_Range range
-              1 .. Num_Features loop
-               Feature_Name :=
-                 Feature_Name_Type (Rows.First_Element.Features (col));
-               if Feature_Name = Feature then
-                  Feature_Data_Type :=
-                    Get_Data_Type (Row2_Features (col));
-                  Value_String := Data.Features (col);
-                  case Feature_Data_Type is
-                     when Boolean_Type =>
-                        declare
-                           Feature_Value : Value_Data (Boolean_Type);
-                        begin
-                           Feature_Value.Feature_Name := Feature;
-                           Feature_Value.Boolean_Value :=
-                             Boolean'Value (To_String (Value_String));
-                           Add_To_Set (Feature_Value);
-                        end;
+      Assert (Rows.Length > 1,
+              "Utilities.Unique_Values called with empty rows vector");
+      for index in Class_Range range
+        Class_Range'Succ (Class_Range (Rows.First_Index)) ..
+          Class_Range (Rows.Last_Index) loop
+         Data := Rows.Element (Integer (index));
+         for col in Class_Range range
+           1 .. Num_Features loop
+            Feature_Name :=
+              Feature_Name_Type (Rows.First_Element.Features (col));
+            if Feature_Name = Feature then
+               Feature_Data_Type :=
+                 Get_Data_Type (Row2_Features (col));
+               Value_String := Data.Features (col);
+               case Feature_Data_Type is
+                  when Boolean_Type =>
+                     declare
+                        Feature_Value : Value_Data (Boolean_Type);
+                     begin
+                        Feature_Value.Feature_Name := Feature;
+                        Feature_Value.Boolean_Value :=
+                          Boolean'Value (To_String (Value_String));
+                        Add_To_Set (Feature_Value);
+                     end;
 
-                     when Float_Type =>
-                        declare
-                           Feature_Value : Value_Data (Float_Type);
-                        begin
-                           Feature_Value.Feature_Name := Feature;
-                           Feature_Value.Float_Value :=
-                             Float'Value (To_String (Value_String));
-                           Add_To_Set (Feature_Value);
-                        end;
+                  when Float_Type =>
+                     declare
+                        Feature_Value : Value_Data (Float_Type);
+                     begin
+                        Feature_Value.Feature_Name := Feature;
+                        Feature_Value.Float_Value :=
+                          Float'Value (To_String (Value_String));
+                        Add_To_Set (Feature_Value);
+                     end;
 
-                     when Integer_Type =>
-                        declare
-                           Feature_Value : Value_Data (Integer_Type);
-                        begin
-                           Feature_Value.Feature_Name := Feature;
-                           Feature_Value.Integer_Value :=
-                             Integer'Value (To_String (Value_String));
-                           Add_To_Set (Feature_Value);
-                        end;
+                  when Integer_Type =>
+                     declare
+                        Feature_Value : Value_Data (Integer_Type);
+                     begin
+                        Feature_Value.Feature_Name := Feature;
+                        Feature_Value.Integer_Value :=
+                          Integer'Value (To_String (Value_String));
+                        Add_To_Set (Feature_Value);
+                     end;
 
-                     when UB_String_Type =>
-                        declare
-                           Feature_Value : Value_Data (UB_String_Type);
-                        begin
-                           Feature_Value.Feature_Name := Feature;
-                           Feature_Value.UB_String_Value := Value_String;
-                           Add_To_Set (Feature_Value);
-                        end;
-                  end case;
-               end if;
-            end loop;
+                  when UB_String_Type =>
+                     declare
+                        Feature_Value : Value_Data (UB_String_Type);
+                     begin
+                        Feature_Value.Feature_Name := Feature;
+                        Feature_Value.UB_String_Value := Value_String;
+                        Add_To_Set (Feature_Value);
+                     end;
+               end case;
+            end if;
          end loop;
-      end if;
+      end loop;
+
       return theSet;
 
    end Unique_Values;
