@@ -2,7 +2,6 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Build_Utils;
-with Classifier_Types; use Classifier_Types;
 with Criterion;
 with Base_Decision_Tree;
 with Encode_Utils;
@@ -36,7 +35,7 @@ package Tree_Printing is
 --                                    theList : ML_Types.Integer_DL_List);
     procedure Print_Integer_List (Name : String; theList : ML_Types.Integer_List);
     procedure Print_Natural_Lists_2D (Name : String;
-                                      Data : Natural_Lists_2D);
+                                      Data : NL_Types.Natural_Lists_2D);
     procedure Print_Float_Lists_2D (Name : String; Data : NL_Types.Float_List_2D);
     procedure Print_Multi_Value_Array (Name    : String;
                                        anArray : Multi_Value_Array);
@@ -44,7 +43,7 @@ package Tree_Printing is
       (Name : String; Multi_List : Tree.Values_List_2D);
     procedure Print_Value_Lists_3D
       (Name : String; theList : Tree.Values_List_3D);
-    procedure Print_Natural_List (Name : String; theList : Natural_List);
+    procedure Print_Natural_List (Name : String; theList : NL_Types.Natural_List);
     procedure Print_Node (Message : String; Node : Tree.Tree_Node);
     procedure Print_Node (Message : String; Node : Tree.Tree_Cursor);
     procedure Print_Node_Cursor_Array (Name    : String;
@@ -65,8 +64,8 @@ package Tree_Printing is
     procedure Print_Unbounded_Set (Name   : String;
                                    theSet : Encode_Utils.UB_String_Sets.Set);
     procedure Print_Value_List (Name : String; theList : Tree.Values_List);
---      procedure Print_Value_Data_List (Name    : String;
---                                       theList : ML_Types.Value_Data_List);
+    procedure Print_Value_Data_List (Name    : String;
+                                     theList : ML_Types.Value_Data_List);
 --      procedure Print_Value_Data_Lists_2D (Name      : String;
 --                                           theList   : ML_Types.Value_Data_Lists_2D;
 --                                           Num_Items : Positive := 1000);

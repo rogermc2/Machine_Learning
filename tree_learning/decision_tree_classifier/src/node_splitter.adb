@@ -361,7 +361,7 @@ package body Node_Splitter is
    procedure Initialize_Splitter
      (Self             : in out Splitter_Class;
       Input_X          : ML_Types.Value_Data_Lists_2D;
-      Y_Encoded        : Classifier_Types.Natural_Lists_2D;
+      Y_Encoded        : NL_Types.Natural_Lists_2D;
       Sample_Weight    : Weights.Weight_List;
       Min_Leaf_Samples : Positive := 1) is
       use Ada.Containers;
@@ -520,10 +520,9 @@ package body Node_Splitter is
 
    procedure Reorder_Rows (Self        : in out Splitter_Class;
                            Best_Split  : in out Split_Record;
-                           X_Samples   : in out
-                             Classifier_Types.Natural_List;
+                           X_Samples   : in out NL_Types.Natural_List;
                            Impurity    : Float) is
-      use Classifier_Types.Natural_Package;
+      use NL_Types.Natural_Package;
       Routine_Name  : constant String := "Node_Splitter.Reorder_Rows ";
       Partition_End : Natural;
       P_Index       : Positive;

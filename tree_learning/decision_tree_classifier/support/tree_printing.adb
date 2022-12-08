@@ -4,10 +4,11 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Tree_Printing is
 
+   procedure Print_Value_Record (Name : String; Value : ML_Types.Value_Record);
+
    --  -------------------------------------------------------------------------
 
-   procedure Print_Boolean_Matrix (Name    : String;
-                                   aMatrix : Estimator.Boolean_Matrix) is
+   procedure Print_Boolean_Matrix (Name : String; aMatrix : Boolean_Matrix) is
    begin
       Put_Line (Name & ": ");
       for row in aMatrix'First .. aMatrix'Last loop
@@ -58,8 +59,8 @@ package body Tree_Printing is
    procedure Print_Criterion (Name : String;
                               Data : Criterion.Criterion_Class) is
       use Criterion;
-      use Classifier_Types.Natural_List_Package;
-      use Classifier_Types.Float_Package;
+      use NL_Types.Natural_List_Package;
+      use NL_Types.Float_Package;
    begin
       Put_Line (Name & ": ");
       Put_Line ("Criterion_Type: " &
@@ -176,7 +177,7 @@ package body Tree_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Float_List (Name : String; theList : Float_List) is
+   procedure Print_Float_List (Name : String; theList : NL_Types.Float_List) is
       Count : Integer := 1;
    begin
       Put_Line (Name & ": ");
@@ -229,7 +230,7 @@ package body Tree_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Integer_List (Name : String; theList : Integer_List) is
+   procedure Print_Integer_List (Name : String; theList : ML_Types.Integer_List) is
       Count : Integer := 1;
    begin
       Put_Line (Name & ": ");
@@ -248,7 +249,7 @@ package body Tree_Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Float_Lists_2D (Name : String;
-                                   Data : Float_List_2D) is
+                                   Data : NL_Types.Float_List_2D) is
    begin
       Put_Line (Name & ": ");
       for index in Data.First_Index .. Data.Last_Index loop
@@ -261,7 +262,8 @@ package body Tree_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Natural_Lists_2D (Name : String; Data : Natural_Lists_2D) is
+   procedure Print_Natural_Lists_2D (Name : String;
+                                     Data : NL_Types.Natural_Lists_2D) is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
@@ -294,7 +296,8 @@ package body Tree_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Natural_List (Name : String; theList : Natural_List) is
+   procedure Print_Natural_List (Name : String;
+                                 theList : NL_Types.Natural_List) is
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
@@ -551,6 +554,54 @@ package body Tree_Printing is
       end loop;
       New_Line;
    end Print_Value_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Value_Data_List (Name    : String;
+                                    theList : ML_Types.Value_Data_List) is
+      Value : ML_Types.Value_Record;
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put_Line (Name);
+      end if;
+
+      Put_Line ("List length: " & Integer'Image (Integer (theList.Length)));
+      for Index in theList.First_Index .. theList.Last_Index loop
+         Value := theList.Element (Index);
+         Put ("   ");
+         Print_Value_Record ("", Value);
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Value_Data_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Value_Record (Name : String; Value : ML_Types.Value_Record) is
+      use ML_Types;
+   begin
+      if Name'Length > 0 then
+         Put_Line (Name & ":");
+      end if;
+
+      case Value.Value_Kind is
+         when Boolean_Type => Put (Boolean'Image (Value.Boolean_Value));
+         when Float_Type => Put (Float'Image (Value.Float_Value));
+         when Integer_Type => Put (Integer'Image (Value.Integer_Value));
+         when UB_String_Type => Put (To_String (Value.UB_String_Value));
+      end case;
+
+      if Name'Length > 0 then
+         New_Line;
+      end if;
+
+   end Print_Value_Record;
 
    --  ------------------------------------------------------------------------
 

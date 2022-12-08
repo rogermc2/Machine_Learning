@@ -16,9 +16,9 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Types;
+with NL_Types;
 with Tree;
 
-with Classifier_Types;
 with Criterion;
 with Estimator;
 with Node_Splitter;
@@ -108,7 +108,7 @@ package Base_Decision_Tree is
    Value_Error      : Exception;
 
    function Apply (aClassifier : Classifier; X : ML_Types.Value_Data_Lists_2D)
-                   return Classifier_Types.Natural_List;
+                   return NL_Types.Natural_List;
    --  BaseDecisionTree.Fit (super of class DecisionTreeClassifier)
    --  Fit builds a decision tree classifier from the training set (X, Y).
    --  X : training input samples; a (n_samples, n_features) matrix
@@ -138,6 +138,6 @@ package Base_Decision_Tree is
                      return ML_Types.Value_Data_Lists_2D;
    function Decision_Path (aClassifier : Classifier;
                            X           : ML_Types.Value_Data_Lists_2D)
-                           return Classifier_Types.Natural_Lists_2D;
+                           return NL_Types.Natural_Lists_2D;
 
 end Base_Decision_Tree;

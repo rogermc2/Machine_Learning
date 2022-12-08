@@ -1,6 +1,6 @@
 
 with ML_Types;
-with Classifier_Types;
+with NL_Types;
 with Tree;
 with Weights;
 
@@ -12,7 +12,7 @@ package Criterion is
                                     MAE_Criteria);
    type Criterion_Class
      (Criterion_Type : Criterion_Kind := Criterion_Classification) is record
-      Y                         : Classifier_Types.Natural_Lists_2D;
+      Y                         : NL_Types.Natural_Lists_2D;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight             : Weights.Weight_List;
       Samples                   : ML_Types.Value_Data_Lists_2D;
@@ -34,12 +34,12 @@ package Criterion is
       Sum_Total                 : Weights.Weight_Lists_2D;
       Sum_Left                  : Weights.Weight_Lists_2D;
       Sum_Right                 : Weights.Weight_Lists_2D;
-      Sample_Indices            : Classifier_Types.Natural_List;
+      Sample_Indices            : NL_Types.Natural_List;
       Proxy_Improvement         : Float := -Float'Last;
       case Criterion_Type is
          when Criterion_Classification =>
             --  each output's number of classes for
-            Num_Classes  : Classifier_Types.Natural_List;
+            Num_Classes  : NL_Types.Natural_List;
          when Criterion_Regression =>
             Sq_Sum_Total : Float := 0.0;
       end case;
@@ -49,8 +49,8 @@ package Criterion is
 
    procedure C_Init (Criteria    : in out Criterion_Class;
                      Num_Outputs : Tree.Index_Range := 1;
-                     Num_Classes : Classifier_Types.Natural_List :=
-                       Classifier_Types.Natural_Package.Empty_Vector);
+                     Num_Classes : NL_Types.Natural_List :=
+                       NL_Types.Natural_Package.Empty_Vector);
    procedure Children_Impurity_Gini (Criteria       : Criterion_Class;
                                      Impurity_Left,
                                      Impurity_Right : out Float);
@@ -59,9 +59,9 @@ package Criterion is
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    procedure Initialize_Node_Criterion
       (Criteria           : in out Criterion_Class;
-      Y                   : Classifier_Types.Natural_Lists_2D;
+      Y                   : NL_Types.Natural_Lists_2D;
       --  Samples:
-      Sample_Indices      : Classifier_Types.Natural_List;
+      Sample_Indices      : NL_Types.Natural_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight       : Weights.Weight_List;
       Weighted_Samples    : Float;

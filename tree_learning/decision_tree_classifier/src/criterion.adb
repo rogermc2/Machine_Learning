@@ -14,8 +14,8 @@ package body Criterion is
    --  L214 __cinit__
    procedure C_Init (Criteria    : in out Criterion_Class;
                      Num_Outputs : Tree.Index_Range := 1;
-                     Num_Classes : Classifier_Types.Natural_List :=
-                       Classifier_Types.Natural_Package.Empty_Vector) is
+                     Num_Classes : NL_Types.Natural_List :=
+                       NL_Types.Natural_Package.Empty_Vector) is
    begin
       --  L220
       Criteria.Num_Outputs := Num_Outputs;
@@ -34,10 +34,10 @@ package body Criterion is
                                      Impurity_Right : out Float) is
 --        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
       Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
-      Num_Classes    :  constant Classifier_Types.Natural_List :=
+      Num_Classes    :  constant NL_Types.Natural_List :=
                          Criteria.Num_Classes;
-      Sum_Left_K     : Classifier_Types.Float_List;
-      Sum_Right_K    : Classifier_Types.Float_List;
+      Sum_Left_K     : NL_Types.Float_List;
+      Sum_Right_K    : NL_Types.Float_List;
       Count_K        : Float;
       Sq_Count_Left  : Float;
       Sq_Count_Right : Float;
@@ -107,8 +107,8 @@ package body Criterion is
    --  L59, L214, 280
    procedure Initialize_Node_Criterion
      (Criteria            : in out Criterion_Class;
-      Y                   : Classifier_Types.Natural_Lists_2D;
-      Sample_Indices      : Classifier_Types.Natural_List;
+      Y                   : NL_Types.Natural_Lists_2D;
+      Sample_Indices      : NL_Types.Natural_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight       : Weights.Weight_List;
       Weighted_Samples    : Float;
@@ -117,9 +117,9 @@ package body Criterion is
 --        Routine_Name    : constant String :=
 --                            "Criterion.Initialize_Node_Criterion ";
       Num_Outputs     : Positive;
-      Sum_Total_K     : Classifier_Types.Float_List;
+      Sum_Total_K     : NL_Types.Float_List;
       Y_I_Index       : Positive;  --  Class index
-      Y_I             : Classifier_Types.Natural_List;  --  Class
+      Y_I             : NL_Types.Natural_List;  --  Class
       Y_Ik            : Natural; --  Class.output
       Weight          : Float := 1.0;
    begin
@@ -187,7 +187,7 @@ package body Criterion is
    function Node_Impurity_Gini (Criteria : Criterion_Class) return Float is
       --        Routine_Name   : constant String := "Criterion.Node_Impurity_Gini ";
       Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
-      Num_Classes    : constant Classifier_Types.Natural_List :=
+      Num_Classes    : constant NL_Types.Natural_List :=
                          Criteria.Num_Classes;
       Sum_Total_K    : Weights.Weight_List;
       Count_K        : Float;
@@ -218,8 +218,8 @@ package body Criterion is
    --  The smaller the impurity the better.
    function Node_Impurity_Entropy (Self : Criterion_Class) return Float is
       use Maths.Float_Math_Functions;
-      Num_Classes : constant Classifier_Types.Natural_List := Self.Num_Classes;
-      Sum_Total_K : Classifier_Types.Float_List;
+      Num_Classes : constant NL_Types.Natural_List := Self.Num_Classes;
+      Sum_Total_K : NL_Types.Float_List;
       Count_K     : Float := 0.0;
       Entropy     : Float := 0.0;
    begin
@@ -286,7 +286,7 @@ package body Criterion is
    procedure Reset (Criteria : in out Criterion_Class) is
       Num_Outputs : constant Positive :=
                       Positive (Criteria.Y.Element (1).Length);
-      Sum_Left_K  : Classifier_Types.Float_List;
+      Sum_Left_K  : NL_Types.Float_List;
    begin
       Criteria.Split_Row := Criteria.Start_Row;
       Criteria.Num_Weighted_Left := 0.0;
@@ -311,7 +311,7 @@ package body Criterion is
    procedure Reverse_Reset (Criteria : in out Criterion_Class) is
       Num_Outputs : constant Positive :=
                       Positive (Criteria.Y.Element (1).Length);
-      Sum_Right_K : Classifier_Types.Float_List;
+      Sum_Right_K : NL_Types.Float_List;
    begin
       Criteria.Split_Row := Criteria.Stop_Row + 1;
       Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Node_Samples;
@@ -338,11 +338,11 @@ package body Criterion is
       Num_Outputs  : constant Positive :=
                        Positive (Criteria.Y.Element (1).Length);
       i            : Positive;
-      Y_I          : Classifier_Types.Natural_List;
+      Y_I          : NL_Types.Natural_List;
       Label_Index  : Positive;  --  Class index?
-      Sum_Left_K   : Classifier_Types.Float_List;
-      Sum_Right_K  : Classifier_Types.Float_List;
-      Sum_K        : Classifier_Types.Float_List;
+      Sum_Left_K   : NL_Types.Float_List;
+      Sum_Right_K  : NL_Types.Float_List;
+      Sum_K        : NL_Types.Float_List;
       Weight       : Float := 1.0;
    begin
       --  L435  Update statistics up to new_pos given that
