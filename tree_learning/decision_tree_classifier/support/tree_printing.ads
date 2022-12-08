@@ -4,10 +4,10 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Build_Utils;
 with Classifier_Types; use Classifier_Types;
 with Criterion;
-with Estimator;
 with Base_Decision_Tree;
 with Encode_Utils;
 with ML_Types;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 with Node_Splitter;
 with Tree;
@@ -18,7 +18,7 @@ package Tree_Printing is
     Print_Error : Exception;
 
     procedure Print_Boolean_Matrix (Name    : String;
-                                    aMatrix : Estimator.Boolean_Matrix);
+                                    aMatrix : Boolean_Matrix);
     procedure Print_Boolean_List (Name : String; aList : NL_Types.Boolean_List;
                                   Start  : Integer := 1; Finish : Integer := 0);
     procedure Print_Criterion (Name : String;
@@ -27,17 +27,17 @@ package Tree_Printing is
     procedure Print_Float_Array (Name   : String; anArray : Float_Array;
                                  Start  : Integer := 1;
                                  Finish : Integer := 0);
-    procedure Print_Float_List (Name  : String; theList : Float_List);
+    procedure Print_Float_List (Name  : String; theList : NL_Types.Float_List);
 --      procedure Print_Indefinite_List (Name   : String;
 --                                      theList : ML_Types.Indef_String_List);
 --      procedure Print_Integer_List (Name : String;
 --                                    theList : ML_Types.Integer_List);
 --      procedure Print_Integer_List (Name : String;
 --                                    theList : ML_Types.Integer_DL_List);
-    procedure Print_Integer_List (Name : String; theList : Integer_List);
+    procedure Print_Integer_List (Name : String; theList : ML_Types.Integer_List);
     procedure Print_Natural_Lists_2D (Name : String;
                                       Data : Natural_Lists_2D);
-    procedure Print_Float_Lists_2D (Name : String; Data : Float_List_2D);
+    procedure Print_Float_Lists_2D (Name : String; Data : NL_Types.Float_List_2D);
     procedure Print_Multi_Value_Array (Name    : String;
                                        anArray : Multi_Value_Array);
     procedure Print_Value_Lists_2D

@@ -9,10 +9,10 @@ with Ada.Text_IO; use Ada.Text_IO;
 package body Tree is
 
    function Apply_Dense (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
-                         return Classifier_Types.Natural_List;
+                         return NL_Types.Natural_List;
    function Decision_Path_Dense (aTree : Tree_Class;
                                  X     : ML_Types.Value_Data_Lists_2D)
-                                 return Classifier_Types.Natural_Lists_2D;
+                                 return NL_Types.Natural_Lists_2D;
 
    --  -------------------------------------------------------------------------
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
@@ -20,7 +20,7 @@ package body Tree is
    --       for each sample?
    --  Apply returns a list containing the Node ID associated with each sample.
    function Apply (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
-                   return Classifier_Types.Natural_List is
+                   return NL_Types.Natural_List is
    begin
       return Apply_Dense (Self, X);
    end Apply;
@@ -35,7 +35,7 @@ package body Tree is
    --  Apply_Dense returns a list containing the Node ID associated with each
    --  sample
    function Apply_Dense (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
-                         return Classifier_Types.Natural_List is
+                         return NL_Types.Natural_List is
       --                           return Tree_Cursor_List is
       --  X is a list of samples of features (num samples x num features)
       use Ada.Containers;
@@ -49,7 +49,7 @@ package body Tree is
       Node           : Tree_Node;
       Current_Sample : Value_Data_List;
       Feature_Value  : Value_Record;
-      Out_Data       : Classifier_Types.Natural_List;
+      Out_Data       : NL_Types.Natural_List;
       Continue       : Boolean;
       Use_Left       : Boolean;
    begin
@@ -131,8 +131,8 @@ package body Tree is
 
    procedure C_Init (aTree        : in out Tree_Class;
                      Num_Features : Natural := 0;
-                     Num_Classes  : Classifier_Types.Natural_List :=
-                       Classifier_Types.Natural_Package.Empty_Vector;
+                     Num_Classes  : NL_Types.Natural_List :=
+                       NL_Types.Natural_Package.Empty_Vector;
                      Num_Outputs  : Index_Range := 1) is
    begin
       aTree.Num_Features := Num_Features;
@@ -149,7 +149,7 @@ package body Tree is
 
    function Decision_Path
      (aTree : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
-      return Classifier_Types.Natural_Lists_2D is
+      return NL_Types.Natural_Lists_2D is
    begin
       return Decision_Path_Dense (aTree, X);
 
@@ -159,7 +159,7 @@ package body Tree is
 
    function Decision_Path_Dense
      (aTree : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
-      return Classifier_Types.Natural_Lists_2D is
+      return NL_Types.Natural_Lists_2D is
       use Ada.Containers;
       use Ada.Strings.Unbounded;
       use ML_Types;
@@ -169,13 +169,13 @@ package body Tree is
       Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
-      Node_ID_List   : Classifier_Types.Natural_List;
+      Node_ID_List   : NL_Types.Natural_List;
       Current_Sample : Value_Data_List;
       Feature_Value  : Value_Record;
       Use_Left       : Boolean;
       Continue       : Boolean := True;
       --  Out_Data: num samples x num nodes
-      Out_Data       : Classifier_Types.Natural_Lists_2D;
+      Out_Data       : NL_Types.Natural_Lists_2D;
    begin
       Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
                 "Top node has no children");
@@ -269,7 +269,7 @@ package body Tree is
       --  Each sample is a list of feature values, one value per feature
       --  Values: num_nodes x num_outputs x num_classes
       Values       : constant Weights.Weight_Lists_3D := Self.Values;
-      Samples      : Classifier_Types.Natural_List;
+      Samples      : NL_Types.Natural_List;
       --  Out_Data: num_samples x num_outputs x num_classes
       Out_Data     : Weights.Weight_Lists_3D;
    begin

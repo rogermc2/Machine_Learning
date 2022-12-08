@@ -9,8 +9,8 @@
 with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Containers.Vectors;
 
-with Classifier_Types;
 with ML_Types;
+with NL_Types;
 with Weights;
 
 package Tree is
@@ -31,9 +31,9 @@ package Tree is
       end case;
    end record;
 
-   subtype Values_List is Classifier_Types.Float_List;
-   subtype Values_List_2D is Classifier_Types.Float_List_2D;
-   subtype Values_List_3D is Classifier_Types.Float_List_3D;
+   subtype Values_List is NL_Types.Float_List;
+   subtype Values_List_2D is NL_Types.Float_List_2D;
+   subtype Values_List_3D is NL_Types.Float_List_3D;
 
    type Tree_Node (Leaf_Node : Boolean := False) is record
       Node_ID                   : Positive := 1;
@@ -71,7 +71,7 @@ package Tree is
       --  _tree.pxd L43
       Num_Features : Natural := 0;
       --  Classes:  outputs x classes
-      Num_Classes  : Classifier_Types.Natural_List;
+      Num_Classes  : NL_Types.Natural_List;
       Classes      : ML_Types.Value_Data_Lists_2D;
       Num_Outputs  : Index_Range := 1;
       Max_Depth    : Integer := -1;
@@ -85,14 +85,14 @@ package Tree is
    Value_Error : Exception;
 
    function Apply (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
-                   return Classifier_Types.Natural_List;
+                   return NL_Types.Natural_List;
    procedure C_Init (aTree        : in out Tree_Class; Num_Features : Natural := 0;
-                     Num_Classes  : Classifier_Types.Natural_List :=
-                       Classifier_Types.Natural_Package.Empty_Vector;
+                     Num_Classes  : NL_Types.Natural_List :=
+                       NL_Types.Natural_Package.Empty_Vector;
                      Num_Outputs  : Index_Range := 1);
    function Decision_Path
      (aTree : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
-      return Classifier_Types.Natural_Lists_2D;
+      return NL_Types.Natural_Lists_2D;
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;

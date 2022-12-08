@@ -18,14 +18,15 @@ package body Weights is
      (Classes : ML_Types.Value_Data_List;  Y : ML_Types.Value_Data_List)
       return Weight_List is
       use Label;
-      use Natural_Package;
+      use NL_Types.Natural_Package;
       Weights             : Weight_List;
-      LE                  : Label.Label_Encoder (Class_Unique);
-      Y_Index             : Natural_List;
+      LE                  : Label.Label_Encoder (Class_Unique,
+                                                 Integer (Y.Length));
+      Y_Index             : NL_Types.Natural_List;
       aWeight             : Float;
-      Bins                : Natural_List;
-      Recip_Freq          : Float_List;
-      Transformed_Classes : Natural_List;
+      Bins                : NL_Types.Natural_List;
+      Recip_Freq          : NL_Types.Float_List;
+      Transformed_Classes : NL_Types.Natural_List;
       Scale               : Float;
       Recip_Freq_Index    : Natural;
    begin
