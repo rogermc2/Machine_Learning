@@ -36,6 +36,11 @@ package Python is
                    B    : NL_Arrays_And_Matrices.Integer_Array);
    procedure Call (M    : Module; Function_Name : String;
                    A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : NL_Arrays_And_Matrices.Integer_Array;
+                   C    : NL_Arrays_And_Matrices.Real_Float_Matrix;
+                   D    : NL_Arrays_And_Matrices.Integer_Array);
+   procedure Call (M    : Module; Function_Name : String;
+                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : NL_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M : Module; Function_Name : String;
                    A : NL_Types.Boolean_List_2D;

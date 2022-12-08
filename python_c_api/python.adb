@@ -521,6 +521,40 @@ package body Python is
    
    procedure Call (M    : Module; Function_Name : String;
                    A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : NL_Arrays_And_Matrices.Integer_Array;
+                   C    : NL_Arrays_And_Matrices.Real_Float_Matrix;
+                   D    : NL_Arrays_And_Matrices.Integer_Array) is
+      
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1, T2, T3, T4  : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      C_Tuple  : constant PyObject := To_Tuple (C);
+      D_Tuple  : constant PyObject := To_Tuple (D);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOOO"),
+                       A_Tuple, B_Tuple, C_Tuple, D_Tuple);
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (C_Tuple);
+      Py_DecRef (D_Tuple);
+
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+   
+   procedure Call (M    : Module; Function_Name : String;
+                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : NL_Arrays_And_Matrices.Integer_Matrix) is
       
       function Py_BuildValue (Format  : Interfaces.C.char_array;
