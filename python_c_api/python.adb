@@ -147,6 +147,31 @@ package body Python is
  
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Array) 
+                      return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      Value        : Integer;
+      Py_Row       : int := -1;
+      Result       : constant PyObject := PyTuple_New (int (Data'Length));
+   begin
+      for row in Data'Range loop
+         Py_Row := Py_Row + 1;
+         Value := Data (row);
+         PyTuple_SetItem (Result, Py_Row, PyLong_FromLong (long (Value)));
+      end loop;
+   
+      return Result;
+         
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise Interpreter_Error;
+            
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject is
       use Interfaces.C;
@@ -277,6 +302,41 @@ package body Python is
          raise Interpreter_Error with Routine_Name & "error" &
            Exception_Message (E);
       
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : NL_Arrays_And_Matrices.Real_Float_Matrix) 
+                      return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Real_Float_Matrix ";
+      Num_Cols     : constant Positive := Data'Length (2);
+      Row_Size     : constant int := int (Num_Cols);
+      Value        : Float;
+      Item         : PyObject;
+      Py_Row       : int := -1;
+      Py_Col       : int := -1;
+      Result       : constant PyObject := PyTuple_New (int (Data'Length));
+   begin
+      for row in Data'Range loop
+         Item := PyTuple_New (Row_Size);
+         Py_Row := Py_Row + 1;
+         Py_Col := -1;
+         for col in Data'Range (2) loop
+            Py_Col := Py_Col + 1;
+            Value := Data (row, col);
+            PyTuple_SetItem (Item, Py_Col, PyFloat_FromDouble (double (Value)));
+         end loop;
+         PyTuple_SetItem (Result, Py_Row, Item);
+      end loop;
+   
+      return Result;
+         
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise Interpreter_Error;
+            
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -427,6 +487,60 @@ package body Python is
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
+
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+   
+   procedure Call (M    : Module; Function_Name : String;
+                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : NL_Arrays_And_Matrices.Integer_Array) is
+      
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1, T2 : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+   
+   procedure Call (M    : Module; Function_Name : String;
+                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : NL_Arrays_And_Matrices.Integer_Matrix) is
+      
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1, T2  : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
 
    end Call;
    

@@ -42,6 +42,9 @@ package Python_API is
    procedure Py_Finalize;
    pragma Import (C, Py_Finalize, "Py_Finalize");
       
+   function PyFloat_FromDouble (Val : Interfaces.C.double) return PyObject;
+   pragma Import (C, PyFloat_FromDouble, "PyFloat_FromDouble");
+   
    function PyImport_Import (Obj : PyObject) return PyObject;
    pragma Import (C, PyImport_Import, "PyImport_Import");
    
