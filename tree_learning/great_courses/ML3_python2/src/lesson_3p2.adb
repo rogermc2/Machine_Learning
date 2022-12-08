@@ -43,7 +43,7 @@ begin
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_3p2");
-   Python.Call (Classifier, "lesson_3p2", X_Data, Labels, Features);
+   Python.Call (Classifier, "classify", X_Data, Labels, Features);
 
    Python.Close_Module (Classifier);
    Python.Finalize;

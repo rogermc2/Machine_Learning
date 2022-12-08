@@ -421,9 +421,7 @@ package body Python is
    begin
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), A_Tuple, B_Tuple, C_Tuple);
-      Put_Line ("Python.Call ABC Function_Name " & Function_Name);
       PyResult := Call_Object (F, PyParams);
-      Put_Line ("Python.Call ABC PyResult set ");
       Result := PyInt_AsLong (PyResult);
       
       Py_DecRef (A_Tuple);
