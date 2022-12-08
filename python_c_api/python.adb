@@ -128,9 +128,7 @@ package body Python is
       Assert (PyFunc /= System.Null_Address, "");  
       Assert (PyCallable_Check (PyFunc) /= 0, ""); 
       Assert (PyParams /= System.Null_Address, "");
-      Put_Line (Routine_Name & "PyObject_CallObject");
       PyResult := PyObject_CallObject (PyFunc, PyParams);
-      Put_Line (Routine_Name & "PyResult set");
       
       if PyResult = System.Null_Address then
          Put_Line (Routine_Name & "Python error message:");
@@ -167,7 +165,7 @@ package body Python is
          Py_Row := Py_Row + 1;
          Py_Col := -1;
          for col in Data'Range (2) loop
-            Py_Col := Py_Col + 11;
+            Py_Col := Py_Col + 1;
             Value := Data (row, col);
             Long_Value := long (Value);
             PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (Long_Value));
@@ -397,8 +395,9 @@ package body Python is
                               
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
-      Py_DecRef (PyParams);
-      Py_DecRef (PyResult);
+      
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
 
    end Call;
    
@@ -426,8 +425,10 @@ package body Python is
       PyResult := Call_Object (F, PyParams);
       Put_Line ("Python.Call ABC PyResult set ");
       Result := PyInt_AsLong (PyResult);
-      Py_DecRef (PyParams);
-      Py_DecRef (PyResult);
+      
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (C_Tuple);
 
    end Call;
    
