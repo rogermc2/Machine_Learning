@@ -333,13 +333,13 @@ package body Base_Decision_Tree is
       Routine_Name : constant String :=
                        "Base_Decision_Tree.Classification_Part ";
       Num_Outputs  : constant Count_Type := Y_Orig.Element (1).Length;
-      Y_Row        : Value_Data_List := Value_Data_Package.Empty_Vector;
-      Yk_Row       : Value_Data_List := Value_Data_Package.Empty_Vector;
-      YE_Row       : Natural_List := Natural_Package.Empty_Vector;
-      OP_Row       : Value_Data_List := Value_Data_Package.Empty_Vector;
-      Column       : Natural_List := Natural_Package.Empty_Vector;
-      Inverse      : Natural_List := Natural_Package.Empty_Vector;
-      Class_List   : ML_Types.Value_Data_List;
+      Y_Row        : Value_Data_List;
+      Yk_Row       : Value_Data_List;
+      YE_Row       : Natural_List;
+      OP_Row       : Value_Data_List;
+      Column       : Natural_List;
+      Inverse      : Natural_List;
+      Class_List   : Value_Data_List;
    begin
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
@@ -367,6 +367,7 @@ package body Base_Decision_Tree is
             Y_Row := Y_Orig.Element (class);
             Yk_Row.Append (Y_Row.Element (op));
          end loop;
+
          Class_List := Encode_Utils.Unique (Yk_Row, Inverse);
          aClassifier.Attributes.Decision_Tree.Num_Classes.Append
            (Positive (Class_List.Length));

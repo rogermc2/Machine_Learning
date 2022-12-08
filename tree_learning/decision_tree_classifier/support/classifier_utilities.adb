@@ -61,9 +61,9 @@ package body Classifier_Utilities is
    --  np.argmax(a, axis=1)
    --  returns array([2, 2]) -> [12, 15]
    function Arg_Max (Values_2D : Weights.Weight_Lists_2D; Axis : Natural := 0)
-                     return Classifier_Types.Natural_List is
+                     return NL_Types.Natural_List is
       Values       : Weights.Weight_List;
-      Max_Indices  : Classifier_Types.Natural_List;
+      Max_Indices  : NL_Types.Natural_List;
    begin
       Max_Indices.Clear;
       if Axis = 0 then
@@ -80,10 +80,10 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Arg_Max (Values_3D : Weights.Weight_Lists_3D; Axis : Natural := 0)
-                     return Classifier_Types.Natural_List is
+                     return NL_Types.Natural_List is
       Values_2K    : Weights.Weight_Lists_2D;
       Values       : Weights.Weight_List;
-      Max_Indices  : Classifier_Types.Natural_List;
+      Max_Indices  : NL_Types.Natural_List;
    begin
       Values_2K.Clear;
       Max_Indices.Clear;
@@ -104,12 +104,13 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
    --  Bin_Count counts the number of occurrences of each value in Numbers.
    --  Each bin gives the number of occurrences of its index value in Numbers.
-   function Bin_Count (Numbers : Natural_List) return Natural_List is
+   function Bin_Count (Numbers : NL_Types.Natural_List)
+                       return NL_Types.Natural_List is
       use Ada.Containers;
-      use Natural_Package;
+      use NL_Types.Natural_Package;
       aNumber    : Natural := 0;
       Max_Number : Natural := 0;
-      Bins       : Natural_List;
+      Bins       : NL_Types.Natural_List;
    begin
       for index in Numbers.First_Index .. Numbers.Last_Index loop
          aNumber := Numbers.Element (index);
@@ -135,12 +136,12 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Bin_Count (Numbers : ML_Types.Value_Data_List)
-                       return Natural_List is
+                       return NL_Types.Natural_List is
       use Ada.Containers;
-      use Natural_Package;
+      use NL_Types.Natural_Package;
       aNumber    : Natural := 0;
       Max_Number : Natural := 0;
-      Bins       : Natural_List;
+      Bins       : NL_Types.Natural_List;
    begin
       for index in Numbers.First_Index .. Numbers.Last_Index loop
          if Numbers.Element (index).Value_Kind /= Integer_Type then
@@ -180,9 +181,9 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Compare_Float_Lists (L, R : Float_List) return Boolean is
+   function Compare_Float_Lists (L, R : NL_Types.Float_List) return Boolean is
       use Ada.Containers;
-      use Float_Package;
+      use NL_Types.Float_Package;
       Diff     : Float := 0.0;
       Max_Diff : Float := 0.0;
       OK       : Boolean := R.Length = L.Length;
@@ -242,8 +243,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Dot (L : Weights.Weight_List;
-                 R : Natural_List) return Float is
-      use Float_Package;
+                 R : NL_Types.Natural_List) return Float is
       Result : Float := 0.0;
    begin
       for index in L.First_Index .. L.Last_Index loop
@@ -288,10 +288,10 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Column (List_2D      : Float_List_2D;
-                        Column_Index : Positive) return Float_List is
-      aList  : Float_List;
-      Column : Float_List;
+   function Get_Column (List_2D      : NL_Types.Float_List_2D;
+                        Column_Index : Positive) return NL_Types.Float_List is
+      aList  : NL_Types.Float_List;
+      Column : NL_Types.Float_List;
       Data   : Float;
    begin
       for index in List_2D.First_Index .. List_2D.Last_Index loop
@@ -447,11 +447,13 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Set_Diff (Values, Uniques : Natural_List) return Natural_List is
-      use Natural_Package;
-      Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
+   function Set_Diff (Values, Uniques : NL_Types.Natural_List)
+                      return NL_Types.Natural_List is
+      use NL_Types.Natural_Package;
+      Unique_Vals : constant NL_Types.Natural_List :=
+                      Encode_Utils.Unique (Values);
       aVal        : Natural;
-      Diff        : Natural_List;
+      Diff        : NL_Types.Natural_List;
    begin
       for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
          aVal := Unique_Vals.Element (index);
@@ -600,9 +602,9 @@ package body Classifier_Utilities is
 
    --  -----------------------------------------------------------------------
 
-   function Sum_Cols (aList : Classifier_Types.Float_List_2D)
-                      return Classifier_Types.Float_List is
-      theSum : Classifier_Types.Float_List;
+   function Sum_Cols (aList : NL_Types.Float_List_2D)
+                      return NL_Types.Float_List is
+      theSum : NL_Types.Float_List;
       Value  : Float;
    begin
       for index in aList.First_Index .. aList.Last_Index loop
@@ -709,8 +711,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Float_List (A : Float_Array) return Float_List is
-      A_List : Float_List;
+   function To_Float_List (A : Float_Array) return NL_Types.Float_List is
+      A_List : NL_Types.Float_List;
    begin
       for index in A'First .. A'Last loop
          A_List.Append (A (index));
@@ -721,9 +723,9 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Float_List (F : ML_Types.Value_Data_List)
-                           return Float_List is
+                           return NL_Types.Float_List is
       Item   : Value_Record;
-      Floats : Float_List;
+      Floats : NL_Types.Float_List;
    begin
       for index in F.First_Index .. F.Last_Index loop
          Item := F.Element (index);
@@ -826,8 +828,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Natural_List (A : Natural_Array) return Natural_List is
-      A_List : Natural_List;
+   function To_Natural_List (A : Natural_Array) return NL_Types.Natural_List is
+      A_List : NL_Types.Natural_List;
    begin
       for index in A'First .. A'Last loop
          A_List.Append (A (index));
@@ -839,9 +841,9 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_List (Numbers : ML_Types.Value_Data_List)
-                             return Natural_List is
+                             return NL_Types.Natural_List is
       Item   : Value_Record;
-      Values : Natural_List;
+      Values : NL_Types.Natural_List;
    begin
       for index in Numbers.First_Index .. Numbers.Last_Index loop
          Item := Numbers.Element (index);
@@ -1104,12 +1106,12 @@ package body Classifier_Utilities is
                             return Weights.Weight_List is
       use Weight_Sets;
       use Weights;
-      use Float_Package;
+      use NL_Types.Float_Package;
       use Weight_Lists_2D_Package;
       Unique_Set     : Weight_Sets.Set;
       Weight_3D_Curs : Weight_Lists_3D_Package.Cursor := Values.First;
       Weight_2D_Curs : Weight_Lists_2D_Package.Cursor;
-      Weights_Curs   : Float_Package.Cursor;
+      Weights_Curs   : NL_Types.Float_Package.Cursor;
       Set_Curs       : Weight_Sets.Cursor;
       Weight_2D_List : Weight_Lists_2D;
       Weights        : Weight_List;

@@ -22,8 +22,8 @@ package body Encode_Utils is
      (Values : ML_Types.Value_Data_List; Uniques : ML_Types.Value_Data_List)
        return ML_Types.Value_Data_List is
       use ML_Types;
-      No_Inverse  : Natural_List :=
-                      Classifier_Types.Natural_Package.Empty_Vector;
+      No_Inverse  : NL_Types.Natural_List :=
+                      NL_Types.Natural_Package.Empty_Vector;
       Unique_Vals : constant Value_Data_List :=
                       Encode_Utils.Unique (Values, No_Inverse);
       aVal        : Value_Record;
@@ -65,9 +65,9 @@ package body Encode_Utils is
    function Encode (Values        : ML_Types.Value_Data_List;
                     Uniques       : ML_Types.Value_Data_List;
                     Check_Unknown : Boolean := True)
-                     return Natural_List is
+                     return NL_Types.Natural_List is
       Diff          : ML_Types.Value_Data_List;
-      Result        : Natural_List;
+      Result        : NL_Types.Natural_List;
    begin
       Result := Map_To_Integer (Values, Uniques);
       if Check_Unknown then
@@ -90,12 +90,12 @@ package body Encode_Utils is
    --  Map each value based on its position in uniques.
    function Map_To_Integer (Values  : ML_Types.Value_Data_List;
                             Uniques : ML_Types.Value_Data_List)
-                             return Natural_List is
+                             return NL_Types.Natural_List is
       use ML_Types;
       use Value_Data_Package;
       Values_Curs  : Value_Data_Package.Cursor := Values.First;
       Uniques_Curs : Value_Data_Package.Cursor := Uniques.First;
-      Result       : Natural_List;
+      Result       : NL_Types.Natural_List;
       aValue       : Value_Record;
    begin
       Result.Set_Length (Values.Length);
@@ -123,12 +123,13 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Unique (Values : Natural_List) return Natural_List is
-      use Natural_Package;
-      use Natural_Sorting;
-      Values_Curs : Natural_Package.Cursor := Values.First;
+   function Unique (Values : NL_Types.Natural_List)
+                    return NL_Types.Natural_List is
+      use NL_Types.Natural_Package;
+      use NL_Types.Natural_Sorting;
+      Values_Curs : NL_Types.Natural_Package.Cursor := Values.First;
       aValue      : Natural;
-      Uniq_List   : Natural_List;
+      Uniq_List   : NL_Types.Natural_List;
    begin
       while Has_Element (Values_Curs) loop
          aValue := Element (Values_Curs);
@@ -220,7 +221,7 @@ package body Encode_Utils is
    -------------------------------------------------------------------------
 
    function Unique (Values         : ML_Types.Value_Data_List;
-                    Inverse        : out Natural_List)
+                    Inverse        : out NL_Types.Natural_List)
                      return ML_Types.Value_Data_List is
       use ML_Types;
       use Int_Sets;

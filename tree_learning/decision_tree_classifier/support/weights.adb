@@ -20,8 +20,8 @@ package body Weights is
       use Label;
       use NL_Types.Natural_Package;
       Weights             : Weight_List;
-      LE                  : Label.Label_Encoder (Class_Unique,
-                                                 Integer (Y.Length));
+      LE                  : Label.Label_Encoder (Class_Unique);
+--                                                   Integer (Y.Length));
       Y_Index             : NL_Types.Natural_List;
       aWeight             : Float;
       Bins                : NL_Types.Natural_List;
@@ -99,7 +99,8 @@ package body Weights is
       Y_1                   : Value_Data_List;
       Y_Full                : Value_Data_List;
       Classes_Full          : Value_Data_List;
-      Inverse               : Natural_List := Natural_Package.Empty_Vector;
+      Inverse               : NL_Types.Natural_List :=
+                                NL_Types.Natural_Package.Empty_Vector;
       K_Indices             : Classifier_Types.Integer_List;
       Weight_K              : Weight_List;
       aWeight               : Float;
@@ -142,9 +143,9 @@ package body Weights is
    function Compute_Sample_Weight (Weight_Kind    : Weight_Type;
                                    Y              : ML_Types.Value_Data_Lists_2D;
                                    Class_Weights  : Weight_List :=
-                                     Float_Package.Empty_Vector;
-                                   Indices        : Integer_List :=
-                                     Integer_Package.Empty_Vector)
+                                     NL_Types.Float_Package.Empty_Vector;
+                                   Indices        : ML_Types.Integer_List :=
+                                     ML_Types.Integer_Package.Empty_Vector)
                                    return Weight_List is
       use ML_Types;
       use Value_Data_Package;
@@ -161,7 +162,7 @@ package body Weights is
       Weight_K              : Weight_List;
       aWeight               : Float;
       K_Indices             : Classifier_Types.Integer_List;
-      Inverse               : Natural_List;
+      Inverse               : NL_Types.Natural_List;
       Class_K_Weights       : Weight_List;
       Expanded_Class_Weight : Weight_Lists_2D;
       Result                : Weight_List;

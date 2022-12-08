@@ -150,7 +150,7 @@ package body Depth_First_Builder is
    procedure Build_Tree
      (theTree   : in out Tree.Tree_Class;
       Builder   : in out Tree_Build.Tree_Builder;
-      Y_Encoded : Classifier_Types.Natural_Lists_2D) is
+      Y_Encoded : NL_Types.Natural_Lists_2D) is
       use Build_Utils;
       use Tree.Nodes_Package;
       Routine_Name      : constant String := "Depth_First_Builder.Build_Tree ";
