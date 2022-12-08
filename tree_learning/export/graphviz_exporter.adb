@@ -7,10 +7,10 @@ with Ada.Integer_Text_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Classifier_Types;
 with Classifier_Utilities;
 with Criterion;
 with Export_Types; use Export_Types;
+with NL_Types;
 with Node_Strings;
 --  with Printing;
 with Weights;
@@ -18,7 +18,7 @@ with Weights;
 package body Graphviz_Exporter is
 
    function Get_Impurities (Exporter : DOT_Tree_Exporter)
-                            return Classifier_Types.Float_List;
+                            return NL_Types.Float_List;
    procedure Head (Exporter    : DOT_Tree_Exporter;
                    Output_File : File_Type);
    procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
@@ -210,13 +210,13 @@ package body Graphviz_Exporter is
                         Value    : Weights.Weight_List) return String is
       use Ada.Characters.Handling;
       use Ada.Integer_Text_IO;
-      use Classifier_Types;
+      use NL_Types;
       Routine_Name  : constant String :=
                         "Graphviz_Exporter.Get_Colour ";
       Colour_Index  : constant Positive :=
                         Classifier_Utilities.Arg_Max (Value);
       Colour        : Integer_Graph_Colours;
-      Sorted_Values : Float_List := Value;
+      Sorted_Values : NL_Types.Float_List := Value;
       Alpha         : Float;
       Alpha_1       : Float;
       Pos           : Integer;
@@ -308,7 +308,7 @@ package body Graphviz_Exporter is
       Output_Values    : Weight_Lists_2D;
       Class_Values     : Weight_List;
       Class            : Float;
-      Impurities       : Classifier_Types.Float_List;
+      Impurities       : NL_Types.Float_List;
    begin
       if Exporter.Colours.Is_Empty then
          --  L251
@@ -357,9 +357,9 @@ package body Graphviz_Exporter is
    --  -------------------------------------------------------------------------
 
    function Get_Impurities (Exporter : DOT_Tree_Exporter)
-                            return Classifier_Types.Float_List is
+                            return NL_Types.Float_List is
       use Tree.Nodes_Package;
-      Impurities : Classifier_Types.Float_List;
+      Impurities : NL_Types.Float_List;
 
       procedure Add_Impurity (Node_Curs : Tree.Tree_Cursor) is
       begin
