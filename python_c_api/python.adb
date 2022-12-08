@@ -402,6 +402,34 @@ package body Python is
    
    --  -------------------------------------------------------------------------
    
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : NL_Arrays_And_Matrices.Integer_Matrix;
+                   C    : ML_Types.Unbounded_List) is
+      
+      function Py_BuildValue (Format      : Interfaces.C.char_array;
+                              T1, T2, T3  : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      C_Tuple  : constant PyObject := To_Tuple (C);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOO"), A_Tuple, B_Tuple, C_Tuple);
+                              
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+   
    procedure Call (M : Module; Function_Name : String;
                    A : NL_Types.Boolean_List_2D;
                    B : ML_Types.Bounded_String_List) is

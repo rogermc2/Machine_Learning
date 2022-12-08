@@ -24,14 +24,9 @@ procedure Lesson_3P2 is
    Num_Samples   : constant Natural := Natural (X_Data_List.Length);
    X_Data        : constant Integer_Matrix := To_Integer_Matrix (X_Data_List);
    Labels        : constant Integer_Matrix := To_Integer_Matrix (Labels_List);
-   --     Base          : Python.Module;
-   Classes       : Python.Module;
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
-   Features      : Feature_Names_List;
-   --     No_Weights    : Weights.Weight_List :=
-   --                       Classifier_Types.Float_Package.Empty_Vector;
-   --     Correct       : Natural := 0;
-   --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
+   Features      : ML_Types.Unbounded_List;
+   Classifier    : Python.Module;
 begin
    Put_Line (Routine_Name);
    Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
@@ -46,48 +41,14 @@ begin
    New_Line;
 
    Python.Initialize;
-   Put_Line ("Lesson 3 python initialized");
-   Python.Execute_String ("import tree");
-   Put_Line ("Lesson 3 tree imported");
-   Python.Execute_String ("from tree import base");
-   Put_Line ("Lesson 3 base imported");
-   Classes := Python.Import_File ("tree.classes");
-   Put_Line ("Lesson 3 Classes loaded");
-   Python.Execute_String ("from tree import classes");
-   Put_Line ("Lesson 3 modules loaded");
 
-   Python.Execute_String
-     ("clf = tree.classes.DecisionTreeClassifier(max_leaf_nodes = 3)");
-   --  Fit function adjusts weights according to data values so that
-   --  better accuracy can be achieved
-   Put_Line ("Lesson 3 fit");
-   --     Python.Execute_String ("clf.fit(X_Data, Labels)");
-   Python.Call (M => Classes, Function_Name => "fit",
-                A => X_Data, B             => Labels);
-   --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
-   --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
-   Put_Line ("----------------------------------------------");
-   New_Line;
+   Classifier := Python.Import_File ("lesson_3p2");
+   Python.Call (Classifier, "lesson_3p2", X_Data, Labels, Features);
 
-   --     for index in X_Data.First_Index .. X_Data.Last_Index loop
-   --          if Base_Decision_Tree.Predict
-   --            (aClassifier, X_Data).Element (index).Element (1) =
-   --                Labels.Element (index).Element (1) then
-   --             Correct := Correct + 1;
-   --          end if;
-   --     end loop;
-   --     Put_Line ("Prediction: " &
-   --                 Float'Image (100.0 * Float (Correct) / Float (X_Data.Length)));
-   --     New_Line;
-
-   --     Python.Close_Module (Base);
-   --     Python.Close_Module (Classes);
+   Python.Close_Module (Classifier);
    Python.Finalize;
 
-   --     Graphviz_Exporter.C_Init
-   --       (Exporter, aClassifier.Attributes.Decision_Tree);
-   --     Graphviz_Exporter.Export_Graphviz
-   --       (Exporter, aClassifier.Attributes.Decision_Tree, Feature_Names => Features,
-   --        Output_File_Name => To_Unbounded_String ("diabetes.dot"));
+   Put_Line ("----------------------------------------------");
+   New_Line;
 
 end Lesson_3P2;

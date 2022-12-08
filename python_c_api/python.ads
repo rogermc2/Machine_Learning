@@ -28,6 +28,9 @@ package Python is
                   return Integer;
    procedure Call (M    : Module; Function_Name : String;
                    A, B : NL_Arrays_And_Matrices.Integer_Matrix);
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : NL_Arrays_And_Matrices.Integer_Matrix;
+                   C    : ML_Types.Unbounded_List);
    procedure Call (M : Module; Function_Name : String;
                    A : NL_Types.Boolean_List_2D;
                    B : ML_Types.Bounded_String_List);
