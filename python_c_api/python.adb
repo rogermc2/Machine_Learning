@@ -127,8 +127,10 @@ package body Python is
    begin 
       Assert (PyFunc /= System.Null_Address, "");  
       Assert (PyCallable_Check (PyFunc) /= 0, ""); 
-      Assert (PyParams /= System.Null_Address, "");  
+      Assert (PyParams /= System.Null_Address, "");
+      Put_Line (Routine_Name & "PyObject_CallObject");
       PyResult := PyObject_CallObject (PyFunc, PyParams);
+      Put_Line (Routine_Name & "PyResult set");
       
       if PyResult = System.Null_Address then
          Put_Line (Routine_Name & "Python error message:");
@@ -420,8 +422,9 @@ package body Python is
    begin
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), A_Tuple, B_Tuple, C_Tuple);
-                              
+      Put_Line ("Python.Call ABC Function_Name " & Function_Name);
       PyResult := Call_Object (F, PyParams);
+      Put_Line ("Python.Call ABC PyResult set ");
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
