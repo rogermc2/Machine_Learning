@@ -5,12 +5,12 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
-with Classifier_Types;
 with Classifier_Utilities;
 with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
+with NL_Types;
 with Tree;
 with Tree_Printing;
 with Weights;
@@ -25,7 +25,7 @@ package body Classification is
       use Ada.Strings.Unbounded;
       use Classifier_Utilities;
       use Decision_Tree_Classification;
-      use Classifier_Types.Float_Package;
+      use NL_Types.Float_Package;
       use Tree_Printing;
       Routine_Name    : constant String :=
                           "Classification.Classify_Iris ";

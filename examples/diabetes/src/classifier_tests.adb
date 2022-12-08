@@ -4,11 +4,11 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
-with Classifier_Types;
 with Classifier_Utilities;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
+with NL_Types;
 with Tree;
 with Tree_Printing;
 with Weights;
@@ -21,7 +21,7 @@ package body Classifier_Tests is
    procedure Test_Diabetes  is
       use Classifier_Utilities;
       use Decision_Tree_Classification;
-      use Classifier_Types.Float_Package;
+      use NL_Types.Float_Package;
       use Tree_Printing;
       Routine_Name    : constant String :=
                           "Test_Diabetes.Test_Probability";
@@ -33,7 +33,7 @@ package body Classifier_Tests is
       X               :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y               : Value_Data_Lists_2D;
-      No_Weights      : Weights.Weight_List := Empty_Vector;
+      No_Weights      : Weights.Weight_List;
       Num_Samples     : Natural;
       Probabilities   : Weights.Weight_Lists_3D;
       Column_Sums     : Weights.Weight_List;
