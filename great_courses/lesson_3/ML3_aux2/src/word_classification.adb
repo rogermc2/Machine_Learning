@@ -4,7 +4,6 @@ with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Tree_Printing;
 with Utilities;
 
 package body Word_Classification is

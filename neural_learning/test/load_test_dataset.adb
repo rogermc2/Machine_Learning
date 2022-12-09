@@ -6,7 +6,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Classifier_Utilities;
 --  with Printing;
 
-package body Load_Dataset is
+package body Load_Test_Dataset is
 
    --  Each Digits datapoint is an 8x8 marix of a digit image.
    --  =================   ==============
@@ -19,7 +19,7 @@ package body Load_Dataset is
    --  Target: num outputs x num classes
    function Load_Digits return Data_Record is
       use Classifier_Utilities;
-      Routine_Name   : constant String := "Load_Dataset.Load_Digits ";
+      Routine_Name   : constant String := "Load_Test_Dataset.Load_Digits ";
       Digits_Data    : constant NL_Types.Multi_Output_Data_Record :=
                          Load_Data ("../../digits.csv");
       Class_Names    : NL_Types.Class_Names_List;
@@ -61,7 +61,7 @@ package body Load_Dataset is
    function Load_Iris return Data_Record is
       use Classifier_Utilities;
       use NL_Types;
-      Routine_Name  : constant String := "Load_Dataset.Load_Iris ";
+      Routine_Name  : constant String := "Load_Test_Dataset.Load_Iris ";
       Iris_Data     : constant NL_Types.Multi_Output_Data_Record :=
                         Load_Data ("../../iris.csv");
       Class_Names   : NL_Types.Class_Names_List;
@@ -110,4 +110,4 @@ package body Load_Dataset is
 
    --  -------------------------------------------------------------------------
 
-end Load_Dataset;
+end Load_Test_Dataset;

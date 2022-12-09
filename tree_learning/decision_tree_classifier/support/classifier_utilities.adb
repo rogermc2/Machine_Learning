@@ -1,13 +1,11 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Ordered_Sets;
---  with Ada.Directories;
 with Ada.Numerics.Elementary_Functions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
---  with Printing;
 with Utilities;
 
 package body Classifier_Utilities is

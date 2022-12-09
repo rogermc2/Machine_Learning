@@ -9,7 +9,6 @@ with NL_Types;
 with Python;
 
 with Aux_Utils;
---  with Tree_Printing;
 with Word_Classification; use Word_Classification;
 
 procedure Lesson_3_Aux2 is
