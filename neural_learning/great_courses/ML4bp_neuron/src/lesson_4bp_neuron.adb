@@ -8,10 +8,10 @@ with Test_Support; use Test_Support;
 
 with Support_4;
 
-procedure Lesson_4CP_Neuron is
+procedure Lesson_4BP_Neuron is
    use Real_Float_Arrays;
    use Support_4;
-   Routine_Name : constant String := "Lesson_4CP_Neuron ";
+   Routine_Name : constant String := "Lesson_4BP_Neuron ";
    Dataset_Name : constant String := "mnist_784";
    Train_Size   : constant Positive := 5000;
    Test_Size    : constant Positive := 1000;
@@ -44,7 +44,7 @@ begin
 
       New_Line;
       Python.Initialize;
-      MLP := Python.Import_File ("lesson_4cp");
+      MLP := Python.Import_File ("lesson_4bp");
 
       Python.Call (MLP, "classify",
                    Train_X, Train_Y_1D, Test_X, Test_Y_1D);
@@ -56,4 +56,4 @@ begin
    Put_Line ("----------------------------------------------");
    New_Line;
 
-end Lesson_4CP_Neuron;
+end Lesson_4BP_Neuron;
