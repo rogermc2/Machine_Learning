@@ -1,0 +1,12 @@
+with "components.gpr";
+with "tables.gpr";
+
+project Components.Python is
+
+   for Languages use ("Ada", "C");
+   for Source_Dirs use (".", "os/pthreads");
+   for Source_Files use ("py.adb", "py.ads", "py-load_python_library.adb", "py-load_python_library.ads", "py_conversions.c");
+   for Object_Dir use Components'Object_Dir;
+
+end Components.Python;
+

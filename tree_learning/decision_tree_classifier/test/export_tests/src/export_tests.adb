@@ -10,7 +10,7 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Printing;
+with Tree_Printing;
 with Tree;
 with Weights;
 
@@ -65,7 +65,7 @@ package body Export_Tests is
               Routine_Name & " called with empty X vector.");
 
       Classification_Fit (theClassifier, X, Y, No_Weights);
-      Printing.Print_Tree ("The Tree", theClassifier);
+      Tree_Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
@@ -112,7 +112,7 @@ package body Export_Tests is
 
       C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 3);
       Classification_Fit (theClassifier, X, Y2, W);
-      Printing.Print_Tree ("The Tree", theClassifier);
+      Tree_Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
@@ -122,7 +122,7 @@ package body Export_Tests is
       --  Test multi-output with weighted samples
       C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 3);
       Classification_Fit (theClassifier, X, Y2, W);
-      Printing.Print_Tree ("The Tree", theClassifier);
+      Tree_Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 

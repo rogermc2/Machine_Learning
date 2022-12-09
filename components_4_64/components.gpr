@@ -1,0 +1,53 @@
+with "strings_edit.gpr";
+with "tables.gpr";
+
+project Components is
+   
+   Dir_List := ();
+   
+   Dir_List := Dir_List & ".";
+
+   for Languages use ("Ada");
+   Dir_List := Dir_List & "os/pthreads";
+         
+   for Source_Dirs use Dir_List;
+   for Object_Dir use "obj";
+   for Exec_Dir use ".";
+
+   Files_List :=
+     (  "backward_link_handles.ads",
+        "backward_link_handles-sets.ads",
+        "generic_unbounded_array.adb",
+        "generic_unbounded_array.ads",
+        "generic_unbounded_ptr_array.adb",
+        "generic_unbounded_ptr_array.ads",
+        "object.adb",
+        "object.ads",
+        "object-handle-generic_handle_set.adb",
+        "object-handle-generic_handle_set.ads",
+        "object-handle-generic_set.adb",
+        "object-handle-generic_set.ads",
+        "object-handle-generic_unbounded_array.adb",
+        "object-handle-generic_unbounded_array.ads",
+        "object-handle.adb",
+        "object-handle.ads",
+        "strings_edit-time_conversions.adb",
+        "strings_edit-time_conversions.ads",
+        "strings_edit-symmetric_serialization.adb",
+        "strings_edit-symmetric_serialization.ads",
+        "system_errno.ads",
+        "tables-utf8_names.adb",
+        "tables-utf8_names.ads");
+   
+   for Source_Files use Files_List;
+   
+   package Compiler renames Strings_Edit.Compiler;
+   package Binder   renames Strings_Edit.Binder;
+   package Builder  renames Strings_Edit.Builder;
+
+   package Linker is
+      for Default_Switches ("Ada") use
+        Strings_Edit.Linker'Default_Switches ("Ada");
+   end Linker;
+
+end Components;

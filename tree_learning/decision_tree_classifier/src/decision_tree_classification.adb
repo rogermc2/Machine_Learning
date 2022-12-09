@@ -6,14 +6,11 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Maths;
 
-with Base_Decision_Tree;
 with Classifier_Utilities;
-with Criterion;
 with Estimator;
 with Node_Splitter;
 --  with Printing;
 with Utilities;
-with Weights;
 
 package body Decision_Tree_Classification is
 

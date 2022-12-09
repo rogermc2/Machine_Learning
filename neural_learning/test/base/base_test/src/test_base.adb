@@ -1,8 +1,6 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Maths;
-
 with Base_Neural; use Base_Neural;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 --  with Test_Support;

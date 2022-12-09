@@ -1,7 +1,7 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with ML_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
 with Stochastic_Optimizers;
 
 package Test_Support is
@@ -28,9 +28,9 @@ package Test_Support is
    procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
                                   Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Integer_List (Name  : String;
-                                 aList : NL_Types.Integer_List);
+                                 aList : ML_Types.Integer_List);
    procedure Print_Integer_Map (Name : String;
-                                aMap : NL_Types.Integer_Label_Map);
+                                aMap : ML_Types.Integer_Label_Map);
    procedure Print_Integer_Matrix (Name : String; aMatrix : Integer_Matrix;
                                    Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Matrix_Dimensions (Name    : String;
@@ -44,7 +44,7 @@ package Test_Support is
       Rows_Start : Positive := 1; Rows_Last : Positive := 10);
    procedure Print_Unbound_Array (Name : String;
                                    UB   : Unbounded_String_Array);
-   procedure Print_Unbound_List (Name : String; UB : NL_Types.Unbounded_List);
+   procedure Print_Unbound_List (Name : String; UB : ML_Types.Unbounded_List);
    procedure Print_Unbound_Matrix (Name : String;
                                    UB   : Unbounded_String_Matrix);
 

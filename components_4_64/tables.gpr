@@ -1,0 +1,80 @@
+project Tables is
+
+   type Development_Type is ("Debug", "Release", "Profile");
+   Development : Development_Type := external ("Development", "Debug");
+
+   for Source_Files use
+       (  "tables-names.adb",
+          "tables-names.ads",
+          "tables.adb",
+          "tables.ads");
+
+   for Source_Dirs use (".");
+   for Object_Dir use "obj";
+   for Exec_Dir use ".";
+
+   package Compiler is
+      case Development is
+         when "Debug" =>
+            for Default_Switches ("ada") use
+                (  "-gnatwcikmoprvz.c.p.t.w.x",
+                   "-gnato",
+                   "-gnatVaep",
+                   "-gnatf",
+                   "-gnatU",
+                   "-g",
+                   "-fstack-check",
+                   "-Wall"
+                );
+         when "Release" =>
+            for Default_Switches ("ada") use
+                (  "-gnatwcikmoprvz.c.p.t.w.x",
+                   "-gnatp",
+                   "-gnatVaep",
+                   "-gnatf",
+                   "-gnatU",
+                   "-O2",
+                   "-gnatn"
+                );
+         when "Profile" =>
+            for Default_Switches ("ada") use (  "-g", "-pg");
+      end case;
+   end Compiler;
+
+   package Binder is
+      case Development is
+         when "Debug" =>
+            for Default_Switches ("ada") use ("-Es");
+         when "Release" =>
+            for Default_Switches ("ada") use ();
+         when others =>
+            null;
+      end case;
+   end Binder;
+
+   package Builder is
+      case Development is
+         when "Debug" =>
+            for Default_Switches ("ada") use ("-g");
+         when "Release" =>
+            for Default_Switches ("ada") use ("-s");
+         when others =>
+            null;
+      end case;
+   end Builder;
+
+   package Linker is
+      case Development is
+         when "Debug" =>
+            for Default_Switches ("ada") use ("-g");
+         when "Release" =>
+            for Default_Switches ("ada") use ("-O2", "-s");
+         when "Profile" =>
+            for Default_Switches ("ada") use ("-g", "-pg");
+      end case;
+
+      for Default_Switches ("Ada")
+      	use Linker'Default_Switches ("Ada") & ("-Wl,-no_pie");
+   end Linker;
+
+end Tables;

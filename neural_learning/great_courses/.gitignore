@@ -1,6 +1,5 @@
 *.lyx~
 *.lyx#
-*.py
 *.dot
 *.ada
 *.oml
@@ -9,5 +8,6 @@
 *.arff
 *.tre
 obj/*
+__pycache__
 *.sublime-project
 *.sublime-workspace

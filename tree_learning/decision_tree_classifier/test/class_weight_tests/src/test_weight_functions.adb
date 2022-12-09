@@ -30,7 +30,6 @@ begin
     Class_Weight_Tests.Test_Compute_Sample_Weight
       (Weights.Balanced_Weight, To_Integer_Value_List_2D ((1, 1, 1, 2, 2, 2)),
        Expected_Sample_Weights);
-    New_Line;
 
     --  Test with unbalanced classes
     Put_Line ("Unbalanced sample weight tests");
@@ -45,7 +44,6 @@ begin
     Class_Weight_Tests.Test_Compute_Sample_Weight
       (Weights.Balanced_Weight, To_Integer_Value_List_2D
       ((1, 1, 1, 2, 2, 2, 3)), Expected_Sample_Weights);
-    New_Line;
 
     --  Test with `None` weights
     Put_Line ("'None' sample weight tests");
@@ -54,7 +52,6 @@ begin
     Class_Weight_Tests.Test_Compute_Sample_Weight
       (Weights.No_Weight, To_Integer_Value_List_2D ((1, 1, 1, 2, 2, 2, 3)),
        Expected_Sample_Weights);
-    New_Line;
 
     --  Test with multi-output of balanced classes
     Put_Line ("Multi-output sample weights balanced classes tests");
@@ -63,7 +60,6 @@ begin
     Class_Weight_Tests.Test_Compute_Sample_Weight
       (Weights.Balanced_Weight, To_Multi_Value_List (Multi_Values),
        Expected_Sample_Weights);
-    New_Line;
 
     --  Test with multi-output of unbalanced classes
     Put_Line ("Multi-output sample weights unbalanced classes tests");
@@ -73,5 +69,6 @@ begin
     Class_Weight_Tests.Test_Compute_Sample_Weight
       (Weights.Balanced_Weight, To_Multi_Value_List (Multi_Values_UB),
        Expected_Sample_Weights);
+   New_Page;
 
 end Test_Weight_Functions;

@@ -702,6 +702,65 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Boolean_Array_Of_Lists (List : NL_Types.Boolean_List_2D)
+                              return NL_Types.Boolean_Array_Of_Lists is
+      use NL_Types;
+   begin
+      if not List.Is_Empty then
+         declare
+            Result : Boolean_Array_Of_Lists
+              (List.First_Index .. List.Last_Index);
+         begin
+            for row in Result'Range loop
+               Result (row) := List (row);
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Boolean_Array_Of_Lists (1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
+
+   end To_Boolean_Array_Of_Lists;
+
+   --  ------------------------------------------------------------------------
+
+   function To_Boolean_Matrix (List : NL_Types.Boolean_List_2D)
+                               return Boolean_Matrix is
+      function Length_2 return Positive is
+         Row_Length : Positive;
+         Max        : Positive := 1;
+      begin
+         for row in List.First_Index .. List.Last_Index loop
+            Row_Length := Positive (List (row).Length);
+            if Row_Length > Max then
+               Max := Row_Length;
+            end if;
+         end loop;
+         return Max;
+      end Length_2;
+
+      List_1D : NL_Types.Boolean_List;
+      Result  : Boolean_Matrix
+        (1 .. Integer (List.Length), 1 .. Length_2) :=
+                  (others => (others => False));
+   begin
+      for row in Result'Range loop
+         List_1D := List (row);
+         for col in List_1D.First_Index .. List_1D.Last_Index loop
+            Result (row, col) := List_1D (col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end To_Boolean_Matrix;
+
+   --  ------------------------------------------------------------------------
+
    function To_Boolean_Matrix (IM : Integer_Matrix) return Boolean_Matrix is
       Result : Boolean_Matrix (IM'Range, IM'Range (2));
    begin
@@ -763,7 +822,7 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Integer_Array (List : NL_Types.Integer_List)
+   function To_Integer_Array (List : ML_Types.Integer_List)
                               return Integer_Array is
    begin
       if not List.Is_Empty then
@@ -787,12 +846,12 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Integer_Matrix (List : NL_Types.Integer_List_2D)
+   function To_Integer_Matrix (List : ML_Types.Integer_List_2D)
                                return Integer_Matrix is
    begin
       if not List.Is_Empty then
          declare
-            List_Row : NL_Types.Integer_List;
+            List_Row : ML_Types.Integer_List;
             Result   : Integer_Matrix
               (List.First_Index .. List.Last_Index,
                List (1).First_Index .. List (1).Last_Index);
@@ -801,6 +860,52 @@ package body NL_Arrays_And_Matrices is
                List_Row := List (row);
                for col in Result'Range (2) loop
                   Result (row, col) := List_Row (col);
+               end loop;
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Integer_Matrix (1 .. 0, 1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
+
+   end To_Integer_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   function To_Integer_Matrix (List : ML_Types.Value_Data_Lists_2D)
+                               return Integer_Matrix is
+      use ML_Types;
+   begin
+      Assert (List.Element (1).Element (1).Value_Kind = Integer_Type,
+              " To_Integer_Matrix List type is not integer.");
+      if not List.Is_Empty then
+         declare
+            List_Row : Value_Data_List;
+            Result   : Integer_Matrix
+              (List.First_Index .. List.Last_Index,
+               List (1).First_Index .. List (1).Last_Index);
+         begin
+            for row in Result'Range loop
+               List_Row := List (row);
+               for col in Result'Range (2) loop
+                  case List_Row (col).Value_Kind is
+                     when Boolean_Type =>
+                        if List_Row.Element (col).Boolean_Value then
+                           Result (row, col) := 1;
+                        else
+                           Result (row, col) := 0;
+                        end if;
+                     when Float_Type =>
+                        Result (row, col) :=
+                          Integer (List_Row.Element (col).Float_Value);
+                     when Integer_Type =>
+                        Result (row, col) := List_Row (col).Integer_Value;
+                     when UB_String_Type => Result (row, col) := 0;
+                  end case;
                end loop;
             end loop;
             return Result;
@@ -854,7 +959,7 @@ package body NL_Arrays_And_Matrices is
       Result : Integer_Matrix (IA'Range, 1 .. 1);
    begin
       for row in IA'Range loop
-               Result (row, 1) := IA (row);
+         Result (row, 1) := IA (row);
       end loop;
 
       return Result;
@@ -950,7 +1055,7 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Unbound_Array (UB_List : NL_Types.Unbounded_List)
+   function To_Unbound_Array (UB_List : ML_Types.Unbounded_List)
                               return Unbounded_String_Array is
    begin
       if not UB_List.Is_Empty then

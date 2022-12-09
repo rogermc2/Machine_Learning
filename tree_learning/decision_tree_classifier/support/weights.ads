@@ -3,8 +3,9 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Classifier_Types; use Classifier_Types;
+with Classifier_Types;
 with ML_Types;
+with NL_Types;
 
 package Weights is
 
@@ -14,8 +15,8 @@ package Weights is
       (Classifier_Types.Class_Label, Float);
     subtype Weight_Map is Weight_Dictionary.Map;
 
-    use Float_Package;
-    subtype Weight_List is Float_Package.Vector;
+    use NL_Types.Float_Package;
+    subtype Weight_List is NL_Types.Float_Package.Vector;
 
     package Weight_Lists_2D_Package is new Ada.Containers.Vectors
       (Positive, Weight_List);
@@ -37,8 +38,9 @@ package Weights is
     function Compute_Sample_Weight
       (Weight_Kind    : Weight_Type;
        Y              : ML_Types.Value_Data_Lists_2D;
-       Class_Weights  : Weight_List := Float_Package.Empty_Vector;
-       Indices        : Integer_List := Integer_Package.Empty_Vector)
+       Class_Weights  : Weight_List := NL_Types.Float_Package.Empty_Vector;
+       Indices        : ML_Types.Integer_List :=
+         ML_Types.Integer_Package.Empty_Vector)
        return Weight_List;
     function Get_Column (Weights  : Weight_Lists_2D; Data_Index : Positive)
                          return Weight_List;

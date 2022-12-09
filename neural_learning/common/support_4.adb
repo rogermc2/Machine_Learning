@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Openml_Ada;
 
 with Data_Splitter;
-with NL_Types;
+with ML_Types;
 with Shuffler;
 --  with Test_Support;
 
@@ -75,7 +75,7 @@ package body Support_4 is
       State_File     : constant String := Dataset_Name & ".sta";
       Has_Data       : constant Boolean := Exists (State_File);
       Num_Features   : Positive;
-      Target_Columns : NL_Types.String_List;
+      Target_Columns : ML_Types.String_List;
       Bunch          : Openml_Ada.Bunch_Data;
       File_ID        : Stream_IO.File_Type;
       aStream        : Stream_Access;

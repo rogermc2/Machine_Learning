@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Classifier_Utilities;
 with Printing;
 with Label;
+with Tree_Printing;
 
 package body Label_Tests is
 
@@ -17,6 +18,7 @@ package body Label_Tests is
       use Printing;
       use Classifier_Types.Natural_Package;
       use Label;
+      use Tree_Printing;
       LE_U              : Label_Encoder (Class_Unique);
       Labels            : Classifier_Types.Natural_List;
       Recovered_Values  : ML_Types.Value_Data_List;
@@ -114,6 +116,7 @@ package body Label_Tests is
       use Classifier_Utilities;
       use Label;
       use Printing;
+      use Tree_Printing;
       use Value_Data_Package;
       use Classifier_Types.Natural_Package;
       Expected_Uniques   : Value_Data_List;

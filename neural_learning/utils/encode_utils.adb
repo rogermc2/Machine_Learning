@@ -66,7 +66,7 @@ package body Encode_Utils is
                       Encode_Utils.Unique (Values, No_Inverse);
       aVal        : Integer;
       Found       : Boolean;
-      Diff_List   : NL_Types.Integer_List;
+      Diff_List   : ML_Types.Integer_List;
    begin
       for index in Unique_Vals'Range loop
          aVal := Unique_Vals (index);
@@ -112,13 +112,13 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Unique (Values : Binary_Matrix) return NL_Types.Integer_List is
+   function Unique (Values : Binary_Matrix) return ML_Types.Integer_List is
       use Int_Sets;
-      use NL_Types.Integer_Sorting;
+      use ML_Types.Integer_Sorting;
       Int_Value       : Natural;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : NL_Types.Integer_List;
+      Uniq_List       : ML_Types.Integer_List;
    begin
       for row in Values'Range loop
          for col in Values'Range (2) loop
@@ -163,11 +163,11 @@ package body Encode_Utils is
 
    function Unique (Values : Integer_Array) return Integer_Array is
       use Int_Sets;
-      use NL_Types.Integer_Sorting;
+      use ML_Types.Integer_Sorting;
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : NL_Types.Integer_List;
+      Uniq_List       : ML_Types.Integer_List;
    begin
       for index in Values'Range loop
          Unique_Integers.Include (Values (index));
@@ -218,11 +218,11 @@ package body Encode_Utils is
    function Unique (Values : Integer_Array; Inverse : out Natural_Array)
                     return Integer_Array is
       use Int_Sets;
-      use NL_Types.Integer_Sorting;
+      use ML_Types.Integer_Sorting;
       --        Routine_Name : constant String := "Encode_Utils.Unique ";
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : NL_Types.Integer_List;
+      Uniq_List       : ML_Types.Integer_List;
    begin
       for index in Values'Range loop
          Unique_Integers.Include (index);
@@ -246,13 +246,13 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : Integer_Array) return NL_Types.Integer_List is
+   function Unique (Values : Integer_Array) return ML_Types.Integer_List is
       use Int_Sets;
-      use NL_Types.Integer_Sorting;
+      use ML_Types.Integer_Sorting;
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : NL_Types.Integer_List;
+      Uniq_List       : ML_Types.Integer_List;
    begin
       for row in Values'Range loop
          Unique_Integers.Include (Values (row));
@@ -273,14 +273,14 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : NL_Types.Integer_List)
-                    return NL_Types.Integer_List is
+   function Unique (Values : ML_Types.Integer_List)
+                    return ML_Types.Integer_List is
       use Int_Sets;
-      use NL_Types.Integer_Sorting;
+      use ML_Types.Integer_Sorting;
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : NL_Types.Integer_List;
+      Uniq_List       : ML_Types.Integer_List;
    begin
       for index in Values.First_Index .. Values.Last_Index loop
          Unique_Integers.Include (Values (index));
@@ -301,14 +301,14 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : NL_Types.Integer_List; Inverse : out Natural_Array)
-                    return NL_Types.Integer_List is
+   function Unique (Values : ML_Types.Integer_List; Inverse : out Natural_Array)
+                    return ML_Types.Integer_List is
       use Int_Sets;
-      use NL_Types.Integer_Sorting;
+      use ML_Types.Integer_Sorting;
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : NL_Types.Integer_List;
+      Uniq_List       : ML_Types.Integer_List;
    begin
       for index in Values.First_Index .. Values.Last_Index loop
          Unique_Integers.Include (Values (index));
@@ -334,15 +334,15 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (List : Integer_Array_List) return NL_Types.Integer_List is
+   function Unique (List : Integer_Array_List) return ML_Types.Integer_List is
       use Int_Sets;
-      use NL_Types.Integer_Sorting;
+      use ML_Types.Integer_Sorting;
       --  Routine_Name    : constant String :=
       --                      "Encode_Utils.Unique Integer_Array_List ";
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : NL_Types.Integer_List;
+      Uniq_List       : ML_Types.Integer_List;
    begin
       for index in List.First_Index .. List.Last_Index loop
          declare
@@ -369,15 +369,15 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : Integer_Matrix) return NL_Types.Integer_List is
+   function Unique (Values : Integer_Matrix) return ML_Types.Integer_List is
       use Int_Sets;
-      use NL_Types.Integer_Sorting;
+      use ML_Types.Integer_Sorting;
 --        Routine_Name    : constant String :=
 --                            "Encode_Utils.Unique Integer_Matrix ";
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : NL_Types.Integer_List;
+      Uniq_List       : ML_Types.Integer_List;
    begin
       for row in Values'Range loop
          for col in Values'Range (2) loop
@@ -425,14 +425,14 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : NL_Types.Array_Of_Integer_Lists)
-                    return NL_Types.Integer_List is
+   function Unique (Values : ML_Types.Array_Of_Integer_Lists)
+                    return ML_Types.Integer_List is
       use Int_Sets;
-      use NL_Types.Integer_Sorting;
-      Value_Row   : NL_Types.Integer_List;
+      use ML_Types.Integer_Sorting;
+      Value_Row   : ML_Types.Integer_List;
       Unique_Ints : Int_Sets.Set;
       Int_Curs    : Int_Sets.Cursor;
-      Uniq_List   : NL_Types.Integer_List;
+      Uniq_List   : ML_Types.Integer_List;
    begin
       for row in Values'Range loop
          Value_Row := Values (row);
@@ -483,13 +483,13 @@ package body Encode_Utils is
    -------------------------------------------------------------------------
 
    function Unique (Values : Unbounded_String_Array)
-                    return NL_Types.Unbounded_List is
+                    return ML_Types.Unbounded_List is
       use UB_String_Sets;
-      use NL_Types.Unbounded_Sorting;
+      use ML_Types.Unbounded_Sorting;
       Value             : Unbounded_String;
       Unique_UB_Strings : UB_String_Sets.Set;
       UB_Curs           : UB_String_Sets.Cursor;
-      Uniq_List         : NL_Types.Unbounded_List;
+      Uniq_List         : ML_Types.Unbounded_List;
    begin
       for row in Values'Range loop
          Unique_UB_Strings.Include (Values (row));
@@ -511,15 +511,15 @@ package body Encode_Utils is
    -------------------------------------------------------------------------
 
    function Unique (Values : Unbounded_String_Array_List)
-                    return NL_Types.Unbounded_List is
+                    return ML_Types.Unbounded_List is
       use UB_String_Sets;
-      use NL_Types.Unbounded_Sorting;
+      use ML_Types.Unbounded_Sorting;
       --  Routine_Name    : constant String :=
       --                      "Encode_Utils.Unique Unbounded_String_Array_List ";
       UB_Value        : Unbounded_String;
       Unique_Strings  : UB_String_Sets.Set;
       UB_Curs         : UB_String_Sets.Cursor;
-      Uniq_List       : NL_Types.Unbounded_List;
+      Uniq_List       : ML_Types.Unbounded_List;
    begin
       for index in Values.First_Index .. Values.Last_Index loop
          declare
@@ -547,13 +547,13 @@ package body Encode_Utils is
    -------------------------------------------------------------------------
 
    function Unique (Values : Unbounded_String_Matrix)
-                    return NL_Types.Unbounded_List is
+                    return ML_Types.Unbounded_List is
       use UB_String_Sets;
-      use NL_Types.Unbounded_Sorting;
+      use ML_Types.Unbounded_Sorting;
       Value             : Unbounded_String;
       Unique_UB_Strings : UB_String_Sets.Set;
       UB_Curs           : UB_String_Sets.Cursor;
-      Uniq_List         : NL_Types.Unbounded_List;
+      Uniq_List         : ML_Types.Unbounded_List;
    begin
       for row in Values'Range loop
          for col in Values'Range (2) loop

@@ -4,7 +4,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.Strings;
 
-with NL_Types; use NL_Types;
+with ML_Types; use ML_Types;
 
 package Dataset_Utilities is
 

@@ -14,7 +14,7 @@ procedure Diabetes is
    aRow           : Row_Data;
 begin
    Put_Line ("Diabetes Example");
-   Open (Data_File, In_File, "src/diabetes.csv");
+   Open (Data_File, In_File, "../diabetes.csv");
    Utilities.Load_CSV_Data (Data_File, Training_Data);
    Close (Data_File);
    Put_Line ("Build Tree");

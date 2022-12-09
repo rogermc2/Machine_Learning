@@ -13,6 +13,7 @@ with Maths;
 with Utilities;
 
 with Dataset_Utilities;
+with ML_Types;
 with Regexep;
 
 --  with Load_ARFF_Data.ARFF_Printing;
@@ -50,8 +51,8 @@ package body Load_ARFF_Data is
    procedure Load_Header (File_ID : File_Type; aLine : out Unbounded_String;
                           Header  : out ARFF_Header_Record);
    procedure Parse_Values (Row    : String;
-                           Values : out NL_Types.Indef_String_List);
-   function Split_Sparse_Line (Row : String) return NL_Types.Indef_String_List;
+                           Values : out ML_Types.Indef_String_List);
+   function Split_Sparse_Line (Row : String) return ML_Types.Indef_String_List;
    procedure Swap (Data : in out NL_Types.Float_List_2D;
                    L, R : Positive);
    pragma Inline (Swap);
@@ -98,13 +99,13 @@ package body Load_ARFF_Data is
 
    --  -------------------------------------------------------------------------
    --  L478
-   function Decode_Dense_Values (Values     : NL_Types.Indef_String_List;
+   function Decode_Dense_Values (Values     : ML_Types.Indef_String_List;
                                  Attributes : Attribute_List;
                                  Nominal_Value : out Integer)
                                  return AR_Real_List is
       use Ada.Containers;
       use Ada.Strings;
-      use NL_Types;
+      use ML_Types;
       use Indefinite_String_Package;
       use Attribute_Data_Package;
       Routine_Name   : constant String := "Load_ARFF_Data.Decode_Dense_Values ";
@@ -319,7 +320,7 @@ package body Load_ARFF_Data is
       Data_Kind       : Unbounded_String;
       Attribute       : Attribute_Record;
       Nominal_Text    : Unbounded_String;
-      Nominal_ML_Type : NL_Types.Data_Type;
+      Nominal_ML_Type : ML_Types.Data_Type;
       Nominal_Kind    : Nominal_Data_Type;
    begin
       H_Tab (1) := ASCII.HT;
@@ -384,11 +385,11 @@ package body Load_ARFF_Data is
                --                 Put_Line (Routine_Name & "Nominal_Text: " & Nominal_Text);
                Nominal_ML_Type := Utilities.Get_Data_Type (Nominal_Text);
                case Nominal_ML_Type is
-               when NL_Types.Integer_Type =>
+               when ML_Types.Integer_Type =>
                   Nominal_Kind := Nominal_Integer;
-               when NL_Types.Float_Type =>
+               when ML_Types.Float_Type =>
                   Nominal_Kind := Nominal_Real;
-               when NL_Types.Boolean_Type | NL_Types.UB_String_Type =>
+               when ML_Types.Boolean_Type | ML_Types.UB_String_Type =>
                   Nominal_Kind := Nominal_String;
                end case;
 
@@ -430,7 +431,7 @@ package body Load_ARFF_Data is
       use Unbounded_IO;
       Routine_Name : constant String := "Load_ARFF_Data.Load_Data ";
       Attributes   : constant Attribute_List := Data.Header.Attributes;
-      Values       : NL_Types.Indef_String_List;
+      Values       : ML_Types.Indef_String_List;
       Target_List  : AR_Integer_List;
       Target_Value : Integer;
    begin
@@ -497,10 +498,10 @@ package body Load_ARFF_Data is
    --  Matches (N) is for the  N'th parenthesized subexpressions;
    --  Matches (0) is for the whole expression.
    procedure Parse_Values (Row    : String;
-                           Values : out NL_Types.Indef_String_List) is
+                           Values : out ML_Types.Indef_String_List) is
       use GNAT.Regpat;
       use Regexep;
-      use NL_Types;
+      use ML_Types;
       use Indefinite_String_Package;
       use String_Package;
       Routine_Name        : constant String := "Load_ARFF_Data.Parse_Values ";
@@ -587,18 +588,17 @@ package body Load_ARFF_Data is
    --  -------------------------------------------------------------------------
 
    function Split_Sparse_Line (Row : String)
-                            return NL_Types.Indef_String_List is
+                            return ML_Types.Indef_String_List is
       use GNAT.Regpat;
       use Regexep;
       use Matches_Package;
-      use NL_Types;
       Matcher     : constant Pattern_Matcher := Build_Re_Sparse;
       First       : Positive;
       Last        : Positive;
       Matches     : Matches_List;
       Loc         : Match_Location;
       Match_Found : Boolean;
-      Result      : Indef_String_List;
+      Result      : ML_Types.Indef_String_List;
    begin
       Matches := Find_Match (Matcher, Row, First, Last, Match_Found);
       if Match_Found then

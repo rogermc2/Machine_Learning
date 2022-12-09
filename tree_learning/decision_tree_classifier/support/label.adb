@@ -57,8 +57,8 @@ package body Label is
     --  n_samples / (n_classes * np.bincount(y))
     function Fit_Transform (Encoder : in out Label_Encoder;
                             Y    : ML_Types.Value_Data_List)
-                           return Natural_List is
-        Encoded_Labels : Natural_List;
+                           return NL_Types.Natural_List is
+        Encoded_Labels : NL_Types.Natural_List;
     begin
         if Encoder.Encoder_Kind = Class_Unique then
             Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
@@ -74,10 +74,10 @@ package body Label is
     --  -------------------------------------------------------------------------
     --   Inverse_Transform transforms labels back to original encoding
     function Inverse_Transform (Self    : in out Label_Encoder;
-                                Labels  : Natural_List)
+                                Labels  : NL_Types.Natural_List)
                                return ML_Types.Value_Data_List is
-        aRange  : Natural_List := Natural_Package.Empty_Vector;
-        Diff    : Natural_List;
+        aRange  : NL_Types.Natural_List;
+        Diff    : NL_Types.Natural_List;
         Result  : ML_Types.Value_Data_List :=
                     ML_Types.Value_Data_Package.Empty_Vector;
     begin
@@ -103,8 +103,8 @@ package body Label is
     --  Transform returns labels as normalized encodings
     function Transform (Self : in out Label_Encoder;
                         Y    : ML_Types.Value_Data_List)
-                       return Natural_List is
-        Labels  : Natural_List := Natural_Package.Empty_Vector;
+                       return NL_Types.Natural_List is
+        Labels  : NL_Types.Natural_List;
     begin
         if not Y.Is_Empty then
             if Self.Encoder_Kind = Class_Unique then

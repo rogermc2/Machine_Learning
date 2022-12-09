@@ -8,6 +8,7 @@ with Base;
 with Classifier_Utilities;
 with Data_Splitter;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
+with ML_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 with Samples_Generator; use Samples_Generator;
@@ -27,7 +28,8 @@ procedure Classifier_Example is
    Y_Train       : Integer_Matrix (1 .. Train_Size, Y'Range (2));
    X_Test        : Real_Float_Matrix (1 .. Test_Size, X'Range (2));
    Y_Test        : Integer_Matrix (1 .. Test_Size, Y'Range (2));
-   MLP           : MLP_Classifier := C_Init (Max_Iter => 300);
+   Layer_Sizes   : ML_Types.Integer_List;
+   MLP           : MLP_Classifier := C_Init (Layer_Sizes, Max_Iter => 300);
    Score         : Float;
 begin
    Put_Line (Routine_Name);

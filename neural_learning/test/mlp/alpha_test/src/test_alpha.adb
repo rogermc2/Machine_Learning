@@ -4,9 +4,10 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Load_Dataset;
 with Multilayer_Perceptron;
+with ML_Types;
+with Neural_Printing;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
-with Printing;
 with Stochastic_Optimizers;
 
 --  Test_Alpha tests that larger alpha yields weights closer to zero.
@@ -29,7 +30,7 @@ procedure Test_Alpha is
    X             : Real_Float_Matrix (1 .. 100, 1 .. Data.Num_Features);
    Y             : Integer_Matrix (1 .. 100, 1 .. 1) :=
                      (others => (others => 0));
-   Layer_Sizes   : NL_Types.Integer_List;
+   Layer_Sizes   : ML_Types.Integer_List;
    Coeffs_Sum    : NL_Types.Float_List;
    Alpha_Vectors : NL_Types.Float_List_2D;
    aClassifier   : MLP_Classifier;
@@ -57,14 +58,14 @@ begin
       end loop;
       Y (row, 1) := Data.Target (row);
    end loop;
-   Printing.Print_Matrix_Dimensions ("X", X);
-   Printing.Print_Matrix_Dimensions ("Y", Y);
+   Neural_Printing.Print_Matrix_Dimensions ("X", X);
+   Neural_Printing.Print_Matrix_Dimensions ("Y", Y);
 
    Layer_Sizes.Append (10);
    for alpha_value in Alpha_Values'Range loop
       aClassifier := C_Init
         (Alpha => Float (alpha_value), Random_State => 1,
-         Hidden_Layer_Sizes => Layer_Sizes);
+         Layer_Sizes => Layer_Sizes);
       Fit (aClassifier, X, Y);
 
       Coeffs_Sum.Clear;
@@ -73,7 +74,7 @@ begin
             Params : constant Parameters_Record :=
                        aClassifier.Attributes.Params.Element (index);
          begin
-            --                  Printing.Print_Parameters ("Params", Params, 1, 4);
+            --                  Neural_Printing.Print_Parameters ("Params", Params, 1, 4);
             Coeffs_Sum.Append (Absolute_Sum (Params.Coeff_Gradients));
          end;
       end loop;
@@ -83,7 +84,7 @@ begin
 
    New_Line;
    for index in Alpha_Vectors.First_Index .. Alpha_Vectors.Last_Index loop
-      Printing.Print_Float_List
+      Neural_Printing.Print_Float_List
         ("Alpha vector" & Integer'Image (index),
          Alpha_Vectors.Element (index));
    end loop;

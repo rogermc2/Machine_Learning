@@ -5,8 +5,9 @@ with Ada.Numerics.Float_Random;
 with Base_Neural;
 with Estimator;
 with Label;
+with ML_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types; use NL_Types;
+with NL_Types;
 with Num_Diff;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
@@ -19,11 +20,11 @@ package Multilayer_Perceptron is
      (X : Parameters_List; Num : Integer := 15000) return Integer;
 
    type MLP_Classifier_Attributes is record
-      Classes              : Integer_List;
+      Classes              : ML_Types.Integer_List;
       Loss_Function_Name   : Loss_Function_Type := Log_Loss_Function;
       Loss                 : Float := 0.0;
       Best_Loss            : Float := 0.0;
-      Loss_Curve           : Float_List;
+      Loss_Curve           : NL_Types.Float_List;
       No_Improvement_Count : Natural := 0;
       T                    : Natural := 0;
       Params               : Parameters_List;  --  Layers
@@ -35,7 +36,7 @@ package Multilayer_Perceptron is
       --          Coef_Indptr          : Coef_Indptr_List;
       --          Intercept_Indptr     : Intercept_Indptr_List;
       N_Features           : Positive := 1;
-      Feature_Names_In     : String_List;
+      Feature_Names_In     : ML_Types.String_List;
       N_Iter               : Natural := 0;
       N_Layers             : Positive := 1;
       N_Outputs            : Positive := 1;
@@ -47,7 +48,7 @@ package Multilayer_Perceptron is
 
    type MLP_Classifier_Parameters is
       record
-         Hidden_Layer_Sizes    : Integer_List;
+         Hidden_Layer_Sizes    : ML_Types.Integer_List;
          Activation            : Base_Neural.Activation_Type :=
                                    Base_Neural.Rect_LU_Activation;
          Solver                : Solver_Type := Adam_Solver;
@@ -66,7 +67,7 @@ package Multilayer_Perceptron is
          Momentum              : Float := 0.9;
          Nesterovs_Momentum    : Boolean := True;
          Early_Stopping        : Boolean := False;
-         Validation_Scores     : Float_List;
+         Validation_Scores     : NL_Types.Float_List;
          Validation_Fraction   : Float := 0.1;
          Best_Validation_Score : Float := Float'Safe_First;
          Best_Params           : Parameters_List;
@@ -107,7 +108,7 @@ package Multilayer_Perceptron is
 
    Float_Gen : Ada.Numerics.Float_Random.Generator;
 
-   function C_Init (Layer_Sizes           : Integer_List;
+   function C_Init (Layer_Sizes           : ML_Types.Integer_List;
                     Activation            : Base_Neural.Activation_Type :=
                       Base_Neural.Rect_LU_Activation;
                     Solver                : Solver_Type := Adam_Solver;
@@ -143,12 +144,12 @@ package Multilayer_Perceptron is
    procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix);
    function Loss_Grad_LBFGS (Args : Loss_Grad_Args) return Loss_Grad_Result;
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-                          Y    : Binary_Matrix; Classes : Integer_List);
+                          Y    : Binary_Matrix; Classes : ML_Types.Integer_List);
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
                           Y    : Integer_Matrix);
    procedure Partial_Fit
      (Self    : in out MLP_Classifier; X : Real_Float_Matrix;
-      Y       : Integer_Matrix; Classes : Integer_List);
+      Y       : Integer_Matrix; Classes : ML_Types.Integer_List);
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                      return Integer_Matrix;
    function Predict_ProbA (Self : MLP_Classifier; X : Real_Float_Matrix)

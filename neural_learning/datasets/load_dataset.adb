@@ -22,20 +22,20 @@ package body Load_Dataset is
                           return Digits_Data_Record is
       use Classifier_Utilities;
       Routine_Name    : constant String := "Load_Dataset.Load_Digits ";
-      Digits_Data     : constant NL_Types.Multi_Output_Data_Record :=
+      Digits_Data     : constant ML_Types.Multi_Output_Data_Record :=
                           Load_Data (File_Name);
-      Digit_Features  : constant NL_Types.Value_Data_Lists_2D :=
+      Digit_Features  : constant ML_Types.Value_Data_Lists_2D :=
                           Digits_Data.Feature_Values;
-      Digit_Values    : constant NL_Types.Value_Data_Lists_2D :=
+      Digit_Values    : constant ML_Types.Value_Data_Lists_2D :=
                           Digits_Data.Label_Values;
       Num_Samples     : constant Positive := Natural (Digit_Features.Length);
       Num_Features    : constant Positive :=
                           Natural (Digit_Features (1).Length);
       Index_Values    : Boolean_Array (1 .. Integer (Digit_Values.Length));
-      Short_Features  : NL_Types.Integer_List_2D;
-      Short_Values    : NL_Types.Integer_List;
-      List_Row        : NL_Types.Integer_List;
-      Features_Row    : NL_Types.Integer_List;
+      Short_Features  : ML_Types.Integer_List_2D;
+      Short_Values    : ML_Types.Integer_List;
+      List_Row        : ML_Types.Integer_List;
+      Features_Row    : ML_Types.Integer_List;
       Data            : Digits_Data_Record (Num_Samples, Num_Features,
                                             Num_Classes);
    begin
@@ -95,11 +95,11 @@ package body Load_Dataset is
 
    function Load_Features (File_Name : String; Num_Features : Positive)
                             return Real_Float_Matrix is
-      CSV_Data  : constant NL_Types.Raw_Data_Vector :=
+      CSV_Data  : constant ML_Types.Raw_Data_Vector :=
                     Utilities.Load_Raw_CSV_Data (File_Name);
-      List_Row  : NL_Types.Unbounded_List;
-      Features  : Real_Float_Matrix (1 .. Positive (CSV_Data.Length) - 1,
-                                     1 .. Num_Features);
+      List_Row  : ML_Types.Unbounded_List;
+      Features  : NL_Arrays_And_Matrices.Real_Float_Matrix
+        (1 .. Positive (CSV_Data.Length) - 1, 1 .. Num_Features);
    begin
       --  First row of CSV_Data is header of feature names
       for row in Features'Range loop
@@ -117,17 +117,17 @@ package body Load_Dataset is
 
    function Load_Iris (File_Name : String) return Iris_Data_Record is
       use Classifier_Utilities;
-      use NL_Types;
+      use ML_Types;
       Routine_Name  : constant String := "Load_Dataset.Load_Iris ";
-      Iris_Data     : constant NL_Types.Multi_Output_Data_Record :=
+      Iris_Data     : constant ML_Types.Multi_Output_Data_Record :=
                         Load_Data (File_Name);
-      Class_Names   : NL_Types.Class_Names_List;
+      Class_Names   : Class_Names_List;
       --        Features        : NL_Types.Feature_Names_List;
-      Iris_Features : constant NL_Types.Value_Data_Lists_2D :=
+      Iris_Features : constant Value_Data_Lists_2D :=
                         Iris_Data.Feature_Values;
-      Iris_Labels   : constant NL_Types.Value_Data_Lists_2D :=
+      Iris_Labels   : constant Value_Data_Lists_2D :=
                         Iris_Data.Label_Values;
-      Iris_Row      : NL_Types.Value_Data_List;
+      Iris_Row      : Value_Data_List;
       Num_Samples   : constant Natural := Natural (Iris_Features.Length);
       Data          : Iris_Data_Record;
    begin
@@ -169,9 +169,10 @@ package body Load_Dataset is
 
    function Load_Labels (File_Name : String; Num_Outputs : Positive := 1)
                           return Integer_Matrix is
-      CSV_Data   : constant NL_Types.Raw_Data_Vector :=
+      use ML_Types;
+      CSV_Data   : constant Raw_Data_Vector :=
                      Utilities.Load_Raw_CSV_Data (File_Name);
-      Data_Row   : NL_Types.Unbounded_List;
+      Data_Row   : Unbounded_List;
       Labels     : Integer_Matrix (1 .. Positive (CSV_Data.Length) - 1,
                                    1 .. Num_Outputs);
    begin

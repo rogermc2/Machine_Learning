@@ -2,6 +2,7 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with AR_Types;
+with ML_Types; use ML_Types;
 with NL_Types; use NL_Types;
 
 package Openml_Ada is

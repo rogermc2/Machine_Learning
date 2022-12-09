@@ -4,14 +4,13 @@ with "aws.gpr";
 
 project ARFF_Test is
 
-   for Source_Dirs use ("src", "../../datasets", "../../decision_tree_classifier/support", "../../common", "../../utils", "../../decision_tree_classifier/src", "../../export", 
-      "../../../../usr/local/include/plplot_bindings/ada");
+   for Source_Dirs use ("src", "../../datasets", "../../decision_tree_classifier/support", "../../common", "../../utils", "../../decision_tree_classifier/src", "../../export", "../../../common");
    for Object_Dir use "obj";
    for Main use ("test_arff.adb");
    for Exec_Dir use ".";
 
    package Compiler is
-      for Switches ("ada") use ("-gnatw.okmru", "-gnatybcp");
+      for Switches ("ada") use ("-gnatw.ofkmpru", "-gnatybcp");
    end Compiler;
 
 end ARFF_Test;

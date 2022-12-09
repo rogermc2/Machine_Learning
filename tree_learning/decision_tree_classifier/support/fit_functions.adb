@@ -3,9 +3,9 @@ with Classifier_Types;
 
 package body Fit_Functions is
 
-   function Get_Default_Parameters (Func : Func_Access;
-                                    X, Y : in out Float_List)
-                                    return Param_List;
+--     function Get_Default_Parameters (Func : Func_Access;
+--                                      X, Y : in out Float_List)
+--                                      return Param_List;
 
    --  -------------------------------------------------------------------------
 
@@ -17,15 +17,15 @@ package body Fit_Functions is
                  Max_Iterations : Positive := 200)
                  return Fit_Result is
       use Ada.Containers;
-      use Param_Package;
+--        use Param_Package;
       use Range_Package;
       use Classifier_Types.Float_Package;
-      X_Last  : Float := X.Last_Element;
+      X_Last  : constant Float := X.Last_Element;
       X_Min   : Float;
       X_Max   : Float;
       X_Slice : Float_List;
       Y_Slice : Float_List;
-      Beta_0  : Param_List;
+--        Beta_0  : Param_List;
 
       Result  : Fit_Result;
    begin
@@ -49,24 +49,25 @@ package body Fit_Functions is
          Y := Y_Slice;
       end if;
 
-      if Default_Params /= Param_Package.Empty_Vector then
-         Beta_0 := Default_Params;
-      else
-         Beta_0 := Get_Default_Parameters (Func, X, Y);
-      end if;
+--        if Default_Params /= Param_Package.Empty_Vector then
+--           Beta_0 := Default_Params;
+--        else
+--           Beta_0 := Get_Default_Parameters (Func, X, Y);
+--        end if;
 
       return Result;
+
    end Fit;
 
    --  -------------------------------------------------------------------------
    --  Some predefined algorithms that help get the everyday functions
    --  set up for proper bounds.
-   function Get_Default_Parameters (Func : Func_Access; X, Y : in out Float_List)
-                                    return Param_List is
-      Default_Params : Param_List;
-   begin
-      return Default_Params;
-   end Get_Default_Parameters;
+--     function Get_Default_Parameters (Func : Func_Access; X, Y : in out Float_List)
+--                                      return Param_List is
+--        Default_Params : Param_List;
+--     begin
+--        return Default_Params;
+--     end Get_Default_Parameters;
 
    --  ------------------------------------------------------------------------
 

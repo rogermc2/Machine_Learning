@@ -3,11 +3,12 @@ with "gnatcoll.gpr";
 
 project Shuffle_Test is
 
-   for Source_Dirs use ("src", "../../datasets", "../../neural_network", "../../decision_tree_classifier/support", "../../common", "../../utils", "../../export", "../../model_selection", "../../base", "../../metrics", "../../../scipy/optimise", "../../test");
+   for Source_Dirs use ("src", "../../datasets", "../../neural_network", "../../decision_tree_classifier/support", "../../common", "../../utils", "../../export", "../../model_selection", "../../base", "../../metrics", 
+      "../../../scipy/optimise", "../../test", "../../../common");
    for Object_Dir use "obj";
    for Main use ("test_shuffle.adb");
    for Exec_Dir use ".";
-   for Languages use ("Ada", "Fortran");
+   for Languages use ("Ada");
 
    package Compiler is
       for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");

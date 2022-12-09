@@ -70,7 +70,7 @@ package body Split_Tests is
       Routine_Name              : constant String :=
                                     "Split_Tests.Test_Min_Samples_Split ";
       Iris_Data                 : constant Multi_Output_Data_Record :=
-                                    Load_Data ("src/iris.csv");
+                                    Load_Data ("../../../datasets/iris.csv");
       --  L666
       X                         : constant Value_Data_Lists_2D :=
                                     Iris_Data.Feature_Values;
@@ -84,11 +84,6 @@ package body Split_Tests is
       No_Weights                : Weights.Weight_List := Empty_Vector;
       Min_Split                 : Natural;
    begin
-      --        for index in 1 .. 10 loop
-      --           Short.Append (X.Element (index));
-      --        end loop;
-      --        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", X_Short", Short);
-
       Put_Line (Routine_Name & " Num_Samples" & Integer'Image (Num_Samples));
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
@@ -97,11 +92,6 @@ package body Split_Tests is
       Y := Iris_Data.Label_Values;
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
-
-      --        for index in 1 .. 100 loop
-      --           Short.Append (Y.Element (index));
-      --        end loop;
-      --        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", Y_Short", Short);
 
       --  L675 test for integer parameter
       --  Max_Leaf_Nodes is only used for Best First tree building

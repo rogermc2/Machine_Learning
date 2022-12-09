@@ -1,6 +1,7 @@
 project Test_Label_Functions is
 
-   for Source_Dirs use ("src", "../../src", "../../support", "../../../common", "../../utils", "../../../export");
+   for Source_Dirs use ("src", "../../../common", "../../src", "../../../utils", "../../../../common", "../../../../tree_learning", "../../support");
+   for Main use ("test_weight_functions");
    for Main use ("test_labels");
    for Object_Dir use "obj";
    for Exec_Dir use ".";

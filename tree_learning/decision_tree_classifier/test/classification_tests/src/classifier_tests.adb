@@ -14,6 +14,7 @@ with Label;
 with ML_Types;
 with Printing;
 with Tree;
+with Tree_Printing;
 with Utilities;
 with Weights;
 
@@ -21,11 +22,6 @@ package body Classifier_Tests is
    use Classifier_Types;
    use ML_Types;
 
-   --     type Clf_Criterions is (Gini, Entropy);
-   --     type Reg_Criterions is (Squared_Error, Absolute_Error,
-   --                             Friedman_Mse, Poisson);
-   --     type Clf_Trees is (Decision_Tree_Classifier, Extra_Tree_Classifier);
-   --     type Reg_Trees is (Decision_Tree_Regressor, Extra_Tree_Regressor);
    --  X_Array 6 rows (samples) x 1 column (outputs)
    Min_Split   : constant String := "2";
    X_Array     : constant Multi_Value_Array (1 .. 6, 1 .. 2) :=
@@ -71,7 +67,7 @@ package body Classifier_Tests is
       Expected := To_Integer_Value_List_2D (True_Result);
       --  L230
       Classification_Fit (theClassifier, X, Y, No_Weights);
-      Printing.Print_Tree ("The Tree", theClassifier);
+      Tree_Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
@@ -92,7 +88,7 @@ package body Classifier_Tests is
       C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria,
               Max_Features => 1);
       Classification_Fit (theClassifier, X, Y, No_Weights);
-      Print_Tree ("Max_Features = 1 Tree", theClassifier);
+      Tree_Printing.Print_Tree ("Max_Features = 1 Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
@@ -121,7 +117,7 @@ package body Classifier_Tests is
       use Classifier_Types.Float_Package;
       Routine_Name   : constant String := "Classifier_Tests.Test_Iris";
       Iris_Data      : constant Multi_Output_Data_Record :=
-                         Load_Data ("src/iris.csv");
+                         Load_Data ("../../../datasets/iris.csv");
       theClassifier  : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter       : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -210,13 +206,12 @@ package body Classifier_Tests is
       use Classifier_Utilities;
       use Decision_Tree_Classification;
       use Label;
-      use Printing;
       use Float_Package;
       use Natural_Package;
       Routine_Name  : constant String :=
                         "Classification_Tests.Test_Probability ";
       Iris_Data     : constant Multi_Output_Data_Record :=
-                        Load_Data ("src/iris.csv");
+                        Load_Data ("../../../datasets/iris.csv");
       theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -254,7 +249,7 @@ package body Classifier_Tests is
                 " invalid Y vector");
       --  L359
       Classification_Fit (theClassifier, X, Y, No_Weights);
-      Print_Tree ("Toy Tree", theClassifier);
+      Tree_Printing.Print_Tree ("Toy Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
@@ -269,7 +264,7 @@ package body Classifier_Tests is
       else
          Put_Line
            ("Classification_Tests Probabilities Column_Sums test failed");
-         Print_Weights
+         Tree_Printing.Print_Weights
            (Routine_Name & " Column_Sums", Column_Sums);
       end if;
 
@@ -309,7 +304,7 @@ package body Classifier_Tests is
       --                                     Transpose (Labels_2D));
       --  L362
       Classification_Fit (theClassifier, X_Iris, Labels_2D, No_Weights);
-      Print_Tree ("The Tree", theClassifier);
+      Tree_Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
@@ -331,7 +326,7 @@ package body Classifier_Tests is
       else
          Put_Line
            ("Classification_Tests Probabilities Iris Column_Sums test failed");
-         Print_Weights
+         Tree_Printing.Print_Weights
            (Routine_Name & " Iris Column_Sums", Column_Sums);
       end if;
 
@@ -343,9 +338,9 @@ package body Classifier_Tests is
       else
          Put_Line
            ("Classification_Tests Iris Probabilities Max_Arg test failed");
-         Print_Natural_List
+         Tree_Printing.Print_Natural_List
            ("Classification_Tests Iris Probabilities Max_Arg", Max_Arg);
-         Print_Natural_List
+         Tree_Printing.Print_Natural_List
            ("Classification_Tests Iris Probabilities Prediction",
             To_Natural_List (Transpose (Prediction).Element (1)));
       end if;
@@ -395,7 +390,7 @@ package body Classifier_Tests is
       Put_Line ("Test Weighted Classification Toy 1");
       Classification_Fit (theClassifier, X, Y, Sample_Weights_1);
 
-      Printing.Print_Tree ("Weighted Classification Tree", theClassifier);
+      Tree_Printing.Print_Tree ("Weighted Classification Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 

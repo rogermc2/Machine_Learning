@@ -1,5 +1,6 @@
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Types;
 with NL_Types;
 
 package Load_Dataset is
@@ -17,7 +18,7 @@ package Load_Dataset is
 
     type Iris_Data_Record is record
         Features     : NL_Types.Float_List_2D;
-        Target       : NL_Types.Integer_List;
+        Target       : ML_Types.Integer_List;
         Num_Features : Positive;
 
     end record;

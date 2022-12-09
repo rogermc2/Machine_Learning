@@ -59,7 +59,7 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L118
-   function Is_Multilabel (Y : NL_Types.Integer_List) return Boolean is
+   function Is_Multilabel (Y : ML_Types.Integer_List) return Boolean is
    begin
       pragma Unreferenced (Y);
       return False;
@@ -100,7 +100,7 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Is_Multilabel (Y : NL_Types.Array_Of_Integer_Lists) return Boolean is
+   function Is_Multilabel (Y : ML_Types.Array_Of_Integer_Lists) return Boolean is
       use Ada.Containers;
       --          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel matrix ";
       Multilabel   : Boolean := False;
@@ -209,7 +209,7 @@ package body Multiclass_Utils is
    --  L202
    function Type_Of_Target (Y : Integer_Array) return Y_Type is
       use Ada.Containers;
-      Classes : constant NL_Types.Integer_List := Unique_Labels (Y);
+      Classes : constant ML_Types.Integer_List := Unique_Labels (Y);
       Result  : Y_Type;
    begin
       if Is_Multilabel (Y) then
@@ -226,9 +226,9 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Type_Of_Target (Y : NL_Types.Integer_List) return Y_Type is
+   function Type_Of_Target (Y : ML_Types.Integer_List) return Y_Type is
       use Ada.Containers;
-      Classes : constant NL_Types.Integer_List := Unique_Labels (Y);
+      Classes : constant ML_Types.Integer_List := Unique_Labels (Y);
       Result  : Y_Type;
    begin
       if Is_Multilabel (Y) then
@@ -245,9 +245,9 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Type_Of_Target (Y : NL_Types.Array_Of_Integer_Lists) return Y_Type is
+   function Type_Of_Target (Y : ML_Types.Array_Of_Integer_Lists) return Y_Type is
       use Ada.Containers;
-      Classes : constant NL_Types.Integer_List := Unique_Labels (Y);
+      Classes : constant ML_Types.Integer_List := Unique_Labels (Y);
       Result  : Y_Type;
    begin
       if Is_Multilabel (Y) then
@@ -333,7 +333,7 @@ package body Multiclass_Utils is
 
    function Type_Of_Target (Y : Unbounded_String_Array) return Y_Type is
       use Ada.Containers;
-      Classes : constant NL_Types.Unbounded_List := Unique_Labels (Y);
+      Classes : constant ML_Types.Unbounded_List := Unique_Labels (Y);
    begin
       if Classes.Length > 2 then
          return Y_Multiclass;
@@ -364,13 +364,13 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
-   function Unique_Labels (Y : Binary_Matrix) return NL_Types.Integer_List is
+   function Unique_Labels (Y : Binary_Matrix) return ML_Types.Integer_List is
       Routine_Name : constant String :=
                        "Multiclass_Utils.Unique_Labels Binary ";
       Label_Kind   : Y_Type := Type_Of_Target (Y);
       Uniques      : Unique_Label_Types := Non_Unique;
       Unique_Val   : Natural := 0;
-      Result       : NL_Types.Integer_List;
+      Result       : ML_Types.Integer_List;
    begin
       --  L78
       if Label_Kind = Y_Binary then
@@ -411,7 +411,7 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
-   function Unique_Labels (Y : Integer_Array) return NL_Types.Integer_List is
+   function Unique_Labels (Y : Integer_Array) return ML_Types.Integer_List is
    begin
       return Encode_Utils.Unique (Y);
 
@@ -420,7 +420,7 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
   --  L42 unique_labels
    function Unique_Labels (Y : Integer_Array_List)
-                           return NL_Types.Integer_List is
+                           return ML_Types.Integer_List is
    begin
       return Encode_Utils.Unique (Y);
 
@@ -429,7 +429,7 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
    function Unique_Labels (Y : Unbounded_String_Array_List)
-                           return NL_Types.Unbounded_List is
+                           return ML_Types.Unbounded_List is
    begin
       return Encode_Utils.Unique (Y);
 
@@ -437,8 +437,8 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
-   function Unique_Labels (Y : NL_Types.Integer_List)
-                              return NL_Types.Integer_List is
+   function Unique_Labels (Y : ML_Types.Integer_List)
+                              return ML_Types.Integer_List is
    begin
       return Encode_Utils.Unique (Y);
 
@@ -446,7 +446,7 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
-   function Unique_Labels (Y : Integer_Matrix) return NL_Types.Integer_List is
+   function Unique_Labels (Y : Integer_Matrix) return ML_Types.Integer_List is
       --        --  L84
       --        Label_Kind   : Label_Type := Unique_Binary;
       --        Label_Set    : Encode_Utils.Int_Sets.Set;
@@ -468,8 +468,8 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
-   function Unique_Labels (Y : NL_Types.Array_Of_Integer_Lists)
-                              return NL_Types.Integer_List is
+   function Unique_Labels (Y : ML_Types.Array_Of_Integer_Lists)
+                              return ML_Types.Integer_List is
    begin
       return Encode_Utils.Unique (Y);
 
@@ -478,7 +478,7 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
    function Unique_Labels (Y : Unbounded_String_Array)
-                           return NL_Types.Unbounded_List is
+                           return ML_Types.Unbounded_List is
    begin
       --  L111
       return Encode_Utils.Unique (Y);
@@ -488,7 +488,7 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
    function Unique_Labels (Y : Unbounded_String_Matrix)
-                           return NL_Types.Unbounded_List is
+                           return ML_Types.Unbounded_List is
    begin
       --  L111
       return Encode_Utils.Unique (Y);
