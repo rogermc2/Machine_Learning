@@ -67,9 +67,7 @@ package body Python is
       Execute_String ("cwd = os.getcwd()");
       Execute_String ("os.path.join (cwd, '/src/py_package')");
       Execute_String ("os.chdir(cwd + '/src/py_package')");
-      --        Execute_String ("print ('cwd: ', os.getcwd())");
-      --        Execute_String ("print ('cwd files: ', os.listdir(os.getcwd()))");
-      --        Execute_String ("print ('Path: ', sys.path)");
+      
       declare
          M  : constant PyObject := PyImport_Import (PyFileName); 
       begin
@@ -103,15 +101,17 @@ package body Python is
       PyModule     : constant PyObject := PyObject (M);
       --  PyObject_GetAttrString retrieves the attribute named Function_Name
       --  from the object PyModule. 
-      F            : constant PyObject := PyObject_GetAttrString
-        (PyModule, Interfaces.C.To_C (Function_Name));
+      F            : constant PyObject :=
+                       PyObject_GetAttrString
+                         (PyModule, Interfaces.C.To_C (Function_Name));
    begin
-      Py_DecRef (PyModule);
       if F = System.Null_Address then
          Put_Line (Routine_Name & "Python error message:");
          PyErr_Print;
          raise Interpreter_Error with "Cannot find function " & Function_Name;
       end if;
+      
+      Py_DecRef (PyModule);
       
       return F;
       
@@ -381,6 +381,7 @@ package body Python is
       Result := PyInt_AsLong (PyResult);
       Put_Line ("Python.Call 1 Result:" & Interfaces.C.long'Image (Result));
       Py_DecRef (Func);
+      Py_DecRef (PyResult);
       
    end Call;
 
@@ -402,6 +403,7 @@ package body Python is
                                  Interfaces.C.int (A));
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
+      Py_DecRef (F);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
@@ -428,6 +430,9 @@ package body Python is
                                  Interfaces.C.int (B));
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
@@ -456,8 +461,11 @@ package body Python is
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       
+      Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
 
    end Call;
    
@@ -484,9 +492,12 @@ package body Python is
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       
+      Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
 
    end Call;
    
@@ -503,17 +514,19 @@ package body Python is
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple  : constant PyObject := To_Tuple (A);
       B_Tuple  : constant PyObject := To_Tuple (B);
-      PyParams : PyObject;
+      PyParams : constant PyObject := 
+                   Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
-      PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       
+      Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
 
    end Call;
    
@@ -524,12 +537,13 @@ package body Python is
                    B    : NL_Arrays_And_Matrices.Integer_Array;
                    C    : NL_Arrays_And_Matrices.Real_Float_Matrix;
                    D    : NL_Arrays_And_Matrices.Integer_Array) is
+--        Routine_Name : constant String := "Python.Call ABCD ";
       
-      function Py_BuildValue (Format  : Interfaces.C.char_array;
+      function Py_BuildValue (Format          : Interfaces.C.char_array;
                               T1, T2, T3, T4  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      Py_Func  : PyObject;
       A_Tuple  : constant PyObject := To_Tuple (A);
       B_Tuple  : constant PyObject := To_Tuple (B);
       C_Tuple  : constant PyObject := To_Tuple (C);
@@ -538,16 +552,21 @@ package body Python is
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
+      Py_Func := Get_Symbol (M, Function_Name);
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOOO"),
                        A_Tuple, B_Tuple, C_Tuple, D_Tuple);
-      PyResult := Call_Object (F, PyParams);
-      Result := PyInt_AsLong (PyResult);
-      
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
       Py_DecRef (D_Tuple);
+      
+      PyResult := Call_Object (Py_Func, PyParams);
+      Py_DecRef (Py_Func);
+      Py_DecRef (PyParams);
+      
+      Result := PyInt_AsLong (PyResult);     
+      Py_DecRef (PyResult);
 
    end Call;
    
@@ -573,8 +592,11 @@ package body Python is
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       
+      Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
 
    end Call;
    
@@ -613,8 +635,11 @@ package body Python is
       Result := PyInt_AsLong (PyResult);
       Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
       
+      Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
 
    end Call;
    
@@ -655,9 +680,12 @@ package body Python is
       Result := PyInt_AsLong (PyResult);
       Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
       
+      Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
 
    end Call;
    
@@ -699,9 +727,12 @@ package body Python is
       
       Result := PyInt_AsLong (PyResult);
       
+      Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
 
    end Call;
    

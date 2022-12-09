@@ -42,17 +42,16 @@ begin
          Test_Y_1D (index) := Test_Y (index, 1);
       end loop;
 
+      New_Line;
       Python.Initialize;
-
       MLP := Python.Import_File ("lesson_4cp");
-      for count in 1 .. 10 loop
-         Python.Call (MLP, "classify",
-                      Train_X, Train_Y_1D, Test_X, Test_Y_1D);
-      end loop;
 
+      Python.Call (MLP, "classify",
+                   Train_X, Train_Y_1D, Test_X, Test_Y_1D);
+      --        end loop;
       Python.Close_Module (MLP);
       Python.Finalize;
-   end;  --  declare
+   end;
 
    Put_Line ("----------------------------------------------");
    New_Line;

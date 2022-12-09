@@ -1,11 +1,12 @@
 from sklearn.neural_network import MLPClassifier
 
 def classify (X_train, y_train, X_test, y_test):
-    clf = MLPClassifier(hidden_layer_sizes=[170], max_iter = 10000, activation = 'identity')
-    clf = clf.fit(X_train, y_train)
+    print("classifying")
+    print("Hidden  Score")
+    for i in range(1,21):
+        nhidden = i*10
+        clf = MLPClassifier(hidden_layer_sizes=[nhidden], max_iter = 10000)
+        clf = clf.fit(X_train, y_train)
 
-    score = clf.score(X_test, y_test)
-    print("Score: ", score)
-
-    return score
-
+        score = clf.score(X_test, y_test)
+        print(nhidden, "    ", score)
