@@ -35,11 +35,11 @@ package body Renderer is
       --  rotation then final translation happens; reversed order) ?
       Model_Matrix :=
         Scaling_Matrix ((Size (GL.X), Size (GL.Y), 1.0)) * Model_Matrix;
-      Model_Matrix := Translation_Matrix
-        ((-0.5 * Size (GL.X), -0.5 * Size (GL.Y), 0.0)) * Model_Matrix;
+--        Model_Matrix := Translation_Matrix
+--          ((Size (GL.X), Size (GL.Y), 0.0)) * Model_Matrix;
       Model_Matrix := Rotation_Matrix (Rotate, (0.0, 0.0, 1.0)) * Model_Matrix;
-      Model_Matrix := Translation_Matrix
-        ((0.5 * Size (GL.X), 0.5 * Size (GL.Y), 0.0)) * Model_Matrix;
+--        Model_Matrix := Translation_Matrix
+--          ((Size (GL.X), Size (GL.Y), 0.0)) * Model_Matrix;
       Model_Matrix := Translation_Matrix
         ((Position (GL.X), Position (GL.Y), 0.0)) * Model_Matrix;
 
