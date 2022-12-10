@@ -1,3 +1,5 @@
+with "opengl.gpr";
+limited with "opengl-glfw.gpr";
 with "../../../../../Ada_Source/Ada_BMP_Library/bitmap.gpr";
 
 project ML5A is
