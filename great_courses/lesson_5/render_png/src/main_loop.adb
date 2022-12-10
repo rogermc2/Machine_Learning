@@ -37,7 +37,7 @@ procedure Main_Loop (Main_Window :  in out Glfw.Windows.Window) is
                               Int (Window_Height));
       Utilities.Clear_Background_Colour (Background);
 
-      Draw_Sprite (Sprite_SP, theTexture, (250.0, 250.0), (500.0, 500.0),
+      Draw_Sprite (Sprite_SP, theTexture, (350.0, 300.0), (350.0, 300.0),
                    0.0, (0.0, 1.0, 0.0));
 
    exception
