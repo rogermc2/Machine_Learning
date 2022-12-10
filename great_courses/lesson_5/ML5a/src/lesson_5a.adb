@@ -12,4 +12,6 @@ begin
    Open (File, In_File, "../greenML.png");
    Buffer := Read_BMP_File (File);
 
+   Close (File);
+
 end Lesson_5A;
