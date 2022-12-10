@@ -7,8 +7,8 @@ project Lesson_04BP_Neuron is
       ("high_sierra", "ventura");
    Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
 
-   for Source_Dirs use ("src", "../../datasets", "../../neural_network", "../../decision_tree_classifier/support", "../../common", "../../utils", "../../export", "../../model_selection", "../../base", "../../metrics", 
-      "../../../scipy/optimise", "../../test", "../../../common", "../../../python_c_api");
+   for Source_Dirs use ("src", "../../../python_c_api", "../../../neural_learning/common", "../../../common", "../../../neural_learning/test", "../../../neural_learning/neural_network", "../../../neural_learning/datasets", 
+      "../../../neural_learning/decision_tree_classifier/support", "../../../neural_learning/model_selection", "../../../neural_learning/utils");
    for Object_Dir use "obj";
    for Main use ("lesson_4bp_neuron.adb");
    for Exec_Dir use ".";

@@ -9,7 +9,6 @@ with Openml_Ada;
 with Data_Splitter;
 with ML_Types;
 with Shuffler;
---  with Test_Support;
 
 package body Support_4 is
 
