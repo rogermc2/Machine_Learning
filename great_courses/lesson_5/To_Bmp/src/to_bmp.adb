@@ -15,8 +15,7 @@ procedure To_BMP is
    as_background         : constant Boolean := False;
    background_image_name : Unbounded_String := Null_Unbounded_String;
 begin
-    Put_Line (Standard_Error, "To_BMP, using GID version " & GID.version &
-               " dated " & GID.reference);
+    Put_Line ("To_BMP, using GID version " & GID.version & " dated " & GID.reference);
     Process (default_bkg_name, as_background, test_only, background_image_name);
 
 end To_BMP;
