@@ -258,9 +258,9 @@ package body Simple_Support is
       --  ^ No packing needed
       BITMAPINFOHEADER_Bytes : constant := 40;
 
-      FileInfo   : BITMAPINFOHEADER;
-      FileHeader : BITMAPFILEHEADER;
-      file_id    : Ada.Streams.Stream_IO.File_Type;
+      FileInfo    : BITMAPINFOHEADER;
+      FileHeader  : BITMAPFILEHEADER;
+      out_file_id : Ada.Streams.Stream_IO.File_Type;
 
       --  ----------------------------------------------------------------------
 
@@ -273,7 +273,7 @@ package body Simple_Support is
          bytes : constant Integer := Number'Size / 8;
       begin
          for i in 1 .. bytes loop
-            Unsigned_8'Write (Stream (file_id), Unsigned_8 (m and 255));
+            Unsigned_8'Write (Stream (out_file_id), Unsigned_8 (m and 255));
             m := m / 256;
          end loop;
       end Write_Intel_x86_number;
@@ -304,7 +304,7 @@ package body Simple_Support is
       FileHeader.bfSize := FileHeader.bfOffBits + FileInfo.biSizeImage;
 
       Put_Line ("Dump_BMP_24 creating " & name & ".dib");
-      Create (file_id, Out_File, name & ".dib");
+      Create (out_file_id, Out_File, name & ".dib");
       --  BMP Header, endian-safe:
       Write_Intel (FileHeader.bfType);
       Write_Intel (FileHeader.bfSize);
@@ -346,15 +346,15 @@ package body Simple_Support is
                pragma Import (Ada, SE_Buffer);
             begin
                Ada.Streams.Write
-                 (Stream (file_id).all,
+                 (Stream (out_file_id).all,
                   SE_Buffer (0 .. Stream_Element_Offset (img_buf'Length - 1)));
             end;
          else
             --  the workaround is about this line...
-            Byte_Array'Write (Stream (file_id), img_buf.all);
+            Byte_Array'Write (Stream (out_file_id), img_buf.all);
          end if;
       end;
-      Close (file_id);
+      Close (out_file_id);
 
    end Dump_BMP_24;
 
@@ -363,18 +363,18 @@ package body Simple_Support is
    procedure Process (name : String; image_name : in out Unbounded_String) is
       Routine_Name  : constant String := "Simple_Support.Process ";
       up_name       : constant String := To_Upper (name);
-      file_id       : Ada.Streams.Stream_IO.File_Type;
+      in_file_id    : Ada.Streams.Stream_IO.File_Type;
       image_desc    : GID.Image_descriptor;
       next_frame    : Ada.Calendar.Day_Duration := 0.0;
 --        current_frame : Ada.Calendar.Day_Duration := 0.0;
       Done          : Boolean := False;
    begin
       --  Load the image in its original format
-      Open (file_id, In_File, name);
+      Open (in_file_id, In_File, name);
       Put_Line (Routine_Name & "processing " & name);
 
       GID.Load_image_header
-        (image_desc, Stream (file_id).all,
+        (image_desc, Stream (in_file_id).all,
          try_tga =>
            name'Length >= 4 and then
          up_name (up_name'Last - 3 .. up_name'Last) = ".TGA");
@@ -460,13 +460,13 @@ package body Simple_Support is
 --           current_frame := next_frame;
       end loop;
       --     end if;
-      Close (file_id);
+      Close (in_file_id);
 
    exception
       when GID.unknown_image_format =>
          Put_Line (Routine_Name & "image format is unknown!");
-         if Is_Open (file_id) then
-            Close (file_id);
+         if Is_Open (in_file_id) then
+            Close (in_file_id);
          end if;
 
    end Process;
