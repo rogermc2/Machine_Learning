@@ -276,7 +276,6 @@ package body BMP_Support is
 
       procedure Write_Intel is new Write_Intel_x86_number (Unsigned_16);
       procedure Write_Intel is new Write_Intel_x86_number (Unsigned_32);
-
    begin
       FileHeader.bfType := 16#4D42#; -- 'BM'
       FileHeader.bfOffBits := BITMAPINFOHEADER_Bytes + BITMAPFILEHEADER_Bytes;
@@ -295,7 +294,6 @@ package body BMP_Support is
 
       FileHeader.bfSize := FileHeader.bfOffBits + FileInfo.biSizeImage;
 
-      New_Line;
       Put_Line ("Dump_BMP_24 creating " & name & ".dib");
       Create (file_id, Out_File, name & ".dib");
       --  BMP Header, endian-safe:
@@ -425,8 +423,12 @@ package body BMP_Support is
 
          bkg := image_desc;
          New_Line;
-
+--           Close (file_id);
+         --           return;
+         --        end if;
       else  --  not as_background"
+         Put_Line ("not as_background, next_frame: " &
+                     Duration'Image (next_frame));
          while not Done loop
             case GID.Display_orientation (image_desc) is
             when GID.Unchanged =>
@@ -444,9 +446,12 @@ package body BMP_Support is
             end case;
 
             if not test_only then
+               Put_Line ("not test_only");
                Dump_BMP_24 (name & '_' &
                               Trim (Duration'Image (current_frame), Left),
                             image_desc);
+            else
+               Put_Line ("test_only");
             end if;
             New_Line;
 
@@ -455,18 +460,19 @@ package body BMP_Support is
             end if;
 
             Done := next_frame = 0.0;
+            --           exit when next_frame = 0.0;
             current_frame := next_frame;
          end loop;
       end if;
       Close (file_id);
 
-   exception
-      when GID.unknown_image_format =>
-         Put_Line (" Image format is unknown!");
-         if Is_Open (file_id) then
-            Close (file_id);
+      exception
+         when GID.unknown_image_format =>
+            Put_Line (" Image format is unknown!");
+            if Is_Open (file_id) then
+               Close (file_id);
          end if;
 
-   end Process;
+      end Process;
 
-end BMP_Support;
+   end BMP_Support;

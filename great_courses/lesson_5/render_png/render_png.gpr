@@ -11,5 +11,9 @@ project Render_PNG is
    for Main use ("render_png");
 
     package Compiler renames OpenGL.Compiler;
+  
+package Compiler is
+      for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");
+   end Compiler;
 
 end Render_PNG;

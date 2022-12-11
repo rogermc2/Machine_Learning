@@ -9,8 +9,8 @@ with BMP_Support; use BMP_Support;
 procedure To_BMP is
 
    --  Image used as background for displaying images having transparency
---     default_bkg_name      : constant String := "../gid.gif";
-   default_bkg_name      : constant String := "../greenML.png";
+--     default_bkg_name      : constant String := "src/gid.gif";
+   default_bkg_name      : constant String := "src/greenML.png";
    test_only             : constant Boolean := False;
    as_background         : constant Boolean := False;
    background_image_name : Unbounded_String := Null_Unbounded_String;
