@@ -4,16 +4,17 @@ with GID;
 with Ada.Calendar;
 with Ada.Characters.Handling;     use Ada.Characters.Handling;
 with Ada.Streams.Stream_IO;       use Ada.Streams.Stream_IO;
-with Ada.Strings.Fixed;
 with Ada.Text_IO;                 use Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
 with Interfaces; use Interfaces;
 
-package body BMP_Support is
+package body Simple_Support is
 
    type Byte_Array is array (Integer range <>) of Unsigned_8;
    type p_Byte_Array is access Byte_Array;
+
+   stars  : Natural := 0;
 
    procedure Dispose is new Ada.Unchecked_Deallocation
      (Byte_Array, p_Byte_Array);
@@ -21,7 +22,7 @@ package body BMP_Support is
    forgive_errors : constant Boolean := False;
    error          : Boolean;
    img_buf        : p_Byte_Array := null;
-   bkg_buf        : p_Byte_Array := null;
+   bkg_buf        : constant p_Byte_Array := null;
    bkg            : GID.Image_descriptor;
 
    generic
@@ -31,7 +32,7 @@ package body BMP_Support is
                              buffer                : in out p_Byte_Array;
                              next_frame            : out Ada.Calendar.Day_Duration;
                              background_image_name : Unbounded_String);
-   --
+
    procedure Load_raw_image
      (image                 : in out GID.Image_descriptor;
       buffer                : in out p_Byte_Array;
@@ -95,6 +96,7 @@ package body BMP_Support is
          end case;
       end Put_Pixel_without_bkg;
 
+      --  -------------------------------------------------------------------------
       --  Unicolor background version of Put_Pixel
       procedure Put_Pixel_with_unicolor_bkg
         (red, green, blue : Primary_color_range; alpha : Primary_color_range) is
@@ -114,6 +116,7 @@ package body BMP_Support is
          --  ^ GID requires us to look to next pixel on the right for next time.
       end Put_Pixel_with_unicolor_bkg;
 
+      --  -------------------------------------------------------------------------
       --  Background image version of Put_Pixel
       procedure Put_Pixel_with_image_bkg
         (red, green, blue : Primary_color_range;
@@ -141,7 +144,8 @@ package body BMP_Support is
          mem_x := mem_x + 1;
       end Put_Pixel_with_image_bkg;
 
-      stars  : Natural := 0;
+      --  -------------------------------------------------------------------------
+
       procedure Feedback (percents : Natural) is
          so_far : constant Natural := percents / 5;
       begin
@@ -150,6 +154,8 @@ package body BMP_Support is
          end loop;
          stars := so_far;
       end Feedback;
+
+      --  -------------------------------------------------------------------------
 
       --  Here, the exciting thing: the instanciation of
       --  GID.Load_image_contents. In our case, we load the image
@@ -175,6 +181,8 @@ package body BMP_Support is
         new GID.Load_image_contents (Primary_color_range, Set_X_Y,
                                      Put_Pixel_with_image_bkg, Feedback,
                                      GID.fast);
+
+      --  -------------------------------------------------------------------------
 
    begin
       error := False;
@@ -203,15 +211,6 @@ package body BMP_Support is
          BMP24_Load_without_bkg (image, next_frame);
       end if;
 
-      --  -- For testing: white rectangle with a red half-frame.
-      --  buffer.all:= (others => 255);
-      --  for x in 0..GID.Pixel_width(image)-1 loop
-      --    Put_Pixel_with_unicolor_bkg(x,0,255,0,0,255);
-      --  end loop;
-      --  for y in 0..GID.Pixel_height(image)-1 loop
-      --    Put_Pixel_with_unicolor_bkg(0,y,255,0,0,255);
-      --  end loop;
-
    exception
       when others =>
          if forgive_errors then
@@ -223,10 +222,14 @@ package body BMP_Support is
 
    end Load_raw_image;
 
+   --  -------------------------------------------------------------------------
+
    procedure Load_raw_image_0 is new Load_raw_image (GID.Unchanged);
    procedure Load_raw_image_90 is new Load_raw_image (GID.Rotation_90);
    procedure Load_raw_image_180 is new Load_raw_image (GID.Rotation_180);
    procedure Load_raw_image_270 is new Load_raw_image (GID.Rotation_270);
+
+   --  -------------------------------------------------------------------------
 
    procedure Dump_BMP_24 (name : String; Image_desc : GID.Image_descriptor) is
       type BITMAPFILEHEADER is record
@@ -294,6 +297,7 @@ package body BMP_Support is
 
       FileHeader.bfSize := FileHeader.bfOffBits + FileInfo.biSizeImage;
 
+      New_Line;
       Put_Line ("Dump_BMP_24 creating " & name & ".dib");
       Create (file_id, Out_File, name & ".dib");
       --  BMP Header, endian-safe:
@@ -349,11 +353,11 @@ package body BMP_Support is
 
    end Dump_BMP_24;
 
-   procedure Process (name                  : String; as_background,
-                      test_only             : Boolean;
-                      background_image_name : in out Unbounded_String) is
+   --  -------------------------------------------------------------------------
+
+   procedure Process (name : String; image_name : in out Unbounded_String) is
       use Ada.Strings;
-      use Ada.Strings.Fixed;
+      Routine_Name  : constant String := "Simple_Support.Process ";
       up_name       : constant String := To_Upper (name);
       file_id       : Ada.Streams.Stream_IO.File_Type;
       image_desc    : GID.Image_descriptor;
@@ -363,7 +367,7 @@ package body BMP_Support is
    begin
       --  Load the image in its original format
       Open (file_id, In_File, name);
-      Put_Line ("Processing " & name & "...");
+      Put_Line (Routine_Name & "processing " & name);
 
       GID.Load_image_header
         (image_desc, Stream (file_id).all,
@@ -371,18 +375,18 @@ package body BMP_Support is
            name'Length >= 4 and then
          up_name (up_name'Last - 3 .. up_name'Last) = ".TGA");
 
-      Put_Line ("  Image format: " &
+      Put_Line ("Image format: " &
                   GID.Image_format_type'Image (GID.Format (image_desc)));
-      Put_Line ("  Image detailed format: " &
+      Put_Line ("Image detailed format: " &
                   GID.Detailed_format (image_desc));
-      Put_Line ("  Image sub-format ID (if any): " &
+      Put_Line ("Image sub-format ID (if any): " &
                   Integer'Image (GID.Subformat (image_desc)));
-      Put_Line ("  Dimensions in pixels: " &
+      Put_Line ("Dimensions in pixels: " &
                   Integer'Image (GID.Pixel_width (image_desc)) & " x" &
                   Integer'Image (GID.Pixel_height (image_desc)));
       Put_Line (Standard_Error,"  Display orientation: " &
                   GID.Orientation'Image (GID.Display_orientation (image_desc)));
-      Put ("  Color depth: " &
+      Put ("Color depth: " &
              Integer'Image (GID.Bits_per_pixel (image_desc)) & " bits");
 
       if GID.Bits_per_pixel (image_desc) <= 24 then
@@ -392,87 +396,77 @@ package body BMP_Support is
          New_Line;
       end if;
 
-      Put_Line ("  Palette: " &
+      Put_Line ("Palette: " &
                   Boolean'Image (GID.Has_palette (image_desc)));
-      Put_Line ("  Greyscale: " & Boolean'Image (GID.Greyscale (image_desc)));
-      Put_Line ("  RLE encoding (if any): " &
+      Put_Line ("Greyscale: " & Boolean'Image (GID.Greyscale (image_desc)));
+      Put_Line ("RLE encoding (if any): " &
                   Boolean'Image (GID.Is_RLE_encoded (image_desc)));
-      Put_Line ("  Interlaced (GIF: each frame's choice): " &
+      Put_Line ("Interlaced (GIF: each frame's choice): " &
                   Boolean'Image (GID.Is_Interlaced (image_desc)));
-      Put_Line ("  Expect transparency: " &
+      Put_Line ("Expect transparency: " &
                   Boolean'Image (GID.Expect_transparency (image_desc)));
       Put_Line ("1........10........20");
       Put_Line ("         |         | ");
 
-      if as_background then
-         Put_Line ("as_background");
+      --        if as_background then
+      --           Put_Line ("as_background");
+      --           case GID.Display_orientation (image_desc) is
+      --           when GID.Unchanged =>
+      --              Load_raw_image_0 (image_desc, bkg_buf, next_frame,
+      --                                background_image_name);
+      --           when GID.Rotation_90 =>
+      --              Load_raw_image_90 (image_desc, bkg_buf, next_frame,
+      --                                 background_image_name);
+      --           when GID.Rotation_180 =>
+      --              Load_raw_image_180 (image_desc, bkg_buf, next_frame,
+      --                                  background_image_name);
+      --           when GID.Rotation_270 =>
+      --              Load_raw_image_270 (image_desc, bkg_buf, next_frame,
+      --                                  background_image_name);
+      --           end case;
+      --
+      --           bkg := image_desc;
+      --           New_Line;
+      --
+      --        else  --  not as_background"
+      while not Done loop
          case GID.Display_orientation (image_desc) is
-         when GID.Unchanged =>
-            Load_raw_image_0 (image_desc, bkg_buf, next_frame,
-                              background_image_name);
-         when GID.Rotation_90 =>
-            Load_raw_image_90 (image_desc, bkg_buf, next_frame,
-                               background_image_name);
-         when GID.Rotation_180 =>
-            Load_raw_image_180 (image_desc, bkg_buf, next_frame,
-                                background_image_name);
-         when GID.Rotation_270 =>
-            Load_raw_image_270 (image_desc, bkg_buf, next_frame,
-                                background_image_name);
-         end case;
-
-         bkg := image_desc;
-         New_Line;
---           Close (file_id);
-         --           return;
-         --        end if;
-      else  --  not as_background"
-         Put_Line ("not as_background, next_frame: " &
-                     Duration'Image (next_frame));
-         while not Done loop
-            case GID.Display_orientation (image_desc) is
             when GID.Unchanged =>
                Load_raw_image_0 (image_desc, img_buf, next_frame,
-                                 background_image_name);
+                                 image_name);
             when GID.Rotation_90 =>
                Load_raw_image_90 (image_desc, img_buf, next_frame,
-                                  background_image_name);
+                                  image_name);
             when GID.Rotation_180 =>
                Load_raw_image_180 (image_desc, img_buf, next_frame,
-                                   background_image_name);
+                                   image_name);
             when GID.Rotation_270 =>
                Load_raw_image_270 (image_desc, img_buf, next_frame,
-                                   background_image_name);
-            end case;
+                                   image_name);
+         end case;
 
-            if not test_only then
-               Put_Line ("not test_only");
-               Dump_BMP_24 (name & '_' &
-                              Trim (Duration'Image (current_frame), Left),
-                            image_desc);
-            else
-               Put_Line ("test_only");
-            end if;
-            New_Line;
+         Dump_BMP_24 (name,image_desc);
+         New_Line;
 
-            if error then
-               Put_Line ("Error!");
-            end if;
-
-            Done := next_frame = 0.0;
-            --           exit when next_frame = 0.0;
-            current_frame := next_frame;
-         end loop;
-      end if;
-      Close (file_id);
-
-      exception
-         when GID.unknown_image_format =>
-            Put_Line (" Image format is unknown!");
-            if Is_Open (file_id) then
-               Close (file_id);
+         if error then
+            Put_Line (Routine_Name & "Error!");
          end if;
 
-      end Process;
+         Done := next_frame = 0.0;
+         current_frame := next_frame;
+      end loop;
+      --     end if;
+      Close (file_id);
 
-   end BMP_Support;
+   exception
+      when GID.unknown_image_format =>
+         Put_Line (Routine_Name & "image format is unknown!");
+         if Is_Open (file_id) then
+            Close (file_id);
+         end if;
+
+   end Process;
+
+   --  -------------------------------------------------------------------------
+
+end Simple_Support;
