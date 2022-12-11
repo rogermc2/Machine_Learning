@@ -28,13 +28,13 @@ package body Simple_Support is
       correct_orientation : GID.Orientation;
       --  Load image into a 24-bit truecolor BGR raw bitmap (for a BMP output)
    procedure Load_raw_image (image                 : in out GID.Image_descriptor;
-                             buffer                : in out p_Byte_Array;
+                             buffer                : out p_Byte_Array;
                              next_frame            : out Ada.Calendar.Day_Duration;
                              background_image_name : Unbounded_String);
 
    procedure Load_raw_image
      (image                 : in out GID.Image_descriptor;
-      buffer                : in out p_Byte_Array;
+      buffer                : out p_Byte_Array;
       next_frame            : out Ada.Calendar.Day_Duration;
       background_image_name : Unbounded_String) is
       subtype Primary_color_range is Unsigned_8;
