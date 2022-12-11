@@ -14,15 +14,14 @@ package body Simple_Support is
    type Byte_Array is array (Integer range <>) of Unsigned_8;
    type p_Byte_Array is access Byte_Array;
 
-   stars  : Natural := 0;
-
    procedure Dispose is new Ada.Unchecked_Deallocation
      (Byte_Array, p_Byte_Array);
 
+   stars          : Natural := 0;
+   bkg_buf        : constant p_Byte_Array := null;
    forgive_errors : constant Boolean := False;
    error          : Boolean;
    img_buf        : p_Byte_Array := null;
-   bkg_buf        : constant p_Byte_Array := null;
    bkg            : GID.Image_descriptor;
 
    generic
@@ -263,6 +262,8 @@ package body Simple_Support is
       FileHeader : BITMAPFILEHEADER;
       file_id    : Ada.Streams.Stream_IO.File_Type;
 
+      --  ----------------------------------------------------------------------
+
       generic
          type Number is mod <>;
       procedure Write_Intel_x86_number (n : in Number);
@@ -276,6 +277,8 @@ package body Simple_Support is
             m := m / 256;
          end loop;
       end Write_Intel_x86_number;
+
+      --  ----------------------------------------------------------------------
 
       procedure Write_Intel is new Write_Intel_x86_number (Unsigned_16);
       procedure Write_Intel is new Write_Intel_x86_number (Unsigned_32);
@@ -294,10 +297,12 @@ package body Simple_Support is
 
       FileInfo.biBitCount   := 24;
       FileInfo.biSizeImage  := Unsigned_32 (img_buf.all'Length);
+      New_Line;
+      Put_Line ("Dump_BMP_24 img_buf.all'Length " &
+                  Integer'Image (img_buf.all'Length));
 
       FileHeader.bfSize := FileHeader.bfOffBits + FileInfo.biSizeImage;
 
-      New_Line;
       Put_Line ("Dump_BMP_24 creating " & name & ".dib");
       Create (file_id, Out_File, name & ".dib");
       --  BMP Header, endian-safe:
@@ -356,13 +361,12 @@ package body Simple_Support is
    --  -------------------------------------------------------------------------
 
    procedure Process (name : String; image_name : in out Unbounded_String) is
-      use Ada.Strings;
       Routine_Name  : constant String := "Simple_Support.Process ";
       up_name       : constant String := To_Upper (name);
       file_id       : Ada.Streams.Stream_IO.File_Type;
       image_desc    : GID.Image_descriptor;
       next_frame    : Ada.Calendar.Day_Duration := 0.0;
-      current_frame : Ada.Calendar.Day_Duration := 0.0;
+--        current_frame : Ada.Calendar.Day_Duration := 0.0;
       Done          : Boolean := False;
    begin
       --  Load the image in its original format
@@ -453,7 +457,7 @@ package body Simple_Support is
          end if;
 
          Done := next_frame = 0.0;
-         current_frame := next_frame;
+--           current_frame := next_frame;
       end loop;
       --     end if;
       Close (file_id);
