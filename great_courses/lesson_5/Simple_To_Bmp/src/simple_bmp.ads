@@ -1,6 +1,6 @@
 
-package Simple_Support is
+package Simple_BMP is
 
    procedure Process (Image_File_Name : String);
 
-end Simple_Support;
+end Simple_BMP;
