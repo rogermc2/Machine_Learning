@@ -10,7 +10,7 @@ with Ada.Unchecked_Deallocation;
 
 with Interfaces; use Interfaces;
 
-package body Simple_BMP is
+package body Simple_PNG_To_BMP is
 
    type Byte_Array is array (Integer range <>) of Unsigned_8;
    type p_Byte_Array is access Byte_Array;
@@ -279,4 +279,4 @@ package body Simple_BMP is
 
    --  -------------------------------------------------------------------------
 
-end Simple_BMP;
+end Simple_PNG_To_BMP;
