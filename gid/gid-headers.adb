@@ -242,9 +242,8 @@ package body GID.Headers is
   ----------------
 
   procedure Load_BMP_header (image : in out Image_descriptor) is
-    n, dummy : U32;
+    n, dummy   : U32;
     w, dummy16 : U16;
-    pragma Unreferenced (dummy, dummy16);
   begin
     --   Pos= 3, read the file size
     Read_Intel (image.stream, dummy);
@@ -411,7 +410,6 @@ package body GID.Headers is
     use Decoding_PNG, Buffering;
     ch : Chunk_head;
     n, dummy : U32;
-    pragma Unreferenced (dummy);
     b, color_type : U8;
     palette : Boolean := False;
   begin

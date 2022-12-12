@@ -2,9 +2,10 @@
 with GID;
 
 with Ada.Calendar;
-with Ada.Characters.Handling;     use Ada.Characters.Handling;
-with Ada.Streams.Stream_IO;       use Ada.Streams.Stream_IO;
-with Ada.Text_IO;                 use Ada.Text_IO;
+with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
+with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
 with Interfaces; use Interfaces;
@@ -55,11 +56,10 @@ package body Simple_BMP is
       next_frame            : out Ada.Calendar.Day_Duration) is
       subtype Primary_color_range is Unsigned_8;
       subtype U16 is Unsigned_16;
-      image_width           : constant Positive := GID.Pixel_width (image);
-      padded_line_size_x    : constant Positive :=
-                                4 * Integer (Float'Ceiling (Float (image_width) * 3.0 / 4.0));
-      --  (in bytes)
-      idx                   : Integer;
+      image_width        : constant Positive := GID.Pixel_width (image);
+      padded_line_size_x : constant Positive :=
+                             4 * Integer (Float'Ceiling (Float (image_width) * 3.0 / 4.0));
+      idx                : Natural;  --  (in bytes)
 
       --  ---------------------------------------------------------------------------------------
 
@@ -124,14 +124,11 @@ package body Simple_BMP is
 
    --  -------------------------------------------------------------------------
 
-   procedure Dump_BMP_24 (File_Name  : String;
-                          Image_desc : GID.Image_descriptor) is
-
-      FileInfo    : BITMAPINFOHEADER;
-      FileHeader  : BITMAPFILEHEADER;
+   procedure Write_BMP_24 (File_Name : String;
+                           Image_desc : GID.Image_descriptor) is
+      use Ada.Strings.Unbounded;
+      Routine_Name : constant String := "Simple_BMP.Write_BMP_24 ";
       out_file_id : Ada.Streams.Stream_IO.File_Type;
-
-      --  ----------------------------------------------------------------------
 
       generic
          type Number is mod <>;
@@ -147,12 +144,17 @@ package body Simple_BMP is
          end loop;
       end Write_Intel_x86_number;
 
-      --  ----------------------------------------------------------------------
-
       procedure Write_Intel is new Write_Intel_x86_number (Unsigned_16);
       procedure Write_Intel is new Write_Intel_x86_number (Unsigned_32);
 
-   begin  --  Dump_BMP_24
+      --  ----------------------------------------------------------------------
+
+      Out_File_Name : constant Unbounded_String := To_Unbounded_String (File_Name);
+      Pos           : constant Natural := Index (Out_File_Name, ".png") - 1;
+      FileInfo      : BITMAPINFOHEADER;
+      FileHeader    : BITMAPFILEHEADER;
+   begin  --  Write_BMP_24
+      New_Line;
       FileHeader.bfType := 16#4D42#; -- 'BM'
       FileHeader.bfOffBits := BITMAPINFOHEADER_Bytes + BITMAPFILEHEADER_Bytes;
       FileInfo.biSize       := BITMAPINFOHEADER_Bytes;
@@ -170,8 +172,8 @@ package body Simple_BMP is
       New_Line;
       FileHeader.bfSize := FileHeader.bfOffBits + FileInfo.biSizeImage;
 
-      Put_Line ("Dump_BMP_24 creating " & File_Name & ".dib");
-      Create (out_file_id, Out_File, File_Name & ".dib");
+      Put_Line (Routine_Name & "creating " & Slice (Out_File_Name, 1, Pos) & ".dib");
+      Create (out_file_id, Out_File, Slice (Out_File_Name, 1, Pos) & ".dib");
       --  BMP Header, endian-safe:
       Write_Intel (FileHeader.bfType);        --  unsigned_32
       Write_Intel (FileHeader.bfSize);        --  unsigned_16
@@ -208,7 +210,7 @@ package body Simple_BMP is
          if workaround_possible then
             declare
                use Ada.Streams;
-               SE_Buffer   : Stream_Element_Array
+               SE_Buffer : Stream_Element_Array
                  (0 .. Stream_Element_Offset (img_buf'Length - 1));
                for SE_Buffer'Address use img_buf.all'Address;
                pragma Import (Ada, SE_Buffer);
@@ -221,10 +223,10 @@ package body Simple_BMP is
             --  the workaround is about this line...
             Byte_Array'Write (Stream (out_file_id), img_buf.all);
          end if;
-      end;
+      end;  --  declare block
       Close (out_file_id);
 
-   end Dump_BMP_24;
+   end Write_BMP_24;
 
    --  -------------------------------------------------------------------------
 
@@ -255,7 +257,7 @@ package body Simple_BMP is
 
       while not Done loop
          Load_raw_image (image_desc, img_buf, next_frame);
-         Dump_BMP_24 (Image_File_Name, image_desc);
+         Write_BMP_24 (Image_File_Name, image_desc);
          New_Line;
 
          if error then
