@@ -2,13 +2,28 @@ with "../../../../../Ada_Source/Ada_BMP_Library/bitmap.gpr";
 
 project ML5A is
 
-   for Source_Dirs use ("src");
+   type Operating_System_Type is
+      ("high_sierra", "ventura");
+   Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
+
+   for Source_Dirs use ("src", "../../../gid", "../../../python_c_api", "../../../common", "../../../neural_learning/common");
    for Object_Dir use "obj";
    for Main use ("lesson_5a.adb");
 
-  package Compiler is
+   package Compiler is
       for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");
    end Compiler;
+
+   package Linker is
+      case Operating_System is
+
+         when "high_sierra" =>
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
+
+         when "ventura" =>
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.0/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.11");
+      end case;
+   end Linker;
 
 end ML5A;
 
