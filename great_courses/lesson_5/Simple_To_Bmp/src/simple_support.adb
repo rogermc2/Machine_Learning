@@ -24,14 +24,6 @@ package body Simple_Support is
    img_buf        : p_Byte_Array := null;
    bkg            : GID.Image_descriptor;
 
---     generic
---        correct_orientation : GID.Orientation;
-      --  Load image into a 24-bit truecolor BGR raw bitmap (for a BMP output)
---     procedure Load_raw_image (image                 : in out GID.Image_descriptor;
---                               buffer                : out p_Byte_Array;
---                               next_frame            : out Ada.Calendar.Day_Duration;
---                               background_image_name : Unbounded_String);
-
    procedure Load_raw_image
      (image                 : in out GID.Image_descriptor;
       buffer                : out p_Byte_Array;
@@ -40,11 +32,8 @@ package body Simple_Support is
       subtype Primary_color_range is Unsigned_8;
       subtype U16 is Unsigned_16;
       image_width           : constant Positive := GID.Pixel_width (image);
---        image_height          : constant Positive := GID.Pixel_height (image);
       padded_line_size_x    : constant Positive :=
                                 4 * Integer (Float'Ceiling (Float (image_width) * 3.0 / 4.0));
---        padded_line_size_y    : constant Positive :=
---                                  4 * Integer (Float'Ceiling (Float (image_height) * 3.0 / 4.0));
       --  (in bytes)
       idx                   : Integer;
       mem_x                 : Natural;
@@ -55,21 +44,8 @@ package body Simple_Support is
 
       procedure Set_X_Y (x, y : Natural) is
          pragma Inline (Set_X_Y);
---           use GID;
---           rev_x : constant Natural := image_width - (x + 1);
---           rev_y : constant Natural := image_height - (y + 1);
       begin
---           case correct_orientation is
---           when Unchanged =>
-            idx := 3 * x + padded_line_size_x * y;
---           when Rotation_90 =>
---              idx := 3 * rev_y + padded_line_size_y * x;
---           when Rotation_180 =>
---              idx := 3 * rev_x + padded_line_size_x * rev_y;
---           when Rotation_270 =>
---              idx := 3 * y + padded_line_size_y * rev_x;
---           end case;
-
+        idx := 3 * x + padded_line_size_x * y;
          mem_x := x;
          mem_y := y;
       end Set_X_Y;
@@ -79,20 +55,10 @@ package body Simple_Support is
         (red, green, blue : Primary_color_range; alpha : Primary_color_range) is
          pragma Inline (Put_Pixel_without_bkg);
          pragma Warnings (off, alpha); -- alpha is ignored
---           use GID;
       begin
          buffer (idx .. idx + 2) := (blue, green, red);
          --  GID requires us to look at the next pixel for next time:
---           case correct_orientation is
---           when Unchanged =>
-            idx := idx + 3;
---           when Rotation_90 =>
---              idx := idx + padded_line_size_y;
---           when Rotation_180 =>
---              idx := idx - 3;
---           when Rotation_270 =>
---              idx := idx - padded_line_size_y;
---           end case;
+         idx := idx + 3;
       end Put_Pixel_without_bkg;
 
       --  -------------------------------------------------------------------------
@@ -187,14 +153,8 @@ package body Simple_Support is
       error := False;
       Dispose (buffer);
 
---        case correct_orientation is
---        when GID.Unchanged | GID.Rotation_180 =>
          buffer := new Byte_Array
            (0 .. padded_line_size_x * GID.Pixel_height (image) - 1);
---        when GID.Rotation_90 | GID.Rotation_270 =>
---           buffer := new
---             Byte_Array (0 .. padded_line_size_y * GID.Pixel_width (image) - 1);
---        end case;
 
       if GID.Expect_transparency (image) then
          if background_image_name = Null_Unbounded_String then
@@ -220,10 +180,6 @@ package body Simple_Support is
          end if;
 
    end Load_raw_image;
-
-   --  -------------------------------------------------------------------------
-
---     procedure Load_raw_image_0 is new Load_raw_image;
 
    --  -------------------------------------------------------------------------
 
@@ -360,7 +316,6 @@ package body Simple_Support is
       in_file_id    : Ada.Streams.Stream_IO.File_Type;
       image_desc    : GID.Image_descriptor;
       next_frame    : Ada.Calendar.Day_Duration := 0.0;
---        current_frame : Ada.Calendar.Day_Duration := 0.0;
       Done          : Boolean := False;
    begin
       --  Load the image in its original format
@@ -406,44 +361,8 @@ package body Simple_Support is
       Put_Line ("1........10........20");
       Put_Line ("         |         | ");
 
-      --        if as_background then
-      --           Put_Line ("as_background");
-      --           case GID.Display_orientation (image_desc) is
-      --           when GID.Unchanged =>
-      --              Load_raw_image_0 (image_desc, bkg_buf, next_frame,
-      --                                background_image_name);
-      --           when GID.Rotation_90 =>
-      --              Load_raw_image_90 (image_desc, bkg_buf, next_frame,
-      --                                 background_image_name);
-      --           when GID.Rotation_180 =>
-      --              Load_raw_image_180 (image_desc, bkg_buf, next_frame,
-      --                                  background_image_name);
-      --           when GID.Rotation_270 =>
-      --              Load_raw_image_270 (image_desc, bkg_buf, next_frame,
-      --                                  background_image_name);
-      --           end case;
-      --
-      --           bkg := image_desc;
-      --           New_Line;
-      --
-      --        else  --  not as_background"
       while not Done loop
---           case GID.Display_orientation (image_desc) is
---              when GID.Unchanged =>
---                 Load_raw_image_0 (image_desc, img_buf, next_frame,
---                                   image_name);
-               Load_raw_image (image_desc, img_buf, next_frame, image_name);
---              when GID.Rotation_90 =>
---                 Load_raw_image_90 (image_desc, img_buf, next_frame,
---                                    image_name);
---              when GID.Rotation_180 =>
---                 Load_raw_image_180 (image_desc, img_buf, next_frame,
---                                     image_name);
---              when GID.Rotation_270 =>
---                 Load_raw_image_270 (image_desc, img_buf, next_frame,
---                                     image_name);
---           end case;
-
+         Load_raw_image (image_desc, img_buf, next_frame, image_name);
          Dump_BMP_24 (name,image_desc);
          New_Line;
 
@@ -452,9 +371,7 @@ package body Simple_Support is
          end if;
 
          Done := next_frame = 0.0;
---           current_frame := next_frame;
       end loop;
-      --     end if;
       Close (in_file_id);
 
    exception
