@@ -8,8 +8,7 @@ procedure Simple_BMP is
 
    Image_File_Name : constant String := "../greenML.png";
 begin
-   Put_Line ("To_BMP, using GID version " & GID.version & " dated " &
-               GID.reference);
-    Process (Image_File_Name);
+   Put_Line ("Simple_BMP using GID version " & GID.version & " dated " & GID.reference);
+   Process (Image_File_Name);
 
 end Simple_BMP;

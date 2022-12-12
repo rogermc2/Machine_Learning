@@ -14,181 +14,6 @@ package body Simple_Support is
    type Byte_Array is array (Integer range <>) of Unsigned_8;
    type p_Byte_Array is access Byte_Array;
 
-   procedure Dispose is new Ada.Unchecked_Deallocation
-     (Byte_Array, p_Byte_Array);
-
-   stars          : Natural := 0;
---     bkg_buf        : constant p_Byte_Array := null;
-   forgive_errors : constant Boolean := False;
-   error          : Boolean;
-   img_buf        : p_Byte_Array := null;
---     bkg            : GID.Image_descriptor;
-
-   procedure Load_raw_image
-     (image                 : in out GID.Image_descriptor;
-      buffer                : out p_Byte_Array;
-      next_frame            : out Ada.Calendar.Day_Duration) is
---        background_image_name : Unbounded_String) is
-      subtype Primary_color_range is Unsigned_8;
-      subtype U16 is Unsigned_16;
-      image_width           : constant Positive := GID.Pixel_width (image);
-      padded_line_size_x    : constant Positive :=
-                                4 * Integer (Float'Ceiling (Float (image_width) * 3.0 / 4.0));
-      --  (in bytes)
-      idx                   : Integer;
---        mem_x                 : Natural;
---        mem_y                 : Natural;
---        bkg_padded_line_size  : Positive;
---        bkg_width             : Natural;
---        bkg_height            : Natural;
-
-      procedure Set_X_Y (x, y : Natural) is
-         pragma Inline (Set_X_Y);
-      begin
-         idx := 3 * x + padded_line_size_x * y;
---           mem_x := x;
---           mem_y := y;
-      end Set_X_Y;
-
-      --  No background version of Put_Pixel
---        procedure Put_Pixel_without_bkg
---          (red, green, blue : Primary_color_range; alpha : Primary_color_range) is
---           pragma Inline (Put_Pixel_without_bkg);
---           pragma Warnings (off, alpha); -- alpha is ignored
---        begin
---           buffer (idx .. idx + 2) := (blue, green, red);
---           --  GID requires us to look at the next pixel for next time:
---           idx := idx + 3;
---        end Put_Pixel_without_bkg;
-
-      --  -------------------------------------------------------------------------
-      --  Unicolor background version of Put_Pixel
-      procedure Put_Pixel_with_unicolor_bkg
-        (red, green, blue : Primary_color_range; alpha : Primary_color_range) is
-         pragma Inline (Put_Pixel_with_unicolor_bkg);
-         u_red   : constant := 200;
-         u_green : constant := 133;
-         u_blue  : constant := 32;
-      begin
-         if alpha = 255 then
-            buffer (idx .. idx + 2) := (blue, green, red);
-         else -- blend with bckground color
-            buffer (idx)  := Primary_color_range ((U16 (alpha) * U16 (blue)  + U16 (255 - alpha) * u_blue) / 255);
-            buffer (idx + 1) := Primary_color_range ((U16 (alpha) * U16 (green) + U16 (255 - alpha) * u_green) / 255);
-            buffer (idx + 2) := Primary_color_range ((U16 (alpha) * U16 (red)   + U16 (255 - alpha) * u_red) / 255);
-         end if;
-         idx := idx + 3;
-         --  ^ GID requires us to look to next pixel on the right for next time.
-      end Put_Pixel_with_unicolor_bkg;
-
-      --  -------------------------------------------------------------------------
-      --  Background image version of Put_Pixel
---        procedure Put_Pixel_with_image_bkg
---          (red, green, blue : Primary_color_range;
---           alpha            : Primary_color_range) is
---           pragma Inline (Put_Pixel_with_image_bkg);
---           b_red,
---           b_green,
---           b_blue  : Primary_color_range;
---           bkg_idx : Natural;
---        begin
---           if alpha = 255 then
---              buffer (idx .. idx + 2) := (blue, green, red);
---           else -- blend with background image
---              bkg_idx := 3 * (mem_x mod bkg_width) + bkg_padded_line_size * (mem_y mod bkg_height);
---              b_blue := bkg_buf (bkg_idx);
---              b_green := bkg_buf (bkg_idx + 1);
---              b_red  := bkg_buf (bkg_idx + 2);
---              buffer (idx)  := Primary_color_range ((U16 (alpha) * U16 (blue)  + U16 (255 - alpha) * U16 (b_blue)) / 255);
---              buffer (idx + 1) := Primary_color_range ((U16 (alpha) * U16 (green) + U16 (255 - alpha) * U16 (b_green)) / 255);
---              buffer (idx + 2) := Primary_color_range ((U16 (alpha) * U16 (red)   + U16 (255 - alpha) * U16 (b_red)) / 255);
---           end if;
---
---           idx := idx + 3;
---           --  ^ GID requires us to look to next pixel on the right for next time.
---           mem_x := mem_x + 1;
---        end Put_Pixel_with_image_bkg;
-
-      --  -------------------------------------------------------------------------
-
-      procedure Feedback (percents : Natural) is
-         so_far : constant Natural := percents / 5;
-      begin
-         for i in stars + 1 .. so_far loop
-            Put ('*');
-         end loop;
-         stars := so_far;
-      end Feedback;
-
-      --  -------------------------------------------------------------------------
-
-      --  Here, the exciting thing: the instanciation of
-      --  GID.Load_image_contents. In our case, we load the image
-      --  into a 24-bit bitmap (because we provide a Put_Pixel
-      --  that does that with the pixels), but we could do plenty
-      --  of other things instead, like display the image live on a GUI.
-
-      --  More exciting: for tuning performance, we have 3 different
-      --  instances of GID.Load_image_contents (each of them with the full
-      --  decoders for all formats, own specialized generic instances, inlines,
-      --  etc.) depending on the transparency features.
-
---        procedure BMP24_Load_without_bkg is
---          new GID.Load_image_contents (Primary_color_range, Set_X_Y,
---                                       Put_Pixel_without_bkg, Feedback, GID.fast);
-
-      procedure BMP24_Load_with_unicolor_bkg is
-        new GID.Load_image_contents (Primary_color_range, Set_X_Y,
-                                     Put_Pixel_with_unicolor_bkg, Feedback,
-                                     GID.fast);
-
---        procedure BMP24_Load_with_image_bkg is
---          new GID.Load_image_contents (Primary_color_range, Set_X_Y,
---                                       Put_Pixel_with_image_bkg, Feedback,
---                                       GID.fast);
-
-      --  -------------------------------------------------------------------------
-
-   begin
-      error := False;
-      Dispose (buffer);
-
-      buffer := new Byte_Array
-        (0 .. padded_line_size_x * GID.Pixel_height (image) - 1);
-
---        if GID.Expect_transparency (image) then
---           Put_Line ("Expect_transparency");
---           if background_image_name = Null_Unbounded_String then
---              Put_Line ("background_image_name is null");
-            BMP24_Load_with_unicolor_bkg (image, next_frame);
---           else
---           Put_Line ("background_image_name not null");
---              bkg_width := GID.Pixel_width (bkg);
---              bkg_height := GID.Pixel_height (bkg);
---              bkg_padded_line_size :=
---                4 * Integer (Float'Ceiling (Float (bkg_width) * 3.0 / 4.0));
---              BMP24_Load_with_image_bkg (image, next_frame);
---           end if;
---        else
---           Put_Line ("don't Expect_transparency");
---           BMP24_Load_without_bkg (image, next_frame);
---        end if;
-
-   exception
-      when others =>
-         if forgive_errors then
-            error := True;
-            next_frame := 0.0;
-         else
-            raise;
-         end if;
-
-   end Load_raw_image;
-
-   --  -------------------------------------------------------------------------
-
-   procedure Dump_BMP_24 (File_Name  : String;
-                          Image_desc : GID.Image_descriptor) is
       type BITMAPFILEHEADER is record
          bfType      : Unsigned_16;
          bfSize      : Unsigned_32;
@@ -214,7 +39,103 @@ package body Simple_Support is
          biClrImportant  : Unsigned_32 := 0;
       end record;
       --  ^ No packing needed
-      BITMAPINFOHEADER_Bytes : constant := 40;
+   BITMAPINFOHEADER_Bytes : constant := 40;
+
+   stars                  : Natural := 0;
+   forgive_errors         : constant Boolean := False;
+   error                  : Boolean;
+   img_buf                : p_Byte_Array := null;
+
+   procedure Dispose is new Ada.Unchecked_Deallocation (Byte_Array, p_Byte_Array);
+
+   --  ---------------------------------------------------------------------------------------
+
+   procedure Load_raw_image
+     (image                 : in out GID.Image_descriptor;
+      buffer                : out p_Byte_Array;
+      next_frame            : out Ada.Calendar.Day_Duration) is
+      subtype Primary_color_range is Unsigned_8;
+      subtype U16 is Unsigned_16;
+      image_width           : constant Positive := GID.Pixel_width (image);
+      padded_line_size_x    : constant Positive :=
+                                4 * Integer (Float'Ceiling (Float (image_width) * 3.0 / 4.0));
+      --  (in bytes)
+      idx                   : Integer;
+
+      --  ---------------------------------------------------------------------------------------
+
+      procedure Set_X_Y (x, y : Natural) is
+         pragma Inline (Set_X_Y);
+      begin
+         idx := 3 * x + padded_line_size_x * y;
+      end Set_X_Y;
+
+      --  ----------------------------------------------------------------------------------------
+      --  Unicolor background version of Put_Pixel
+      procedure Put_Pixel_with_unicolor_bkg
+        (red, green, blue : Primary_color_range; alpha : Primary_color_range) is
+         pragma Inline (Put_Pixel_with_unicolor_bkg);
+         u_red   : constant := 200;
+         u_green : constant := 133;
+         u_blue  : constant := 32;
+      begin
+         if alpha = 255 then
+            buffer (idx .. idx + 2) := (blue, green, red);
+         else -- blend with bckground color
+            buffer (idx)  := Primary_color_range ((U16 (alpha) * U16 (blue)  + U16 (255 - alpha) * u_blue) / 255);
+            buffer (idx + 1) := Primary_color_range ((U16 (alpha) * U16 (green) + U16 (255 - alpha) * u_green) / 255);
+            buffer (idx + 2) := Primary_color_range ((U16 (alpha) * U16 (red)   + U16 (255 - alpha) * u_red) / 255);
+         end if;
+         idx := idx + 3;
+         --  ^ GID requires us to look to next pixel on the right for next time.
+      end Put_Pixel_with_unicolor_bkg;
+
+      --  -------------------------------------------------------------------------------------------------------------
+
+      procedure Feedback (percents : Natural) is
+         so_far : constant Natural := percents / 5;
+      begin
+         for i in stars + 1 .. so_far loop
+            Put ('*');
+         end loop;
+         stars := so_far;
+      end Feedback;
+
+      --  -------------------------------------------------------------------------
+
+      --  Here, the exciting thing: the instanciation of GID.Load_image_contents.
+      --  In our case, we load the image into a 24-bit bitmap because we provide a
+      --  Put_Pixel that does that with the pixels. We could do plenty of other
+      --  things instead like display the image live on a GUI.
+
+      procedure BMP24_Load_with_unicolor_bkg is new GID.Load_image_contents
+        (Primary_color_range, Set_X_Y, Put_Pixel_with_unicolor_bkg, Feedback, GID.fast);
+
+      --  -------------------------------------------------------------------------
+
+   begin  --  Load_raw_image
+      error := False;
+      Dispose (buffer);
+
+      buffer := new Byte_Array
+        (0 .. padded_line_size_x * GID.Pixel_height (image) - 1);
+      BMP24_Load_with_unicolor_bkg (image, next_frame);
+
+   exception
+      when others =>
+         if forgive_errors then
+            error := True;
+            next_frame := 0.0;
+         else
+            raise;
+         end if;
+
+   end Load_raw_image;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Dump_BMP_24 (File_Name  : String;
+                          Image_desc : GID.Image_descriptor) is
 
       FileInfo    : BITMAPINFOHEADER;
       FileHeader  : BITMAPFILEHEADER;
@@ -240,7 +161,8 @@ package body Simple_Support is
 
       procedure Write_Intel is new Write_Intel_x86_number (Unsigned_16);
       procedure Write_Intel is new Write_Intel_x86_number (Unsigned_32);
-   begin
+
+   begin  --  Dump_BMP_24
       FileHeader.bfType := 16#4D42#; -- 'BM'
       FileHeader.bfOffBits := BITMAPINFOHEADER_Bytes + BITMAPFILEHEADER_Bytes;
       FileInfo.biSize       := BITMAPINFOHEADER_Bytes;
@@ -261,17 +183,18 @@ package body Simple_Support is
       Put_Line ("Dump_BMP_24 creating " & File_Name & ".dib");
       Create (out_file_id, Out_File, File_Name & ".dib");
       --  BMP Header, endian-safe:
-      Write_Intel (FileHeader.bfType);
-      Write_Intel (FileHeader.bfSize);
-      Write_Intel (FileHeader.bfReserved1);
-      Write_Intel (FileHeader.bfReserved2);
-      Write_Intel (FileHeader.bfOffBits);
+      Write_Intel (FileHeader.bfType);        --  unsigned_32
+      Write_Intel (FileHeader.bfSize);        --  unsigned_16
+      Write_Intel (FileHeader.bfReserved1);   --  unsigned_32
+      Write_Intel (FileHeader.bfReserved2);   --  unsigned_32
+      Write_Intel (FileHeader.bfOffBits);    --  unsigned_16
 
-      Write_Intel (FileInfo.biSize);
-      Write_Intel (FileInfo.biWidth);
-      Write_Intel (FileInfo.biHeight);
-      Write_Intel (FileInfo.biPlanes);
-      Write_Intel (FileInfo.biBitCount);
+      Write_Intel (FileInfo.biSize);    --  unsigned_16
+      Write_Intel (FileInfo.biWidth);    --  unsigned_16
+      Write_Intel (FileInfo.biHeight);    --  unsigned_16
+      Write_Intel (FileInfo.biPlanes);     --  unsigned_32
+      Write_Intel (FileInfo.biBitCount);   --  unsigned_32
+      --  ther rest are unsigned_16
       Write_Intel (FileInfo.biCompression);
       Write_Intel (FileInfo.biSizeImage);
       Write_Intel (FileInfo.biXPelsPerMeter);
@@ -336,39 +259,11 @@ package body Simple_Support is
 
       Put_Line ("Image format: " &
                   GID.Image_format_type'Image (GID.Format (image_desc)));
-      Put_Line ("Image detailed format: " &
-                  GID.Detailed_format (image_desc));
-      Put_Line ("Image sub-format ID (if any): " &
-                  Integer'Image (GID.Subformat (image_desc)));
       Put_Line ("Dimensions in pixels: " &
                   Integer'Image (GID.Pixel_width (image_desc)) & " x" &
                   Integer'Image (GID.Pixel_height (image_desc)));
-      Put_Line (Standard_Error,"  Display orientation: " &
-                  GID.Orientation'Image (GID.Display_orientation (image_desc)));
-      Put ("Color depth: " &
-             Integer'Image (GID.Bits_per_pixel (image_desc)) & " bits");
-
-      if GID.Bits_per_pixel (image_desc) <= 24 then
-         Put_Line (',' & Integer'Image (2**GID.Bits_per_pixel (image_desc)) &
-                     " colors");
-      else
-         New_Line;
-      end if;
-
-      Put_Line ("Palette: " &
-                  Boolean'Image (GID.Has_palette (image_desc)));
-      Put_Line ("Greyscale: " & Boolean'Image (GID.Greyscale (image_desc)));
-      Put_Line ("RLE encoding (if any): " &
-                  Boolean'Image (GID.Is_RLE_encoded (image_desc)));
-      Put_Line ("Interlaced (GIF: each frame's choice): " &
-                  Boolean'Image (GID.Is_Interlaced (image_desc)));
-      Put_Line ("Expect transparency: " &
-                  Boolean'Image (GID.Expect_transparency (image_desc)));
-      Put_Line ("1........10........20");
-      Put_Line ("         |         | ");
 
       while not Done loop
---           Load_raw_image (image_desc, img_buf, next_frame, image_name);
          Load_raw_image (image_desc, img_buf, next_frame);
          Dump_BMP_24 (Image_File_Name, image_desc);
          New_Line;
