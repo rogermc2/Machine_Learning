@@ -18,17 +18,17 @@ package body Simple_Support is
      (Byte_Array, p_Byte_Array);
 
    stars          : Natural := 0;
-   bkg_buf        : constant p_Byte_Array := null;
+--     bkg_buf        : constant p_Byte_Array := null;
    forgive_errors : constant Boolean := False;
    error          : Boolean;
    img_buf        : p_Byte_Array := null;
-   bkg            : GID.Image_descriptor;
+--     bkg            : GID.Image_descriptor;
 
    procedure Load_raw_image
      (image                 : in out GID.Image_descriptor;
       buffer                : out p_Byte_Array;
-      next_frame            : out Ada.Calendar.Day_Duration;
-      background_image_name : Unbounded_String) is
+      next_frame            : out Ada.Calendar.Day_Duration) is
+--        background_image_name : Unbounded_String) is
       subtype Primary_color_range is Unsigned_8;
       subtype U16 is Unsigned_16;
       image_width           : constant Positive := GID.Pixel_width (image);
@@ -36,30 +36,30 @@ package body Simple_Support is
                                 4 * Integer (Float'Ceiling (Float (image_width) * 3.0 / 4.0));
       --  (in bytes)
       idx                   : Integer;
-      mem_x                 : Natural;
-      mem_y                 : Natural;
-      bkg_padded_line_size  : Positive;
-      bkg_width             : Natural;
-      bkg_height            : Natural;
+--        mem_x                 : Natural;
+--        mem_y                 : Natural;
+--        bkg_padded_line_size  : Positive;
+--        bkg_width             : Natural;
+--        bkg_height            : Natural;
 
       procedure Set_X_Y (x, y : Natural) is
          pragma Inline (Set_X_Y);
       begin
-        idx := 3 * x + padded_line_size_x * y;
-         mem_x := x;
-         mem_y := y;
+         idx := 3 * x + padded_line_size_x * y;
+--           mem_x := x;
+--           mem_y := y;
       end Set_X_Y;
 
       --  No background version of Put_Pixel
-      procedure Put_Pixel_without_bkg
-        (red, green, blue : Primary_color_range; alpha : Primary_color_range) is
-         pragma Inline (Put_Pixel_without_bkg);
-         pragma Warnings (off, alpha); -- alpha is ignored
-      begin
-         buffer (idx .. idx + 2) := (blue, green, red);
-         --  GID requires us to look at the next pixel for next time:
-         idx := idx + 3;
-      end Put_Pixel_without_bkg;
+--        procedure Put_Pixel_without_bkg
+--          (red, green, blue : Primary_color_range; alpha : Primary_color_range) is
+--           pragma Inline (Put_Pixel_without_bkg);
+--           pragma Warnings (off, alpha); -- alpha is ignored
+--        begin
+--           buffer (idx .. idx + 2) := (blue, green, red);
+--           --  GID requires us to look at the next pixel for next time:
+--           idx := idx + 3;
+--        end Put_Pixel_without_bkg;
 
       --  -------------------------------------------------------------------------
       --  Unicolor background version of Put_Pixel
@@ -83,31 +83,31 @@ package body Simple_Support is
 
       --  -------------------------------------------------------------------------
       --  Background image version of Put_Pixel
-      procedure Put_Pixel_with_image_bkg
-        (red, green, blue : Primary_color_range;
-         alpha            : Primary_color_range) is
-         pragma Inline (Put_Pixel_with_image_bkg);
-         b_red,
-         b_green,
-         b_blue  : Primary_color_range;
-         bkg_idx : Natural;
-      begin
-         if alpha = 255 then
-            buffer (idx .. idx + 2) := (blue, green, red);
-         else -- blend with background image
-            bkg_idx := 3 * (mem_x mod bkg_width) + bkg_padded_line_size * (mem_y mod bkg_height);
-            b_blue := bkg_buf (bkg_idx);
-            b_green := bkg_buf (bkg_idx + 1);
-            b_red  := bkg_buf (bkg_idx + 2);
-            buffer (idx)  := Primary_color_range ((U16 (alpha) * U16 (blue)  + U16 (255 - alpha) * U16 (b_blue)) / 255);
-            buffer (idx + 1) := Primary_color_range ((U16 (alpha) * U16 (green) + U16 (255 - alpha) * U16 (b_green)) / 255);
-            buffer (idx + 2) := Primary_color_range ((U16 (alpha) * U16 (red)   + U16 (255 - alpha) * U16 (b_red)) / 255);
-         end if;
-
-         idx := idx + 3;
-         --  ^ GID requires us to look to next pixel on the right for next time.
-         mem_x := mem_x + 1;
-      end Put_Pixel_with_image_bkg;
+--        procedure Put_Pixel_with_image_bkg
+--          (red, green, blue : Primary_color_range;
+--           alpha            : Primary_color_range) is
+--           pragma Inline (Put_Pixel_with_image_bkg);
+--           b_red,
+--           b_green,
+--           b_blue  : Primary_color_range;
+--           bkg_idx : Natural;
+--        begin
+--           if alpha = 255 then
+--              buffer (idx .. idx + 2) := (blue, green, red);
+--           else -- blend with background image
+--              bkg_idx := 3 * (mem_x mod bkg_width) + bkg_padded_line_size * (mem_y mod bkg_height);
+--              b_blue := bkg_buf (bkg_idx);
+--              b_green := bkg_buf (bkg_idx + 1);
+--              b_red  := bkg_buf (bkg_idx + 2);
+--              buffer (idx)  := Primary_color_range ((U16 (alpha) * U16 (blue)  + U16 (255 - alpha) * U16 (b_blue)) / 255);
+--              buffer (idx + 1) := Primary_color_range ((U16 (alpha) * U16 (green) + U16 (255 - alpha) * U16 (b_green)) / 255);
+--              buffer (idx + 2) := Primary_color_range ((U16 (alpha) * U16 (red)   + U16 (255 - alpha) * U16 (b_red)) / 255);
+--           end if;
+--
+--           idx := idx + 3;
+--           --  ^ GID requires us to look to next pixel on the right for next time.
+--           mem_x := mem_x + 1;
+--        end Put_Pixel_with_image_bkg;
 
       --  -------------------------------------------------------------------------
 
@@ -133,19 +133,19 @@ package body Simple_Support is
       --  decoders for all formats, own specialized generic instances, inlines,
       --  etc.) depending on the transparency features.
 
-      procedure BMP24_Load_without_bkg is
-        new GID.Load_image_contents (Primary_color_range, Set_X_Y,
-                                     Put_Pixel_without_bkg, Feedback, GID.fast);
+--        procedure BMP24_Load_without_bkg is
+--          new GID.Load_image_contents (Primary_color_range, Set_X_Y,
+--                                       Put_Pixel_without_bkg, Feedback, GID.fast);
 
       procedure BMP24_Load_with_unicolor_bkg is
         new GID.Load_image_contents (Primary_color_range, Set_X_Y,
                                      Put_Pixel_with_unicolor_bkg, Feedback,
                                      GID.fast);
 
-      procedure BMP24_Load_with_image_bkg is
-        new GID.Load_image_contents (Primary_color_range, Set_X_Y,
-                                     Put_Pixel_with_image_bkg, Feedback,
-                                     GID.fast);
+--        procedure BMP24_Load_with_image_bkg is
+--          new GID.Load_image_contents (Primary_color_range, Set_X_Y,
+--                                       Put_Pixel_with_image_bkg, Feedback,
+--                                       GID.fast);
 
       --  -------------------------------------------------------------------------
 
@@ -153,22 +153,26 @@ package body Simple_Support is
       error := False;
       Dispose (buffer);
 
-         buffer := new Byte_Array
-           (0 .. padded_line_size_x * GID.Pixel_height (image) - 1);
+      buffer := new Byte_Array
+        (0 .. padded_line_size_x * GID.Pixel_height (image) - 1);
 
-      if GID.Expect_transparency (image) then
-         if background_image_name = Null_Unbounded_String then
+--        if GID.Expect_transparency (image) then
+--           Put_Line ("Expect_transparency");
+--           if background_image_name = Null_Unbounded_String then
+--              Put_Line ("background_image_name is null");
             BMP24_Load_with_unicolor_bkg (image, next_frame);
-         else
-            bkg_width := GID.Pixel_width (bkg);
-            bkg_height := GID.Pixel_height (bkg);
-            bkg_padded_line_size :=
-              4 * Integer (Float'Ceiling (Float (bkg_width) * 3.0 / 4.0));
-            BMP24_Load_with_image_bkg (image, next_frame);
-         end if;
-      else
-         BMP24_Load_without_bkg (image, next_frame);
-      end if;
+--           else
+--           Put_Line ("background_image_name not null");
+--              bkg_width := GID.Pixel_width (bkg);
+--              bkg_height := GID.Pixel_height (bkg);
+--              bkg_padded_line_size :=
+--                4 * Integer (Float'Ceiling (Float (bkg_width) * 3.0 / 4.0));
+--              BMP24_Load_with_image_bkg (image, next_frame);
+--           end if;
+--        else
+--           Put_Line ("don't Expect_transparency");
+--           BMP24_Load_without_bkg (image, next_frame);
+--        end if;
 
    exception
       when others =>
@@ -183,7 +187,8 @@ package body Simple_Support is
 
    --  -------------------------------------------------------------------------
 
-   procedure Dump_BMP_24 (name : String; Image_desc : GID.Image_descriptor) is
+   procedure Dump_BMP_24 (File_Name  : String;
+                          Image_desc : GID.Image_descriptor) is
       type BITMAPFILEHEADER is record
          bfType      : Unsigned_16;
          bfSize      : Unsigned_32;
@@ -253,8 +258,8 @@ package body Simple_Support is
       New_Line;
       FileHeader.bfSize := FileHeader.bfOffBits + FileInfo.biSizeImage;
 
-      Put_Line ("Dump_BMP_24 creating " & name & ".dib");
-      Create (out_file_id, Out_File, name & ".dib");
+      Put_Line ("Dump_BMP_24 creating " & File_Name & ".dib");
+      Create (out_file_id, Out_File, File_Name & ".dib");
       --  BMP Header, endian-safe:
       Write_Intel (FileHeader.bfType);
       Write_Intel (FileHeader.bfSize);
@@ -310,23 +315,24 @@ package body Simple_Support is
 
    --  -------------------------------------------------------------------------
 
-   procedure Process (name : String; image_name : in out Unbounded_String) is
-      Routine_Name  : constant String := "Simple_Support.Process ";
-      up_name       : constant String := To_Upper (name);
-      in_file_id    : Ada.Streams.Stream_IO.File_Type;
-      image_desc    : GID.Image_descriptor;
-      next_frame    : Ada.Calendar.Day_Duration := 0.0;
-      Done          : Boolean := False;
+   procedure Process (Image_File_Name : String) is
+      Routine_Name    : constant String := "Simple_Support.Process ";
+      File_Name_Upper : constant String := To_Upper (Image_File_Name);
+      in_file_id      : Ada.Streams.Stream_IO.File_Type;
+      image_desc      : GID.Image_descriptor;
+      next_frame      : Ada.Calendar.Day_Duration := 0.0;
+      Done            : Boolean := False;
    begin
       --  Load the image in its original format
-      Open (in_file_id, In_File, name);
-      Put_Line (Routine_Name & "processing " & name);
+      Open (in_file_id, In_File, Image_File_Name);
+      Put_Line (Routine_Name & "processing " & Image_File_Name);
 
       GID.Load_image_header
         (image_desc, Stream (in_file_id).all,
          try_tga =>
-           name'Length >= 4 and then
-         up_name (up_name'Last - 3 .. up_name'Last) = ".TGA");
+           Image_File_Name'Length >= 4 and then
+         File_Name_Upper
+           (File_Name_Upper'Last - 3 .. File_Name_Upper'Last) = ".TGA");
 
       Put_Line ("Image format: " &
                   GID.Image_format_type'Image (GID.Format (image_desc)));
@@ -362,8 +368,9 @@ package body Simple_Support is
       Put_Line ("         |         | ");
 
       while not Done loop
-         Load_raw_image (image_desc, img_buf, next_frame, image_name);
-         Dump_BMP_24 (name,image_desc);
+--           Load_raw_image (image_desc, img_buf, next_frame, image_name);
+         Load_raw_image (image_desc, img_buf, next_frame);
+         Dump_BMP_24 (Image_File_Name, image_desc);
          New_Line;
 
          if error then
