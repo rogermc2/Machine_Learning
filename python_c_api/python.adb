@@ -131,6 +131,7 @@ package body Python is
       PyResult := PyObject_CallObject (PyFunc, PyParams);
       
       if PyResult = System.Null_Address then
+         New_Line;
          Put_Line (Routine_Name & "Python error message:");
          PyErr_Print;
          raise Interpreter_Error with Routine_Name & "failed.";
@@ -341,6 +342,15 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : String) return PyObject is
+   begin
+      
+      return PyString_FromString (Interfaces.C.To_C (Data));
+            
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : ML_Types.Unbounded_List) return PyObject is
       use Interfaces.C;
       use Ada.Strings.Unbounded;
@@ -388,21 +398,29 @@ package body Python is
    --  -------------------------------------------------------------------------
     
    procedure Call (M : Module; Function_Name, A : String) is
-      
-      function Py_BuildValue (Format : Interfaces.C.char_array;
-                              A      : Interfaces.C.char_array) return PyObject;
-      pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      F            : constant PyObject := Get_Symbol (M, Function_Name);
+      use type System.Address;
+      Routine_Name : constant String := "Python.Call String ";
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
+      
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1      : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
    begin
-      PyParams := Py_BuildValue (Interfaces.C.To_C ("s"),
-                                 Interfaces.C.To_C (A));
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
+      if PyParams = System.Null_Address then
+         Put_Line (Routine_Name & "Python error message:");
+         PyErr_Print;
+         raise Interpreter_Error with Routine_Name & "failed.";
+      end if;
+      
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       Py_DecRef (F);
+      Py_DecRef (A_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
       
