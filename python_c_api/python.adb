@@ -343,9 +343,11 @@ package body Python is
    --  -------------------------------------------------------------------------
 
    function To_Tuple (Data : String) return PyObject is
+      Tuple  :constant PyObject := PyTuple_New (1);
    begin
+      PyTuple_SetItem (Tuple, 0, PyString_FromString (Interfaces.C.To_C (Data)));
       
-      return PyString_FromString (Interfaces.C.To_C (Data));
+      return Tuple;
             
    end To_Tuple;
 
