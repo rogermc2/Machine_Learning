@@ -12,9 +12,8 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
-with Interfaces; use Interfaces;
-
 package body Simple_PNG_To_BMP is
+   use Interfaces;
 
    type Byte_Array is array (Integer range <>) of Unsigned_8;
    type p_Byte_Array is access Byte_Array;
@@ -52,6 +51,20 @@ package body Simple_PNG_To_BMP is
    procedure Dispose is new Ada.Unchecked_Deallocation (Byte_Array, p_Byte_Array);
 
    --  ---------------------------------------------------------------------------------------
+
+      function Height (Data : Image_Array) return Natural is
+      begin
+         return Data'Length (2);
+      end Height;
+
+      --  -------------------------------------------------------------------------
+
+   function Width (Data : Image_Array) return Natural is
+      begin
+         return Data'Length;
+      end Width;
+
+   --  -------------------------------------------------------------------------
 
    procedure Load_raw_image (image      : in out GID.Image_descriptor;
                              buffer     : out p_Byte_Array;
@@ -103,7 +116,6 @@ package body Simple_PNG_To_BMP is
       end Feedback;
 
       --  -------------------------------------------------------------------------
-
       --  Here, the exciting thing: the instanciation of GID.Load_image_contents.
       --  In our case, we load the image into a 24-bit bitmap because we provide a
       --  Put_Pixel that does that with the pixels. We could do plenty of other
@@ -125,8 +137,8 @@ package body Simple_PNG_To_BMP is
 
    --  -------------------------------------------------------------------------
 
-   function Write_BMP_24 (File_Name  : String;
-                          Image_desc : GID.Image_descriptor) return String is
+   procedure Write_BMP_24 (File_Name  : String;
+                          Image_desc : GID.Image_descriptor) is
       use Ada.Strings.Unbounded;
       Routine_Name : constant String := "Simple_BMP.Write_BMP_24 ";
       out_file_id  : Ada.Streams.Stream_IO.File_Type;
@@ -228,18 +240,19 @@ package body Simple_PNG_To_BMP is
       end;  --  declare block
       Close (out_file_id);
 
-      return To_String (Out_File_Name);
-
    end Write_BMP_24;
 
    --  -------------------------------------------------------------------------
 
-   function Process (Image_File_Name : String) return String is
+   function Process (Image_File_Name : String) return Image_Array is
       Routine_Name    : constant String := "Simple_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
       in_file_id      : Ada.Streams.Stream_IO.File_Type;
       image_desc      : GID.Image_descriptor;
+      Width           : Positive;
+      Height          : Positive;
       next_frame      : Ada.Calendar.Day_Duration := 0.0;
+      Buffer_Index    : Natural := 0;
    begin
       --  Load the image in its original format
       Open (in_file_id, In_File, Image_File_Name);
@@ -251,21 +264,27 @@ package body Simple_PNG_To_BMP is
            Image_File_Name'Length >= 4 and then
          File_Name_Upper
            (File_Name_Upper'Last - 3 .. File_Name_Upper'Last) = ".TGA");
-
+      Width := GID.Pixel_width (image_desc);
+      Height := GID.Pixel_height (image_desc);
       Put_Line ("Image format: " &
                   GID.Image_format_type'Image (GID.Format (image_desc)));
       Put_Line ("Dimensions in pixels: " &
-                  Integer'Image (GID.Pixel_width (image_desc)) & " x" &
-                  Integer'Image (GID.Pixel_height (image_desc)));
+                  Integer'Image (Width) & " x" & Integer'Image (Height));
 
       Load_raw_image (image_desc, img_buf, next_frame);
       Assert (next_frame = 0.0, "");
+      Write_BMP_24 (Image_File_Name, image_desc);
       declare
-         Out_File_Name : constant String :=
-                           Write_BMP_24 (Image_File_Name, image_desc);
+         Image_Data    : Image_Array (1 .. Height, 1 .. Width);
       begin
+         for row in Image_Data'Range loop
+            for col in Image_Data'Range (2) loop
+               Buffer_Index := Buffer_Index + 1;
+               Image_Data (row, col) := img_buf (Buffer_Index);
+            end loop;
+         end loop;
          Close (in_file_id);
-         return Out_File_Name;
+         return Image_Data;
       end;  --  declare block
 
    exception
