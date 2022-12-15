@@ -52,12 +52,12 @@ package body Simple_PNG_To_BMP is
 
    --  ---------------------------------------------------------------------------------------
 
-      function Height (Data : Image_Array) return Natural is
-      begin
+   function Height (Data : Image_Array) return Natural is
+   begin
          return Data'Length (2);
-      end Height;
+   end Height;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
    function Width (Data : Image_Array) return Natural is
       begin
