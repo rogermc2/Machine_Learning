@@ -1,4 +1,8 @@
 
+--  Derived from gid/test/To_BMP
+
+with Ada.Assertions; use Ada.Assertions;
+
 with GID;
 
 with Ada.Calendar;
@@ -15,45 +19,43 @@ package body Simple_PNG_To_BMP is
    type Byte_Array is array (Integer range <>) of Unsigned_8;
    type p_Byte_Array is access Byte_Array;
 
-      type BITMAPFILEHEADER is record
-         bfType      : Unsigned_16;
-         bfSize      : Unsigned_32;
-         bfReserved1 : Unsigned_16 := 0;
-         bfReserved2 : Unsigned_16 := 0;
-         bfOffBits   : Unsigned_32;
-      end record;
+   type BITMAPFILEHEADER is record
+      bfType      : Unsigned_16;
+      bfSize      : Unsigned_32;
+      bfReserved1 : Unsigned_16 := 0;
+      bfReserved2 : Unsigned_16 := 0;
+      bfOffBits   : Unsigned_32;
+   end record;
 
-      --  ^ No packing needed
-      BITMAPFILEHEADER_Bytes : constant := 14;
+   --  ^ No packing needed
+   BITMAPFILEHEADER_Bytes : constant := 14;
 
-      type BITMAPINFOHEADER is record
-         biSize          : Unsigned_32;
-         biWidth         : Unsigned_32;
-         biHeight        : Unsigned_32;
-         biPlanes        : Unsigned_16 := 1;
-         biBitCount      : Unsigned_16;
-         biCompression   : Unsigned_32 := 0;
-         biSizeImage     : Unsigned_32;
-         biXPelsPerMeter : Unsigned_32 := 0;
-         biYPelsPerMeter : Unsigned_32 := 0;
-         biClrUsed       : Unsigned_32 := 0;
-         biClrImportant  : Unsigned_32 := 0;
-      end record;
-      --  ^ No packing needed
+   type BITMAPINFOHEADER is record
+      biSize          : Unsigned_32;
+      biWidth         : Unsigned_32;
+      biHeight        : Unsigned_32;
+      biPlanes        : Unsigned_16 := 1;
+      biBitCount      : Unsigned_16;
+      biCompression   : Unsigned_32 := 0;
+      biSizeImage     : Unsigned_32;
+      biXPelsPerMeter : Unsigned_32 := 0;
+      biYPelsPerMeter : Unsigned_32 := 0;
+      biClrUsed       : Unsigned_32 := 0;
+      biClrImportant  : Unsigned_32 := 0;
+   end record;
+   --  ^ No packing needed
    BITMAPINFOHEADER_Bytes : constant := 40;
 
    stars                  : Natural := 0;
-   error                  : Boolean;
    img_buf                : p_Byte_Array := null;
 
    procedure Dispose is new Ada.Unchecked_Deallocation (Byte_Array, p_Byte_Array);
 
    --  ---------------------------------------------------------------------------------------
 
-   procedure Load_raw_image
-     (image                 : in out GID.Image_descriptor;
-      buffer                : out p_Byte_Array;
-      next_frame            : out Ada.Calendar.Day_Duration) is
+   procedure Load_raw_image (image      : in out GID.Image_descriptor;
+                             buffer     : out p_Byte_Array;
+                             next_frame : out Ada.Calendar.Day_Duration) is
       subtype Primary_color_range is Unsigned_8;
       subtype U16 is Unsigned_16;
       image_width        : constant Positive := GID.Pixel_width (image);
@@ -113,7 +115,6 @@ package body Simple_PNG_To_BMP is
       --  -------------------------------------------------------------------------
 
    begin  --  Load_raw_image
-      error := False;
       Dispose (buffer);
 
       buffer := new Byte_Array
@@ -124,11 +125,11 @@ package body Simple_PNG_To_BMP is
 
    --  -------------------------------------------------------------------------
 
-   procedure Write_BMP_24 (File_Name : String;
-                           Image_desc : GID.Image_descriptor) is
+   function Write_BMP_24 (File_Name  : String;
+                          Image_desc : GID.Image_descriptor) return String is
       use Ada.Strings.Unbounded;
       Routine_Name : constant String := "Simple_BMP.Write_BMP_24 ";
-      out_file_id : Ada.Streams.Stream_IO.File_Type;
+      out_file_id  : Ada.Streams.Stream_IO.File_Type;
 
       generic
          type Number is mod <>;
@@ -173,6 +174,7 @@ package body Simple_PNG_To_BMP is
       FileHeader.bfSize := FileHeader.bfOffBits + FileInfo.biSizeImage;
 
       Put_Line (Routine_Name & "creating " & Slice (Out_File_Name, 1, Pos) & ".dib");
+      --  Reason for ".dib": unknown synonym of ".bmp";
       Create (out_file_id, Out_File, Slice (Out_File_Name, 1, Pos) & ".dib");
       --  BMP Header, endian-safe:
       Write_Intel (FileHeader.bfType);        --  unsigned_32
@@ -226,17 +228,18 @@ package body Simple_PNG_To_BMP is
       end;  --  declare block
       Close (out_file_id);
 
+      return To_String (Out_File_Name);
+
    end Write_BMP_24;
 
    --  -------------------------------------------------------------------------
 
-   procedure Process (Image_File_Name : String) is
+   function Process (Image_File_Name : String) return String is
       Routine_Name    : constant String := "Simple_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
       in_file_id      : Ada.Streams.Stream_IO.File_Type;
       image_desc      : GID.Image_descriptor;
       next_frame      : Ada.Calendar.Day_Duration := 0.0;
-      Done            : Boolean := False;
    begin
       --  Load the image in its original format
       Open (in_file_id, In_File, Image_File_Name);
@@ -255,18 +258,15 @@ package body Simple_PNG_To_BMP is
                   Integer'Image (GID.Pixel_width (image_desc)) & " x" &
                   Integer'Image (GID.Pixel_height (image_desc)));
 
-      while not Done loop
-         Load_raw_image (image_desc, img_buf, next_frame);
-         Write_BMP_24 (Image_File_Name, image_desc);
-         New_Line;
-
-         if error then
-            Put_Line (Routine_Name & "Error!");
-         end if;
-
-         Done := next_frame = 0.0;
-      end loop;
-      Close (in_file_id);
+      Load_raw_image (image_desc, img_buf, next_frame);
+      Assert (next_frame = 0.0, "");
+      declare
+         Out_File_Name : constant String :=
+                           Write_BMP_24 (Image_File_Name, image_desc);
+      begin
+         Close (in_file_id);
+         return Out_File_Name;
+      end;  --  declare block
 
    exception
       when GID.unknown_image_format =>
@@ -274,6 +274,7 @@ package body Simple_PNG_To_BMP is
          if Is_Open (in_file_id) then
             Close (in_file_id);
          end if;
+         raise;
 
    end Process;
 

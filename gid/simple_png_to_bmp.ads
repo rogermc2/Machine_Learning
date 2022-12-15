@@ -1,6 +1,6 @@
 
 package Simple_PNG_To_BMP is
 
-   procedure Process (Image_File_Name : String);
+   function Process (Image_File_Name : String) return String;
 
 end Simple_PNG_To_BMP;
