@@ -216,13 +216,14 @@ package body Python is
                       return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Integer_Array_3D ";
-      Pix_Value    : Integer;
+      Value        : Integer;
       Long_Value   : long;
       Py_Row       : int := -1;  --  Python indexing starts at 0
       Py_Col       : int := -1;
+      Py_Depth     : int := -1;
       Py_Matrix    : constant PyObject := PyTuple_New (int (Data'Length));
       Py_Array     : constant PyObject := PyTuple_New (int (Data'Length (2)));
-      Py_Pixels    : constant PyObject := PyTuple_New (3);
+      Py_Data      : constant PyObject := PyTuple_New (int (Data'Length (3)));
       Result       : constant PyObject := PyTuple_New (1);
    begin
       for row in Data'Range loop
@@ -230,13 +231,15 @@ package body Python is
          Py_Col := -1;
          for col in Data'Range (2) loop
             Py_Col := Py_Col + 1;
-            for pix in 1 .. 3 loop
-               Pix_Value := Data (row, col, pix);
-               Long_Value := long (Pix_Value);
-               PyTuple_SetItem (Py_Pixels, int (pix),
+            Py_Depth := -1;
+            for depth in Data'Range (3) loop
+               Py_Depth := Py_Depth + 1;
+               Value := Data (row, col, depth);
+               Long_Value := long (Value);
+               PyTuple_SetItem (Py_Data, int (depth),
                                 PyLong_FromLong (Long_Value));
             end loop;
-            PyTuple_SetItem (Py_Array, Py_Col, Py_Pixels);
+            PyTuple_SetItem (Py_Array, Py_Col, Py_Data);
          end loop;
          PyTuple_SetItem (Py_Matrix, Py_Row, Py_Array);
       end loop;
