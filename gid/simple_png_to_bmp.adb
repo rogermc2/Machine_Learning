@@ -300,6 +300,7 @@ package body Simple_PNG_To_BMP is
       Load_raw_image (image_desc, img_buf, next_frame);
       Assert (next_frame = 0.0, "");
       Write_BMP_24 (Image_File_Name, image_desc);
+
       declare
          Image_Data : Image_Array (1 .. Height, 1 .. Width);
       begin

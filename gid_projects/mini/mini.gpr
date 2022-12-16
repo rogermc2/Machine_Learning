@@ -1,0 +1,8 @@
+project Mini is
+
+   for Source_Dirs use ("src", "../../gid");
+   for Object_Dir use "obj";
+   for Main use ("mini.adb");
+
+end Mini;
+
