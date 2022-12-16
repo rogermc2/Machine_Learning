@@ -212,6 +212,47 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array_3D) 
+                      return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Integer_Array_3D ";
+      Pix_Value    : Integer;
+      Long_Value   : long;
+      Py_Row       : int := -1;  --  Python indexing starts at 0
+      Py_Col       : int := -1;
+      Py_Matrix    : constant PyObject := PyTuple_New (int (Data'Length));
+      Py_Array     : constant PyObject := PyTuple_New (int (Data'Length (2)));
+      Py_Pixels    : constant PyObject := PyTuple_New (3);
+      Result       : constant PyObject := PyTuple_New (1);
+   begin
+      for row in Data'Range loop
+         Py_Row := Py_Row + 1;
+         Py_Col := -1;
+         for col in Data'Range (2) loop
+            Py_Col := Py_Col + 1;
+            for pix in 1 .. 3 loop
+               Pix_Value := Data (row, col, pix);
+               Long_Value := long (Pix_Value);
+               PyTuple_SetItem (Py_Pixels, int (pix),
+                                PyLong_FromLong (Long_Value));
+            end loop;
+            PyTuple_SetItem (Py_Array, Py_Col, Py_Pixels);
+         end loop;
+         PyTuple_SetItem (Py_Matrix, Py_Row, Py_Array);
+      end loop;
+      PyTuple_SetItem (Result, 0, Py_Matrix);
+   
+      return Result;
+         
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise Interpreter_Error;
+            
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : NL_Types.Boolean_List) return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
@@ -649,6 +690,33 @@ package body Python is
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+   
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Integer_Array_3D) is
+      
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1      : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 

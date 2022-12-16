@@ -42,6 +42,8 @@ package ML_Arrays_And_Matrices is
      Boolean;
    type Integer_Matrix is array (Integer range <>, Integer range <>) of
      Integer;
+   type Integer_Array_3D is array (Integer range <>, Integer range <>,
+                                   Integer range <>) of Integer;
 
    package Integer_Array_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Integer_Array);

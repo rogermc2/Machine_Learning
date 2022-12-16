@@ -54,11 +54,13 @@ package body Simple_PNG_To_BMP is
    --  ---------------------------------------------------------------------------------------
 
    function As_Matrix (Image : Image_Array) return BMP_Matrix is
-      theMatrix : BMP_Matrix (Image'Range, Image'Range (2));
+      theMatrix : BMP_Matrix (Image'Range, Image'Range (2), Image'Range (3));
    begin
       for row in Image'Range loop
          for col in Image'Range (2) loop
-            theMatrix (row, col) := Integer (Image (row, col));
+            for pix in Image'Range (3) loop
+               theMatrix (row, col, pix) := Integer (Image (row, col, pix));
+            end loop;
          end loop;
       end loop;
 
@@ -302,12 +304,14 @@ package body Simple_PNG_To_BMP is
       Write_BMP_24 (Image_File_Name, image_desc);
 
       declare
-         Image_Data : Image_Array (1 .. Height, 1 .. Width);
+         Image_Data : Image_Array (1 .. Height, 1 .. Width, 1 .. 3);
       begin
          for row in Image_Data'Range loop
             for col in Image_Data'Range (2) loop
-               Buffer_Index := Buffer_Index + 1;
-               Image_Data (row, col) := img_buf (Buffer_Index);
+               for pix in Image_Data'Range (3) loop
+                  Buffer_Index := Buffer_Index + 1;
+                  Image_Data (row, col, pix) := img_buf (Buffer_Index);
+               end loop;
             end loop;
          end loop;
          Close (in_file_id);

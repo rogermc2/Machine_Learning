@@ -3,7 +3,8 @@ with Interfaces;
 
 package Simple_PNG_To_BMP is
 
-   type BMP_Matrix is array (Integer range <>, Integer range <>) of Integer;
+   type BMP_Matrix is array (Integer range <>, Integer range <>,
+                              Integer range <>) of Integer;
    type Image_Array (<>) is private;
 
    function As_Matrix (Image : Image_Array) return BMP_Matrix;

@@ -10,8 +10,8 @@ procedure Lesson_5A is
    Image_File_Name : constant String := "../greenML.png";
 begin
    declare
-      Image_Data : constant Integer_Matrix :=
-                     Integer_Matrix (As_Matrix (Process (Image_File_Name)));
+      Image_Data : constant Integer_Array_3D :=
+                     Integer_Array_3D (As_Matrix (Process (Image_File_Name)));
       Py_Module  : Module;
    begin
       Put_Line (Project_Name & "Image Dimensions: " &
