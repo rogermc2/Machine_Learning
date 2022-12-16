@@ -7,7 +7,7 @@ with ML_Types;
 
 with Classifier_Utilities;
 
-package Utilities is
+package TL_Utilities is
 
    Utilities_Exception : exception;
 
@@ -79,4 +79,4 @@ package Utilities is
    function XY_To_Rows (X, Y : ML_Types.Value_Data_Lists_2D)
                          return ML_Types.Rows_Vector;
 
-end Utilities;
+end TL_Utilities;

@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Maths;
 
-package body NL_Arrays_And_Matrices is
+package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
@@ -1199,4 +1199,4 @@ package body NL_Arrays_And_Matrices is
 
    --  -------------------------------------------------------------------------
 
-end NL_Arrays_And_Matrices;
+end ML_Arrays_And_Matrices;

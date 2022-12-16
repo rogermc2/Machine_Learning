@@ -12,7 +12,7 @@ package Simple_PNG_To_BMP is
    function Width (Data : Image_Array) return Natural;
 
 private
-   type Image_Array is array (Integer range <>, Integer range <>)
-     of Interfaces.Unsigned_8;
+   type Image_Array is array (Integer range <>, Integer range <>,
+                              Integer range <>) of Interfaces.Unsigned_8;
 
 end Simple_PNG_To_BMP;

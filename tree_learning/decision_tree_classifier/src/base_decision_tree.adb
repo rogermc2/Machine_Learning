@@ -10,7 +10,7 @@ with Classifier_Utilities;
 with Encode_Utils;
 --  with Printing;
 with Tree_Build;
-with Utilities;
+with Neural_Utilities;
 
 package body Base_Decision_Tree is
 
@@ -286,14 +286,15 @@ package body Base_Decision_Tree is
                      CCP_Alpha                : Float := 0.0;
                      Random_State             : Integer := 0) is
    begin
-      if Utilities.Is_Float (To_Unbounded_String (Min_Samples_Split)) then
+      if Neural_Utilities.Is_Float (To_Unbounded_String (Min_Samples_Split)) then
          declare
             Min_Split : Split_Value_Record (Split_Float);
          begin
             Min_Split.Float_Value := Float'Value (Min_Samples_Split);
             aClassifier.Parameters.Min_Samples_Split := Min_Split;
          end;
-      elsif Utilities.Is_Integer (To_Unbounded_String (Min_Samples_Split)) then
+      elsif Neural_Utilities.Is_Integer
+        (To_Unbounded_String (Min_Samples_Split)) then
          declare
             Min_Split : Split_Value_Record (Split_Integer);
          begin

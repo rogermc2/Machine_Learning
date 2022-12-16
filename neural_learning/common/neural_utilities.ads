@@ -4,11 +4,11 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types; use ML_Types;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 with Classifier_Utilities;
 
-package Utilities is
+package Neural_Utilities is
 
    type Integer_Pair is record
       Integer_1 : Integer;
@@ -43,7 +43,7 @@ package Utilities is
    function Number_Of_Features (Rows : Rows_Vector) return Class_Range;
    function Number_Of_Features (Rows : Value_Data_List) return Class_Range;
    function Pair_Items (A, B : Integer_Array) return Integer_Pair_List;
-   procedure Permute (anArray : in out NL_Arrays_And_Matrices.Float_Array);
+   procedure Permute (anArray : in out Float_Array);
    procedure Permute (anArray : in out Integer_Array);
    function Permute (aMatrix : Integer_Matrix) return Integer_Matrix;
    procedure Permute (aList : in out String_List);
@@ -79,4 +79,4 @@ package Utilities is
    function XY_To_Rows (X, Y : Value_Data_Lists_2D)
                          return Rows_Vector;
 
-end Utilities;
+end Neural_Utilities;

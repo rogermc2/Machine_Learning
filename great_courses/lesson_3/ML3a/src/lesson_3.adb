@@ -1,19 +1,16 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Utilities;
-
-with ML_Types;
-
 with Base_Decision_Tree;
 with Decision_Tree_Classification;
+with ML_Types;
+with TL_Utilities;
 with Tree;
 with Weights;
 
 procedure Lesson_3 is
-   use Utilities;
    use ML_Types;
-
+   use TL_Utilities;
    Data_File : File_Type;
 begin
    Put_Line ("Lesson 3 ");
@@ -24,7 +21,7 @@ begin
       Weight_Data : Weights.Weight_List;
    begin
       Put_Line ("Feature Names:");
-      Utilities.Load_CSV_Data (Data_File, Row_Data);
+      Load_CSV_Data (Data_File, Row_Data);
       Data := Split_Row_Data (Row_Data);
       declare
          aClassifier : Base_Decision_Tree.Classifier

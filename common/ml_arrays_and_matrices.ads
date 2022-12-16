@@ -8,7 +8,7 @@ with Ada.Strings.Unbounded;
 with ML_Types;
 with NL_Types;
 
-package NL_Arrays_And_Matrices is
+package ML_Arrays_And_Matrices is
    use Ada.Numerics;
 
    subtype Safe_Float is Float range Float'Range;
@@ -211,4 +211,4 @@ package NL_Arrays_And_Matrices is
    function Zero_Matrix (Num_Rows, Num_Cols : Positive)
                           return Real_Float_Matrix;
 
-end NL_Arrays_And_Matrices;
+end ML_Arrays_And_Matrices;

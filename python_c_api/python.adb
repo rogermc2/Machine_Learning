@@ -148,7 +148,7 @@ package body Python is
  
    --  -------------------------------------------------------------------------
 
-   function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Array) 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array) 
                       return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
@@ -173,7 +173,7 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
-   function To_Tuple (Data : NL_Arrays_And_Matrices.Integer_Matrix) 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
@@ -309,7 +309,7 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
-   function To_Tuple (Data : NL_Arrays_And_Matrices.Real_Float_Matrix) 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_Matrix) 
                       return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Real_Float_Matrix ";
@@ -468,7 +468,7 @@ package body Python is
    --  -------------------------------------------------------------------------
     
    procedure Call (M : Module; Function_Name : String;
-                   A : NL_Arrays_And_Matrices.Integer_Matrix) is
+                   A : ML_Arrays_And_Matrices.Integer_Matrix) is
       
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1  : PyObject) return PyObject;
@@ -496,7 +496,7 @@ package body Python is
    --  -------------------------------------------------------------------------
    
    procedure Call (M    : Module; Function_Name : String;
-                   A, B : NL_Arrays_And_Matrices.Integer_Matrix) is
+                   A, B : ML_Arrays_And_Matrices.Integer_Matrix) is
       
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject) return PyObject;
@@ -526,7 +526,7 @@ package body Python is
    --  -------------------------------------------------------------------------
    
    procedure Call (M    : Module; Function_Name : String;
-                   A, B : NL_Arrays_And_Matrices.Integer_Matrix;
+                   A, B : ML_Arrays_And_Matrices.Integer_Matrix;
                    C    : ML_Types.Unbounded_List) is
       
       function Py_BuildValue (Format      : Interfaces.C.char_array;
@@ -558,8 +558,8 @@ package body Python is
    --  -------------------------------------------------------------------------
    
    procedure Call (M    : Module; Function_Name : String;
-                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
-                   B    : NL_Arrays_And_Matrices.Integer_Array) is
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Integer_Array) is
       
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               T1, T2 : PyObject) return PyObject;
@@ -587,10 +587,10 @@ package body Python is
    --  -------------------------------------------------------------------------
    
    procedure Call (M    : Module; Function_Name : String;
-                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
-                   B    : NL_Arrays_And_Matrices.Integer_Array;
-                   C    : NL_Arrays_And_Matrices.Real_Float_Matrix;
-                   D    : NL_Arrays_And_Matrices.Integer_Array) is
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Integer_Array;
+                   C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   D    : ML_Arrays_And_Matrices.Integer_Array) is
 --        Routine_Name : constant String := "Python.Call ABCD ";
       
       function Py_BuildValue (Format          : Interfaces.C.char_array;
@@ -627,8 +627,8 @@ package body Python is
    --  -------------------------------------------------------------------------
    
    procedure Call (M    : Module; Function_Name : String;
-                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
-                   B    : NL_Arrays_And_Matrices.Integer_Matrix) is
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Integer_Matrix) is
       
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject) return PyObject;

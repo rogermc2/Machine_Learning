@@ -3,7 +3,7 @@ with System;
 
 with ML_Types;
 with NL_Types;
-with NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices;
 
 package Python is
 
@@ -28,23 +28,23 @@ package Python is
    function Call (M : Module; Function_Name : String; A, B : Integer)
                   return Integer;
    procedure Call (M : Module; Function_Name : String;
-                   A : NL_Arrays_And_Matrices.Integer_Matrix);
+                   A : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
-                   A, B : NL_Arrays_And_Matrices.Integer_Matrix);
+                   A, B : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
-                   A, B : NL_Arrays_And_Matrices.Integer_Matrix;
+                   A, B : ML_Arrays_And_Matrices.Integer_Matrix;
                    C    : ML_Types.Unbounded_List);
    procedure Call (M    : Module; Function_Name : String;
-                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
-                   B    : NL_Arrays_And_Matrices.Integer_Array);
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Integer_Array);
    procedure Call (M    : Module; Function_Name : String;
-                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
-                   B    : NL_Arrays_And_Matrices.Integer_Array;
-                   C    : NL_Arrays_And_Matrices.Real_Float_Matrix;
-                   D    : NL_Arrays_And_Matrices.Integer_Array);
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Integer_Array;
+                   C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   D    : ML_Arrays_And_Matrices.Integer_Array);
    procedure Call (M    : Module; Function_Name : String;
-                   A    : NL_Arrays_And_Matrices.Real_Float_Matrix;
-                   B    : NL_Arrays_And_Matrices.Integer_Matrix);
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M : Module; Function_Name : String;
                    A : NL_Types.Boolean_List_2D;
                    B : ML_Types.Bounded_String_List);

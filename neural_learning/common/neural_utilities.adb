@@ -7,7 +7,7 @@ with Ada.Strings.Fixed;
 
 with Maths;
 
-package body Utilities is
+package body Neural_Utilities is
 
    function Unique_Values (Rows    : Rows_Vector;
                            Feature : Feature_Name_Type) return Value_List;
@@ -179,8 +179,7 @@ package body Utilities is
    begin
       while not End_Of_File (Data_File) loop
          Data_Line := To_Unbounded_String (Get_Line (Data_File));
-         CSV_Line := Utilities.Split_String
-           (To_String (Data_Line), ",");
+         CSV_Line := Split_String (To_String (Data_Line), ",");
          Curs := CSV_Line.First;
          Values.Clear;
          while Has_Element (Curs) loop
@@ -226,7 +225,7 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   procedure Permute (anArray : in out NL_Arrays_And_Matrices.Float_Array) is
+   procedure Permute (anArray : in out Float_Array) is
       Array_Length  : constant Positive := Positive (anArray'Length);
       Index_2       : Natural;
       Rand          : Positive;
@@ -861,4 +860,4 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-end Utilities;
+end Neural_Utilities;

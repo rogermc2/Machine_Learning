@@ -4,7 +4,7 @@ with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Utilities;
+with Neural_Utilities;
 
 package body Word_Classification is
 
@@ -32,7 +32,8 @@ package body Word_Classification is
    begin
       for index in Data_In.First_Index .. Data_In.Last_Index loop
          aLine := Data_In (index);
-         Word_Line := Utilities.Split_String_On_Spaces (To_String (aLine));
+         Word_Line :=
+           Neural_Utilities.Split_String_On_Spaces (To_String (aLine));
          Features := Get_Features (Word_Line);
          Data_Out.Append (Features);
          Labels.Append

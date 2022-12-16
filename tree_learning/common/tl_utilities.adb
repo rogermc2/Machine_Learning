@@ -8,7 +8,7 @@ with Maths;
 
 --  with Printing;
 
-package body Utilities is
+package body TL_Utilities is
 
    use ML_Types;
 
@@ -247,8 +247,7 @@ package body Utilities is
             begin
                if aLine'Length > 1 then
                   Data_Line := To_Unbounded_String (aLine);
-                  CSV_Line := Utilities.Split_String
-                    (To_String (Data_Line), ",");
+                  CSV_Line := Split_String (To_String (Data_Line), ",");
                   Curs := CSV_Line.First;
                   while Has_Element (Curs) loop
                      if Curs /= CSV_Line.Last then
@@ -295,8 +294,7 @@ package body Utilities is
                Row          : Row_Data (Num_Features);
             begin
                Data_Line := To_Unbounded_String (Get_Line (Data_File));
-               CSV_Line := Utilities.Split_String
-                 (To_String (Data_Line), ",");
+               CSV_Line := Split_String (To_String (Data_Line), ",");
                Curs := CSV_Line.First;
                while Has_Element (Curs) loop
                   if Curs /= CSV_Line.Last then
@@ -330,8 +328,7 @@ package body Utilities is
    begin
       while not End_Of_File (Data_File) loop
          Data_Line := To_Unbounded_String (Get_Line (Data_File));
-         CSV_Line := Utilities.Split_String
-           (To_String (Data_Line), ",");
+         CSV_Line := Split_String (To_String (Data_Line), ",");
          Curs := CSV_Line.First;
          Values.Clear;
          while Has_Element (Curs) loop
@@ -1265,4 +1262,4 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-end Utilities;
+end TL_Utilities;

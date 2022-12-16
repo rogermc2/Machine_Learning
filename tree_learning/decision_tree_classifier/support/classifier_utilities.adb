@@ -6,7 +6,7 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
-with Utilities;
+with Neural_Utilities;
 
 package body Classifier_Utilities is
 
@@ -349,7 +349,7 @@ package body Classifier_Utilities is
    begin
 --        Put_Line (Routine_Name & "Curr_Dir: " & Curr_Dir);
       Open (Data_File, In_File, File_Name);
-      Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
+      Raw_CSV_Data := Neural_Utilities.Load_Raw_CSV_Data (Data_File);
       Close (Data_File);
 
       Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
@@ -508,24 +508,28 @@ package body Classifier_Utilities is
                Last_Char : constant Character := Row_S (S_Last);
             begin
                if Character'Pos (Last_Char) < 32 then
-                  aRow (f_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
+                  aRow (f_index) :=
+                    To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
                Feature_Types (Positive (f_index)) :=
-                 Utilities.Get_Data_Type (aRow (Positive (f_index)));
+                 Neural_Utilities.Get_Data_Type (aRow (Positive (f_index)));
             end;
          end loop;
 
          for l_index in 1 .. Num_Outputs loop
             declare
-               Row_S     : constant String := To_String (aRow (Num_Features + l_index));
+               Row_S     : constant String :=
+                             To_String (aRow (Num_Features + l_index));
                S_Last    : constant Integer := Row_S'Last;
                Last_Char : constant Character := Row_S (S_Last);
             begin
                if Character'Pos (Last_Char) < 32 then
-                  aRow (Num_Features + l_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
+                  aRow (Num_Features + l_index) :=
+                    To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
                Label_Types (Positive (l_index)) :=
-                 Utilities.Get_Data_Type (aRow (Positive (Num_Features + l_index)));
+                 Neural_Utilities.Get_Data_Type
+                   (aRow (Positive (Num_Features + l_index)));
             end;
          end loop;
 

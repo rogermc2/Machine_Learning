@@ -4,7 +4,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Printing;
-with Utilities;
+with Neural_Utilities;
 
 package body Encode_Utils is
 
@@ -108,7 +108,7 @@ package body Encode_Utils is
          Uniques_Curs := Uniques.Find (aValue);
          if Uniques_Curs = No_Element then
             Put_Line ("Encode_Utils.Map_To_Integer error");
-            Utilities.Print_Value_Record
+            Neural_Utilities.Print_Value_Record
               ("Value record not found in Uniques",
                aValue);
          else
