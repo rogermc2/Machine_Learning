@@ -48,21 +48,37 @@ package body Simple_PNG_To_BMP is
    stars                  : Natural := 0;
    img_buf                : p_Byte_Array := null;
 
-   procedure Dispose is new Ada.Unchecked_Deallocation (Byte_Array, p_Byte_Array);
+   procedure Dispose is new Ada.Unchecked_Deallocation (Byte_Array,
+                                                        p_Byte_Array);
 
    --  ---------------------------------------------------------------------------------------
 
+   function As_Matrix (Image : Image_Array) return BMP_Matrix is
+      theMatrix : BMP_Matrix (Image'Range, Image'Range (2));
+   begin
+      for row in Image'Range loop
+         for col in Image'Range (2) loop
+            theMatrix (row, col) := Integer (Image (row, col));
+         end loop;
+      end loop;
+
+      return theMatrix;
+
+   end As_Matrix;
+
+   --  -------------------------------------------------------------------------
+
    function Height (Data : Image_Array) return Natural is
    begin
-         return Data'Length (2);
+      return Data'Length (2);
    end Height;
 
    --  -------------------------------------------------------------------------
 
    function Width (Data : Image_Array) return Natural is
-      begin
-         return Data'Length;
-      end Width;
+   begin
+      return Data'Length;
+   end Width;
 
    --  -------------------------------------------------------------------------
 
@@ -73,10 +89,11 @@ package body Simple_PNG_To_BMP is
       subtype U16 is Unsigned_16;
       image_width        : constant Positive := GID.Pixel_width (image);
       padded_line_size_x : constant Positive :=
-                             4 * Integer (Float'Ceiling (Float (image_width) * 3.0 / 4.0));
+                             4 * Integer (Float'Ceiling (Float (image_width) *
+                                            3.0 / 4.0));
       idx                : Natural;  --  (in bytes)
 
-      --  ---------------------------------------------------------------------------------------
+      --  ----------------------------------------------------------------------
 
       procedure Set_X_Y (x, y : Natural) is
          pragma Inline (Set_X_Y);
@@ -84,10 +101,11 @@ package body Simple_PNG_To_BMP is
          idx := 3 * x + padded_line_size_x * y;
       end Set_X_Y;
 
-      --  ----------------------------------------------------------------------------------------
+      --  ----------------------------------------------------------------------
       --  Unicolor background version of Put_Pixel
       procedure Put_Pixel
-        (red, green, blue : Primary_color_range; alpha : Primary_color_range) is
+        (red, green, blue : Primary_color_range;
+         alpha            : Primary_color_range) is
          pragma Inline (Put_Pixel);
          u_red   : constant := 200;
          u_green : constant := 133;
@@ -96,15 +114,21 @@ package body Simple_PNG_To_BMP is
          if alpha = 255 then
             buffer (idx .. idx + 2) := (blue, green, red);
          else -- blend with bckground color
-            buffer (idx)  := Primary_color_range ((U16 (alpha) * U16 (blue)  + U16 (255 - alpha) * u_blue) / 255);
-            buffer (idx + 1) := Primary_color_range ((U16 (alpha) * U16 (green) + U16 (255 - alpha) * u_green) / 255);
-            buffer (idx + 2) := Primary_color_range ((U16 (alpha) * U16 (red)   + U16 (255 - alpha) * u_red) / 255);
+            buffer (idx) :=
+              Primary_color_range ((U16 (alpha) * U16 (blue) +
+                                     U16 (255 - alpha) * u_blue) / 255);
+            buffer (idx + 1) :=
+              Primary_color_range ((U16 (alpha) * U16 (green) +
+                                     U16 (255 - alpha) * u_green) / 255);
+            buffer (idx + 2) :=
+              Primary_color_range ((U16 (alpha) * U16 (red) +
+                                     U16 (255 - alpha) * u_red) / 255);
          end if;
          idx := idx + 3;
          --  ^ GID requires us to look to next pixel on the right for next time.
       end Put_Pixel;
 
-      --  -------------------------------------------------------------------------------------------------------------
+      --  ----------------------------------------------------------------------
 
       procedure Feedback (percents : Natural) is
          so_far : constant Natural := percents / 5;
@@ -115,16 +139,16 @@ package body Simple_PNG_To_BMP is
          stars := so_far;
       end Feedback;
 
-      --  -------------------------------------------------------------------------
-      --  Here, the exciting thing: the instanciation of GID.Load_image_contents.
-      --  In our case, we load the image into a 24-bit bitmap because we provide a
+      --  ----------------------------------------------------------------------
+      --  The exciting thing: the instanciation of GID.Load_image_contents.
+      --  Load the image into a 24-bit bitmap because we provide a
       --  Put_Pixel that does that with the pixels. We could do plenty of other
       --  things instead like display the image live on a GUI.
 
       procedure BMP24_Load is new GID.Load_image_contents
         (Primary_color_range, Set_X_Y, Put_Pixel, Feedback, GID.fast);
 
-      --  -------------------------------------------------------------------------
+      --  ----------------------------------------------------------------------
 
    begin  --  Load_raw_image
       Dispose (buffer);
@@ -138,7 +162,7 @@ package body Simple_PNG_To_BMP is
    --  -------------------------------------------------------------------------
 
    procedure Write_BMP_24 (File_Name  : String;
-                          Image_desc : GID.Image_descriptor) is
+                           Image_desc : GID.Image_descriptor) is
       use Ada.Strings.Unbounded;
       Routine_Name : constant String := "Simple_BMP.Write_BMP_24 ";
       out_file_id  : Ada.Streams.Stream_IO.File_Type;
@@ -162,7 +186,8 @@ package body Simple_PNG_To_BMP is
 
       --  ----------------------------------------------------------------------
 
-      Out_File_Name : constant Unbounded_String := To_Unbounded_String (File_Name);
+      Out_File_Name : constant Unbounded_String :=
+                        To_Unbounded_String (File_Name);
       Pos           : constant Natural := Index (Out_File_Name, ".png") - 1;
       FileInfo      : BITMAPINFOHEADER;
       FileHeader    : BITMAPFILEHEADER;
@@ -185,7 +210,8 @@ package body Simple_PNG_To_BMP is
       New_Line;
       FileHeader.bfSize := FileHeader.bfOffBits + FileInfo.biSizeImage;
 
-      Put_Line (Routine_Name & "creating " & Slice (Out_File_Name, 1, Pos) & ".dib");
+      Put_Line (Routine_Name & "creating " & Slice (Out_File_Name, 1, Pos) &
+                  ".dib");
       --  Reason for ".dib": unknown synonym of ".bmp";
       Create (out_file_id, Out_File, Slice (Out_File_Name, 1, Pos) & ".dib");
       --  BMP Header, endian-safe:
@@ -266,16 +292,16 @@ package body Simple_PNG_To_BMP is
            (File_Name_Upper'Last - 3 .. File_Name_Upper'Last) = ".TGA");
       Width := GID.Pixel_width (image_desc);
       Height := GID.Pixel_height (image_desc);
-      Put_Line ("Image format: " &
-                  GID.Image_format_type'Image (GID.Format (image_desc)));
-      Put_Line ("Dimensions in pixels: " &
-                  Integer'Image (Width) & " x" & Integer'Image (Height));
+--        Put_Line ("Image format: " &
+--                    GID.Image_format_type'Image (GID.Format (image_desc)));
+--        Put_Line ("Dimensions in pixels: " &
+--                    Integer'Image (Width) & " x" & Integer'Image (Height));
 
       Load_raw_image (image_desc, img_buf, next_frame);
       Assert (next_frame = 0.0, "");
       Write_BMP_24 (Image_File_Name, image_desc);
       declare
-         Image_Data    : Image_Array (1 .. Height, 1 .. Width);
+         Image_Data : Image_Array (1 .. Height, 1 .. Width);
       begin
          for row in Image_Data'Range loop
             for col in Image_Data'Range (2) loop

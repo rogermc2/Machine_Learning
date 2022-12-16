@@ -184,7 +184,8 @@ package body Python is
       Item         : PyObject;
       Py_Row       : int := -1;
       Py_Col       : int := -1;
-      Result       : constant PyObject := PyTuple_New (int (Data'Length));
+      Py_Matrix    : constant PyObject := PyTuple_New (int (Data'Length));
+      Result       : constant PyObject := PyTuple_New (1);
    begin
       for row in Data'Range loop
          Item := PyTuple_New (Row_Size);
@@ -196,8 +197,9 @@ package body Python is
             Long_Value := long (Value);
             PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (Long_Value));
          end loop;
-         PyTuple_SetItem (Result, Py_Row, Item);
+         PyTuple_SetItem (Py_Matrix, Py_Row, Item);
       end loop;
+      PyTuple_SetItem (Result, 0, Py_Matrix);
    
       return Result;
          
@@ -465,6 +467,34 @@ package body Python is
    
    --  -------------------------------------------------------------------------
     
+   procedure Call (M : Module; Function_Name : String;
+                   A : NL_Arrays_And_Matrices.Integer_Matrix) is
+      
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1  : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
+                              
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+   
+   --  -------------------------------------------------------------------------
+   
    procedure Call (M    : Module; Function_Name : String;
                    A, B : NL_Arrays_And_Matrices.Integer_Matrix) is
       

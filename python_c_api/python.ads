@@ -27,6 +27,8 @@ package Python is
                   return Integer;
    function Call (M : Module; Function_Name : String; A, B : Integer)
                   return Integer;
+   procedure Call (M : Module; Function_Name : String;
+                   A : NL_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : NL_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
