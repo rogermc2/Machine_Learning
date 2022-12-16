@@ -3,7 +3,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Python; use Python;
---  with Python_API;
 with Simple_PNG_To_BMP; use Simple_PNG_To_BMP;
 
 procedure Lesson_5A is

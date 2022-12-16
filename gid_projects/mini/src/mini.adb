@@ -5,6 +5,8 @@
 --  For a larger example, look for to_bmp.adb .
 --
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 with GID;
 
 with Ada.Calendar;
@@ -12,6 +14,7 @@ with Ada.Characters.Handling;           use Ada.Characters.Handling;
 with Ada.Command_Line;                  use Ada.Command_Line;
 with Ada.Streams.Stream_IO;             use Ada.Streams.Stream_IO;
 with Ada.Text_IO;                       use Ada.Text_IO;
+with Ada.Strings.Fixed;
 with Ada.Unchecked_Deallocation;
 
 with Interfaces;
@@ -20,14 +23,14 @@ procedure Mini is
 
   procedure Blurb is
   begin
-    Put_Line (Standard_Error, "Mini * Converts any image file to a PPM file");
-    Put_Line (Standard_Error, "Simple test for the GID (Generic Image Decoder) package");
-    Put_Line (Standard_Error, "Package version " & GID.version & " dated " & GID.reference);
-    Put_Line (Standard_Error, "URL: " & GID.web);
-    New_Line (Standard_Error);
-    Put_Line (Standard_Error, "Syntax:");
-    Put_Line (Standard_Error, "mini <image_1> [<image_2>...]");
-    New_Line (Standard_Error);
+    Put_Line ("Mini * Converts any image file to a PPM file");
+    Put_Line ("Simple test for the GID (Generic Image Decoder) package");
+    Put_Line ("Package version " & GID.version & " dated " & GID.reference);
+    Put_Line ("URL: " & GID.web);
+    New_Line;
+    Put_Line ("Syntax:");
+    Put_Line ("mini <image_1> [<image_2>...]");
+    New_Line;
   end Blurb;
 
   use Interfaces;
@@ -39,12 +42,9 @@ procedure Mini is
   img_buf : p_Byte_Array := null;
 
   --  Load image into a 24-bit truecolor RGB raw bitmap (for a PPM output)
-  procedure Load_raw_image (
-    image : in out GID.Image_descriptor;
-    buffer : in out p_Byte_Array;
-    next_frame : out Ada.Calendar.Day_Duration
-  )
-  is
+  procedure Load_raw_image (image : in out GID.Image_descriptor;
+                            buffer : in out p_Byte_Array;
+                            next_frame : out Ada.Calendar.Day_Duration) is
     subtype Primary_color_range is Unsigned_8;
     image_width : constant Positive := GID.Pixel_width (image);
     image_height : constant Positive := GID.Pixel_height (image);
@@ -55,11 +55,8 @@ procedure Mini is
       idx := 3 * (x + image_width * (image_height - 1 - y));
     end Set_X_Y;
     --
-    procedure Put_Pixel (
-      red, green, blue : Primary_color_range;
-      alpha            : Primary_color_range
-    )
-    is
+    procedure Put_Pixel (red, green, blue : Primary_color_range;
+                         alpha            : Primary_color_range) is
     pragma Warnings (off, alpha); -- alpha is just ignored
     begin
       buffer (idx .. idx + 2) := (red, green, blue);
@@ -78,10 +75,8 @@ procedure Mini is
     end Feedback;
 
     procedure Load_image is
-      new GID.Load_image_contents (
-        Primary_color_range, Set_X_Y,
-        Put_Pixel, Feedback, GID.fast
-      );
+      new GID.Load_image_contents (Primary_color_range, Set_X_Y,
+                                   Put_Pixel, Feedback, GID.fast);
 
   begin
     Dispose (buffer);
@@ -89,10 +84,17 @@ procedure Mini is
     Load_image (image, next_frame);
   end Load_raw_image;
 
-  procedure Dump_PPM (name : String; i : GID.Image_descriptor) is
-    f : Ada.Streams.Stream_IO.File_Type;
-  begin
-    Create (f, Out_File, name & ".ppm");
+  procedure Dump_PPM (Name : String; i : GID.Image_descriptor) is
+      use Ada.Strings.Fixed;
+      Pos      : constant Natural := Index (name, ".");
+      f        : Ada.Streams.Stream_IO.File_Type;
+      Out_Name : Unbounded_String := To_Unbounded_String (Name);
+   begin
+      if Pos > 0 then
+         Out_Name := To_Unbounded_String (Slice (Out_Name, 1, Pos - 1));
+      end if;
+
+    Create (f, Out_File, To_String (Out_Name) & ".ppm");
     --  PPM Header:
     String'Write (
       Stream (f),
