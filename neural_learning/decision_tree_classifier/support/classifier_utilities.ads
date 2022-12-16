@@ -1,6 +1,6 @@
 
 with ML_Types;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with NL_Types;
 
 package Classifier_Utilities is
@@ -29,19 +29,14 @@ package Classifier_Utilities is
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return ML_Types.Multi_Output_Data_Record;
    function Max_Probability_Indices
-     (Probabilities : NL_Arrays_And_Matrices.Binary_Matrix)
-      return NL_Arrays_And_Matrices.Integer_Array;
+     (Probabilities : Binary_Matrix) return Integer_Array;
    function Max_Probability_Indices
-     (Probabilities : Real_Float_Matrix)
-      return NL_Arrays_And_Matrices.Integer_Array;
+     (Probabilities : Real_Float_Matrix) return Integer_Array;
    function Probabilities (aMatrix : Real_Float_Matrix)
                            return Real_Float_Matrix;
-   function Probabilities (Vec : Real_Float_Vector)
-                           return Real_Float_Vector;
-   function Row_Max_Indices (Values : NL_Arrays_And_Matrices.Boolean_Matrix)
-                             return NL_Arrays_And_Matrices.Natural_Array;
-   function Row_Max_Indices (Values : Real_Float_Matrix)
-                             return NL_Arrays_And_Matrices.Natural_Array;
+   function Probabilities (Vec : Real_Float_Vector) return Real_Float_Vector;
+   function Row_Max_Indices (Values : Boolean_Matrix) return Natural_Array;
+   function Row_Max_Indices (Values : Real_Float_Matrix) return Natural_Array;
    function Search_Sorted_Integer_List (List_A, List_B : ML_Types.Integer_List)
                                         return ML_Types.Integer_List;
    function Search_Sorted_Float_List (List_A, List_B : NL_Types.Float_List)
@@ -52,9 +47,10 @@ package Classifier_Utilities is
                       return NL_Types.Natural_List;
    function Set_Diff (Values : Natural_Array; Uniques : Integer_Array)
                       return NL_Types.Natural_List;
-   function Set_Diff (Values, Uniques : NL_Arrays_And_Matrices.Boolean_Array)
+   function Set_Diff (Values, Uniques : Boolean_Array)
                       return NL_Types.Boolean_List;
-   function Sum_Cols (aList : NL_Types.Float_List_2D) return NL_Types.Float_List;
+   function Sum_Cols (aList : NL_Types.Float_List_2D)
+                      return NL_Types.Float_List;
    function Sum_Cols (aMatrix : Real_Float_Matrix) return Real_Float_Vector;
    function Sum_Cols (aList : ML_Types.Value_Data_Lists_2D)
                       return ML_Types.Value_Data_List;

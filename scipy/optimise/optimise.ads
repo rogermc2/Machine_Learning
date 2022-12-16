@@ -3,7 +3,7 @@
 with Opt_Constraints;
 with Differentiable_Functions; use Differentiable_Functions;
 with Multilayer_Perceptron;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with Num_Diff;
 with Stochastic_Optimizers;
 
@@ -12,8 +12,8 @@ package Optimise is
     type Direction_Kind is (Random_Direction, All_Direction);
     type Opt_Fun_Access is access function (X : Real_Float_List) return Float;
     type Lbfgs_Inv_Hess_Product (N_Coor, N : Natural) is record
-        SK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
-        YK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
+        SK : Real_Float_Matrix (1 .. N_Coor, 1 .. N);
+        YK : Real_Float_Matrix (1 .. N_Coor, 1 .. N);
     end record;
     --     type Grad_Func_Access is access function (X : Real_Float_Vector)
     --                                                return Real_Float_Matrix;

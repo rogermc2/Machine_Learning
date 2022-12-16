@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/metrics/_classification.py
 
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Classification_Metrics is
 

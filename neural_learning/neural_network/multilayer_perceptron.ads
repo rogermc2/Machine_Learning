@@ -6,7 +6,7 @@ with Base_Neural;
 with Estimator;
 with Label;
 with ML_Types;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with NL_Types;
 with Num_Diff;
 with Stochastic_Optimizers; use Stochastic_Optimizers;

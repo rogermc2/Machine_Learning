@@ -2,7 +2,7 @@
 with Ada.Containers.Indefinite_Vectors;
 
 with Multiclass_Utils; use Multiclass_Utils;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 generic
     type Index_Type is range <>;  --  Any signed integer type

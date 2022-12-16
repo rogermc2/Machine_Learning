@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
 --  with Printing;
-with Utilities;
+with Neural_Utilities;
 
 package body Classifier_Utilities is
 
@@ -324,7 +324,7 @@ package body Classifier_Utilities is
       Output_Data  : ML_Types.Multi_Output_Data_Record;
    begin
       Open (Data_File, In_File, File_Name);
-      Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
+      Raw_CSV_Data := Neural_Utilities.Load_Raw_CSV_Data (Data_File);
       Close (Data_File);
 
       Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
@@ -717,7 +717,7 @@ package body Classifier_Utilities is
                   aRow (f_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
                Feature_Types (Positive (f_index)) :=
-                 Utilities.Get_Data_Type (aRow (Positive (f_index)));
+                 Neural_Utilities.Get_Data_Type (aRow (Positive (f_index)));
             end;
          end loop;
 
@@ -731,7 +731,7 @@ package body Classifier_Utilities is
                   aRow (Num_Features + l_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
                Label_Types (Positive (l_index)) :=
-                 Utilities.Get_Data_Type (aRow (Positive (Num_Features + l_index)));
+                 Neural_Utilities.Get_Data_Type (aRow (Positive (Num_Features + l_index)));
             end;
          end loop;
 
@@ -1004,7 +1004,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
+   function To_Integer_Value_List (A : ML_Arrays_And_Matrices.Integer_Array)
                                    return ML_Types.Value_Data_List is
       use ML_Types;
       Data   : Value_Record (Integer_Type);
@@ -1020,7 +1020,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_Value_List_2D (A : NL_Arrays_And_Matrices.Integer_Array)
+   function To_Integer_Value_List_2D (A : ML_Arrays_And_Matrices.Integer_Array)
                                       return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Data       : Value_Record (Integer_Type);
@@ -1053,7 +1053,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
+   function To_Multi_Value_List (A : ML_Arrays_And_Matrices.Multi_Value_Array)
                                  return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Value    : Value_Record (Integer_Type);
@@ -1074,7 +1074,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Natural_List (A : NL_Arrays_And_Matrices.Natural_Array)
+   function To_Natural_List (A : Natural_Array)
                              return NL_Types.Natural_List is
       A_List : NL_Types.Natural_List;
    begin
@@ -1111,9 +1111,9 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
+   function To_Natural_Value_List (A : Natural_Array)
                                    return ML_Types.Value_Data_Lists_2D is
-      Int_Array : NL_Arrays_And_Matrices.Integer_Array (1 .. A'Length);
+      Int_Array : Integer_Array (1 .. A'Length);
    begin
       for index in A'First .. A'Last loop
          Int_Array (index) := A (index);

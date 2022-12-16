@@ -30,7 +30,7 @@ package body Classification_Metrics is
       Score        : Real_Float_Matrix (Y_True'Range, Y_True'Range (2)) :=
                        (others => (others => 0.0));
    begin
-      NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_Prediction,
+      ML_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_Prediction,
                                             Y_True);
       --  L210
       Check_Targets (Y_True, Y_Prediction);
@@ -60,7 +60,7 @@ package body Classification_Metrics is
       Score        : Real_Float_Matrix (Y_True'Range, Y_True'Range (2)) :=
                        (others => (others => 0.0));
    begin
-      NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_True,
+      ML_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_True,
                                             Y_Prediction);
       --  L210
       Check_Targets (Y_True, Y_Prediction);
@@ -88,7 +88,7 @@ package body Classification_Metrics is
       Score        : Real_Float_Matrix (Y_True'Range, Y_True'Range (2)) :=
                        (others => (others => 0.0));
    begin
-      NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_Prediction, Y_True);
+      ML_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_Prediction, Y_True);
       --  L210
       Check_Targets (Y_True, Y_Prediction);
 --        Printing.Print_Integer_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
@@ -117,7 +117,7 @@ package body Classification_Metrics is
       Score        : Real_Float_Matrix (Y_True'Range, Y_True'Range (2)) :=
                        (others => (others => 0.0));
    begin
-      NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_True,
+      ML_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_True,
                                             Y_Prediction);
       --  L210
       Check_Targets (Y_True, Y_Prediction);
@@ -185,7 +185,7 @@ package body Classification_Metrics is
       --        Put_Line (Routine_Name & "True type: " & Y_Type'Image (Type_True));
       --        Put_Line (Routine_Name & "Prediction type: " & Y_Type'Image (Type_Pred));
       --  L84
-      NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_True,
+      ML_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_True,
                                             Y_Prediction);
       if Type_True = Y_Binary and Type_Pred = Y_Multiclass then
          Type_Pred := Y_Multiclass;
@@ -213,7 +213,7 @@ package body Classification_Metrics is
       --        Put_Line (Routine_Name & "True type: " & Y_Type'Image (Type_True));
       --        Put_Line (Routine_Name & "Prediction type: " & Y_Type'Image (Type_Pred));
 
-      NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_Prediction, Y_True);
+      ML_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_Prediction, Y_True);
       if Type_True = Y_Binary and Type_Pred = Y_Multiclass then
          Type_Pred := Y_Multiclass;
       end if;

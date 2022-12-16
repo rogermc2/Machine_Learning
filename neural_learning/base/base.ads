@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/base.py
 
 with Multilayer_Perceptron;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Base is
 

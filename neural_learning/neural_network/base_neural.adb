@@ -293,7 +293,7 @@ package body Base_Neural is
       Tmp          : Real_Float_Matrix := Activation - Max (Activation);
       Sum_Tmp      : Real_Float_Vector (Activation'Range);
    begin
-      Tmp := NL_Arrays_And_Matrices.Exp (Tmp);
+      Tmp := ML_Arrays_And_Matrices.Exp (Tmp);
       Activation := Tmp;
       Sum_Tmp := Sum (Tmp);
       Activation := Activation / Sum_Tmp;

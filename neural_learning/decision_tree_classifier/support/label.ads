@@ -6,7 +6,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Estimator;
 with ML_Types;
 with Multiclass_Utils;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Label is
 

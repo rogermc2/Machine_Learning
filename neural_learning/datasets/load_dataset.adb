@@ -5,7 +5,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Classifier_Utilities;
 --  with Printing;
-with Utilities;
+with Neural_Utilities;
 
 package body Load_Dataset is
 
@@ -96,9 +96,9 @@ package body Load_Dataset is
    function Load_Features (File_Name : String; Num_Features : Positive)
                             return Real_Float_Matrix is
       CSV_Data  : constant ML_Types.Raw_Data_Vector :=
-                    Utilities.Load_Raw_CSV_Data (File_Name);
+                    Neural_Utilities.Load_Raw_CSV_Data (File_Name);
       List_Row  : ML_Types.Unbounded_List;
-      Features  : NL_Arrays_And_Matrices.Real_Float_Matrix
+      Features  : ML_Arrays_And_Matrices.Real_Float_Matrix
         (1 .. Positive (CSV_Data.Length) - 1, 1 .. Num_Features);
    begin
       --  First row of CSV_Data is header of feature names
@@ -171,7 +171,7 @@ package body Load_Dataset is
                           return Integer_Matrix is
       use ML_Types;
       CSV_Data   : constant Raw_Data_Vector :=
-                     Utilities.Load_Raw_CSV_Data (File_Name);
+                     Neural_Utilities.Load_Raw_CSV_Data (File_Name);
       Data_Row   : Unbounded_List;
       Labels     : Integer_Matrix (1 .. Positive (CSV_Data.Length) - 1,
                                    1 .. Num_Outputs);

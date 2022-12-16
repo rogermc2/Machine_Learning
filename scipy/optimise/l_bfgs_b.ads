@@ -4,7 +4,7 @@ with Opt_Constraints;
 with Multilayer_Perceptron;
 with Optimise;
 with Opt_Minimise;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Stochastic_Optimizers;
 
 package L_BFGS_B is

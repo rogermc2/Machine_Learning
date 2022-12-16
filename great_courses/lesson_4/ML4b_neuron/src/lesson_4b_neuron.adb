@@ -6,7 +6,7 @@ with Base;
 with Base_Neural;
 with ML_Types;
 with Multilayer_Perceptron;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Test_Support;
 with Support_4;
 

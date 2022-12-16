@@ -17,7 +17,7 @@ package body Base is
       Pred         : constant Integer_Matrix :=
                        Multilayer_Perceptron.Predict (Self, X);
    begin
-      NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y,  Pred);
+      ML_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y,  Pred);
 
       return Classification_Metrics.Accuracy_Score
         (Y_True  => Y, Y_Prediction => Pred, Normalize => True);

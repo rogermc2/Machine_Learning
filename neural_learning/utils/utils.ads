@@ -2,13 +2,13 @@
 
 with Ada.Containers.Formal_Ordered_Maps;
 
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with NL_Types; use NL_Types;
 
 package Utils is
 
    type Bunch_Data is record
-      Position       : Positive := 1;
+      Position : Positive := 1;
    end record;
 
    package Bunch_Package is new
