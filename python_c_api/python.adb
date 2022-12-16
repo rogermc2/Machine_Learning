@@ -212,12 +212,12 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
-   function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array_3D) 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) 
                       return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Integer_Array_3D ";
-      Value        : Integer;
-      Long_Value   : long;
+      Value        : Interfaces.unsigned_8;
+      Long_Value   : unsigned_long;
       Py_Row       : int := -1;  --  Python indexing starts at 0
       Py_Col       : int := -1;
       Py_Depth     : int := -1;
@@ -235,9 +235,9 @@ package body Python is
             for depth in Data'Range (3) loop
                Py_Depth := Py_Depth + 1;
                Value := Data (row, col, depth);
-               Long_Value := long (Value);
+               Long_Value := unsigned_long (Value);
                PyTuple_SetItem (Py_Data, int (depth),
-                                PyLong_FromLong (Long_Value));
+                                PyLong_FromUnsignedLong (Long_Value));
             end loop;
             PyTuple_SetItem (Py_Array, Py_Col, Py_Data);
          end loop;
@@ -701,7 +701,7 @@ package body Python is
    --  -------------------------------------------------------------------------
    
    procedure Call (M : Module; Function_Name : String;
-                   A : ML_Arrays_And_Matrices.Integer_Array_3D) is
+                   A : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) is
       
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1      : PyObject) return PyObject;

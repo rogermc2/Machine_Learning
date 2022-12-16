@@ -1,3 +1,4 @@
+with Interfaces;
 
 with Ada.Containers.Generic_Array_Sort;
 with Ada.Containers.Indefinite_Vectors;
@@ -42,8 +43,9 @@ package ML_Arrays_And_Matrices is
      Boolean;
    type Integer_Matrix is array (Integer range <>, Integer range <>) of
      Integer;
-   type Integer_Array_3D is array (Integer range <>, Integer range <>,
-                                   Integer range <>) of Integer;
+
+   type Unsigned_8_Array_3D is array (Integer range <>, Integer range <>,
+                                      Integer range <>) of Interfaces.Unsigned_8;
 
    package Integer_Array_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Integer_Array);

@@ -61,6 +61,9 @@ package Python_API is
    function PyLong_FromLong (Val : Interfaces.C.long) return PyObject;
    pragma Import (C, PyLong_FromLong, "PyLong_FromLong");
    
+   function PyLong_FromUnsignedLong (Val : Interfaces.C.unsigned_long) return PyObject;
+   pragma Import (C, PyLong_FromUnsignedLong, "PyLong_FromUnsignedLong");
+   
    function PyObject_GetAttr (Obj, Name : PyObject) return PyObject;
    pragma Import (C, PyObject_GetAttr, "PyObject_GetAttr");  
 

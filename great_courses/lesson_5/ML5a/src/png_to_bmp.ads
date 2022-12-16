@@ -1,10 +1,10 @@
 
 with Interfaces;
 
-package Simple_PNG_To_BMP is
+package PNG_To_BMP is
 
    type BMP_Matrix is array (Integer range <>, Integer range <>,
-                              Integer range <>) of Integer;
+                              Integer range <>) of Interfaces.Unsigned_8;
    type Image_Array (<>) is private;
 
    function As_Matrix (Image : Image_Array) return BMP_Matrix;
@@ -16,4 +16,4 @@ private
    type Image_Array is array (Integer range <>, Integer range <>,
                               Integer range <>) of Interfaces.Unsigned_8;
 
-end Simple_PNG_To_BMP;
+end PNG_To_BMP;

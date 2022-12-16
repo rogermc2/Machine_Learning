@@ -12,7 +12,7 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
-package body Simple_PNG_To_BMP is
+package body PNG_To_BMP is
    use Interfaces;
 
    type Byte_Array is array (Integer range <>) of Unsigned_8;
@@ -59,7 +59,7 @@ package body Simple_PNG_To_BMP is
       for row in Image'Range loop
          for col in Image'Range (2) loop
             for pix in Image'Range (3) loop
-               theMatrix (row, col, pix) := Integer (Image (row, col, pix));
+               theMatrix (row, col, pix) := Image (row, col, pix);
             end loop;
          end loop;
       end loop;
@@ -330,4 +330,4 @@ package body Simple_PNG_To_BMP is
 
    --  -------------------------------------------------------------------------
 
-end Simple_PNG_To_BMP;
+end PNG_To_BMP;

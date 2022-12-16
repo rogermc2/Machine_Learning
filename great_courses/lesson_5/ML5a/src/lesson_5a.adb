@@ -3,15 +3,15 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
-with Simple_PNG_To_BMP; use Simple_PNG_To_BMP;
+with PNG_To_BMP; use PNG_To_BMP;
 
 procedure Lesson_5A is
    Project_Name    : constant String := "Lesson_5A ";
    Image_File_Name : constant String := "../greenML.png";
 begin
    declare
-      Image_Data : constant Integer_Array_3D :=
-                     Integer_Array_3D (As_Matrix (Process (Image_File_Name)));
+      Image_Data : constant Unsigned_8_Array_3D :=
+                     Unsigned_8_Array_3D (As_Matrix (Process (Image_File_Name)));
       Py_Module  : Module;
    begin
       Put_Line (Project_Name & "Image Dimensions: " &
