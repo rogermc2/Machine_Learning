@@ -21,7 +21,7 @@ begin
       Python.Initialize;
       Py_Module := Import_File ("lesson_5a");
 --        Python.Execute_String ("import matplotlib.pyplot as plt");
-      Python.Call (Py_Module, "show", Image_Data);
+      Python.Call (Py_Module, "show_bitmap", Image_Data);
 
       Python.Finalize;
 

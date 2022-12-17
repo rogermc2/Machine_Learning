@@ -52,13 +52,18 @@ package body Python is
    --  -------------------------------------------------------------------------
     
    procedure Execute_String (Script : String) is
-      Dummy : Interfaces.C.int;
+      use Interfaces.C;
+      Dummy : int;
    begin
       Dummy := PyRun_SimpleString (Interfaces.C.To_C (Script));
+      if Dummy /= 0 then
+         Put_Line ("Python.Execute_String caused a Python exception!");
+      end if;
+      
    end Execute_String;
     
    --  -------------------------------------------------------------------------
-    
+        
    function Import_File (File_Name : String) return Module is
       use type System.Address;
       Routine_Name : constant String := "Python.Import_File ";
@@ -126,9 +131,11 @@ package body Python is
       Routine_Name : constant String := "Python.Call_Object ";
       PyResult     : PyObject;
    begin 
-      Assert (PyFunc /= System.Null_Address, "");  
-      Assert (PyCallable_Check (PyFunc) /= 0, ""); 
-      Assert (PyParams /= System.Null_Address, "");
+      Assert (PyFunc /= System.Null_Address, Routine_Name & "PyFunc is null.");  
+      Assert (PyCallable_Check (PyFunc) /= 0, Routine_Name &
+                "PyCallable_Check is null."); 
+      Assert (PyParams /= System.Null_Address, Routine_Name &
+                "PyParams is null.");
       PyResult := PyObject_CallObject (PyFunc, PyParams);
       
       if PyResult = System.Null_Address then
@@ -715,9 +722,11 @@ package body Python is
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
+      Put_Line ("Call for Unsigned_8_Array_3D");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
-      PyResult := Call_Object (F, PyParams);
+      Execute_String ("print ('is tuple', isinstance(PyParams, tuple))");
+--        PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       
       Py_DecRef (F);
