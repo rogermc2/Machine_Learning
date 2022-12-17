@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 def show_bitmap(bitmap):
-    null;
+    print("show_bitmap")
 #    print("bitmap:", bitmap)
 #    print("Is tuple : ", isinstance(bitmap, tuple))
 #    print("bitmap type:", type(bitmap))

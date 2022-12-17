@@ -227,33 +227,32 @@ package body Python is
       Value        : Interfaces.unsigned_8;
       Long_Value   : unsigned_long;
       Py_Row       : int := -1;  --  Python indexing starts at 0
-      Py_Col       : int := -1;
       Py_Depth     : int := -1;
-      Py_Matrix    : constant PyObject := PyTuple_New (int (Data'Length));
-      Py_Array     : constant PyObject := PyTuple_New (int (Data'Length (2)));
-      Py_Data      : constant PyObject := PyTuple_New (int (Data'Length (3)));
+      Py_Data      : PyObject;
+      Py_Array     : constant PyObject :=
+                       PyTuple_New (int (Data'Length (1) * Data'Length (2)));
       Result       : constant PyObject := PyTuple_New (1);
    begin
       Print_Matrix_Dimensions (Routine_Name & "Data", Data);
       for row in Data'Range loop
-         Py_Row := Py_Row + 1;
-         Py_Col := -1;
          for col in Data'Range (2) loop
-            Py_Col := Py_Col + 1;
+            Py_Row := Py_Row + 1;
             Py_Depth := -1;
             for depth in Data'Range (3) loop
+               Py_Data := PyTuple_New (int (Data'Length (3)));
                Py_Depth := Py_Depth + 1;
                Value := Data (row, col, depth);
                Long_Value := unsigned_long (Value);
                PyTuple_SetItem (Py_Data, int (depth),
                                 PyLong_FromUnsignedLong (Long_Value));
             end loop;
-            PyTuple_SetItem (Py_Array, Py_Col, Py_Data);
+            PyTuple_SetItem (Py_Array, Py_Row, Py_Data);
          end loop;
-         PyTuple_SetItem (Py_Matrix, Py_Row, Py_Array);
       end loop;
-      PyTuple_SetItem (Result, 0, Py_Matrix);
-   
+      Put_Line (Routine_Name & "done, Py_Row:" & int'Image (Py_Row));
+      PyTuple_SetItem (Result, 0, Py_Array);
+      
+      
       return Result;
          
    exception
@@ -722,11 +721,10 @@ package body Python is
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
-      Put_Line ("Call for Unsigned_8_Array_3D");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
-      Execute_String ("print ('is tuple', isinstance(PyParams, tuple))");
---        PyResult := Call_Object (F, PyParams);
+--        Execute_String ("print ('is tuple', isinstance(PyParams, tuple))");
+      PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       
       Py_DecRef (F);
