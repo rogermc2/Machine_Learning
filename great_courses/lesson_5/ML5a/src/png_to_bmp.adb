@@ -297,7 +297,13 @@ package body PNG_To_BMP is
             for col in Image_Data'Range (2) loop
                for pix in Image_Data'Range (3) loop
                   Buffer_Index := Buffer_Index + 1;
-                  Image_Data (row, col, pix) := img_buf (Buffer_Index);
+                  if pix = 1 then
+                     Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
+                  elsif pix =2 then
+                     Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
+                  else
+                     Image_Data (row, col, pix) := img_buf (Buffer_Index);
+                  end if;
                end loop;
             end loop;
          end loop;
