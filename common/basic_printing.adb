@@ -1,4 +1,6 @@
 
+with Interfaces;
+
 with Ada.Text_IO; use Ada.Text_IO;
 
 package body Basic_Printing is
@@ -28,6 +30,36 @@ package body Basic_Printing is
       New_Line;
 
    end Print_Binary_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Byte_Array (Name  : String; anArray : Byte_Array;
+                               Start : Positive := 1; Finish : Natural := 0) is
+      Last  : Positive;
+      Count : Positive := 1;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (anArray'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= anArray'First and then Finish <= anArray'Last then
+         for Index in Start .. Last loop
+            Put (Interfaces.Unsigned_8'Image (anArray (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 4 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+      else
+         Put_Line ("Print_Byte_Array called with invalid start or finish index.");
+      end if;
+      New_Line;
+
+   end Print_Byte_Array;
 
    --  ------------------------------------------------------------------------
 

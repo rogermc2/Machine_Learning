@@ -12,11 +12,13 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
+with ML_Arrays_And_Matrices;
+
 package body PNG_To_BMP is
    use Interfaces;
 
-   type Byte_Array is array (Integer range <>) of Unsigned_8;
-   type p_Byte_Array is access Byte_Array;
+--     type Byte_Array is array (Integer range <>) of Unsigned_8;
+   type p_Byte_Array is access ML_Arrays_And_Matrices.Byte_Array;
 
    type BITMAPFILEHEADER is record
       bfType      : Unsigned_16;
@@ -48,8 +50,8 @@ package body PNG_To_BMP is
    stars                  : Natural := 0;
    img_buf                : p_Byte_Array := null;
 
-   procedure Dispose is new Ada.Unchecked_Deallocation (Byte_Array,
-                                                        p_Byte_Array);
+   procedure Dispose is new Ada.Unchecked_Deallocation
+     (ML_Arrays_And_Matrices.Byte_Array, p_Byte_Array);
 
    --  ---------------------------------------------------------------------------------------
 
@@ -155,7 +157,7 @@ package body PNG_To_BMP is
    begin  --  Load_raw_image
       Dispose (buffer);
 
-      buffer := new Byte_Array
+      buffer := new ML_Arrays_And_Matrices.Byte_Array
         (0 .. padded_line_size_x * GID.Pixel_height (image) - 1);
       BMP24_Load (image, next_frame);
 
@@ -166,6 +168,7 @@ package body PNG_To_BMP is
    procedure Write_BMP_24 (File_Name  : String;
                            Image_desc : GID.Image_descriptor) is
       use Ada.Strings.Unbounded;
+      use ML_Arrays_And_Matrices;
       Routine_Name : constant String := "Simple_BMP.Write_BMP_24 ";
       out_file_id  : Ada.Streams.Stream_IO.File_Type;
 
@@ -214,7 +217,7 @@ package body PNG_To_BMP is
 
       Put_Line (Routine_Name & "creating " & Slice (Out_File_Name, 1, Pos) &
                   ".dib");
-      --  Reason for ".dib": unknown synonym of ".bmp";
+      --  ".dib": unknown synonym of ".bmp";
       Create (out_file_id, Out_File, Slice (Out_File_Name, 1, Pos) & ".dib");
       --  BMP Header, endian-safe:
       Write_Intel (FileHeader.bfType);        --  unsigned_32
@@ -242,7 +245,7 @@ package body PNG_To_BMP is
          --  This is possible if and only if Byte = Stream_Element and
          --  arrays types are both packed the same way.
          --
-         subtype Size_test_a is Byte_Array (1 .. 19);
+         subtype Size_test_a is ML_Arrays_And_Matrices.Byte_Array (1 .. 19);
          subtype Size_test_b is Ada.Streams.Stream_Element_Array (1 .. 19);
          workaround_possible : constant Boolean :=
                                  Size_test_a'Size = Size_test_b'Size and then
@@ -266,6 +269,8 @@ package body PNG_To_BMP is
             Byte_Array'Write (Stream (out_file_id), img_buf.all);
          end if;
       end;  --  declare block
+      Put_Line (Routine_Name & "img_buf.all length" &
+                  Integer'Image (img_buf.all'Length));
       Close (out_file_id);
 
    end Write_BMP_24;

@@ -7,6 +7,8 @@ package Basic_Printing is
 
    procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix;
                                   Start : Positive := 1; Finish : Natural := 0);
+   procedure Print_Byte_Array (Name  : String; anArray : Byte_Array;
+                               Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
                                 Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
