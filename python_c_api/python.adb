@@ -195,6 +195,7 @@ package body Python is
       Py_Matrix    : constant PyObject := PyTuple_New (int (Data'Length));
       Result       : constant PyObject := PyTuple_New (1);
    begin
+      Print_Matrix_Dimensions (Routine_Name & "Data", Data);
       for row in Data'Range loop
          Item := PyTuple_New (Row_Size);
          Py_Row := Py_Row + 1;
@@ -222,37 +223,22 @@ package body Python is
 
    function To_Tuple (Data : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) 
                       return PyObject is
-      use Interfaces.C;
+      use ML_Arrays_And_Matrices;
       Routine_Name : constant String := "Python.To_Tuple Integer_Array_3D ";
-      Value        : Interfaces.unsigned_8;
-      Long_Value   : unsigned_long;
-      Py_Row       : int := -1;  --  Python indexing starts at 0
-      Py_Depth     : int := -1;
-      Py_Data      : PyObject;
-      Py_Array     : constant PyObject :=
-                       PyTuple_New (int (Data'Length (1) * Data'Length (2)));
-      Result       : constant PyObject := PyTuple_New (1);
+      Array_Length : constant Positive := Data'Length (1) * Data'Length (2);
+      Array_2D     : Integer_Matrix (1 .. Array_Length, Data'Range (3));
    begin
       Print_Matrix_Dimensions (Routine_Name & "Data", Data);
       for row in Data'Range loop
          for col in Data'Range (2) loop
-            Py_Row := Py_Row + 1;
-            Py_Depth := -1;
             for depth in Data'Range (3) loop
-               Py_Data := PyTuple_New (int (Data'Length (3)));
-               Py_Depth := Py_Depth + 1;
-               Value := Data (row, col, depth);
-               Long_Value := unsigned_long (Value);
-               PyTuple_SetItem (Py_Data, int (depth),
-                                PyLong_FromUnsignedLong (Long_Value));
+               Array_2D ((row - 1) * Data'Length (2) + col, depth) :=
+                 Integer (Data (row, col, depth));
             end loop;
-            PyTuple_SetItem (Py_Array, Py_Row, Py_Data);
          end loop;
       end loop;
-      Put_Line (Routine_Name & "done, Py_Row:" & int'Image (Py_Row));
-      PyTuple_SetItem (Result, 0, Py_Array);
 
-      return Result;
+      return To_Tuple (Array_2D);
 
    exception
       when E : others =>
@@ -709,22 +695,22 @@ package body Python is
 
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) is
-
+      use Interfaces.C;
       function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              T1      : PyObject) return PyObject;
+                              T1      : PyObject;
+                              I1      : int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      --  if the Py_BuildValue format string contains exactly one format unit,
-      --  Py_BuildValue returns whatever object is described by that format unit.
-      --  To force Py_BuildValue to return a tuple of size 0 or one,
-      --  parenthesize the format string.
-      PyParams : constant PyObject := Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+      F          : constant PyObject := Get_Symbol (M, Function_Name);
+      Row_Length : constant int := int (A'Length (2));
+      A_Tuple    : constant PyObject := To_Tuple (A);
+      PyParams   : constant PyObject :=
+                     Py_BuildValue (Interfaces.C.To_C ("(Oi)"),
+                                    A_Tuple, Row_Length);
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
-      PyResult := Call_Object (F, A_Tuple);
+      PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
 
       Py_DecRef (F);
