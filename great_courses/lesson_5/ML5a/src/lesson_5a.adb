@@ -11,7 +11,7 @@ procedure Lesson_5A is
 begin
    declare
       Image_Data : constant Unsigned_8_Array_3D :=
-                     Unsigned_8_Array_3D (As_Matrix (Process (Image_File_Name)));
+                     Unsigned_8_Array_3D (Process (Image_File_Name));
       Py_Module  : Module;
    begin
       Put_Line (Project_Name & "Image Dimensions: " &

@@ -17,7 +17,6 @@ with ML_Arrays_And_Matrices;
 package body PNG_To_BMP is
    use Interfaces;
 
---     type Byte_Array is array (Integer range <>) of Unsigned_8;
    type p_Byte_Array is access ML_Arrays_And_Matrices.Byte_Array;
 
    type BITMAPFILEHEADER is record
@@ -54,23 +53,6 @@ package body PNG_To_BMP is
      (ML_Arrays_And_Matrices.Byte_Array, p_Byte_Array);
 
    --  ---------------------------------------------------------------------------------------
-
-   function As_Matrix (Image : Image_Array) return BMP_Matrix is
-      theMatrix : BMP_Matrix (Image'Range, Image'Range (2), Image'Range (3));
-   begin
-      for row in Image'Range loop
-         for col in Image'Range (2) loop
-            for pix in Image'Range (3) loop
-               theMatrix (row, col, pix) := Image (row, col, pix);
-            end loop;
-         end loop;
-      end loop;
-
-      return theMatrix;
-
-   end As_Matrix;
-
-   --  -------------------------------------------------------------------------
 
    function Height (Data : Image_Array) return Natural is
    begin

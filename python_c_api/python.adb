@@ -10,7 +10,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
 with Python_API; use Python_API;
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 
 package body Python is
 
@@ -195,7 +195,6 @@ package body Python is
       Py_Matrix    : constant PyObject := PyTuple_New (int (Data'Length));
       Result       : constant PyObject := PyTuple_New (1);
    begin
-      Print_Matrix_Dimensions (Routine_Name & "Data", Data);
       for row in Data'Range loop
          Item := PyTuple_New (Row_Size);
          Py_Row := Py_Row + 1;
@@ -228,7 +227,6 @@ package body Python is
       Array_Length : constant Positive := Data'Length (1) * Data'Length (2);
       Array_2D     : Integer_Matrix (1 .. Array_Length, Data'Range (3));
    begin
-      Print_Matrix_Dimensions (Routine_Name & "Data", Data);
       for row in Data'Range loop
          for col in Data'Range (2) loop
             for depth in Data'Range (3) loop
