@@ -291,7 +291,7 @@ package body PNG_To_BMP is
       Write_BMP_24 (Image_File_Name, image_desc);
 
       declare
-         Image_Data : Image_Array (1 .. Height, 1 .. Width, 1 .. 3);
+         Image_Data : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
       begin
          for row in reverse Image_Data'Range loop
             for col in Image_Data'Range (2) loop
@@ -299,7 +299,7 @@ package body PNG_To_BMP is
                   Buffer_Index := Buffer_Index + 1;
                   if pix = 1 then
                      Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
-                  elsif pix =2 then
+                  elsif pix = 2 then
                      Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
                   else
                      Image_Data (row, col, pix) := img_buf (Buffer_Index);
