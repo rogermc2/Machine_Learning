@@ -13,9 +13,9 @@ with Python_API; use Python_API;
 with Basic_Printing; use Basic_Printing;
 
 package body Python is
-   
+
    --  -------------------------------------------------------------------------
-   
+
    procedure Initialize (Program_Name : String := "") is
       use  Interfaces.C;
    begin
@@ -29,9 +29,9 @@ package body Python is
             Py_SetProgramName (Program_Name_Ptr.all);
          end;
       end if;
-       
+
       Py_Initialize;
-      
+
       Execute_String ("import sys");
       Execute_String ("import os");
       Execute_String ("sys.path.append('.')");
@@ -39,18 +39,18 @@ package body Python is
       Execute_String ("sys.path.append('../..')");
       Execute_String ("sys.path.append('../../python')");
       Execute_String ("sys.path.append('../../tree')");
-      
+
    end Initialize;
-    
+
    --  -------------------------------------------------------------------------
-    
+
    procedure Finalize is
    begin
       Py_Finalize;
    end Finalize;
-    
+
    --  -------------------------------------------------------------------------
-    
+
    procedure Execute_String (Script : String) is
       use Interfaces.C;
       Dummy : int;
@@ -59,11 +59,11 @@ package body Python is
       if Dummy /= 0 then
          Put_Line ("Python.Execute_String caused a Python exception!");
       end if;
-      
+
    end Execute_String;
-    
+
    --  -------------------------------------------------------------------------
-        
+
    function Import_File (File_Name : String) return Module is
       use type System.Address;
       Routine_Name : constant String := "Python.Import_File ";
@@ -73,7 +73,7 @@ package body Python is
       Execute_String ("cwd = os.getcwd()");
       Execute_String ("os.path.join (cwd, '/src/py_package')");
       Execute_String ("os.chdir(cwd + '/src/py_package')");
-      
+
       declare
          M  : constant PyObject := PyImport_Import (PyFileName); 
       begin
@@ -85,20 +85,20 @@ package body Python is
               "cannot load module from file " & File_Name &
               " or " & File_Name & " is not a module";
          end if;
-       
+
          return Module (M);
       end;
-      
+
    end Import_File;
-   
+
    --  -------------------------------------------------------------------------
-    
+
    procedure Close_Module (M : Module) is
    begin
       Py_DecRef (PyObject (M));
    end Close_Module;
 
-   --  -------------------------------------------------------------------------   
+   --  -------------------------------------------------------------------------
    --  helpers for use from all overloaded Call subprograms
    function Get_Symbol (M : in Module; Function_Name : in String)
                         return PyObject is
@@ -106,7 +106,7 @@ package body Python is
       Routine_Name : constant String := "Python.Get_Symbol ";
       PyModule     : constant PyObject := PyObject (M);
       --  PyObject_GetAttrString retrieves the attribute named Function_Name
-      --  from the object PyModule. 
+      --  from the object PyModule.
       F            : constant PyObject :=
                        PyObject_GetAttrString
                          (PyModule, Interfaces.C.To_C (Function_Name));
@@ -116,15 +116,15 @@ package body Python is
          PyErr_Print;
          raise Interpreter_Error with "Cannot find function " & Function_Name;
       end if;
-      
+
       Py_DecRef (PyModule);
-      
+
       return F;
-      
+
    end Get_Symbol;
-   
+
    --  -------------------------------------------------------------------------
-    
+
    function Call_Object (PyFunc, PyParams : PyObject) return PyObject is
       use Interfaces.C;
       use type System.Address;
@@ -137,23 +137,23 @@ package body Python is
       Assert (PyParams /= System.Null_Address, Routine_Name &
                 "PyParams is null.");
       PyResult := PyObject_CallObject (PyFunc, PyParams);
-      
+
       if PyResult = System.Null_Address then
          New_Line;
          Put_Line (Routine_Name & "Python error message:");
          PyErr_Print;
          raise Interpreter_Error with Routine_Name & "failed.";
       end if;
-      
+
       return PyResult;
-      
+
    exception
       when E : others =>
          raise Interpreter_Error with Routine_Name & "exception: " &
            Exception_Message (E);
-      
+
    end Call_Object;     
- 
+
    --  -------------------------------------------------------------------------
 
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array) 
@@ -169,14 +169,14 @@ package body Python is
          Value := Data (row);
          PyTuple_SetItem (Result, Py_Row, PyLong_FromLong (long (Value)));
       end loop;
-   
+
       return Result;
-         
+
    exception
       when E : others =>
          Put_Line (Routine_Name & "error" & Exception_Message (E));
          raise Interpreter_Error;
-            
+
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -208,14 +208,14 @@ package body Python is
          PyTuple_SetItem (Py_Matrix, Py_Row, Item);
       end loop;
       PyTuple_SetItem (Result, 0, Py_Matrix);
-   
+
       return Result;
-         
+
    exception
       when E : others =>
          Put_Line (Routine_Name & "error" & Exception_Message (E));
          raise Interpreter_Error;
-            
+
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -251,15 +251,14 @@ package body Python is
       end loop;
       Put_Line (Routine_Name & "done, Py_Row:" & int'Image (Py_Row));
       PyTuple_SetItem (Result, 0, Py_Array);
-      
-      
+
       return Result;
-         
+
    exception
       when E : others =>
          Put_Line (Routine_Name & "error" & Exception_Message (E));
          raise Interpreter_Error;
-            
+
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -280,14 +279,14 @@ package body Python is
          end if;
          PyTuple_SetItem (Tuple_2D, Py_Index, PyBool_FromLong (Long_Value));
       end loop;
-      
+
       return Tuple_2D;
 
    exception
       when E : others =>
          raise Interpreter_Error with Routine_Name & "error" &
            Exception_Message (E);
-      
+
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -315,20 +314,20 @@ package body Python is
             else
                Long_Value := 0;
             end if;
-            
+
             PyTuple_SetItem (Tuple, Py_Col, PyBool_FromLong (Long_Value));
          end loop;
-         
+
          PyTuple_SetItem (Tuple_2D, Py_Row, Tuple);
       end loop;
-      
+
       return Tuple_2D;
-       
+
    exception
       when E : others =>
          raise Interpreter_Error with Routine_Name & "error" &
            Exception_Message (E);
-      
+
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -349,14 +348,14 @@ package body Python is
             PyTuple_SetItem (Tuple, Py_Index, Item);
          end;
       end loop;
-      
+
       return Tuple;
 
    exception
       when E : others =>
          raise Interpreter_Error with Routine_Name & "error" &
            Exception_Message (E);
-      
+
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -384,14 +383,14 @@ package body Python is
          end loop;
          PyTuple_SetItem (Result, Py_Row, Item);
       end loop;
-   
+
       return Result;
-         
+
    exception
       when E : others =>
          Put_Line (Routine_Name & "error" & Exception_Message (E));
          raise Interpreter_Error;
-            
+
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -413,19 +412,19 @@ package body Python is
             PyTuple_SetItem (Tuple, Py_Index, Item);
          end;
       end loop;
-      
+
       return Tuple;
 
    exception
       when E : others =>
          raise Interpreter_Error with Routine_Name & "error" &
            Exception_Message (E);
-      
+
    end To_Tuple;
 
    --  -------------------------------------------------------------------------
    --  public operations
-   
+
    procedure Call (M : Module; Function_Name : String) is
       Func     : PyObject;
       PyResult : PyObject;
@@ -437,13 +436,13 @@ package body Python is
       Put_Line ("Python.Call 1 Result:" & Interfaces.C.long'Image (Result));
       Py_DecRef (Func);
       Py_DecRef (PyResult);
-      
+
    end Call;
 
    --  -------------------------------------------------------------------------
-    
+
    procedure Call (M : Module; Function_Name, A : String) is
-      
+
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               A      : Interfaces.C.char_array) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -460,14 +459,14 @@ package body Python is
       Py_DecRef (F);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
-      
+
    end Call;
-   
+
    -- --------------------------------------------------------------------------
- 
+
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer is
-      
+
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               A      : Interfaces.C.int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -486,14 +485,14 @@ package body Python is
       Py_DecRef (PyResult);
 
       return Integer (Result);
-      
+
    end Call;
-   
+
    -- --------------------------------------------------------------------------
- 
+
    function Call (M : Module; Function_Name : String; A, B : Integer)
                   return Integer is
-      
+
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               A      : Interfaces.C.int;
                               B      : Interfaces.C.int) return PyObject;
@@ -516,12 +515,12 @@ package body Python is
 
       return Integer (Result);
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-    
+
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix) is
-      
+
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -534,22 +533,22 @@ package body Python is
    begin
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
-                              
+
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
-      
+
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-   
+
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Integer_Matrix) is
-      
+
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -563,10 +562,10 @@ package body Python is
    begin
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
-                              
+
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
-      
+
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
@@ -574,13 +573,13 @@ package body Python is
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-   
+
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Integer_Matrix;
                    C    : ML_Types.Unbounded_List) is
-      
+
       function Py_BuildValue (Format      : Interfaces.C.char_array;
                               T1, T2, T3  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -597,7 +596,7 @@ package body Python is
         Py_BuildValue (Interfaces.C.To_C ("OOO"), A_Tuple, B_Tuple, C_Tuple);
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
-      
+
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
@@ -606,13 +605,13 @@ package body Python is
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-   
+
    procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Array) is
-      
+
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               T1, T2 : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -627,7 +626,7 @@ package body Python is
    begin
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
-      
+
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
@@ -635,16 +634,16 @@ package body Python is
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-   
+
    procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Array;
                    C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    D    : ML_Arrays_And_Matrices.Integer_Array) is
 --        Routine_Name : constant String := "Python.Call ABCD ";
-      
+
       function Py_BuildValue (Format          : Interfaces.C.char_array;
                               T1, T2, T3, T4  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -666,22 +665,22 @@ package body Python is
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
       Py_DecRef (D_Tuple);
-      
+
       PyResult := Call_Object (Py_Func, PyParams);
       Py_DecRef (Py_Func);
       Py_DecRef (PyParams);
-      
+
       Result := PyInt_AsLong (PyResult);     
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-   
+
    procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Matrix) is
-      
+
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -697,7 +696,7 @@ package body Python is
         Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
-      
+
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
@@ -705,37 +704,35 @@ package body Python is
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-   
+
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) is
-      
+
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1      : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple  : constant PyObject := To_Tuple (A);
-      PyParams : PyObject;
+      PyParams : constant PyObject := Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
-      PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
---        Execute_String ("print ('is tuple', isinstance(PyParams, tuple))");
+      --        Execute_String ("print ('is tuple', isinstance(PyParams, tuple))");
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
-      
+
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-   
+
    procedure Call (M : Module; Function_Name : String;
                    A : NL_Types.Boolean_List_2D;
                    B : ML_Types.Bounded_String_List) is
@@ -743,7 +740,7 @@ package body Python is
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
-      
+
       Routine_Name : constant String := "Python.Call 2 ";
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
@@ -755,20 +752,20 @@ package body Python is
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
       Assert (B_Tuple /= Null_Address, Routine_Name &
                 "Labels_Tuple is null");
-      
+
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
-                              
+
       PyResult := Call_Object (PyFunc, PyParams);
       if PyResult = System.Null_Address then
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
       end if;
-      
+
       Result := PyInt_AsLong (PyResult);
       Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
-      
+
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
@@ -776,9 +773,9 @@ package body Python is
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-   
+
    procedure Call (M : Module; Function_Name : String;
                    A : NL_Types.Boolean_List_2D;
                    B : NL_Types.Boolean_List;
@@ -787,7 +784,7 @@ package body Python is
       function Py_BuildValue (Format      : Interfaces.C.char_array;
                               T1, T2, T3  : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
-      
+
       Routine_Name : constant String := "Python.Call 2 ";
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
@@ -800,20 +797,20 @@ package body Python is
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
       Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
       Assert (C_Tuple /= Null_Address, Routine_Name & "C_Tuple is null");
-      
+
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), A_Tuple, B_Tuple,C_Tuple);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
-                              
+
       PyResult := Call_Object (PyFunc, PyParams);
       if PyResult = System.Null_Address then
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
       end if;
-      
+
       Result := PyInt_AsLong (PyResult);
       Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
-      
+
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
@@ -822,9 +819,9 @@ package body Python is
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-     
+
    procedure Call (M : Module; Function_Name : String;
                    A : NL_Types.Boolean_List_2D; B : NL_Types.Boolean_List;
                    C : NL_Types.Boolean_List_2D; D : ML_Types.Unbounded_List) is
@@ -832,7 +829,7 @@ package body Python is
       function Py_BuildValue (Format         : Interfaces.C.char_array;
                               T1, T2, T3, T4 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
-      
+
       Routine_Name : constant String := "Python.Call 4 ";
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
@@ -847,20 +844,20 @@ package body Python is
       Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
       Assert (C_Tuple /= Null_Address, Routine_Name & "C_Tuple is null");
       Assert (D_Tuple /= Null_Address, Routine_Name & "D_Tuple is null");
-      
+
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOOO"),
                        A_Tuple, B_Tuple, C_Tuple, D_Tuple);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
-                              
+
       PyResult := Call_Object (PyFunc, PyParams);
       if PyResult = System.Null_Address then
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
       end if;
-      
+
       Result := PyInt_AsLong (PyResult);
-      
+
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
@@ -869,7 +866,7 @@ package body Python is
       Py_DecRef (PyResult);
 
    end Call;
-   
+
    --  -------------------------------------------------------------------------
-     
+
 end Python;
