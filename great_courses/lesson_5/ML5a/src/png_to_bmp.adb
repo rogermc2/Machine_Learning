@@ -260,7 +260,7 @@ package body PNG_To_BMP is
    --  -------------------------------------------------------------------------
 
    function Process (Image_File_Name : String) return Image_Array is
-      Routine_Name    : constant String := "Simple_BMP.Process ";
+      Routine_Name    : constant String := "PNG_To_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
       in_file_id      : Ada.Streams.Stream_IO.File_Type;
       image_desc      : GID.Image_descriptor;
@@ -281,10 +281,6 @@ package body PNG_To_BMP is
            (File_Name_Upper'Last - 3 .. File_Name_Upper'Last) = ".TGA");
       Width := GID.Pixel_width (image_desc);
       Height := GID.Pixel_height (image_desc);
---        Put_Line ("Image format: " &
---                    GID.Image_format_type'Image (GID.Format (image_desc)));
---        Put_Line ("Dimensions in pixels: " &
---                    Integer'Image (Width) & " x" & Integer'Image (Height));
 
       Load_raw_image (image_desc, img_buf, next_frame);
       Assert (next_frame = 0.0, "");
