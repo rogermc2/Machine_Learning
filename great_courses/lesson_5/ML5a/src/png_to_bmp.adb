@@ -293,7 +293,7 @@ package body PNG_To_BMP is
       declare
          Image_Data : Image_Array (1 .. Height, 1 .. Width, 1 .. 3);
       begin
-         for row in Image_Data'Range loop
+         for row in reverse Image_Data'Range loop
             for col in Image_Data'Range (2) loop
                for pix in Image_Data'Range (3) loop
                   Buffer_Index := Buffer_Index + 1;
