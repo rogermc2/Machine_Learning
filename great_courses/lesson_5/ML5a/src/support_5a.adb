@@ -4,10 +4,11 @@ with PNG_To_BMP; use PNG_To_BMP;
 package body Support_5A is
 
    function Get_Part
-     (Image                     : Unsigned_8_Array_3D; First_Row, Last_Row : Positive;
+     (Image                     : Unsigned_8_Array_3D;
+      First_Row, Last_Row       : Positive;
       First_Column, Last_Column : Positive) return Unsigned_8_Array_3D is
       Part      : Unsigned_8_Array_3D
-        (First_Row .. Last_Row, First_Column .. Last_Column, Image'Range (3));
+        (1 .. Last_Row - First_Row, 1 .. Last_Column - First_Column, Image'Range (3));
       Image_Row : Natural := First_Row - 1;
       Image_Col : Natural;
    begin

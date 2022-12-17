@@ -440,6 +440,7 @@ package body Python is
                                  Interfaces.C.To_C (A));
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
+      
       Py_DecRef (F);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
@@ -464,6 +465,7 @@ package body Python is
                                  Interfaces.C.int (A));
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
+      
       Py_DecRef (F);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
