@@ -16,7 +16,8 @@ begin
    begin
       Put_Line (Project_Name & "Image Dimensions: " &
                   Integer'Image (Image_Data'Length) & " x" &
-                  Integer'Image (Image_Data'Length (2)));
+                  Integer'Image (Image_Data'Length (2)) & " x" &
+                  Integer'Image (Image_Data'Length (3)));
       Python.Initialize;
       Py_Module := Import_File ("lesson_5a");
 --        Python.Execute_String ("import matplotlib.pyplot as plt");

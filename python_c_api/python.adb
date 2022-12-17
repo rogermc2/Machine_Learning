@@ -10,6 +10,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
 with Python_API; use Python_API;
+with Basic_Printing; use Basic_Printing;
 
 package body Python is
    
@@ -226,6 +227,7 @@ package body Python is
       Py_Data      : constant PyObject := PyTuple_New (int (Data'Length (3)));
       Result       : constant PyObject := PyTuple_New (1);
    begin
+      Print_Matrix_Dimensions (Routine_Name & "Data", Data);
       for row in Data'Range loop
          Py_Row := Py_Row + 1;
          Py_Col := -1;
