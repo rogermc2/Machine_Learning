@@ -251,8 +251,7 @@ package body PNG_To_BMP is
             Byte_Array'Write (Stream (out_file_id), img_buf.all);
          end if;
       end;  --  declare block
-      Put_Line (Routine_Name & "img_buf.all length" &
-                  Integer'Image (img_buf.all'Length));
+
       Close (out_file_id);
 
    end Write_BMP_24;

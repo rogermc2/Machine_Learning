@@ -278,7 +278,7 @@ package body Basic_Printing is
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Integer_Matrix) is
    begin
-      Put (Name & ": ");
+      Put (Name & " dimensions:");
       Put_Line (Integer'Image (aMatrix'Length) & "  x" &
                   Integer'Image (aMatrix'Length (2)));
 
@@ -289,7 +289,7 @@ package body Basic_Printing is
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Real_Float_Matrix) is
    begin
-      Put (Name & " size:");
+      Put (Name & " dimensions:");
       Put_Line (Integer'Image (aMatrix'Length) & "  x" &
                   Integer'Image (aMatrix'Length (2)));
 
@@ -300,7 +300,7 @@ package body Basic_Printing is
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Unsigned_8_Array_3D) is
    begin
-      Put (Name & " size:");
+      Put (Name & " dimensions:");
       Put_Line (Integer'Image (aMatrix'Length) & "  x" &
                   Integer'Image (aMatrix'Length (2)) & "  x" &
                   Integer'Image (aMatrix'Length (3)));
