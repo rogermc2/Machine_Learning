@@ -716,12 +716,15 @@ package body Python is
 
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple  : constant PyObject := To_Tuple (A);
-      PyParams : constant PyObject := Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
+      --  if the Py_BuildValue format string contains exactly one format unit,
+      --  Py_BuildValue returns whatever object is described by that format unit.
+      --  To force Py_BuildValue to return a tuple of size 0 or one,
+      --  parenthesize the format string.
+      PyParams : constant PyObject := Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
-      --        Execute_String ("print ('is tuple', isinstance(PyParams, tuple))");
-      PyResult := Call_Object (F, PyParams);
+      PyResult := Call_Object (F, A_Tuple);
       Result := PyInt_AsLong (PyResult);
 
       Py_DecRef (F);
