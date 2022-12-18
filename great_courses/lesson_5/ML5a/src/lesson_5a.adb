@@ -40,11 +40,31 @@ begin
                                                        Fore_Data'Range (3)) :=
                                 To_2D (Fore_Data);
       All_Data              : constant Integer_Matrix := Yes_List & No_List;
-      Labels                : Integer_Array (All_Data'Range) := (others => 1);
+      All_Data_With_Offset  :  Integer_Matrix (All_Data'Range ,
+                                               1 .. All_Data'Length (2) + 1);
+      Labels                : Integer_Array (All_Data'Range);
       Py_Module             : Module;
       Seen_List             : Integer3_List;
       Colour                : Integer3_Array;
    begin
+      for row in All_Data_With_Offset'Range loop
+         for col in All_Data_With_Offset'Range (2) loop
+            if col <= All_Data'Length (2) then
+               All_Data_With_Offset (row, col) := All_Data (row, col);
+            else
+               All_Data_With_Offset (row, col) := 1;
+            end if;
+         end loop;
+      end loop;
+
+      for index in Labels'Range loop
+         if index <= Yes_Length then
+            Labels (index) := 1;
+         else
+            Labels (index) := 0;
+         end if;
+      end loop;
+
       Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
       Python.Initialize;
       Py_Module := Import_File ("lesson_5a");
