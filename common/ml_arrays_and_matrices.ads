@@ -123,6 +123,7 @@ package ML_Arrays_And_Matrices is
    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
    function "+" (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
+   function "+" (L, R : Integer_Matrix) return Integer_Matrix;
    pragma Inline ("+");
    function "-" (L, R : Binary_Matrix) return Binary_Matrix;
    function "-" (L, R : Integer_Matrix) return Integer_Matrix;
@@ -133,6 +134,8 @@ package ML_Arrays_And_Matrices is
    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
    pragma Inline ("-");
+   function "&" (L, R : Integer_Matrix) return Integer_Matrix;
+   pragma Inline ("&");
    procedure Check_Lengths (Routine_Name : String; L, R : Boolean_Matrix);
    procedure Check_Lengths (Routine_Name : String; L, R : Integer_Matrix);
    procedure Check_Lengths (Routine_Name : String;

@@ -175,6 +175,21 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "+" (L, R : Integer_Matrix) return Integer_Matrix is
+      Result : Integer_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
+   begin
+      for row in L'Range loop
+         for col in L'Range (2) loop
+            Result (row, col) := L (row, col) + R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "+";
+
+   --  ----------------------------------------------------------------------------
+
    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
                  return Real_Float_Matrix is
       Result : Real_Float_Matrix := L;
@@ -294,6 +309,29 @@ package body ML_Arrays_And_Matrices is
    end "-";
 
    --  ------------------------------------------------------------------------
+
+   function "&" (L, R : Integer_Matrix) return Integer_Matrix is
+      Result : Integer_Matrix (1 .. L'Length + R'Length, L'First (2) .. L'Last (2));
+   begin
+      Assert (R'Length (2) = L'Length (2),
+              "Attempt to concatenate matrices of different row sizes.");
+      for row in L'Range loop
+         for col in L'Range (2) loop
+            Result (row, col) := L (row, col);
+         end loop;
+      end loop;
+
+      for row in R'Range loop
+         for col in R'Range (2) loop
+            Result (L'Length + row, col) := R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "&";
+
+   --  ----------------------------------------------------------------------------
 
    procedure Check_Lengths (Routine_Name : String; L, R : Boolean_Matrix) is
    begin

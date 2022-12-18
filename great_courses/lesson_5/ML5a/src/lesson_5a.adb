@@ -12,28 +12,38 @@ procedure Lesson_5A is
    type Integer3_Array is array (Integer range 1 .. 3) of Integer;
 
    package Integer3_Package is new
-      Ada.Containers.Vectors (Positive, Integer3_Array);
+     Ada.Containers.Vectors (Positive, Integer3_Array);
    subtype Integer3_List is Integer3_Package.Vector;
 
    Project_Name    : constant String := "Lesson_5A ";
    Image_File_Name : constant String := "../greenML.png";
 begin
    declare
-      Image_Data  : constant Unsigned_8_Array_3D :=
-                      Get_Picture (Image_File_Name);
-      Green_Data  : constant Unsigned_8_Array_3D :=
-                      Get_Part (Image_Data, Image_Data'First, Image_Data'Last,
-                                Image_Data'First (2),
-                                Image_Data'First (2) + 360);
-      Fore_Data    : constant Unsigned_8_Array_3D :=
-                      Get_Part (Image_Data, 30, 300,
-                                547, 620);
-      Yes_List    : constant Integer_Matrix
-        (1 .. Green_Data'Length * Green_Data'Length (2),
-         Green_Data'Range (3)) := To_2D (Green_Data);
-      Py_Module    : Module;
-      Seen_List    : Integer3_List;
-      Colour       : Integer3_Array;
+      Image_Data            : constant Unsigned_8_Array_3D :=
+                                Get_Picture (Image_File_Name);
+      Green_Data            : constant Unsigned_8_Array_3D :=
+                                Get_Part (Image_Data, Image_Data'First,
+                                          Image_Data'Last,
+                                          Image_Data'First (2),
+                                          Image_Data'First (2) + 360);
+      Fore_Data             : constant Unsigned_8_Array_3D :=
+                                Get_Part (Image_Data, 30, Image_Data'Last,
+                                          547, 620);
+      Yes_Length            : constant Positive := Green_Data'Length *
+                                Green_Data'Length (2);
+      No_Length             : constant Positive := Fore_Data'Length *
+                                Fore_Data'Length (2);
+      Yes_List              : constant Integer_Matrix (1 .. Yes_Length,
+                                                       Green_Data'Range (3)) :=
+                                To_2D (Green_Data);
+      No_List               : constant Integer_Matrix (1 .. No_Length,
+                                                       Fore_Data'Range (3)) :=
+                                To_2D (Fore_Data);
+      All_Data              : constant Integer_Matrix := Yes_List & No_List;
+      Labels                : Integer_Array (All_Data'Range) := (others => 1);
+      Py_Module             : Module;
+      Seen_List             : Integer3_List;
+      Colour                : Integer3_Array;
    begin
       Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
       Python.Initialize;
@@ -48,7 +58,7 @@ begin
             Colour (col) := Yes_List (index, col);
          end loop;
          if not Seen_List.Contains (Colour) then
-              Seen_List.Append (Colour);
+            Seen_List.Append (Colour);
          end if;
       end loop;
       Put_Line (Project_Name & "Seen_List length" &
