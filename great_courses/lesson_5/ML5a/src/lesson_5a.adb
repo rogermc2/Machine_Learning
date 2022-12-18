@@ -38,7 +38,6 @@ begin
       Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
       Python.Initialize;
       Py_Module := Import_File ("lesson_5a");
-      Python.Call (Py_Module, "show_bitmap", Fore_Data);
       Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
       Python.Call (Py_Module, "show_bitmap", Image_Data);
       Python.Call (Py_Module, "show_bitmap", Green_Data);

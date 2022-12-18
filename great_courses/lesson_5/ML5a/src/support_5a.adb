@@ -1,4 +1,6 @@
 
+with Ada.Assertions; use Ada.Assertions;
+
 with PNG_To_BMP; use PNG_To_BMP;
 
 package body Support_5A is
@@ -7,18 +9,22 @@ package body Support_5A is
      (Image                     : Unsigned_8_Array_3D;
       First_Row, Last_Row       : Positive;
       First_Column, Last_Column : Positive) return Unsigned_8_Array_3D is
-      Part      : Unsigned_8_Array_3D
-        (1 .. Last_Row - First_Row, 1 .. Last_Column - First_Column, Image'Range (3));
-      Image_Row : Natural := First_Row - 1;
-      Image_Col : Natural;
+      Routine_Name : constant String := "Support_5A.Get_Part ";
+      Part  : Unsigned_8_Array_3D
+        (1 .. Last_Row - First_Row + 1, 1 .. Last_Column - First_Column + 1,
+         Image'Range (3));
+      Part_Row : Natural := 0;
+      Part_Col : Natural;
    begin
-      for row in Part'Range loop
-         Image_Row := Image_Row + 1;
-         Image_Col := First_Column - 1;
-         for col in Part'Range (2) loop
-            Image_Col := Image_Col + 1;
-            for pix in Part'Range (3) loop
-               Part (row, col, pix) := Image (row, col, pix);
+      Assert (Last_Row <= Image'Last, Routine_Name & "invalid Last_Row.");
+      Assert (Last_Column <= Image'Last (2), Routine_Name & "invalid Last_Column.");
+      for row in First_Row .. Last_Row loop
+         Part_Row := Part_Row + 1;
+         Part_Col := 0;
+         for col in First_Column .. Last_Column loop
+            Part_Col := Part_Col + 1;
+            for pix in Image'Range (3) loop
+               Part (Part_Row, Part_Col, pix) := Image (row, col, pix);
             end loop;
          end loop;
       end loop;
