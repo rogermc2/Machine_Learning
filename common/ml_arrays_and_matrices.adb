@@ -129,6 +129,35 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "**" (L : Real_Float_Matrix; R : Natural) return Real_Float_Matrix is
+      Result : Real_Float_Matrix (L'Range, L'Range (2));
+   begin
+      for row in L'Range loop
+         for col in L'Range (2) loop
+            Result (row, col) := L (row, col) ** R;
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "**";
+
+   --  ------------------------------------------------------------------------
+   function "/" (L : Float; R : Real_Float_Matrix) return Real_Float_Matrix is
+      Result : Real_Float_Matrix (R'Range, R'Range (2));
+   begin
+      for row in R'Range loop
+         for col in R'Range (2) loop
+            Result (row, col) := L / R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  ------------------------------------------------------------------------
+
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix is
       Result : Real_Float_Matrix := L;
    begin
@@ -206,6 +235,21 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "+" (L : Float; R : Real_Float_Matrix) return Real_Float_Matrix is
+      Result : Real_Float_Matrix := R;
+   begin
+      for row in R'Range loop
+         for col in R'Range (2) loop
+            Result (row, col) := Result (row, col) + L;
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "+";
+
+   --  ------------------------------------------------------------------------
+
    function "+" (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
       Result : Real_Float_Vector := R;
    begin
@@ -234,8 +278,23 @@ package body ML_Arrays_And_Matrices is
 
    --  ----------------------------------------------------------------------------
 
+   function "-" (M : Integer_Matrix) return Integer_Matrix is
+      Result : Integer_Matrix (M'Range, M'Range (2));
+   begin
+      for row in M'Range loop
+         for col in M'Range (2) loop
+            Result (row, col) := - M (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ----------------------------------------------------------------------------
+
    function "-" (L, R : Integer_Matrix) return Integer_Matrix is
-      Result : Integer_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
+      Result : Integer_Matrix (L'Range, L'Range (2));
    begin
       for row in L'Range loop
          for col in L'Range (2) loop
@@ -698,6 +757,21 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Sum (Data : Real_Float_Matrix) return Float is
+      Result : Float := 0.0;
+   begin
+      for row in Data'Range loop
+         for col in Data'Range (2) loop
+            Result := Result + Data (row, Col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Sum;
+
+   --  ------------------------------------------------------------------------
+
    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector is
       Result : Real_Float_Vector (Data'Range);
       Val    : Float;
@@ -741,7 +815,7 @@ package body ML_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function To_Boolean_Array_Of_Lists (List : NL_Types.Boolean_List_2D)
-                              return NL_Types.Boolean_Array_Of_Lists is
+                                       return NL_Types.Boolean_Array_Of_Lists is
       use NL_Types;
    begin
       if not List.Is_Empty then
@@ -781,10 +855,10 @@ package body ML_Arrays_And_Matrices is
          return Max;
       end Length_2;
 
-      List_1D : NL_Types.Boolean_List;
-      Result  : Boolean_Matrix
+      List_1D                                     : NL_Types.Boolean_List;
+      Result                                      : Boolean_Matrix
         (1 .. Integer (List.Length), 1 .. Length_2) :=
-                  (others => (others => False));
+                                                      (others => (others => False));
    begin
       for row in Result'Range loop
          List_1D := List (row);

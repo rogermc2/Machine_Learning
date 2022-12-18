@@ -115,6 +115,9 @@ package ML_Arrays_And_Matrices is
    function "*" (L, R : Float_Array) return Float_Array;
    function "*" (L : Float; R : Float_Array) return Float_Array;
    pragma Inline ("*");
+   function "**" (L : Real_Float_Matrix; R : Natural) return Real_Float_Matrix;
+   pragma Inline ("**");
+   function "/" (L : Float; R : Real_Float_Matrix) return Real_Float_Matrix;
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
@@ -123,9 +126,11 @@ package ML_Arrays_And_Matrices is
    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
    function "+" (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
+   function "+" (L : Float; R : Real_Float_Matrix) return Real_Float_Matrix;
    function "+" (L, R : Integer_Matrix) return Integer_Matrix;
    pragma Inline ("+");
    function "-" (L, R : Binary_Matrix) return Binary_Matrix;
+   function "-" (M : Integer_Matrix) return Integer_Matrix;
    function "-" (L, R : Integer_Matrix) return Integer_Matrix;
    function "-" (L : Real_Float_Matrix; R : Boolean_Matrix)
                   return Real_Float_Matrix;
@@ -162,6 +167,7 @@ package ML_Arrays_And_Matrices is
    pragma Inline ("not");
    function Outer (L, R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline (Outer);
+   function Sum (Data : Real_Float_Matrix) return Float;
    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector;
    pragma Inline (Sum);
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector;
