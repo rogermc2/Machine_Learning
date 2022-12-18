@@ -42,7 +42,6 @@ begin
       Python.Call (Py_Module, "show_bitmap", Image_Data);
       Python.Call (Py_Module, "show_bitmap", Green_Data);
       Python.Call (Py_Module, "show_bitmap", Fore_Data);
-      Print_Matrix_Dimensions ("Yes_List", Yes_List);
 
       for index in Yes_List'Range loop
          for col in Colour'Range loop
@@ -52,7 +51,7 @@ begin
               Seen_List.Append (Colour);
          end if;
       end loop;
-      Put_Line ("Seen_List length" &
+      Put_Line (Project_Name & "Seen_List length" &
                   Integer'Image (Integer (Seen_List.Length)));
 
       Put_Line (Project_Name & "finalizing Python");

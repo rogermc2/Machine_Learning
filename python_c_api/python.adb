@@ -117,8 +117,6 @@ package body Python is
          raise Interpreter_Error with "Cannot find function " & Function_Name;
       end if;
 
-      Py_DecRef (PyModule);
-
       return F;
 
    end Get_Symbol;
@@ -130,7 +128,7 @@ package body Python is
       use type System.Address;
       Routine_Name : constant String := "Python.Call_Object ";
       PyResult     : PyObject;
-   begin 
+   begin
       Assert (PyFunc /= System.Null_Address, Routine_Name & "PyFunc is null.");  
       Assert (PyCallable_Check (PyFunc) /= 0, Routine_Name &
                 "PyCallable_Check is null."); 
@@ -508,7 +506,7 @@ package body Python is
                    A : ML_Arrays_And_Matrices.Integer_Matrix) is
 
       function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              T1  : PyObject) return PyObject;
+                              T1      : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject := Get_Symbol (M, Function_Name);
@@ -628,7 +626,7 @@ package body Python is
                    B    : ML_Arrays_And_Matrices.Integer_Array;
                    C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    D    : ML_Arrays_And_Matrices.Integer_Array) is
---        Routine_Name : constant String := "Python.Call ABCD ";
+      --        Routine_Name : constant String := "Python.Call ABCD ";
 
       function Py_BuildValue (Format          : Interfaces.C.char_array;
                               T1, T2, T3, T4  : PyObject) return PyObject;
@@ -696,20 +694,24 @@ package body Python is
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) is
       use Interfaces.C;
+      
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1      : PyObject;
                               I1      : int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F          : constant PyObject := Get_Symbol (M, Function_Name);
-      Row_Length : constant int := int (A'Length (2));
-      A_Tuple    : constant PyObject := To_Tuple (A);
-      PyParams   : constant PyObject :=
-                     Py_BuildValue (Interfaces.C.To_C ("(Oi)"),
-                                    A_Tuple, Row_Length);
-      PyResult : PyObject;
-      Result   : aliased Interfaces.C.long;
+--        Routine_Name : constant String := "Python.Call U8_3D ";
+      F            : PyObject;
+      Row_Length   : constant int := int (A'Length (2));
+      A_Tuple      : PyObject;
+      PyParams     :  PyObject;
+      PyResult     : PyObject;
+      Result       : aliased Interfaces.C.long;
    begin
+      F := Get_Symbol (M, Function_Name);
+      A_Tuple := To_Tuple (A);
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("(Oi)"),
+                                 A_Tuple, Row_Length);
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
 
