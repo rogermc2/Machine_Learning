@@ -55,6 +55,23 @@ package body Support_5A is
 
    --  -------------------------------------------------------------------------
 
+   function Loss (Weights  : Real_Float_Vector; All_Data : Integer_Matrix;
+                  Labels   : Integer_Array) return Float is
+      --  Compute a weighted sums
+      H      : Integer_Matrix := Dot (Weights, All_Data);
+   begin
+        --  transform the sum using the sigmoid function
+--        y := sigm1/(1 + np.exp(-h))
+          --  take the difference between the labels and the output of the
+          --   sigmoid, squared, then sum up over all instances to get the
+          --   total loss.
+--        return np.sum((labs - y)**2);
+      return 0.0;
+
+   end Loss;
+
+   --  -------------------------------------------------------------------------
+
    function Set_All_Data (Yes_List, No_List : Integer_Matrix)
                           return Integer_Matrix is
       All_Data              : constant Integer_Matrix := Yes_List & No_List;
