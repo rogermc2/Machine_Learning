@@ -39,23 +39,13 @@ begin
       No_List               : constant Integer_Matrix (1 .. No_Length,
                                                        Fore_Data'Range (3)) :=
                                 To_2D (Fore_Data);
-      All_Data              : constant Integer_Matrix := Yes_List & No_List;
-      All_Data_With_Offset  :  Integer_Matrix (All_Data'Range ,
-                                               1 .. All_Data'Length (2) + 1);
+      All_Data              : constant Integer_Matrix :=
+                                Set_All_Data (Yes_List, No_List);
       Labels                : Integer_Array (All_Data'Range);
       Py_Module             : Module;
       Seen_List             : Integer3_List;
       Colour                : Integer3_Array;
    begin
-      for row in All_Data_With_Offset'Range loop
-         for col in All_Data_With_Offset'Range (2) loop
-            if col <= All_Data'Length (2) then
-               All_Data_With_Offset (row, col) := All_Data (row, col);
-            else
-               All_Data_With_Offset (row, col) := 1;
-            end if;
-         end loop;
-      end loop;
 
       for index in Labels'Range loop
          if index <= Yes_Length then
