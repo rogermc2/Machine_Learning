@@ -60,18 +60,18 @@ package body Support_5A is
 
    --  -------------------------------------------------------------------------
 
-   function Loss (Data   : Integer_Matrix; Weights  : Real_Float_Vector;
+   function Loss (Data   : Integer_Matrix; Weights : Real_Float_Vector;
                   Labels : Integer_Array) return Float is
       Weighted_Data : Integer_Matrix := Data;
       Y             : Real_Float_Matrix (Data'Range, Data'Range (2));
       Diff          : Real_Float_Matrix (Data'Range, Data'Range (2));
    begin
       Mult (Weighted_Data, Weights);
-      --  transform the sum using the sigmoid function
+      --  transform using the sigmoid function
       Y := 1.0 / (1.0 + Exp (To_Real_Float_Matrix (-Weighted_Data)));
           --  take the difference between the labels and the output of the
-          --   sigmoid squared, then sum up over all instances to get the
-          --   total loss.
+          --  sigmoid squared, then sum over all instances to get the
+          --  total loss.
       Diff := (Y - To_Real_Float_Vector (Labels)) ** 2;
 
       return Sum (Diff);

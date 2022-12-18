@@ -3,6 +3,7 @@ with Ada.Containers.Vectors;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
+with Maths;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
 
@@ -45,6 +46,8 @@ begin
       Py_Module             : Module;
       Seen_List             : Integer3_List;
       Colour                : Integer3_Array;
+      Weights               : Real_Float_Vector (1 .. 4);
+      theLoss               : Float;
    begin
 
       for index in Labels'Range loop
@@ -73,6 +76,15 @@ begin
       end loop;
       Put_Line (Project_Name & "Seen_List length" &
                   Integer'Image (Integer (Seen_List.Length)));
+
+      for count in 1 .. 10 loop
+         for index in Weights'Range loop
+            Weights (index) := Maths.Random_Float;
+         end loop;
+         theLoss := Loss (All_Data, Weights, Labels);
+         Print_Float_Vector ("Weights", Weights);
+         Put_Line ("Loss: " & Float'Image (theLoss));
+      end loop;
 
       Put_Line (Project_Name & "finalizing Python");
       Python.Finalize;

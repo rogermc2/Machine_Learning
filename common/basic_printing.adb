@@ -94,8 +94,8 @@ package body Basic_Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Float_Matrix
-     (Name  : String; aMatrix : Real_Float_Matrix;
-      Start : Positive := 1; Finish : Natural := 0;
+     (Name      : String; aMatrix : Real_Float_Matrix;
+      Start     : Positive := 1; Finish : Natural := 0;
       Col_Start : Positive := 1; Col_Finish : Natural := 0) is
       Last     : Positive;
       Col_Last : Positive;
@@ -137,7 +137,7 @@ package body Basic_Printing is
       Put_Line (Name);
       for index in aList.First_Index .. aList.Last_Index loop
          Print_Float_Matrix ("" & Integer'Image (index),
-                              aList (index), Start, Finish);
+                             aList (index), Start, Finish);
       end loop;
 
    end Print_Float_Matrix_List;
@@ -147,7 +147,8 @@ package body Basic_Printing is
    procedure Print_Float_Vector
      (Name  : String; Vec : Real_Float_Vector;
       Start : Positive := 1; Finish : Natural := 0) is
-      Last : Integer;
+      Last  : Integer;
+      Count : Positive := 1;
    begin
       if Finish > 0 and then Finish < Vec'Length then
          Last := Finish;
@@ -159,11 +160,18 @@ package body Basic_Printing is
       if Start >= Vec'First then
          for row in Start .. Last loop
             Put (Float'Image (Vec (row)) & "  ");
-            New_Line;
          end loop;
+
+         Count := Count + 1;
+         if Count > 8 then
+            New_Line;
+            Count := 1;
+         end if;
+
       else
          Put_Line ("Print_Float_Vector called with invalid start index.");
       end if;
+      New_Line;
 
    end Print_Float_Vector;
 
