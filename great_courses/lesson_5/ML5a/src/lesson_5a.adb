@@ -47,7 +47,8 @@ begin
       Py_Module             : Module;
       Seen_List             : Integer3_List;
       Colour                : Integer3_Array;
-      Weights               : Real_Float_Vector (1 .. 4);
+      Weights               : Real_Float_Vector (1 .. 4) :=
+                                (0.786, 0.175, -0.558, -0.437);
       theLoss               : Float;
    begin
 
@@ -82,12 +83,12 @@ begin
          for index in Weights'Range loop
             Weights (index) := Maths.Random_Float;
          end loop;
-         theLoss := Loss (All_Data, Weights, Labels);
+         theLoss := Loss (Weights, All_Data, Labels);
          Put_Line ("Loss: " & Float'Image (theLoss) & ", Weights:");
          Print_Float_Vector ("", Weights);
       end loop;
+      Fit (Weights, All_Data, Labels);
 
-      Put_Line (Project_Name & "finalizing Python");
       Python.Finalize;
       Put_Line (Project_Name & "done");
 
