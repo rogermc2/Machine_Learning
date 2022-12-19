@@ -7,6 +7,7 @@ with Maths;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
 
+with ML; use ML;
 with Support_5A; use Support_5A;
 
 procedure Lesson_5A is

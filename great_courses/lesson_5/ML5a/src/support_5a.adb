@@ -5,11 +5,6 @@ with PNG_To_BMP; use PNG_To_BMP;
 
 package body Support_5A is
 
-   procedure Mult (Data    : in out Integer_Matrix;
-                   Weights : Real_Float_Vector);
-
-   --  -------------------------------------------------------------------------
-
    function Get_Part
      (Image                     : Unsigned_8_Array_3D;
       First_Row, Last_Row       : Positive;
@@ -57,43 +52,6 @@ package body Support_5A is
       return Clipped;
 
    end Get_Picture;
-
-   --  -------------------------------------------------------------------------
-
-   function Loss (Data   : Integer_Matrix; Weights : Real_Float_Vector;
-                  Labels : Integer_Array) return Float is
-      Weighted_Data : Integer_Matrix := Data;
-      Y             : Real_Float_Matrix (Data'Range, Data'Range (2));
-      Diff          : Real_Float_Matrix (Data'Range, Data'Range (2));
-   begin
-      Mult (Weighted_Data, Weights);
-      --  transform using the sigmoid function
-      Y := 1.0 / (1.0 + Exp (To_Real_Float_Matrix (-Weighted_Data)));
-          --  take the difference between the labels and the output of the
-          --  sigmoid squared, then sum over all instances to get the
-          --  total loss.
-      Diff := (Y - To_Real_Float_Vector (Labels)) ** 2;
-
-      return Sum (Diff);
-
-   end Loss;
-
-   --  -------------------------------------------------------------------------
-
-   procedure Mult (Data    : in out Integer_Matrix;
-                   Weights : Real_Float_Vector) is
-      Routine_Name : constant String := "Support_5A.Mult ";
-   begin
-      Assert (Weights'Length = Data'Length (2), Routine_Name &
-             "Weights length is different to number of Data columns.");
-      for row in Data'Range loop
-         for col in Data'Range (2) loop
-            Data (row, col) :=
-              Integer (Weights (col) * Float (Data (row, col)));
-         end loop;
-      end loop;
-
-   end Mult;
 
    --  -------------------------------------------------------------------------
 

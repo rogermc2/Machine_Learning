@@ -129,6 +129,19 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "*" (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector := R;
+   begin
+      for row in R'Range loop
+         Result (row) := L * Result (row);
+      end loop;
+
+      return Result;
+
+   end "*";
+
+   --  ------------------------------------------------------------------------
+
    function "**" (L : Real_Float_Matrix; R : Natural) return Real_Float_Matrix is
       Result : Real_Float_Matrix (L'Range, L'Range (2));
    begin
@@ -218,6 +231,19 @@ package body ML_Arrays_And_Matrices is
    end "+";
 
    --  ----------------------------------------------------------------------------
+
+   function "+" (L, R : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector := L;
+   begin
+      for row in L'Range loop
+         Result (row) := L (row) + R (row);
+      end loop;
+
+      return Result;
+
+   end "+";
+
+   --  ------------------------------------------------------------------------
 
    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
                  return Real_Float_Matrix is
@@ -389,6 +415,19 @@ package body ML_Arrays_And_Matrices is
       return Result;
 
    end "&";
+
+   --  ----------------------------------------------------------------------------
+
+   function "abs" (V : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector (V'Range);
+   begin
+      for index in V'Range loop
+            Result (index) := abs V (index);
+      end loop;
+
+      return Result;
+
+   end "abs";
 
    --  ----------------------------------------------------------------------------
 
@@ -670,6 +709,21 @@ package body ML_Arrays_And_Matrices is
             Result (row) := L (row);
          else
             Result (row) := R (row);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
+
+   function Max (V : Real_Float_Vector) return Float is
+      Result : Float := Float'Safe_First;
+   begin
+      for index in V'Range loop
+         if V (index) > Result then
+            Result := V (index);
          end if;
       end loop;
 

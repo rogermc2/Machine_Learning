@@ -114,6 +114,7 @@ package ML_Arrays_And_Matrices is
    pragma Inline ("<");
    function "*" (L, R : Float_Array) return Float_Array;
    function "*" (L : Float; R : Float_Array) return Float_Array;
+   function "*" (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline ("*");
    function "**" (L : Real_Float_Matrix; R : Natural) return Real_Float_Matrix;
    pragma Inline ("**");
@@ -128,6 +129,7 @@ package ML_Arrays_And_Matrices is
    function "+" (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    function "+" (L : Float; R : Real_Float_Matrix) return Real_Float_Matrix;
    function "+" (L, R : Integer_Matrix) return Integer_Matrix;
+   function "+" (L, R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline ("+");
    function "-" (L, R : Binary_Matrix) return Binary_Matrix;
    function "-" (M : Integer_Matrix) return Integer_Matrix;
@@ -141,6 +143,8 @@ package ML_Arrays_And_Matrices is
    pragma Inline ("-");
    function "&" (L, R : Integer_Matrix) return Integer_Matrix;
    pragma Inline ("&");
+   function "abs" (V : Real_Float_Vector) return Real_Float_Vector;
+   pragma Inline ("abs");
    procedure Check_Lengths (Routine_Name : String; L, R : Boolean_Matrix);
    procedure Check_Lengths (Routine_Name : String; L, R : Integer_Matrix);
    procedure Check_Lengths (Routine_Name : String;
@@ -172,6 +176,7 @@ package ML_Arrays_And_Matrices is
    pragma Inline (Sum);
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector;
    function Max (L, R : Real_Float_Vector) return Real_Float_Vector;
+   function Max (V : Real_Float_Vector) return Float;
    pragma Inline (Max);
    function Min (L, R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline (Min);
