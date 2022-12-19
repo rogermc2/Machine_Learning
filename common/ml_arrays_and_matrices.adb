@@ -129,19 +129,6 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function "*" (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
-      Result : Real_Float_Vector := R;
-   begin
-      for row in R'Range loop
-         Result (row) := L * Result (row);
-      end loop;
-
-      return Result;
-
-   end "*";
-
-   --  ------------------------------------------------------------------------
-
    function "**" (L : Real_Float_Matrix; R : Natural) return Real_Float_Matrix is
       Result : Real_Float_Matrix (L'Range, L'Range (2));
    begin
@@ -156,6 +143,20 @@ package body ML_Arrays_And_Matrices is
    end "**";
 
    --  ------------------------------------------------------------------------
+
+   function "**" (L : Real_Float_Vector; R : Natural) return Real_Float_Vector is
+      Result : Real_Float_Vector (L'Range);
+   begin
+      for index in L'Range loop
+         Result (index) := L (index) ** R;
+      end loop;
+
+      return Result;
+
+   end "**";
+
+   --  ------------------------------------------------------------------------
+
    function "/" (L : Float; R : Real_Float_Matrix) return Real_Float_Matrix is
       Result : Real_Float_Matrix (R'Range, R'Range (2));
    begin
@@ -163,6 +164,19 @@ package body ML_Arrays_And_Matrices is
          for col in R'Range (2) loop
             Result (row, col) := L / R (row, col);
          end loop;
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  ------------------------------------------------------------------------
+
+   function "/" (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector (R'Range);
+   begin
+      for index in R'Range loop
+         Result (index) := L / R (index);
       end loop;
 
       return Result;
@@ -231,19 +245,6 @@ package body ML_Arrays_And_Matrices is
    end "+";
 
    --  ----------------------------------------------------------------------------
-
-   function "+" (L, R : Real_Float_Vector) return Real_Float_Vector is
-      Result : Real_Float_Vector := L;
-   begin
-      for row in L'Range loop
-         Result (row) := L (row) + R (row);
-      end loop;
-
-      return Result;
-
-   end "+";
-
-   --  ------------------------------------------------------------------------
 
    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
                  return Real_Float_Matrix is
@@ -415,19 +416,6 @@ package body ML_Arrays_And_Matrices is
       return Result;
 
    end "&";
-
-   --  ----------------------------------------------------------------------------
-
-   function "abs" (V : Real_Float_Vector) return Real_Float_Vector is
-      Result : Real_Float_Vector (V'Range);
-   begin
-      for index in V'Range loop
-            Result (index) := abs V (index);
-      end loop;
-
-      return Result;
-
-   end "abs";
 
    --  ----------------------------------------------------------------------------
 
@@ -836,6 +824,19 @@ package body ML_Arrays_And_Matrices is
             Val := Val + Data (row, Col);
          end loop;
          Result (row) := Val;
+      end loop;
+
+      return Result;
+
+   end Sum;
+
+   --  ------------------------------------------------------------------------
+
+   function Sum (Data : Real_Float_Vector) return Float is
+      Result : Float := 0.0;
+   begin
+      for index in Data'Range loop
+         Result := Result + Data (index);
       end loop;
 
       return Result;
