@@ -8,7 +8,6 @@ with GID;
 with Ada.Calendar;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
-with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
@@ -19,54 +18,12 @@ package body PNG_To_BMP is
 
    type p_Byte_Array is access ML_Arrays_And_Matrices.Byte_Array;
 
-   type BITMAPFILEHEADER is record
-      bfType      : Unsigned_16;
-      bfSize      : Unsigned_32;
-      bfReserved1 : Unsigned_16 := 0;
-      bfReserved2 : Unsigned_16 := 0;
-      bfOffBits   : Unsigned_32;
-   end record;
-
-   --  ^ No packing needed
-   BITMAPFILEHEADER_Bytes : constant := 14;
-
-   type BITMAPINFOHEADER is record
-      biSize          : Unsigned_32;
-      biWidth         : Unsigned_32;
-      biHeight        : Unsigned_32;
-      biPlanes        : Unsigned_16 := 1;
-      biBitCount      : Unsigned_16;
-      biCompression   : Unsigned_32 := 0;
-      biSizeImage     : Unsigned_32;
-      biXPelsPerMeter : Unsigned_32 := 0;
-      biYPelsPerMeter : Unsigned_32 := 0;
-      biClrUsed       : Unsigned_32 := 0;
-      biClrImportant  : Unsigned_32 := 0;
-   end record;
-   --  ^ No packing needed
-   BITMAPINFOHEADER_Bytes : constant := 40;
-
-   stars                  : Natural := 0;
    img_buf                : p_Byte_Array := null;
 
    procedure Dispose is new Ada.Unchecked_Deallocation
      (ML_Arrays_And_Matrices.Byte_Array, p_Byte_Array);
 
    --  ---------------------------------------------------------------------------------------
-
-   function Height (Data : Image_Array) return Natural is
-   begin
-      return Data'Length (2);
-   end Height;
-
-   --  -------------------------------------------------------------------------
-
-   function Width (Data : Image_Array) return Natural is
-   begin
-      return Data'Length;
-   end Width;
-
-   --  -------------------------------------------------------------------------
 
    procedure Load_raw_image (image      : in out GID.Image_descriptor;
                              buffer     : out p_Byte_Array;
@@ -117,12 +74,8 @@ package body PNG_To_BMP is
       --  ----------------------------------------------------------------------
 
       procedure Feedback (percents : Natural) is
-         so_far : constant Natural := percents / 5;
       begin
-         for i in stars + 1 .. so_far loop
-            Put ('*');
-         end loop;
-         stars := so_far;
+         null;
       end Feedback;
 
       --  ----------------------------------------------------------------------
@@ -144,117 +97,6 @@ package body PNG_To_BMP is
       BMP24_Load (image, next_frame);
 
    end Load_raw_image;
-
-   --  -------------------------------------------------------------------------
-
-   procedure Write_BMP_24 (File_Name  : String;
-                           Image_desc : GID.Image_descriptor) is
-      use Ada.Strings.Unbounded;
-      use ML_Arrays_And_Matrices;
-      Routine_Name : constant String := "Simple_BMP.Write_BMP_24 ";
-      out_file_id  : Ada.Streams.Stream_IO.File_Type;
-
-      generic
-         type Number is mod <>;
-      procedure Write_Intel_x86_number (n : in Number);
-
-      procedure Write_Intel_x86_number (n : in Number) is
-         m     : Number := n;
-         bytes : constant Integer := Number'Size / 8;
-      begin
-         for i in 1 .. bytes loop
-            Unsigned_8'Write (Stream (out_file_id), Unsigned_8 (m and 255));
-            m := m / 256;
-         end loop;
-      end Write_Intel_x86_number;
-
-      procedure Write_Intel is new Write_Intel_x86_number (Unsigned_16);
-      procedure Write_Intel is new Write_Intel_x86_number (Unsigned_32);
-
-      --  ----------------------------------------------------------------------
-
-      Out_File_Name : constant Unbounded_String :=
-                        To_Unbounded_String (File_Name);
-      Pos           : constant Natural := Index (Out_File_Name, ".png") - 1;
-      FileInfo      : BITMAPINFOHEADER;
-      FileHeader    : BITMAPFILEHEADER;
-   begin  --  Write_BMP_24
-      New_Line;
-      FileHeader.bfType := 16#4D42#; -- 'BM'
-      FileHeader.bfOffBits := BITMAPINFOHEADER_Bytes + BITMAPFILEHEADER_Bytes;
-      FileInfo.biSize       := BITMAPINFOHEADER_Bytes;
-      case GID.Display_orientation (Image_desc) is
-      when GID.Unchanged | GID.Rotation_180 =>
-         FileInfo.biWidth  := Unsigned_32 (GID.Pixel_width (Image_desc));
-         FileInfo.biHeight := Unsigned_32 (GID.Pixel_height (Image_desc));
-      when GID.Rotation_90 | GID.Rotation_270 =>
-         FileInfo.biWidth  := Unsigned_32 (GID.Pixel_height (Image_desc));
-         FileInfo.biHeight := Unsigned_32 (GID.Pixel_width (Image_desc));
-      end case;
-
-      FileInfo.biBitCount   := 24;
-      FileInfo.biSizeImage  := Unsigned_32 (img_buf.all'Length);
-      New_Line;
-      FileHeader.bfSize := FileHeader.bfOffBits + FileInfo.biSizeImage;
-
-      Put_Line (Routine_Name & "creating " & Slice (Out_File_Name, 1, Pos) &
-                  ".dib");
-      --  ".dib": unknown synonym of ".bmp";
-      Create (out_file_id, Out_File, Slice (Out_File_Name, 1, Pos) & ".dib");
-      --  BMP Header, endian-safe:
-      Write_Intel (FileHeader.bfType);        --  unsigned_32
-      Write_Intel (FileHeader.bfSize);        --  unsigned_16
-      Write_Intel (FileHeader.bfReserved1);   --  unsigned_32
-      Write_Intel (FileHeader.bfReserved2);   --  unsigned_32
-      Write_Intel (FileHeader.bfOffBits);    --  unsigned_16
-
-      Write_Intel (FileInfo.biSize);    --  unsigned_16
-      Write_Intel (FileInfo.biWidth);    --  unsigned_16
-      Write_Intel (FileInfo.biHeight);    --  unsigned_16
-      Write_Intel (FileInfo.biPlanes);     --  unsigned_32
-      Write_Intel (FileInfo.biBitCount);   --  unsigned_32
-      --  ther rest are unsigned_16
-      Write_Intel (FileInfo.biCompression);
-      Write_Intel (FileInfo.biSizeImage);
-      Write_Intel (FileInfo.biXPelsPerMeter);
-      Write_Intel (FileInfo.biYPelsPerMeter);
-      Write_Intel (FileInfo.biClrUsed);
-      Write_Intel (FileInfo.biClrImportant);
-      --  BMP raw BGR image:
-      declare
-         --  Workaround for the severe xxx'Read xxx'Write performance
-         --  problems in the GNAT and ObjectAda compilers (as in 2009)
-         --  This is possible if and only if Byte = Stream_Element and
-         --  arrays types are both packed the same way.
-         --
-         subtype Size_test_a is ML_Arrays_And_Matrices.Byte_Array (1 .. 19);
-         subtype Size_test_b is Ada.Streams.Stream_Element_Array (1 .. 19);
-         workaround_possible : constant Boolean :=
-                                 Size_test_a'Size = Size_test_b'Size and then
-                                     Size_test_a'Alignment =
-                                       Size_test_b'Alignment;
-      begin
-         if workaround_possible then
-            declare
-               use Ada.Streams;
-               SE_Buffer : Stream_Element_Array
-                 (0 .. Stream_Element_Offset (img_buf'Length - 1));
-               for SE_Buffer'Address use img_buf.all'Address;
-               pragma Import (Ada, SE_Buffer);
-            begin
-               Ada.Streams.Write
-                 (Stream (out_file_id).all,
-                  SE_Buffer (0 .. Stream_Element_Offset (img_buf'Length - 1)));
-            end;
-         else
-            --  the workaround is about this line...
-            Byte_Array'Write (Stream (out_file_id), img_buf.all);
-         end if;
-      end;  --  declare block
-
-      Close (out_file_id);
-
-   end Write_BMP_24;
 
    --  -------------------------------------------------------------------------
 
@@ -283,7 +125,6 @@ package body PNG_To_BMP is
 
       Load_raw_image (image_desc, img_buf, next_frame);
       Assert (next_frame = 0.0, "");
-      Write_BMP_24 (Image_File_Name, image_desc);
 
       declare
          Image_Data : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
