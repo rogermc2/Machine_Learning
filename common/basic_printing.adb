@@ -156,7 +156,10 @@ package body Basic_Printing is
          Last := Integer (Vec'Length);
       end if;
 
-      Put_Line (Name & ": ");
+      if Name'Length > 0 then
+         Put_Line (Name & ": ");
+      end if;
+
       if Start >= Vec'First then
          for row in Start .. Last loop
             Put (Float'Image (Vec (row)) & "  ");

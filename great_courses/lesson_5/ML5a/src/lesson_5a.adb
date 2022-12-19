@@ -82,8 +82,8 @@ begin
             Weights (index) := Maths.Random_Float;
          end loop;
          theLoss := Loss (All_Data, Weights, Labels);
-         Print_Float_Vector ("Weights", Weights);
-         Put_Line ("Loss: " & Float'Image (theLoss));
+         Put_Line ("Loss: " & Float'Image (theLoss) & ", Weights:");
+         Print_Float_Vector ("", Weights);
       end loop;
 
       Put_Line (Project_Name & "finalizing Python");

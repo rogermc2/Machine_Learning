@@ -45,7 +45,7 @@ package body PNG_To_BMP is
       end Set_X_Y;
 
       --  ----------------------------------------------------------------------
-      --  Unicolor background version of Put_Pixel
+
       procedure Put_Pixel
         (red, green, blue : Primary_color_range;
          alpha            : Primary_color_range) is
@@ -73,16 +73,12 @@ package body PNG_To_BMP is
 
       --  ----------------------------------------------------------------------
 
-      procedure Feedback (percents : Natural) is
+      procedure Feedback (percents : Natural := 0) is
       begin
          null;
       end Feedback;
 
       --  ----------------------------------------------------------------------
-      --  The exciting thing: the instanciation of GID.Load_image_contents.
-      --  Load the image into a 24-bit bitmap because we provide a
-      --  Put_Pixel that does that with the pixels. We could do plenty of other
-      --  things instead like display the image live on a GUI.
 
       procedure BMP24_Load is new GID.Load_image_contents
         (Primary_color_range, Set_X_Y, Put_Pixel, Feedback, GID.fast);
@@ -91,7 +87,6 @@ package body PNG_To_BMP is
 
    begin  --  Load_raw_image
       Dispose (buffer);
-
       buffer := new ML_Arrays_And_Matrices.Byte_Array
         (0 .. padded_line_size_x * GID.Pixel_height (image) - 1);
       BMP24_Load (image, next_frame);
