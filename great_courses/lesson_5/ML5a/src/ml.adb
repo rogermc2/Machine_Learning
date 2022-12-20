@@ -19,9 +19,9 @@ package body ML is
       use Real_Float_Arrays;
       Routine_Name    : constant String := "ML.Fit ";
       F_Data          : constant Real_Float_Matrix :=
-                          To_Real_Float_Matrix (Data);
+        To_Real_Float_Matrix (Data);
       F_Labels        : constant Real_Float_Vector :=
-                          To_Real_Float_Vector (Labels);
+        To_Real_Float_Vector (Labels);
       Step_Size       : Float := 0.1;
       --  Y1 = h = np.matmul(alldat,w) dot product
       --  Y1i = w1xi1 + w2x21 + ... wnxn1 + w_offset
@@ -33,7 +33,7 @@ package body ML is
       Delta_Weights   : Real_Float_Vector (Weights'Range);
       New_Weights     : Real_Float_Vector (Weights'Range);
       Current_Loss    : Float;
---        Sum             : Float;
+      Sum             : Float;
       --  Stop searching near a local minimum
       Done            : Boolean := False;
    begin
@@ -49,8 +49,8 @@ package body ML is
          --  The next few lines compute the gradient
          --  Delta_Weight is the change in  weights suggested by the gradient
 
-         Y1 := Dot (Data, Weights);  --  h
---           Put_Line ("Y1 Max" & Float'Image (Max (Y1)));
+         Y1 :=  F_Data * Weights;  --  h
+         --           Put_Line ("Y1 Max" & Float'Image (Max (Y1)));
          --  transform using the sigmoid function
          Exp_Y1 := Exp (-Y1);
          Y := 1.0 / (1.0 + Exp_Y1);
@@ -59,9 +59,11 @@ package body ML is
          --  delta_w is the change in the weights suggested by the gradient
          --  Delta_Weight = np.add.reduce
          --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
-         Errors := (F_Labels - Y);
+         --  add.reduce() is equivalent to sum()
+         Errors := F_Labels - Y;
          Put_Line ("Errors Min, Max: " & Float'Image (Min (Errors)) & ", " &
                      Float'Image (Max (Errors)));
+         --  (labs-y) * np.exp(-h)*y**2
          Mult_Vec := Mult (Errors, Exp_Y1, Y) ** 2;
          Put_Line ("Mult_Vec Min, Max:" & Float'Image (Min (Mult_Vec)) & ", " &
                      Float'Image (Max (Mult_Vec)));
@@ -74,30 +76,13 @@ package body ML is
          Put_Line ("255 * F_Data length" & Integer'Image (255 * F_Data'Length));
          Put_Line ("Max Mult_Vec matrix" &
                      Float'Image (Max (Vec_To_1xN_Matrix (Mult_Vec))));
-         declare
-            Mat : constant Real_Float_Matrix :=
-                    Vec_To_1xN_Matrix (Mult_Vec) * F_Data;
-         begin
-            Print_Matrix_Dimensions ("Vec_To_1xN_Matrix (Mult_Vec) ",
-                                     Vec_To_1xN_Matrix (Mult_Vec) );
-            Put_Line ("Max Mat: " & Float'Image (Max (Mat)));
-            Put_Line ("Min Mat: " & Float'Image (Min (Mat)));
-            Put_Line ("Mat (1, 1): " & Float'Image (Mat (1, 1)));
-            Put_Line ("Mat (1, 2): " & Float'Image (Mat (1, 2)));
-            Put_Line ("Mat (1, 3): " & Float'Image (Mat (1, 3)));
-            Put_Line ("Mat (1, 4): " & Float'Image (Mat (1, 4)));
-            Print_Float_Matrix ("Mat", Mat);
-            for index in Mat'Range (2) loop
-               Delta_Weights (index) := Mat (1, index);
+         for col in F_Data'Range (2) loop
+            Sum := 0.0;
+            for row in F_Data'Range loop
+               Sum := Sum + Mult_Vec (row) * F_Data (row, col);
+               Delta_Weights (Integer (col)) := Sum;
             end loop;
-         end;
---           for row in F_Data'Range loop
---              Sum := 0.0;
---              for col in F_Data'Range (2) loop
---                 Sum := Sum + Mult_Vec (row) * F_Data (row, col);
---              end loop;
---              Delta_Weights (row) := Sum;
---           end loop;
+         end loop;
          --           Print_Float_Vector ("Mult (Errors, Exp_Y1, Y)",
          --                               Mult (Errors, Exp_Y1, Y));
          Print_Float_Vector ("Delta_Weights", Delta_Weights);
@@ -174,16 +159,16 @@ package body ML is
    --  -------------------------------------------------------------------------
 
    function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
-                                return Real_Float_Matrix is
+                               return Real_Float_Matrix is
       Routine_Name : constant String := "ML.Vec_To_1xN_Matrix ";
       Result : Real_Float_Matrix (1 .. 1, Vec'Range);
    begin
       for index in Vec'Range loop
          Assert (Vec (index)'Valid, Routine_Name & "invalid Vec value at (" &
-                Integer'Image (index) & ")");
+                   Integer'Image (index) & ")");
          Result (1, index) := Vec (index);
          Assert (Result (1, index)'Valid, Routine_Name & "invalid Result at (" &
-                Integer'Image (1) & Integer'Image (index) & ")");
+                   Integer'Image (1) & Integer'Image (index) & ")");
       end loop;
 
       return Result;

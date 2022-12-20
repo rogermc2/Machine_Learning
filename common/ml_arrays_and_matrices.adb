@@ -545,12 +545,18 @@ package body ML_Arrays_And_Matrices is
    --  ----------------------------------------------------------------------------
 
    function Exp (M : Real_Float_Matrix) return Real_Float_Matrix is
-      use Maths.Float_Math_Functions;
+      use Maths.Long_Float_Math_Functions;
+      Value  : Long_Float;
       Result : Real_Float_Matrix (M'Range, M'Range (2));
    begin
       for row in M'Range loop
          for col in M'Range (2) loop
-            Result (row, col) := Exp (M (row, col));
+            Value := Exp (Long_Float (M (row, col)));
+            if Value < Float'Safe_Last - 1.0 then
+               Result (row, col) := Float (Value);
+            else
+               Result (row, col) := Float'Safe_Last - 1.0;
+            end if;
          end loop;
       end loop;
 
@@ -567,10 +573,10 @@ package body ML_Arrays_And_Matrices is
    begin
       for index in V'Range loop
          Value := Exp (Long_Float (V (index)));
-         if Value < Float'Safe_Last then
+         if Value < Float'Safe_Last - 1.0 then
             Result (index) := Float (Value);
          else
-            Result (index) := Float'Safe_Last;
+            Result (index) := Float'Safe_Last - 1.0;
          end if;
       end loop;
 
