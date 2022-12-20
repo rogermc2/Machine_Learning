@@ -50,6 +50,7 @@ package body ML is
          --  Delta_Weight is the change in  weights suggested by the gradient
 
          Y1 := Dot (Data, Weights);  --  h
+         Print_Float_Vector ("Y1", Y1, 276120, 276130);
          --  transform using the sigmoid function
          Exp_Y1 := Exp (-Y1);
          Y := 1.0 / (1.0 + Exp_Y1);

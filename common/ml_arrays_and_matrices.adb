@@ -1,10 +1,10 @@
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
@@ -561,11 +561,17 @@ package body ML_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function Exp (V : Real_Float_Vector) return Real_Float_Vector is
-      use Maths.Float_Math_Functions;
+      use Maths.Long_Float_Math_Functions;
+      Value  : Long_Float;
       Result : Real_Float_Vector (V'Range);
    begin
-      for row in V'Range loop
-         Result (row) := Exp (V (row));
+      for index in V'Range loop
+         Value := Exp (Long_Float (V (index)));
+         if Value < Float'Safe_Last then
+            Result (index) := Float (Value);
+         else
+            Result (index) := Float'Safe_Last;
+         end if;
       end loop;
 
       return Result;
@@ -721,12 +727,8 @@ package body ML_Arrays_And_Matrices is
    function Max (Data : Real_Float_Matrix) return Float is
       Max_Val : Float := Float'Safe_First;
    begin
-      Print_Matrix_Dimensions ("Max return float", Data);
       for row in Data'First .. Data'Last loop
          for col in Data'First (2) .. Data'Last (2) loop
-            Assert (Data (row, col)'Valid,
-                    "Max return float found Invalid value at (" &
-                      Integer'Image (row) & ", " & Integer'Image (col) & ")");
             if Data (row, col) > Max_Val then
                Max_Val := Data (row, Col);
             end if;
@@ -746,9 +748,6 @@ package body ML_Arrays_And_Matrices is
       for row in Data'First .. Data'Last loop
          for col in Data'First (2) .. Data'Last (2) loop
             if Data (row, col) > Max_Val then
-               Assert (Data (row, col)'Valid,
-                       "Max return Float_Vector found Invalid value at (" &
-                      Integer'Image (row) & "," & Integer'Image (col) & ")");
                Max_Val := Data (row, Col);
             end if;
          end loop;
@@ -781,12 +780,8 @@ package body ML_Arrays_And_Matrices is
    function Max (V : Real_Float_Vector) return Float is
       Result : Float := Float'Safe_First;
    begin
-      Put_Line ("Max Float_Vector length:" & Integer'Image (V'Length));
       for index in V'First .. V'Last loop
          if V (index) > Result then
-            Assert (V (index)'Valid,
-                    "Max Float_Vector found Invalid value at (" &
-                      Integer'Image (index));
             Result := V (index);
          end if;
       end loop;
@@ -802,8 +797,6 @@ package body ML_Arrays_And_Matrices is
    begin
       for row in Data'First .. Data'Last loop
          for col in Data'First (2) .. Data'Last (2) loop
-            Assert (Data (row, col)'Valid, "Min found Invalid value at (" &
-                      Integer'Image (row) & ", " & Integer'Image (col) & ")");
             if Data (row, col) < Min_Val then
                Min_Val := Data (row, Col);
             end if;
@@ -838,8 +831,6 @@ package body ML_Arrays_And_Matrices is
    begin
       for index in V'First .. V'Last loop
          if V (index) < Result then
-            Assert (V (index)'Valid, "Min found Invalid value at (" &
-                      Integer'Image (index));
             Result := V (index);
          end if;
       end loop;
