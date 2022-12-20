@@ -727,8 +727,8 @@ package body ML_Arrays_And_Matrices is
    function Max (Data : Real_Float_Matrix) return Float is
       Max_Val : Float := Float'Safe_First;
    begin
-      for row in Data'First .. Data'Last loop
-         for col in Data'First (2) .. Data'Last (2) loop
+      for row in Data'Range loop
+         for col in Data'Range (2) loop
             if Data (row, col) > Max_Val then
                Max_Val := Data (row, Col);
             end if;
@@ -745,8 +745,8 @@ package body ML_Arrays_And_Matrices is
       Result  : Real_Float_Vector (Data'Range);
       Max_Val : Float := Float'Safe_First;
    begin
-      for row in Data'First .. Data'Last loop
-         for col in Data'First (2) .. Data'Last (2) loop
+      for row in Data'Range loop
+         for col in Data'Range (2) loop
             if Data (row, col) > Max_Val then
                Max_Val := Data (row, Col);
             end if;
@@ -763,7 +763,7 @@ package body ML_Arrays_And_Matrices is
    function Max (L, R : Real_Float_Vector) return Real_Float_Vector is
       Result  : Real_Float_Vector (L'Range);
    begin
-      for row in L'First .. L'Last loop
+      for row in L'Range loop
          if L (row) >= R (row) then
             Result (row) := L (row);
          else
@@ -780,7 +780,7 @@ package body ML_Arrays_And_Matrices is
    function Max (V : Real_Float_Vector) return Float is
       Result : Float := Float'Safe_First;
    begin
-      for index in V'First .. V'Last loop
+      for index in V'Range loop
          if V (index) > Result then
             Result := V (index);
          end if;
@@ -795,8 +795,8 @@ package body ML_Arrays_And_Matrices is
    function Min (Data : Real_Float_Matrix) return Float is
       Min_Val : Float := Float'Safe_Last;
    begin
-      for row in Data'First .. Data'Last loop
-         for col in Data'First (2) .. Data'Last (2) loop
+      for row in Data'Range loop
+         for col in Data'Range (2) loop
             if Data (row, col) < Min_Val then
                Min_Val := Data (row, Col);
             end if;
@@ -812,7 +812,7 @@ package body ML_Arrays_And_Matrices is
    function Min (L, R : Real_Float_Vector) return Real_Float_Vector is
       Result  : Real_Float_Vector (L'Range);
    begin
-      for row in L'First .. L'Last loop
+      for row in L'Range loop
          if L (row) < R (row) then
             Result (row) := L (row);
          else
@@ -829,7 +829,7 @@ package body ML_Arrays_And_Matrices is
    function Min (V : Real_Float_Vector) return Float is
       Result : Float := Float'Safe_Last;
    begin
-      for index in V'First .. V'Last loop
+      for index in V'Range loop
          if V (index) < Result then
             Result := V (index);
          end if;
