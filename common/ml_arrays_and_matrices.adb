@@ -482,6 +482,54 @@ package body ML_Arrays_And_Matrices is
 
    --  ----------------------------------------------------------------------------
 
+   function Dot (L : Integer_Matrix; R : Real_Float_Vector)
+                 return Real_Float_Vector is
+      Sum    : Float;
+      Result : Real_Float_Vector (L'Range);
+   begin
+      for row in L'Range loop
+         Sum := 0.0;
+         for col in R'Range loop
+            Sum := Sum + Float (L (row, col)) * R (col);
+            Assert (Sum'Valid, "Dot, Sum =" & Float'Image (Sum) & "row, col:"
+                    & Integer'Image (row) & ", " & Integer'Image (col) &
+                      ", L, R:" & Integer'Image (L (row, col)) & ", " &
+                      Float'Image (R (col)));
+         end loop;
+         Result (row) := Sum;
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
+   function Dot (L : Real_Float_Vector; R : Integer_Matrix)
+                 return Real_Float_Vector is
+      Sum    : Float;
+      Result : Real_Float_Vector (L'Range);
+   begin
+      Assert (L'Length = R'Length (2), "Dot, L'Length /= R'Length (2)");
+      for row in R'Range loop
+         Sum := 0.0;
+         for col in L'Range loop
+            Sum := Sum + L (col) * Float (R (row, col));
+            Assert (Sum'Valid, "Dot, Sum =" & Float'Image (Sum) & "row, col:"
+                    & Integer'Image (row) & ", " & Integer'Image (col) &
+                      ", L, R:" & Float'Image (L (col)) & ", " &
+                      Integer'Image (R (row, col)));
+         end loop;
+
+         Result (row) := Sum;
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
    function Dot (L, R : Real_Float_List) return Float is
       Result : Float := 0.0;
    begin

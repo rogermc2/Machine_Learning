@@ -151,6 +151,10 @@ package ML_Arrays_And_Matrices is
    pragma Inline (Check_Lengths);
    function Cumulative_Sum (A : Float_Array) return Float_Array;
    function Dot (L, R : Real_Float_List) return Float;
+   function Dot (L : Integer_Matrix; R : Real_Float_Vector)
+                 return Real_Float_Vector;
+   function Dot (L : Real_Float_Vector; R : Integer_Matrix)
+                 return Real_Float_Vector;
    pragma Inline (Dot);
    function Exp (M : Real_Float_Matrix) return Real_Float_Matrix;
    function Exp (V : Real_Float_Vector) return Real_Float_Vector;

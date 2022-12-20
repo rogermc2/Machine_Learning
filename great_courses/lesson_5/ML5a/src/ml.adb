@@ -27,9 +27,11 @@ package body ML is
       Exp_Y1          : Real_Float_Vector (Data'Range);
       Y               : Real_Float_Vector (Data'Range);
       Errors          : Real_Float_Vector (Data'Range);
+      Mult_Vec        : Real_Float_Vector (Data'Range);
       Delta_Weights   : Real_Float_Vector (Weights'Range);
       New_Weights     : Real_Float_Vector (Weights'Range);
       Current_Loss    : Float;
+      Sum             : Float;
       --  Stop searching near a local minimum
       Done            : Boolean := False;
    begin
@@ -45,7 +47,7 @@ package body ML is
          --  The next few lines compute the gradient
          --  Delta_Weight is the change in  weights suggested by the gradient
 
-         Y1 := F_Data * Weights;  --  h
+         Y1 := Dot (Data, Weights);  --  h
          --  transform using the sigmoid function
          Exp_Y1 := Exp (-Y1);
          Y := 1.0 / (1.0 + Exp_Y1);
@@ -53,14 +55,33 @@ package body ML is
          --  Delta_Weight = np.add.reduce
          --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
          Errors := (F_Labels - Y);
-         Delta_Weights := Mult (Errors, Exp_Y1, Y) ** 2 * F_Data;
+         Mult_Vec := Mult (Errors, Exp_Y1, Y) ** 2;
+         Put_Line ("Mult_Vec length" & Integer'Image (Mult_Vec'Length));
+         Put_Line ("F_Data length" & Integer'Image (F_Data'Length));
+         Put_Line ("Delta_Weights length" & Integer'Image (Delta_Weights'Length));
+         for row in F_Data'Range loop
+            Sum := 0.0;
+            for col in F_Data'Range (2) loop
+               Sum := Sum + Mult_Vec (row) * F_Data (row, col);
+            end loop;
+            Delta_Weights (row) := Sum;
+         end loop;
+         --           Print_Float_Vector ("Mult (Errors, Exp_Y1, Y)",
+         --                               Mult (Errors, Exp_Y1, Y));
+         Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
          --  Get new weights by taking a step of size alpha and updating
          Current_Loss := Loss (Weights, Data, Labels);
          Step_Size := 2.0 * Step_Size;
          New_Weights := Weights + Step_Size * Delta_Weights;
+         Put_Line ("Step_Size: " & Float'Image (Step_Size));
+         Put_Line ("Current_Loss: " & Float'Image (Current_Loss));
+         Print_Float_Vector ("New_Weights", New_Weights);
+         Put_Line ("Next Loss: " &
+                     Float'Image (Loss (New_Weights, Data, Labels)));
 
-         while Loss (New_Weights, Data, Labels) >= Current_Loss and not Done loop
+         while Loss (New_Weights, Data, Labels) >= Current_Loss and
+           not Done loop
             Step_Size := Step_Size / 2.0;
             Done := Step_Size * Max (abs (Delta_Weights)) < 0.0001;
             if Done then
@@ -73,6 +94,7 @@ package body ML is
                end if;
             end if;
          end loop;
+         Done := Step_Size * Max (abs (Delta_Weights)) < 0.0001;
 
       end loop;
 
@@ -80,15 +102,18 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
-   function Loss (Weights : Real_Float_Vector; Data   : Integer_Matrix;
-                  Labels : Integer_Array) return Float is
+   function Loss (Weights : Real_Float_Vector; Data : Integer_Matrix;
+                  Labels  : Integer_Array) return Float is
       use Real_Float_Arrays;
-      H      : constant Real_Float_Vector := To_Real_Float_Matrix (Data) * Weights;
+      --        Routine_Name : constant String := "ML.Loss ";
+      H      : constant Real_Float_Vector := Dot (Data, Weights);
       --  transform using the sigmoid function
       Exp_H  : constant Real_Float_Vector := Exp (-H);
       Y      : constant Real_Float_Vector := 1.0 / (1.0 + Exp_H);
       Errors : Real_Float_Vector (Labels'Range);
    begin
+      --        Print_Float_Vector (Routine_Name & "H", H);
+      --        Put_Line (Routine_Name & "Max (Exp_H): " & Float'Image (Max (Exp_H)));
       --  take the difference between the labels and the output of the
       --  sigmoid squared, then sum over all instances to get the
       --  total loss.
