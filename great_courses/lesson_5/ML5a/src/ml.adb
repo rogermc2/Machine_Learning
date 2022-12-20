@@ -50,23 +50,25 @@ package body ML is
          --  Delta_Weight is the change in  weights suggested by the gradient
 
          Y1 := Dot (Data, Weights);  --  h
-         Print_Float_Vector ("Y1", Y1, 276120, 276130);
+--           Put_Line ("Y1 Max" & Float'Image (Max (Y1)));
          --  transform using the sigmoid function
          Exp_Y1 := Exp (-Y1);
          Y := 1.0 / (1.0 + Exp_Y1);
+         Put_Line ("Y Min, Max:" & Float'Image (Min (Y)) & ", " &
+                     Float'Image (Max (Y)));
          --  delta_w is the change in the weights suggested by the gradient
          --  Delta_Weight = np.add.reduce
          --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
          Errors := (F_Labels - Y);
+         Put_Line ("Errors Min, Max: " & Float'Image (Min (Errors)) & ", " &
+                     Float'Image (Max (Errors)));
          Mult_Vec := Mult (Errors, Exp_Y1, Y) ** 2;
-         Put_Line ("Max Mult_Vec" &
+         Put_Line ("Mult_Vec Min, Max:" & Float'Image (Min (Mult_Vec)) & ", " &
                      Float'Image (Max (Mult_Vec)));
          Put_Line ("Mult_Vec length" & Integer'Image (Mult_Vec'Length));
          Put_Line ("F_Data length" & Integer'Image (F_Data'Length));
          Put_Line ("Delta_Weights length" &
                      Integer'Image (Delta_Weights'Length));
-         Put_Line ("Max Mult_Vec" & Float'Image (Max (Mult_Vec)));
-         Put_Line ("Min Mult_Vec" & Float'Image (Min (Mult_Vec)));
          Put_Line ("Max F_Data" & Float'Image (Max (F_Data)));
          Put_Line ("Min F_Data" & Float'Image (Min (F_Data)));
          Put_Line ("255 * F_Data length" & Integer'Image (255 * F_Data'Length));
