@@ -1,9 +1,10 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
+with Basic_Printing; use Basic_Printing;
 package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
@@ -716,15 +717,38 @@ package body ML_Arrays_And_Matrices is
    end "not";
 
    --  ------------------------------------------------------------------------
+
+   function Max (Data : Real_Float_Matrix) return Float is
+      Max_Val : Float := Float'Safe_First;
+   begin
+      Print_Matrix_Dimensions ("Max return float", Data);
+      for row in Data'First .. Data'Last loop
+         for col in Data'First (2) .. Data'Last (2) loop
+            Assert (Data (row, col)'Valid,
+                    "Max return float found Invalid value at (" &
+                      Integer'Image (row) & ", " & Integer'Image (col) & ")");
+            if Data (row, col) > Max_Val then
+               Max_Val := Data (row, Col);
+            end if;
+         end loop;
+      end loop;
+
+      return Max_Val;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
    --  Max returns a vector containing the maximum value of each row of a matrix
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector is
       Result  : Real_Float_Vector (Data'Range);
-      Max_Val : Float;
+      Max_Val : Float := Float'Safe_First;
    begin
-      for row in Data'Range loop
-         Max_Val := Data (row, 1);
-         for col in 2 .. Data'Length (2) loop
+      for row in Data'First .. Data'Last loop
+         for col in Data'First (2) .. Data'Last (2) loop
             if Data (row, col) > Max_Val then
+               Assert (Data (row, col)'Valid,
+                       "Max return Float_Vector found Invalid value at (" &
+                      Integer'Image (row) & "," & Integer'Image (col) & ")");
                Max_Val := Data (row, Col);
             end if;
          end loop;
@@ -740,7 +764,7 @@ package body ML_Arrays_And_Matrices is
    function Max (L, R : Real_Float_Vector) return Real_Float_Vector is
       Result  : Real_Float_Vector (L'Range);
    begin
-      for row in L'Range loop
+      for row in L'First .. L'Last loop
          if L (row) >= R (row) then
             Result (row) := L (row);
          else
@@ -757,8 +781,12 @@ package body ML_Arrays_And_Matrices is
    function Max (V : Real_Float_Vector) return Float is
       Result : Float := Float'Safe_First;
    begin
-      for index in V'Range loop
+      Put_Line ("Max Float_Vector length:" & Integer'Image (V'Length));
+      for index in V'First .. V'Last loop
          if V (index) > Result then
+            Assert (V (index)'Valid,
+                    "Max Float_Vector found Invalid value at (" &
+                      Integer'Image (index));
             Result := V (index);
          end if;
       end loop;
@@ -769,14 +797,50 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Min (Data : Real_Float_Matrix) return Float is
+      Min_Val : Float := Float'Safe_Last;
+   begin
+      for row in Data'First .. Data'Last loop
+         for col in Data'First (2) .. Data'Last (2) loop
+            Assert (Data (row, col)'Valid, "Min found Invalid value at (" &
+                      Integer'Image (row) & ", " & Integer'Image (col) & ")");
+            if Data (row, col) < Min_Val then
+               Min_Val := Data (row, Col);
+            end if;
+         end loop;
+      end loop;
+
+      return Min_Val;
+
+   end Min;
+
+   --  ------------------------------------------------------------------------
+
    function Min (L, R : Real_Float_Vector) return Real_Float_Vector is
       Result  : Real_Float_Vector (L'Range);
    begin
-      for row in L'Range loop
+      for row in L'First .. L'Last loop
          if L (row) < R (row) then
             Result (row) := L (row);
          else
             Result (row) := R (row);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Min;
+
+   --  ------------------------------------------------------------------------
+
+   function Min (V : Real_Float_Vector) return Float is
+      Result : Float := Float'Safe_Last;
+   begin
+      for index in V'First .. V'Last loop
+         if V (index) < Result then
+            Assert (V (index)'Valid, "Min found Invalid value at (" &
+                      Integer'Image (index));
+            Result := V (index);
          end if;
       end loop;
 

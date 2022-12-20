@@ -9,6 +9,8 @@ with Basic_Printing; use Basic_Printing;
 package body ML is
 
    function Mult (L, M, R : Real_Float_Vector) return Real_Float_Vector;
+   function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
+                               return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -31,7 +33,7 @@ package body ML is
       Delta_Weights   : Real_Float_Vector (Weights'Range);
       New_Weights     : Real_Float_Vector (Weights'Range);
       Current_Loss    : Float;
-      Sum             : Float;
+--        Sum             : Float;
       --  Stop searching near a local minimum
       Done            : Boolean := False;
    begin
@@ -56,16 +58,43 @@ package body ML is
          --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
          Errors := (F_Labels - Y);
          Mult_Vec := Mult (Errors, Exp_Y1, Y) ** 2;
+         Put_Line ("Max Mult_Vec" &
+                     Float'Image (Max (Mult_Vec)));
          Put_Line ("Mult_Vec length" & Integer'Image (Mult_Vec'Length));
          Put_Line ("F_Data length" & Integer'Image (F_Data'Length));
-         Put_Line ("Delta_Weights length" & Integer'Image (Delta_Weights'Length));
-         for row in F_Data'Range loop
-            Sum := 0.0;
-            for col in F_Data'Range (2) loop
-               Sum := Sum + Mult_Vec (row) * F_Data (row, col);
+         Put_Line ("Delta_Weights length" &
+                     Integer'Image (Delta_Weights'Length));
+         Put_Line ("Max Mult_Vec" & Float'Image (Max (Mult_Vec)));
+         Put_Line ("Min Mult_Vec" & Float'Image (Min (Mult_Vec)));
+         Put_Line ("Max F_Data" & Float'Image (Max (F_Data)));
+         Put_Line ("Min F_Data" & Float'Image (Min (F_Data)));
+         Put_Line ("255 * F_Data length" & Integer'Image (255 * F_Data'Length));
+         Put_Line ("Max Mult_Vec matrix" &
+                     Float'Image (Max (Vec_To_1xN_Matrix (Mult_Vec))));
+         declare
+            Mat : constant Real_Float_Matrix :=
+                    Vec_To_1xN_Matrix (Mult_Vec) * F_Data;
+         begin
+            Print_Matrix_Dimensions ("Vec_To_1xN_Matrix (Mult_Vec) ",
+                                     Vec_To_1xN_Matrix (Mult_Vec) );
+            Put_Line ("Max Mat: " & Float'Image (Max (Mat)));
+            Put_Line ("Min Mat: " & Float'Image (Min (Mat)));
+            Put_Line ("Mat (1, 1): " & Float'Image (Mat (1, 1)));
+            Put_Line ("Mat (1, 2): " & Float'Image (Mat (1, 2)));
+            Put_Line ("Mat (1, 3): " & Float'Image (Mat (1, 3)));
+            Put_Line ("Mat (1, 4): " & Float'Image (Mat (1, 4)));
+            Print_Float_Matrix ("Mat", Mat);
+            for index in Mat'Range (2) loop
+               Delta_Weights (index) := Mat (1, index);
             end loop;
-            Delta_Weights (row) := Sum;
-         end loop;
+         end;
+--           for row in F_Data'Range loop
+--              Sum := 0.0;
+--              for col in F_Data'Range (2) loop
+--                 Sum := Sum + Mult_Vec (row) * F_Data (row, col);
+--              end loop;
+--              Delta_Weights (row) := Sum;
+--           end loop;
          --           Print_Float_Vector ("Mult (Errors, Exp_Y1, Y)",
          --                               Mult (Errors, Exp_Y1, Y));
          Print_Float_Vector ("Delta_Weights", Delta_Weights);
@@ -138,6 +167,25 @@ package body ML is
       return Result;
 
    end Mult;
+
+   --  -------------------------------------------------------------------------
+
+   function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
+                                return Real_Float_Matrix is
+      Routine_Name : constant String := "ML.Vec_To_1xN_Matrix ";
+      Result : Real_Float_Matrix (1 .. 1, Vec'Range);
+   begin
+      for index in Vec'Range loop
+         Assert (Vec (index)'Valid, Routine_Name & "invalid Vec value at (" &
+                Integer'Image (index) & ")");
+         Result (1, index) := Vec (index);
+         Assert (Result (1, index)'Valid, Routine_Name & "invalid Result at (" &
+                Integer'Image (1) & Integer'Image (index) & ")");
+      end loop;
+
+      return Result;
+
+   end Vec_To_1xN_Matrix;
 
    --  -------------------------------------------------------------------------
 

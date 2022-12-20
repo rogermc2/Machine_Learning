@@ -177,11 +177,14 @@ package ML_Arrays_And_Matrices is
    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector;
    function Sum (Data : Real_Float_Vector) return Float;
    pragma Inline (Sum);
+   function Max (Data : Real_Float_Matrix) return Float;
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector;
    function Max (L, R : Real_Float_Vector) return Real_Float_Vector;
    function Max (V : Real_Float_Vector) return Float;
    pragma Inline (Max);
+   function Min (Data : Real_Float_Matrix) return Float;
    function Min (L, R : Real_Float_Vector) return Real_Float_Vector;
+   function Min (V : Real_Float_Vector) return Float;
    pragma Inline (Min);
    function Slice (Matrix : Binary_Matrix; First, Last : Positive)
                    return Binary_Matrix;
