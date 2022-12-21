@@ -28,6 +28,7 @@ package body ML is
       --  Y1 = h = np.matmul(alldat,w) dot product
       --  Y1i = w1xi1 + w2x21 + ... wnxn1 + w_offset
       Y1              : Real_Float_Vector (Data'Range);
+      Y2              : Real_Float_Vector (Data'Range);
 --        Exp_Y1          : Real_Float_Vector (Data'Range);
       Y               : Real_Float_Vector (Data'Range);
       Errors          : Real_Float_Vector (Data'Range);
@@ -55,14 +56,18 @@ package body ML is
          Y1 :=  F_Data * Weights;  --  h
          --           Put_Line ("Y1 Max" & Float'Image (Max (Y1)));
          --  transform using the sigmoid function
---           Exp_Y1 := Exp (-Y1);
 --           Y := 1.0 / (1.0 + Exp_Y1);
          Y := Sigmoid (Y1);
 --           Put_Line ("Y Min, Max:" & Float'Image (Min (Y)) & ", " &
 --                       Float'Image (Max (Y)));
-         --  delta_w is the change in the weights suggested by the gradient
-         --  Delta_Weight = np.add.reduce
-         --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
+--  delta_w is the change in the weights suggested by the gradient
+--  Delta_Weight_i = error_i * derivative of the sigmoid *
+--                   activation_i
+--                   derivative of the sigmoid = exp(-h) * y**2
+--                   activation_i = alldat_i
+--  Delta_Weight = np.add.reduce
+--  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
+--  np.exp(-h)*y is the derivative of the sigmoid function
          --  add.reduce() is equivalent to sum()
          --  exp(-h)*y = exp(-h) * 1.0 / (1.0 + exp(-h))
          --            = exp(-h) / (1.0 + exp(-h))
@@ -78,7 +83,8 @@ package body ML is
          Put_Line ("Scaled_Errors Min, Max: " &
                      Float'Image (Min (Scaled_Errors)) & ", " &
                      Float'Image (Max (Scaled_Errors)));
-         Mult_Vec := Mult_3 (Errors, Exp (-Y1), Y) ** 2;
+         Y2 := Y ** 2;
+         Mult_Vec := Mult_3 (Errors, Exp (-Y1), Y2);
          Put_Line ("Mult_Vec Min, Max:" & Float'Image (Min (Mult_Vec)) & ", " &
                      Float'Image (Max (Mult_Vec)));
          Put_Line ("Mult_Vec length" & Integer'Image (Mult_Vec'Length));
