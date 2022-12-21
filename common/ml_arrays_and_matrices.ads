@@ -177,6 +177,8 @@ package ML_Arrays_And_Matrices is
    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector;
    function Sum (Data : Real_Float_Vector) return Float;
    pragma Inline (Sum);
+   function Sum_Each_Column (Data : Real_Float_Matrix) return Real_Float_Vector;
+   pragma Inline (Sum_Each_Column);
    function Max (Data : Real_Float_Matrix) return Float;
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector;
    function Max (L, R : Real_Float_Vector) return Real_Float_Vector;

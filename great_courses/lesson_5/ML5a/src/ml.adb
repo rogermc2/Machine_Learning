@@ -8,11 +8,11 @@ with Basic_Printing; use Basic_Printing;
 
 package body ML is
 
-   function Mult_2 (L, R : Real_Float_Vector) return Real_Float_Vector;
+   function Mult_2 (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    function Mult_3 (L, M, R : Real_Float_Vector) return Real_Float_Vector;
    function Sigmoid (H : Real_Float_Vector) return Real_Float_Vector;
---     function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
---                                 return Real_Float_Matrix;
+   function Vec_To_Nx1_Matrix (Vec : Real_Float_Vector)
+                               return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ package body ML is
         To_Real_Float_Matrix (Data);
       F_Labels        : constant Real_Float_Vector :=
         To_Real_Float_Vector (Labels);
-      Step_Size       : Float := 0.1;
+      Learn_Rate      : Float := 0.1;
       --  Y1 = h = np.matmul(alldat,w) dot product
       --  Y1i = w1xi1 + w2x21 + ... wnxn1 + w_offset
       Y1              : Real_Float_Vector (Data'Range);
@@ -32,12 +32,14 @@ package body ML is
 --        Exp_Y1          : Real_Float_Vector (Data'Range);
       Y               : Real_Float_Vector (Data'Range);
       Errors          : Real_Float_Vector (Data'Range);
-      Scaled_Errors   : Real_Float_Vector (Data'Range);
+--        Scaled_Errors   : Real_Float_Vector (Data'Range);
       Mult_Vec        : Real_Float_Vector (Data'Range);
+      Scale_Matrix    : Real_Float_Matrix (Data'Range, 1 .. 1);
+      Delta_Matrix    : Real_Float_Matrix (Data'Range, Data'Range (2));
       Delta_Weights   : Real_Float_Vector (Weights'Range);
       New_Weights     : Real_Float_Vector (Weights'Range);
       Current_Loss    : Float;
-      Sum             : Float;
+--        Sum             : Float;
       --  Stop searching near a local minimum
       Done            : Boolean := False;
    begin
@@ -79,36 +81,37 @@ package body ML is
                      Float'Image (Max (Errors)));
          Print_Float_Vector ("Errors", Errors, 100001, 100006);
          --  (labs-y) * np.exp(-h)*y**2
-         Scaled_Errors := Mult_2 (Errors, Exp (-Y1));
-         Put_Line ("Scaled_Errors Min, Max: " &
-                     Float'Image (Min (Scaled_Errors)) & ", " &
-                     Float'Image (Max (Scaled_Errors)));
+--           Scaled_Errors := Mult_2 (Errors, Exp (-Y1));
+--           Put_Line ("Scaled_Errors Min, Max: " &
+--                       Float'Image (Min (Scaled_Errors)) & ", " &
+--                       Float'Image (Max (Scaled_Errors)));
          Y2 := Y ** 2;
          Mult_Vec := Mult_3 (Errors, Exp (-Y1), Y2);
+         Scale_Matrix := Vec_To_Nx1_Matrix (Mult_3 (Errors, Exp (-Y1), Y2));
          Put_Line ("Mult_Vec Min, Max:" & Float'Image (Min (Mult_Vec)) & ", " &
                      Float'Image (Max (Mult_Vec)));
          Put_Line ("Mult_Vec length" & Integer'Image (Mult_Vec'Length));
          Put_Line ("F_Data length" & Integer'Image (F_Data'Length));
          Put_Line ("Delta_Weights length" &
                      Integer'Image (Delta_Weights'Length));
-         Put_Line ("Max F_Data" & Float'Image (Max (F_Data)));
-         Put_Line ("Min F_Data" & Float'Image (Min (F_Data)));
-         for col in F_Data'Range (2) loop
-            Sum := 0.0;
-            for row in F_Data'Range loop
-               Sum := Sum + Mult_Vec (row) * F_Data (row, col);
-               Delta_Weights (Integer (col)) := Sum;
-            end loop;
-         end loop;
-         --           Print_Float_Vector ("Mult (Errors, Exp_Y1, Y)",
-         --                               Mult (Errors, Exp_Y1, Y));
+         Put_Line ("Min, Max F_Data: " & Float'Image (Min (F_Data)) & ", " &
+                     Float'Image (Max (F_Data)));
+         Print_Matrix_Dimensions ("Scale_Matrix", Scale_Matrix);
+         Print_Matrix_Dimensions ("F_Data", F_Data);
+         Delta_Matrix := Mult_2 (Scale_Matrix, F_Data);
+         Print_Float_Matrix ("Scale_Matrix", Scale_Matrix, 1, 5);
+         Print_Float_Matrix ("F_Data", F_Data, 1, 5);
+         Print_Float_Matrix ("Delta_Matrix", Delta_Matrix, 1, 5);
+         Delta_Weights := Sum_Each_Column (Delta_Matrix);
+         Put_Line ("Delta_Weights size:" &
+                     Integer'Image (Integer (Delta_Weights'Length)));
          Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
          --  Get new weights by taking a step of size alpha and updating
          Current_Loss := Loss (Weights, Data, Labels);
-         Step_Size := 2.0 * Step_Size;
-         New_Weights := Weights + Step_Size * Delta_Weights;
-         Put_Line ("Step_Size: " & Float'Image (Step_Size));
+         Learn_Rate := 2.0 * Learn_Rate;
+         New_Weights := Weights + Learn_Rate * Delta_Weights;
+         Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
          Put_Line ("Current_Loss: " & Float'Image (Current_Loss));
          Print_Float_Vector ("New_Weights", New_Weights);
          Put_Line ("Next Loss: " &
@@ -116,19 +119,19 @@ package body ML is
 
          while Loss (New_Weights, Data, Labels) >= Current_Loss and
            not Done loop
-            Step_Size := Step_Size / 2.0;
-            Done := Step_Size * Max (abs (Delta_Weights)) < 0.0001;
+            Learn_Rate := Learn_Rate / 2.0;
+            Done := Learn_Rate * Max (abs (Delta_Weights)) < 0.0001;
             if Done then
-               Put_Line ("Step_Size: " & Float'Image (Step_Size));
+               Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
                Print_Float_Vector ("Delta_Weights", Delta_Weights);
             else
-               New_Weights := Weights + Step_Size * Delta_Weights;
+               New_Weights := Weights + Learn_Rate * Delta_Weights;
                if not done then
                   Weights := New_Weights;
                end if;
             end if;
          end loop;
-         Done := Step_Size * Max (abs (Delta_Weights)) < 0.0001;
+         Done := Learn_Rate * Max (abs (Delta_Weights)) < 0.0001;
 
       end loop;
 
@@ -159,14 +162,16 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
-   function Mult_2 (L, R : Real_Float_Vector) return Real_Float_Vector is
-      Routine_Name : constant String := "ML.Mult ";
-      Result       : Real_Float_Vector := L;
+   function Mult_2 (L, R : Real_Float_Matrix) return Real_Float_Matrix is
+      Routine_Name : constant String := "ML.Mult_2 ";
+      Result       : Real_Float_Matrix (R'Range, R'Range (2));
    begin
       Assert (L'Length = R'Length, Routine_Name &
                 "vectors have different lengths.");
-      for index in L'Range loop
-         Result (index) := Result (index) * R (index);
+      for row in R'Range loop
+         for col in R'Range (2) loop
+            Result (row, col) := L (row, 1) * R (row, col);
+         end loop;
       end loop;
 
       return Result;
@@ -176,7 +181,7 @@ package body ML is
    --  -------------------------------------------------------------------------
 
    function Mult_3 (L, M, R : Real_Float_Vector) return Real_Float_Vector is
-      Routine_Name : constant String := "ML.Mult ";
+      Routine_Name : constant String := "ML.Mult_3 ";
       Result       : Real_Float_Vector := L;
    begin
       Assert (L'Length = M'Length and L'Length = R'Length, Routine_Name &
@@ -201,22 +206,20 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
---     function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
---                                 return Real_Float_Matrix is
---        Routine_Name : constant String := "ML.Vec_To_1xN_Matrix ";
---        Result : Real_Float_Matrix (1 .. 1, Vec'Range);
---     begin
---        for index in Vec'Range loop
---           Assert (Vec (index)'Valid, Routine_Name & "invalid Vec value at (" &
---                     Integer'Image (index) & ")");
---           Result (1, index) := Vec (index);
---           Assert (Result (1, index)'Valid, Routine_Name & "invalid Result at (" &
---                     Integer'Image (1) & Integer'Image (index) & ")");
---        end loop;
---
---        return Result;
---
---     end Vec_To_1xN_Matrix;
+   function Vec_To_Nx1_Matrix (Vec : Real_Float_Vector)
+                               return Real_Float_Matrix is
+      Routine_Name : constant String := "ML.Vec_To_Nx1_Matrix ";
+      Result : Real_Float_Matrix (Vec'Range, 1 .. 1);
+   begin
+      for index in Vec'Range loop
+         Assert (Vec (index)'Valid, Routine_Name & "invalid Vec value at (" &
+                   Integer'Image (index) & ")");
+         Result (index, 1) := Vec (index);
+      end loop;
+
+      return Result;
+
+   end Vec_To_Nx1_Matrix;
 
    --  -------------------------------------------------------------------------
 
