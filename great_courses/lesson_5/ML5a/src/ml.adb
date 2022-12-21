@@ -9,6 +9,7 @@ with Basic_Printing; use Basic_Printing;
 package body ML is
 
    function Mult (L, M, R : Real_Float_Vector) return Real_Float_Vector;
+   function Sigmoid (H : Real_Float_Vector) return Real_Float_Vector;
    function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
                                return Real_Float_Matrix;
 
@@ -26,7 +27,7 @@ package body ML is
       --  Y1 = h = np.matmul(alldat,w) dot product
       --  Y1i = w1xi1 + w2x21 + ... wnxn1 + w_offset
       Y1              : Real_Float_Vector (Data'Range);
-      Exp_Y1          : Real_Float_Vector (Data'Range);
+--        Exp_Y1          : Real_Float_Vector (Data'Range);
       Y               : Real_Float_Vector (Data'Range);
       Errors          : Real_Float_Vector (Data'Range);
       Mult_Vec        : Real_Float_Vector (Data'Range);
@@ -52,19 +53,25 @@ package body ML is
          Y1 :=  F_Data * Weights;  --  h
          --           Put_Line ("Y1 Max" & Float'Image (Max (Y1)));
          --  transform using the sigmoid function
-         Exp_Y1 := Exp (-Y1);
-         Y := 1.0 / (1.0 + Exp_Y1);
+--           Exp_Y1 := Exp (-Y1);
+--           Y := 1.0 / (1.0 + Exp_Y1);
+         Y := Sigmoid (Y1);
          Put_Line ("Y Min, Max:" & Float'Image (Min (Y)) & ", " &
                      Float'Image (Max (Y)));
          --  delta_w is the change in the weights suggested by the gradient
          --  Delta_Weight = np.add.reduce
          --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
          --  add.reduce() is equivalent to sum()
+         --  exp(-h)*y = exp(-h) * 1.0 / (1.0 + exp(-h))
+         --            = exp(-h) / (1.0 + exp(-h))
+         --            = 1.0 / (1.0 + 1 / exp(-h))
+         --  0.0 <= exp(-h) * y <= 1.0
+
          Errors := F_Labels - Y;
          Put_Line ("Errors Min, Max: " & Float'Image (Min (Errors)) & ", " &
                      Float'Image (Max (Errors)));
          --  (labs-y) * np.exp(-h)*y**2
-         Mult_Vec := Mult (Errors, Exp_Y1, Y) ** 2;
+         Mult_Vec := Mult (Errors, Exp (-Y1), Y) ** 2;
          Put_Line ("Mult_Vec Min, Max:" & Float'Image (Min (Mult_Vec)) & ", " &
                      Float'Image (Max (Mult_Vec)));
          Put_Line ("Mult_Vec length" & Integer'Image (Mult_Vec'Length));
@@ -155,6 +162,16 @@ package body ML is
       return Result;
 
    end Mult;
+
+   --  -------------------------------------------------------------------------
+
+   function Sigmoid (H : Real_Float_Vector) return Real_Float_Vector is
+      use Real_Float_Arrays;
+   begin
+
+      return 1.0 / (1.0 + Exp (-H));
+
+   end Sigmoid;
 
    --  -------------------------------------------------------------------------
 
