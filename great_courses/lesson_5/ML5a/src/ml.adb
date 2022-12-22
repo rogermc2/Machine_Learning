@@ -29,19 +29,14 @@ package body ML is
       --  Y1i = w1xi1 + w2x21 + ... wnxn1 + w_offset
       Y1              : Real_Float_Vector (Data'Range);
       Y2              : Real_Float_Vector (Data'Range);
---        Exp_Y1          : Real_Float_Vector (Data'Range);
       Y               : Real_Float_Vector (Data'Range);
       Errors          : Real_Float_Vector (Data'Range);
---        Scaled_Errors   : Real_Float_Vector (Data'Range);
-      Mult_Vec        : Real_Float_Vector (Data'Range);
-      Scale_Matrix    : Real_Float_Matrix ( 1 .. 1, Data'Range);
+      Errors_x_Grad   : Real_Float_Matrix ( 1 .. 1, Data'Range);
       Delta_Matrix    : Real_Float_Matrix (1 .. 1, Data'Range (2));
       Delta_Weights   : Real_Float_Vector (Weights'Range);
       New_Weights     : Real_Float_Vector (Weights'Range);
       Current_Loss    : Float;
---        Sum             : Float;
-      --  Stop searching near a local minimum
-      Done            : Boolean := False;
+      Done            : Boolean := False;  --  Stop near a local minimum
    begin
       Assert (Weights'Length = Data'Length (2), Routine_Name &
                 "Invalid Weights length");
@@ -53,16 +48,16 @@ package body ML is
             Put_Line ("Loss: " & Float'Image (Loss (Weights, Data, Labels)));
             New_Line;
          end if;
-         --  The next few lines compute the gradient
-         --  Delta_Weight is the change in  weights suggested by the gradient
 
          Y1 :=  F_Data * Weights;  --  h
          --           Put_Line ("Y1 Max" & Float'Image (Max (Y1)));
-         --  transform using the sigmoid function
+         --  transform using the sigmoid function S(x) = 1.0 / (1.0 + exp (-x))
 --           Y := 1.0 / (1.0 + Exp_Y1);
          Y := Sigmoid (Y1);
---           Put_Line ("Y Min, Max:" & Float'Image (Min (Y)) & ", " &
---                       Float'Image (Max (Y)));
+         --  d/dx (S(x)) = exp (-x) / (1.0 + exp (-x))^2
+         --              = exp (-x) * 1.0 / (1.0 + exp (-x))^2
+         --              =  exp (-x) * S(x)^2
+         --  d/dY1 (Y(Y1)) = exp (-Y1)  * Y(Y1)^2
 --  delta_w is the change in the weights suggested by the gradient
 --  Delta_Weight_i = error_i * derivative of the sigmoid *
 --                   activation_i
@@ -71,42 +66,22 @@ package body ML is
 --  Delta_Weight = np.add.reduce
 --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
 --  np.exp(-h)*y**2 is the derivative (gradient) of the sigmoid function
---  add.reduce appears to do matrix multiplication of (error * sigmoid gradient) and alldat
-         --  exp(-h)*y = exp(-h) * 1.0 / (1.0 + exp(-h))
-         --            = exp(-h) / (1.0 + exp(-h))
-         --            = 1.0 / (1.0 + 1 / exp(-h))
-         --  0.0 <= exp(-h) * y <= 1.0
+--  add.reduce appears to do matrix multiplication of
+--  (error * sigmoid gradient) and alldat
 
          Errors := F_Labels - Y;
-         Put_Line ("Errors Min, Max: " & Float'Image (Min (Errors)) & ", " &
-                     Float'Image (Max (Errors)));
---           Print_Float_Vector ("Errors 100001 .. 100006: ", Errors, 100001, 100006);
-         --  (labs-y) * np.exp(-h)*y**2
---           Scaled_Errors := Mult_2 (Errors, Exp (-Y1));
---           Put_Line ("Scaled_Errors Min, Max: " &
---                       Float'Image (Min (Scaled_Errors)) & ", " &
---                       Float'Image (Max (Scaled_Errors)));
+         --  Gradient = d/dY1 (Y(Y1)) = exp (-Y1) * Y(Y1)^2
          Y2 := Y ** 2;
-         Mult_Vec := Mult_3 (Errors, Exp (-Y1), Y2);
-         Scale_Matrix := Vec_To_1xN_Matrix (Mult_3 (Errors, Exp (-Y1), Y2));
-         Put_Line ("Mult_Vec Min, Max:" & Float'Image (Min (Mult_Vec)) & ", " &
-                     Float'Image (Max (Mult_Vec)));
-         Put_Line ("Min, Max F_Data: " & Float'Image (Min (F_Data)) & ", " &
-                     Float'Image (Max (F_Data)));
-         Print_Matrix_Dimensions ("Scale_Matrix", Scale_Matrix);
-         Print_Matrix_Dimensions ("F_Data", F_Data);
-         Delta_Matrix := Scale_Matrix * F_Data;
---           Delta_Matrix := Mult_2 (Scale_Matrix, F_Data);
---           Print_Float_Matrix ("Scale_Matrix", Scale_Matrix, 1, 5);
---           Print_Float_Matrix ("F_Data", F_Data, 1, 5);
-         Print_Float_Matrix ("Delta_Matrix", Delta_Matrix);
-         Delta_Weights := Sum_Each_Column (Delta_Matrix);
+         Errors_x_Grad := Vec_To_1xN_Matrix (Mult_3 (Errors, Exp (-Y1), Y2));
+         Delta_Matrix := Errors_x_Grad * F_Data;
+         Print_Float_Matrix ("Delta_Matrix", Delta_Matrix, 1, 10);
+         Learn_Rate := 2.0 * Learn_Rate;
+         Delta_Weights := Learn_Rate * Sum_Each_Column (Delta_Matrix);
          Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
          --  Get new weights by taking a step of size alpha and updating
          Current_Loss := Loss (Weights, Data, Labels);
-         Learn_Rate := 2.0 * Learn_Rate;
-         New_Weights := Weights + Learn_Rate * Delta_Weights;
+         New_Weights := Weights + Delta_Weights;
          Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
          Put_Line ("Current_Loss: " & Float'Image (Current_Loss));
          Print_Float_Vector ("New_Weights", New_Weights);
