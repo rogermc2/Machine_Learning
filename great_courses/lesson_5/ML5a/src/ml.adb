@@ -46,11 +46,12 @@ package body ML is
       Assert (Weights'Length = Data'Length (2), Routine_Name &
                 "Invalid Weights length");
       while not Done loop
-         --   take a peek at the weights, the learning
-         --   rate, and the current loss
          if Maths.Random_Float < 0.01 then
-            null;
-            --           Put_Line (w, Alpha, Loss (w, Data, Labels));
+            Put_Line ("***************");
+            Put_Line ("Learning Rate: " & Float'Image (Learn_Rate));
+            Print_Float_Vector ("Weights", Weights);
+            Put_Line ("Loss: " & Float'Image (Loss (Weights, Data, Labels)));
+            New_Line;
          end if;
          --  The next few lines compute the gradient
          --  Delta_Weight is the change in  weights suggested by the gradient
@@ -69,8 +70,8 @@ package body ML is
 --                   activation_i = alldat_i
 --  Delta_Weight = np.add.reduce
 --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
---  np.exp(-h)*y is the derivative of the sigmoid function
-         --  add.reduce() is equivalent to sum()
+--  np.exp(-h)*y**2 is the derivative (gradient) of the sigmoid function
+--  add.reduce appears to do matrix multiplication of (error * sigmoid gradient) and alldat
          --  exp(-h)*y = exp(-h) * 1.0 / (1.0 + exp(-h))
          --            = exp(-h) / (1.0 + exp(-h))
          --            = 1.0 / (1.0 + 1 / exp(-h))
@@ -79,7 +80,7 @@ package body ML is
          Errors := F_Labels - Y;
          Put_Line ("Errors Min, Max: " & Float'Image (Min (Errors)) & ", " &
                      Float'Image (Max (Errors)));
-         Print_Float_Vector ("Errors", Errors, 100001, 100006);
+--           Print_Float_Vector ("Errors 100001 .. 100006: ", Errors, 100001, 100006);
          --  (labs-y) * np.exp(-h)*y**2
 --           Scaled_Errors := Mult_2 (Errors, Exp (-Y1));
 --           Put_Line ("Scaled_Errors Min, Max: " &
@@ -90,23 +91,16 @@ package body ML is
          Scale_Matrix := Vec_To_1xN_Matrix (Mult_3 (Errors, Exp (-Y1), Y2));
          Put_Line ("Mult_Vec Min, Max:" & Float'Image (Min (Mult_Vec)) & ", " &
                      Float'Image (Max (Mult_Vec)));
-         Put_Line ("Mult_Vec length" & Integer'Image (Mult_Vec'Length));
-         Put_Line ("F_Data length" & Integer'Image (F_Data'Length));
-         Put_Line ("Delta_Weights length" &
-                     Integer'Image (Delta_Weights'Length));
          Put_Line ("Min, Max F_Data: " & Float'Image (Min (F_Data)) & ", " &
                      Float'Image (Max (F_Data)));
          Print_Matrix_Dimensions ("Scale_Matrix", Scale_Matrix);
          Print_Matrix_Dimensions ("F_Data", F_Data);
          Delta_Matrix := Scale_Matrix * F_Data;
-         Print_Matrix_Dimensions ("Delta_Matrix", Delta_Matrix);
 --           Delta_Matrix := Mult_2 (Scale_Matrix, F_Data);
 --           Print_Float_Matrix ("Scale_Matrix", Scale_Matrix, 1, 5);
 --           Print_Float_Matrix ("F_Data", F_Data, 1, 5);
          Print_Float_Matrix ("Delta_Matrix", Delta_Matrix);
          Delta_Weights := Sum_Each_Column (Delta_Matrix);
-         Put_Line ("Delta_Weights size:" &
-                     Integer'Image (Integer (Delta_Weights'Length)));
          Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
          --  Get new weights by taking a step of size alpha and updating
