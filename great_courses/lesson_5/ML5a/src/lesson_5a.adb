@@ -2,7 +2,7 @@
 with Ada.Containers.Vectors;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Maths;
+with Maths;
 
 with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
@@ -49,7 +49,6 @@ begin
       Seen_List             : Integer3_List;
       Colour                : Integer3_Array;
       Weights               : Real_Float_Vector (1 .. 4);
---        theLoss               : Float;
    begin
       for index in Labels'Range loop
          if index <= Yes_Length then
@@ -78,15 +77,15 @@ begin
       Put_Line (Project_Name & "Seen_List length" &
                   Integer'Image (Integer (Seen_List.Length)));
 
---        for count in 1 .. 10 loop
---           for index in Weights'Range loop
---              Weights (index) := Maths.Random_Float;
---           end loop;
---           theLoss := Loss (Weights, All_Data, Labels);
---           Put_Line ("Loss: " & Float'Image (theLoss) & ", Weights:");
---           Print_Float_Vector ("", Weights);
---        end loop;
---        New_Line;
+      for count in 1 .. 10 loop
+         for index in Weights'Range loop
+            Weights (index) := Maths.Random_Float;
+         end loop;
+         Put
+           ("Loss: " & Float'Image (Loss (Weights, All_Data, Labels)));
+         Print_Float_Vector_As_Line ("Weights", Weights);
+      end loop;
+      New_Line;
 
       Weights := (0.786,  0.175, -0.558, -0.437);
       Fit (Weights, All_Data, Labels);

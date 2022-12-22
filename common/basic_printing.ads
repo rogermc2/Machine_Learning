@@ -20,6 +20,9 @@ package Basic_Printing is
        Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Vector (Name : String; Vec : Real_Float_Vector;
                                  Start : Positive := 1; Finish : Natural := 0);
+   procedure Print_Float_Vector_As_Line
+     (Name : String; Vec : Real_Float_Vector;  Start : Positive := 1;
+      Finish : Natural := 0);
    procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
                                   Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Integer_List (Name  : String;

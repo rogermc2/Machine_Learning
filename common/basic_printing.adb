@@ -180,6 +180,42 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Float_Vector_As_Line
+     (Name  : String; Vec : Real_Float_Vector;
+      Start : Positive := 1; Finish : Natural := 0) is
+      Last  : Integer;
+      Count : Positive := 1;
+   begin
+      if Finish > 0 and then Finish < Vec'Length then
+         Last := Finish;
+      else
+         Last := Integer (Vec'Length);
+      end if;
+
+      if Name'Length > 0 then
+         Put ("  " & Name & ": ");
+      end if;
+
+      if Start >= Vec'First then
+         for row in Start .. Last loop
+            Put (Float'Image (Vec (row)) & "  ");
+         end loop;
+
+         Count := Count + 1;
+         if Count > 8 then
+            New_Line;
+            Count := 1;
+         end if;
+
+      else
+         Put_Line ("Print_Float_Vector_As_Line called with invalid start index.");
+      end if;
+      New_Line;
+
+   end Print_Float_Vector_As_Line;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
                                   Start : Positive := 1; Finish : Natural := 0) is
       Last  : Positive;

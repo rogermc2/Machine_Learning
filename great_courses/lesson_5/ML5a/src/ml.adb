@@ -49,15 +49,18 @@ package body ML is
             New_Line;
          end if;
 
+         --  Current pre-sigmoid solution
          Y1 :=  F_Data * Weights;  --  h
-         --           Put_Line ("Y1 Max" & Float'Image (Max (Y1)));
-         --  transform using the sigmoid function S(x) = 1.0 / (1.0 + exp (-x))
---           Y := 1.0 / (1.0 + Exp_Y1);
+         --  transform current solution to range 0 .. 1.0 using the
+         --  sigmoid function S(x) = 1.0 / (1.0 + exp (-x))
+         --  Y := 1.0 / (1.0 + Exp_Y1);
          Y := Sigmoid (Y1);
          --  d/dx (S(x)) = exp (-x) / (1.0 + exp (-x))^2
          --              = exp (-x) * 1.0 / (1.0 + exp (-x))^2
          --              =  exp (-x) * S(x)^2
          --  d/dY1 (Y(Y1)) = exp (-Y1)  * Y(Y1)^2
+         --  F_Labels are the expected solutions, 0 or 1
+         Errors := F_Labels - Y;
 --  delta_w is the change in the weights suggested by the gradient
 --  Delta_Weight_i = error_i * derivative of the sigmoid *
 --                   activation_i
@@ -69,7 +72,6 @@ package body ML is
 --  add.reduce appears to do matrix multiplication of
 --  (error * sigmoid gradient) and alldat
 
-         Errors := F_Labels - Y;
          --  Gradient = d/dY1 (Y(Y1)) = exp (-Y1) * Y(Y1)^2
          Y2 := Y ** 2;
          Errors_x_Grad := Vec_To_1xN_Matrix (Mult_3 (Errors, Exp (-Y1), Y2));
