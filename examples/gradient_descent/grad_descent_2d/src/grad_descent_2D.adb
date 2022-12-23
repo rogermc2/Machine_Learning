@@ -44,7 +44,8 @@ begin
       Py_Module             : Module;
       First                 : constant Float := -1.0;
       Last                  : constant Float := 3.0;
-      Step                  : constant Float := (Last - First) / Float (Num_Samples);
+      Step                  : constant Float :=
+                                (Last - First) / Float (Num_Samples);
       Val                   : Float;
       --        Weights               : Real_Float_Vector :=
       --                                  (0.786,  0.175, -0.558, -0.437);
