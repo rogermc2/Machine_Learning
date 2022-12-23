@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def show_bitmap(bitmap, Row_Size):
-    listmap = list (bitmap[0])
-    bm_array = np.asarray(bitmap[0])
-    num_rows = int (len(bm_array) / Row_Size)
-    bm_array = bm_array.reshape(num_rows, Row_Size, 3)
-    plt.imshow(bm_array)
+def show_contours(xy, z):
+    listmap = list (xy[0])
+    contour_array = np.asarray(xy[0])
+    num_rows = int (len(contour_array) / 2)
+    contour_array = bm_array.reshape(num_rows, Row_Size, 3)
+    plt.contourf(xy, z, 10, cmap="Greys")
     plt.show()
