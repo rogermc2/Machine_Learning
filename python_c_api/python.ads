@@ -48,6 +48,11 @@ package Python is
    procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Real_Float_Vector);
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : ML_Arrays_And_Matrices.Real_Float_Vector;
+                   C    : ML_Arrays_And_Matrices.Real_Float_Matrix);
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B, C : ML_Arrays_And_Matrices.Real_Float_Vector);
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unsigned_8_Array_3D);
    procedure Call (M : Module; Function_Name : String;

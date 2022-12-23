@@ -35,8 +35,9 @@ procedure Grad_Descent_2D is
    end dy;
 
    Num_Samples : constant Positive := 100;
-   Data        : Real_Float_Matrix (1 .. Num_Samples, 1 .. 2);
-   Labels      : Real_Float_Vector (1 .. Num_Samples);
+   X           : Real_Float_Vector (1 .. Num_Samples);
+   Y           : Real_Float_Vector (1 .. Num_Samples);
+   Z           : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Samples);
 begin
    declare
       --        Labels                : Integer_Array (1 .. Num_Samples);
@@ -48,17 +49,21 @@ begin
       --        Weights               : Real_Float_Vector :=
       --                                  (0.786,  0.175, -0.558, -0.437);
    begin
+      for index in 1 .. Num_Samples loop
+         Val := First + Float ((index - 1)) * Step;
+         X (index) := Val;
+         Y (index) := Val;
+      end loop;
+
       for row in 1 .. Num_Samples loop
-         Val := First + Float ((row - 1)) * Step;
-         for col in 1 .. 2 loop
-            Data (row, col) := Val;
+         for col in 1 .. Num_Samples loop
+            Z (row, col) := F (X (row), Y (col));
          end loop;
-         Labels (row) := F (Data (row, 1), Data (row, 2));
       end loop;
 
       Python.Initialize;
       Py_Module := Import_File ("grad_descent_2d");
-      Python.Call (Py_Module, "show_contours", Data, Labels);
+      Python.Call (Py_Module, "show_contours", X, Y, Z);
       New_Line;
       Python.Finalize;
       Put_Line (Project_Name & "done");
