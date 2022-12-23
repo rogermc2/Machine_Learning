@@ -10,7 +10,7 @@ procedure Grad_Descent_2D is
 
    function F (x, y : Float) return Float is
    begin
-      return 6.0 * x**2 + 9.0 * y**2 - 12.0 * x - 14.0 * y + 3.0;
+      return 6.0 * y**2 + 9.0 * x**2 - 12.0 * y - 14.0 * x + 3.0;
    end F;
 
    function dx (x : Float) return Float is
