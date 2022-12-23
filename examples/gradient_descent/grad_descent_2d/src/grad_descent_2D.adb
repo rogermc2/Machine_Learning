@@ -42,18 +42,19 @@ procedure Grad_Descent_2D is
    z           : Real_Float_Vector (1 .. Num_Samples);
 begin
    declare
-      Labels                : Integer_Array (1 .. Num_Samples);
+--        Labels                : Integer_Array (1 .. Num_Samples);
       Py_Module             : Module;
       First     : constant Float := -1.0;
       Last      : constant Float := 3.0;
       Step      : constant Float := (Last - First) / Float (Num_Samples);
       Val       : Float;
-      Weights               : Real_Float_Vector :=
-                                (0.786,  0.175, -0.558, -0.437);
+--        Weights               : Real_Float_Vector :=
+--                                  (0.786,  0.175, -0.558, -0.437);
    begin
       for index in 1 .. Num_Samples loop
          Val := First + Float ((index - 1)) * Step;
          Data (index) := (Val, Val);
+         z (index) := F (Data (index));
       end loop;
 
       Python.Initialize;
