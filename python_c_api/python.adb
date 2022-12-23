@@ -381,14 +381,14 @@ package body Python is
                       return PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Real_Float_Vector ";
-      Value        : Float;
+      Value        : double;
       Py_Row       : int := -1;
       Result       : constant PyObject := PyTuple_New (int (Data'Length));
    begin
       for row in Data'Range loop
          Py_Row := Py_Row + 1;
-         Value := Data (row);
-         PyTuple_SetItem (Result, Py_Row, PyLong_FromLong (long (Value)));
+         Value := double (Data (row));
+         PyTuple_SetItem (Result, Py_Row, PyFloat_FromDouble (Value));
       end loop;
 
       return Result;

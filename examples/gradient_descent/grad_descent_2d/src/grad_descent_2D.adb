@@ -1,21 +1,10 @@
 
---  with Ada.Containers.Vectors;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Maths;
-
---  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
 
---  with ML; use ML;
---  with Support_5A; use Support_5A;
-
 procedure Grad_Descent_2D is
-
-   --     package Float2_Package is new
-   --       Ada.Containers.Vectors (Positive, Float2_Array);
-   --     subtype Float2_List is Float2_Package.Vector;
 
    Project_Name    : constant String := "Grad_Descent_2D ";
 
@@ -55,6 +44,7 @@ begin
 
    for row in 1 .. Num_Samples loop
       for col in 1 .. Num_Samples loop
+--           Z (row, col) := (6.0 * Float (row))**2 + (9.0 * Float (col))**2;
          Z (row, col) := F (X (row), Y (col));
       end loop;
    end loop;
