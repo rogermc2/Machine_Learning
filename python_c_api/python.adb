@@ -617,6 +617,34 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   procedure Call (M : Module; Function_Name : String;  A, B, C, D : Float) is
+      use Interfaces.C;
+      function Py_BuildValue (Format             : Interfaces.C.char_array;
+                              A_C, B_C, C_C, D_C : double) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F    : constant PyObject := Get_Symbol (M, Function_Name);
+      A_C  : constant double := double (A);
+      B_C  : constant double := double (B);
+      C_C  : constant double := double (C);
+      D_C  : constant double := double (D);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("dddd"), A_C, B_C, C_C, D_C);
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Array) is

@@ -34,6 +34,7 @@ package Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Integer_Matrix;
                    C    : ML_Types.Unbounded_List);
+   procedure Call (M : Module; Function_Name : String; A, B, C, D : Float);
    procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Array);

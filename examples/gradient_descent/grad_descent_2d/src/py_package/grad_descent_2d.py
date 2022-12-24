@@ -8,4 +8,10 @@ def show_contours(x, y, z):
     plt.plot([0, 0], [-1, 3], color='k', linewidth=1)
     plt.plot([-1, 3], [0, 0], color='k', linewidth=1)
     plt.plot(1, 0.7777778, color='k', marker='+')
+#    plt.show()
+
+def plot_data(x_prev, x, y_prev, y):
+    plt.plot([x_prev, x], [y_prev, y], color='k', linestyle="dotted", marker='o')
+
+def show():
     plt.show()
