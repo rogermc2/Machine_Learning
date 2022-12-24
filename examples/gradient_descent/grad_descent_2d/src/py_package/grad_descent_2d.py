@@ -7,7 +7,7 @@ def show_contours(x, y, z):
     plt.contour(x, y, z, colors='k', linewidths=1)
     plt.plot([0, 0], [-1, 3], color='k', linewidth=1)
     plt.plot([-1, 3], [0, 0], color='k', linewidth=1)
-    plt.plot(1, 0.7777778, color='k', marker='+')
+    plt.plot(1, 0.4, color='k', marker='+')
 #    plt.show()
 
 def plot_data(x_prev, x, y_prev, y):

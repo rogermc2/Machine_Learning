@@ -10,7 +10,7 @@ procedure Grad_Descent_2D is
 
    function F (x, y : Float) return Float is
    begin
-      return 6.0 * y**2 + 9.0 * x**2 - 12.0 * y - 14.0 * x + 3.0;
+      return 6.0 * y**2 + 40.0 * x**2 - 12.0 * y - 30.0 * x + 3.0;
    end F;
 
    function dx (x : Float) return Float is
@@ -20,23 +20,35 @@ procedure Grad_Descent_2D is
 
    function dy (y : Float) return Float is
    begin
-      return 18.0 * y - 14.0;
+      return 80.0 * y - 30.0;
    end dy;
+
+   procedure Plot_Points (Py_Module : Module; X_Start, Y_Start,
+                          Alpha : Float) is
+      X     : Float := X_Start;
+      Y     : Float := Y_start;
+      X_Old : Float := X;
+      Y_Old : Float := Y;
+   begin
+      for index in 1 .. 12 loop
+         Python.Call (Py_Module, "plot_data", X_Old, X, Y_Old, Y);
+         X_Old := X;
+         Y_Old := Y;
+         X := X - Alpha * dx (X);
+         Y := Y - Alpha * dy (Y);
+      end loop;
+
+   end Plot_Points;
 
    Num_Samples : constant Positive := 100;
    First       : constant Float := -1.0;
    Last        : constant Float := 3.0;
    Step        : constant Float :=
                    (Last - First) / Float (Num_Samples);
-   Alpha       : constant Float := 0.02;
    X_Data      : Real_Float_Vector (1 .. Num_Samples);
    Y_Data      : Real_Float_Vector (1 .. Num_Samples);
    Z           : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Samples);
    Val         : Float;
-   X           : Float := -0.5;
-   Y           : Float := 2.9;
-   X_Old       : Float := X;
-   Y_Old       : Float := Y;
    Py_Module   : Module;
 begin
    for index in 1 .. Num_Samples loop
@@ -55,13 +67,9 @@ begin
    Py_Module := Import_File ("grad_descent_2d");
    Python.Call (Py_Module, "show_contours", X_Data, Y_Data, Z);
 
-   for index in 1 .. 12 loop
-      Python.Call (Py_Module, "plot_data", X_Old, X, Y_Old, Y);
-      X_Old := X;
-      Y_Old := Y;
-      X := X - Alpha * dx (X);
-      Y := Y - Alpha * dy (Y);
-   end loop;
+   Plot_Points (Py_Module, -0.5, 2.3, 0.02);
+   Plot_Points (Py_Module, 2.3, 2.3, 0.01);
+
    Python.Call (Py_Module, "show");
    New_Line;
    Python.Finalize;
