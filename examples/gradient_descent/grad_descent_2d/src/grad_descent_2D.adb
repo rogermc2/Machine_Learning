@@ -44,7 +44,6 @@ begin
 
    for row in 1 .. Num_Samples loop
       for col in 1 .. Num_Samples loop
---           Z (row, col) := (6.0 * Float (row))**2 + (9.0 * Float (col))**2;
          Z (row, col) := F (X (row), Y (col));
       end loop;
    end loop;
