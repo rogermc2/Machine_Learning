@@ -53,4 +53,31 @@ package body NN_By_Hand_Support is
 
    end Means;
 
+   --  -------------------------------------------------------------------------
+
+   function Standard_Deviation (M : Real_Float_Matrix)
+                                return Real_Float_Vector is
+      M_Length  : constant Float := Float (M'Length);
+      Mean_Vals : constant Real_Float_Vector := Means (M);
+      Diffs     : Real_Float_Matrix (M'Range, M'Range (2));
+      Sum1      : Float := 0.0;
+      Sum2      : Float := 0.0;
+      Result    : Real_Float_Vector (1 .. 2);
+   begin
+      for row in M'Range loop
+         Sum1 := Sum1 + M (row, 1);
+         Sum2 := Sum2 + M (row, 2);
+      end loop;
+
+      for row in M'Range loop
+         Result (1) := Sum1 / M_Length;
+         Result (2) := Sum2 / M_Length;
+      end loop;
+
+      return Result;
+
+   end Standard_Deviation;
+
+   --  -------------------------------------------------------------------------
+
 end NN_By_Hand_Support;
