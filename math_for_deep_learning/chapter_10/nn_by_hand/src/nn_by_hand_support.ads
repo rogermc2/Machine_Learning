@@ -2,7 +2,7 @@
 with Ada.Containers.Ordered_Maps;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with NL_Types;
+with ML_Types;
 
 package NN_By_Hand_Support is
 
@@ -21,7 +21,7 @@ package NN_By_Hand_Support is
      (Net            : Network_Package.Map; X : Real_Float_Matrix;
       Y              : Integer_Array;
       Tn, Fp, Fn, Tp : out Natural;
-      Pred           : out NL_Types.Boolean_List);
+      Pred           : out ML_Types.Integer_List);
    function Net_Map return Network_Package.Map;
 
 end NN_By_Hand_Support;
