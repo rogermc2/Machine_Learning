@@ -2,11 +2,14 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with ML_Types;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with NL_Types;
 
 package Basic_Printing is
 
    procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix;
                                   Start : Positive := 1; Finish : Natural := 0);
+   procedure Print_Boolean_List (Name  : String;
+                                 aList : NL_Types.Boolean_List);
    procedure Print_Byte_Array (Name  : String; anArray : Byte_Array;
                                Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;

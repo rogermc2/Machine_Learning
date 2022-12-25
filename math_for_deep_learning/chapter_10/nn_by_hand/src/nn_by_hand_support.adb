@@ -4,7 +4,7 @@
 with Maths;
 
 with Load_Dataset;
-with NL_Types;
+with ML_Types;
 
 package body NN_By_Hand_Support is
 
@@ -120,9 +120,9 @@ package body NN_By_Hand_Support is
    procedure Evaluate
      (Net            : Network_Package.Map; X : Real_Float_Matrix;
       Y              : Integer_Array;
-      Tn, Fp, Fn, Tp : out Natural; Pred : out ML_Types.Integer_List) is
+      Tn, Fp, Fn, Tp : out Natural; Pred : out NL_Types.Boolean_List) is
       F_Data : constant Real_Float_Vector := Forward (Net, X);
-      C      : Natural;
+      C      : Boolean;
    begin
       Tn := 0;
       Fp := 0;
@@ -130,18 +130,14 @@ package body NN_By_Hand_Support is
       Tp := 0;
 
       for index in Y'Range loop
-         if F_Data (index) < 0.5 then
-            C := 0;
-         else
-            C := 1;
-         end if;
+         C :=  F_Data (index) >= 0.5;
          Pred.Append (C);
 
-         if C = 0 and then Y (index) = 0 then
+         if not C and then Y (index) = 0 then
             Tn := Tn + 1;
-         elsif C = 0 and then Y (index) = 1 then
+         elsif not C and then Y (index) = 1 then
             Fn := Fn + 1;
-         elsif C = 1 and then Y (index) = 0 then
+         elsif C and then Y (index) = 0 then
             Fp := Fp + 1;
          else
             Tp := Tp + 1;

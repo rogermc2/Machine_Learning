@@ -33,6 +33,25 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Boolean_List (Name  : String;
+                                 aList : NL_Types.Boolean_List) is
+      Count : Positive := 1;
+   begin
+      Put_Line (Name & ": ");
+         for Index in aList.First_Index .. aList.Last_Index loop
+            Put (Boolean'Image (aList (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+      New_Line;
+
+   end Print_Boolean_List;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Byte_Array (Name  : String; anArray : Byte_Array;
                                Start : Positive := 1; Finish : Natural := 0) is
       Last  : Positive;
