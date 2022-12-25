@@ -13,7 +13,7 @@ procedure NN_By_Hand is
    Project_Name : constant String := "NN_By_Hand ";
 
    Data         : constant Dataset := Build_Dataset;
-   Net          : Network_Package.Map;
+   Net          : constant Network_Package.Map := Net_Map;
    Tn           : Natural;
    Fp           : Natural;
    Fn           : Natural;

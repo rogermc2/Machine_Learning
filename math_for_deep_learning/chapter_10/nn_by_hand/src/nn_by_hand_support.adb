@@ -11,7 +11,7 @@ package body NN_By_Hand_Support is
    type Net_Cursor is new Network_Package.Cursor;
 
    Max_Initial_Weight : constant Float := 0.0005;
-   Network : Network_Package.Map;
+   Network            : Network_Package.Map;
 
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector;
@@ -191,6 +191,15 @@ package body NN_By_Hand_Support is
       return Result;
 
    end Means;
+
+   --  -------------------------------------------------------------------------
+
+   function Net_Map return Network_Package.Map is
+   begin
+
+      return Network;
+
+   end Net_Map;
 
    --  -------------------------------------------------------------------------
 
