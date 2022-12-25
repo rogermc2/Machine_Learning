@@ -1,43 +1,41 @@
 
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Containers.Ordered_Maps;
 
 with Maths;
 
 with Load_Dataset;
-with ML_Types;
 with NL_Types;
 
 package body NN_By_Hand_Support is
 
-     package Network_Package is new Ada.Containers.Ordered_Maps
-     (Key_Type => String_2, Element_Type => Float);
    type Net_Cursor is new Network_Package.Cursor;
 
    Max_Initial_Weight : constant Float := 0.0005;
    Network : Network_Package.Map;
 
+   function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
+                     return Real_Float_Vector;
    function Means (M : Real_Float_Matrix) return Real_Float_Vector;
    function Sigmoid (Val : Float) return float;
    function Standard_Deviation (M : Real_Float_Matrix)
                                 return Real_Float_Vector;
    --  -------------------------------------------------------------------------
 
-   procedure Build_Dataset (X_Train : out Real_Float_Matrix;
-                            Y_Train : out Integer_Array;
-                            X_Test  : out Real_Float_Matrix;
-                            Y_Test  : out Integer_Array) is
-      Iris_Data        : constant Load_Dataset.Iris_Data_Record :=
-                           Load_Dataset.Load_Iris ("src/iris.csv");
-      Features         : constant NL_Types.Float_List_2D := Iris_Data.Features;
-      Target           : constant ML_Types.Integer_List := Iris_Data.Target;
-      Feature_Row      : NL_Types.Float_List;
-      X                : Real_Float_Matrix
+   function Build_Dataset return Dataset is
+      Iris_Data         : constant Load_Dataset.Iris_Data_Record :=
+                            Load_Dataset.Load_Iris ("../../iris.csv");
+      Features          : constant NL_Types.Float_List_2D := Iris_Data.Features;
+      Target            : constant ML_Types.Integer_List := Iris_Data.Target;
+      Train_Length      : constant Positive := 70;
+      Test_Length       : constant Positive := 30;
+      Feature_Row       : NL_Types.Float_List;
+      X                 : Real_Float_Matrix
         (Features.First_Index .. Features.Last_Index, 1 .. 2);
-      X_Means          : Real_Float_Vector (X'Range (2));
-      X_SDs            : Real_Float_Vector (X'Range (2));
-      I0               : ML_Types.Integer_List;
-      I1               : ML_Types.Integer_List;
+      X_Means           : Real_Float_Vector (X'Range (2));
+      X_SDs             : Real_Float_Vector (X'Range (2));
+      I0                : ML_Types.Integer_List;
+      I1                : ML_Types.Integer_List;
+      theDataset        : Dataset (Train_Length, Test_Length, 2);
    begin
       for row in X'Range loop
          Feature_Row := Features (row);
@@ -61,8 +59,8 @@ package body NN_By_Hand_Support is
       end loop;
 
       declare
-         I0_Length : constant Positive := Integer (I0.Length);
-         I1_Length : constant Positive := Integer (I1.Length);
+         I0_Length : constant Natural := Integer (I0.Length);
+         I1_Length : constant Natural := Integer (I1.Length);
          X_Trimmed : Real_Float_Matrix
            (1 .. I0_Length + I1_Length, 1 .. 2);
       begin
@@ -77,43 +75,80 @@ package body NN_By_Hand_Support is
          end loop;
 
          for row in 1 .. 35 loop
-            X_Train (row, 1) := X_Trimmed (row, 1);
-            X_Train (row, 2) := X_Trimmed (row, 2);
+            theDataset.X_Train (row, 1) := X_Trimmed (row, 1);
+            theDataset.X_Train (row, 2) := X_Trimmed (row, 2);
          end loop;
 
          for row in 36 .. 70 loop
-            X_Train (row, 1) := X_Trimmed (row + 14, 1);
-            X_Train (row, 2) := X_Trimmed (row + 14, 2);
+            theDataset.X_Train (row, 1) := X_Trimmed (row + 14, 1);
+            theDataset.X_Train (row, 2) := X_Trimmed (row + 14, 2);
          end loop;
 
          for index in 1 .. 70 loop
             if index < 36 then
-               Y_Train (index) := 0;
+               theDataset.Y_Train (index) := 0;
             else
-               Y_Train (index) := 1;
+               theDataset.Y_Train (index) := 1;
             end if;
          end loop;
 
          for row in 1 .. 15 loop
-            X_Test (row, 1) := X_Trimmed (row + 35, 1);
-            X_Test (row, 2) := X_Trimmed (row + 35, 2);
+            theDataset.X_Test (row, 1) := X_Trimmed (row + 35, 1);
+            theDataset.X_Test (row, 2) := X_Trimmed (row + 35, 2);
          end loop;
 
          for row in 16 .. 30 loop
-            X_Test (row, 1) := X_Trimmed (row + 85, 1);
-            X_Test (row, 2) := X_Trimmed (row + 85, 2);
+            theDataset.X_Test (row, 1) := X_Trimmed (row + 85, 1);
+            theDataset.X_Test (row, 2) := X_Trimmed (row + 85, 2);
          end loop;
 
          for index in 1 .. 30 loop
             if index < 16 then
-               Y_Test (index) := 0;
+               theDataset.Y_Test (index) := 0;
             else
-               Y_Test (index) := 1;
+               theDataset.Y_Test (index) := 1;
             end if;
          end loop;
       end;
 
+      return theDataset;
+
    end Build_Dataset;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Evaluate
+     (Net            : Network_Package.Map; X : Real_Float_Matrix;
+      Y              : Integer_Array;
+      Tn, Fp, Fn, Tp : out Natural; Pred : out ML_Types.Integer_List) is
+      F_Data : constant Real_Float_Vector := Forward (Net, X);
+      C      : Natural;
+   begin
+      Tn := 0;
+      Fp := 0;
+      Fn := 0;
+      Tp := 0;
+
+      for index in Y'Range loop
+         if F_Data (index) < 0.5 then
+            C := 0;
+         else
+            C := 1;
+         end if;
+         Pred.Append (C);
+
+         if C = 0 and then Y (index) = 0 then
+            Tn := Tn + 1;
+         elsif C = 0 and then Y (index) = 1 then
+            Fn := Fn + 1;
+         elsif C = 1 and then Y (index) = 0 then
+            Fp := Fp + 1;
+         else
+            Tp := Tp + 1;
+         end if;
+      end loop;
+
+   end Evaluate;
 
    --  -------------------------------------------------------------------------
 
