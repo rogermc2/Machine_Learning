@@ -1,4 +1,7 @@
 
+--  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Containers.Ordered_Maps;
+
 with Maths;
 
 with Load_Dataset;
@@ -7,7 +10,15 @@ with NL_Types;
 
 package body NN_By_Hand_Support is
 
+     package Network_Package is new Ada.Containers.Ordered_Maps
+     (Key_Type => String_2, Element_Type => Float);
+   type Net_Cursor is new Network_Package.Cursor;
+
+   Max_Initial_Weight : constant Float := 0.0005;
+   Network : Network_Package.Map;
+
    function Means (M : Real_Float_Matrix) return Real_Float_Vector;
+   function Sigmoid (Val : Float) return float;
    function Standard_Deviation (M : Real_Float_Matrix)
                                 return Real_Float_Vector;
    --  -------------------------------------------------------------------------
@@ -106,6 +117,26 @@ package body NN_By_Hand_Support is
 
    --  -------------------------------------------------------------------------
 
+   function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
+                     return Real_Float_Vector is
+      A0     : Float;
+      A1     : Float;
+      Result : Real_Float_Vector (X'Range) := (others => 0.0);
+   begin
+      for row in X'Range loop
+         A0 := Sigmoid (Net ("w0") * X (row, 1) + Net ("w2") * X (row, 2) +
+                          Net ("b0"));
+         A1 := Sigmoid (Net ("w1") * X (row, 1) + Net ("w3") * X (row, 2) +
+                          Net ("b1"));
+         Result (row) := Net ("w4") * A0 + Net ("w5") * A1 + Net ("b2");
+      end loop;
+
+      return Result;
+
+   end Forward;
+
+   --  -------------------------------------------------------------------------
+
    function Means (M : Real_Float_Matrix) return Real_Float_Vector is
       M_Length : constant Float := Float (M'Length);
       Sum1     : Float := 0.0;
@@ -125,6 +156,16 @@ package body NN_By_Hand_Support is
       return Result;
 
    end Means;
+
+   --  -------------------------------------------------------------------------
+
+   function Sigmoid (Val : Float) return float is
+      use Maths.Float_Math_Functions;
+   begin
+
+      return 1.0 / (1.0 + Exp (Val));
+
+   end Sigmoid;
 
    --  -------------------------------------------------------------------------
 
@@ -156,5 +197,16 @@ package body NN_By_Hand_Support is
    end Standard_Deviation;
 
    --  -------------------------------------------------------------------------
+
+begin
+   Network.Include("b2", 0.0);
+   Network.Include("b1", 0.0);
+   Network.Include("b0", 0.0);
+   Network.Include("w0", Max_Initial_Weight * Maths.Random_Float);
+   Network.Include("w1", Max_Initial_Weight * Maths.Random_Float);
+   Network.Include("w2", Max_Initial_Weight * Maths.Random_Float);
+   Network.Include("w3", Max_Initial_Weight * Maths.Random_Float);
+   Network.Include("w4", Max_Initial_Weight * Maths.Random_Float);
+   Network.Include("w5", Max_Initial_Weight * Maths.Random_Float);
 
 end NN_By_Hand_Support;
