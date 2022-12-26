@@ -156,13 +156,13 @@ package body NN_By_Hand_Support is
                      return Real_Float_Vector is
       Node_11     : Float;
       Node_12     : Float;
-      Result : Real_Float_Vector (X'Range) := (others => 0.0);
+      Result      : Real_Float_Vector (X'Range) := (others => 0.0);
    begin
       for row in X'Range loop
          Node_11 := Sigmoid (Net ("w11") * X (row, 1) + Net ("w21") * X (row, 2) +
-                          Net ("b11"));
+                               Net ("b11"));
          Node_12 := Sigmoid (Net ("w12") * X (row, 1) + Net ("w22") * X (row, 2) +
-                          Net ("b12"));
+                               Net ("b12"));
          Result (row) := Net ("w13") * Node_11 + Net ("w23") * Node_12 + Net ("b2 ");
       end loop;
 
@@ -175,21 +175,21 @@ package body NN_By_Hand_Support is
    procedure Gradient_Descent
      (Net : in out Network_Package.Map; X   : Real_Float_Matrix;
       Y   : Integer_Array; Epochs : Positive; Eta : Float) is
-      Eta_F       : constant Float := Eta / Float (Y'Length);
-      Y_Float     : constant Real_Float_Vector := To_Real_Float_Vector (Y);
-      Node_11          : Float;
-      Node_12          : Float;
-      Node_2          : Float;
-      dw11         : Float;
-      dw12         : Float;
-      dw21        : Float;
-      dw22         : Float;
-      dw4         : Float;
-      dw5         : Float;
-      db11         : Float;
-       db12         : Float;
-      db2         : Float;
-      Diff        : Float;
+      Eta_F   : constant Float := Eta / Float (Y'Length);
+      Y_Float : constant Real_Float_Vector := To_Real_Float_Vector (Y);
+      Node_11 : Float;
+      Node_12 : Float;
+      Node_2  : Float;
+      dw11    : Float;
+      dw12    : Float;
+      dw21    : Float;
+      dw22    : Float;
+      dw4     : Float;
+      dw5     : Float;
+      db11    : Float;
+      db12    : Float;
+      db2     : Float;
+      Error   : Float;
    begin
       --  Pass over training set accumulating deltas
       for count in 1 .. Epochs loop
@@ -200,29 +200,32 @@ package body NN_By_Hand_Support is
          dw4 := 0.0;
          dw5 := 0.0;
          db11 := 0.0;
-          db12 := 0.0;
+         db12 := 0.0;
          db2 := 0.0;
 
          for row in X'Range loop
             --  Forward pass for this row (sample)
             Node_11 := Sigmoid (Net ("w11") * X (row, 1) + Net ("w21") * X (row, 2) +
-                             Net ("b11"));
+                                  Net ("b11"));
             Node_12 := Sigmoid (Net ("w12") * X (row, 1) + Net ("w22") * X (row, 2) +
                                   Net ("b12"));
             --  Result
             Node_2 := Net ("w13") * Node_11 + Net ("w23") * Node_12 + Net ("b2 ");
 
             --  Backward pass
-            Diff := Node_2 - Y_Float (row);
-            db2 := db2 + Diff;
-            dw4 := dw4 + Diff * Node_11;
-            dw5 := dw5 + Diff * Node_12;
-            db12 := db12 + Diff * Net ("w23") * Node_12 * (1.0 - Node_12);
-            dw12 := dw12 + Diff * Net ("w23") * Node_12 * (1.0 - Node_12) * X (row, 1);
-            dw22 := dw22 + Diff * Net ("w23") * Node_12 * (1.0 - Node_12) * X (row, 2);
-            db11 := db11 + Diff * Net ("w13") * Node_11 * (1.0 - Node_11);
-            dw11 := dw11 + Diff * Net ("w13") * Node_11 * (1.0 - Node_11) * X (row, 1);
-            dw21:= dw21+ Diff * Net ("w13") * Node_11 * (1.0 - Node_11) * X (row, 2);
+            --  Loss function L = 0.5 (Y - Node_2)^2
+            --  The increments to the deltas, db2 etc. are the
+            --  partial derivatives of the loss function
+            Error := Node_2 - Y_Float (row);
+            db2 := db2 + Error;
+            dw4 := dw4 + Error * Node_11;
+            dw5 := dw5 + Error * Node_12;
+            db12 := db12 + Error * Net ("w23") * Node_12 * (1.0 - Node_12);
+            dw12 := dw12 + Error * Net ("w23") * Node_12 * (1.0 - Node_12) * X (row, 1);
+            dw22 := dw22 + Error * Net ("w23") * Node_12 * (1.0 - Node_12) * X (row, 2);
+            db11 := db11 + Error * Net ("w13") * Node_11 * (1.0 - Node_11);
+            dw11 := dw11 + Error * Net ("w13") * Node_11 * (1.0 - Node_11) * X (row, 1);
+            dw21:= dw21+ Error * Net ("w13") * Node_11 * (1.0 - Node_11) * X (row, 2);
          end loop;
 
          --  Use average deltas to update the network
@@ -285,21 +288,21 @@ package body NN_By_Hand_Support is
    function Standard_Deviation (M : Real_Float_Matrix)
                                 return Real_Float_Vector is
       use maths.Float_Math_Functions;
-      M_Length  : constant Float := Float (M'Length);
-      Mean_Vals : constant Real_Float_Vector := Means (M);
-      Diffs_Sq  : Real_Float_Matrix (M'Range, M'Range (2));
-      Sum1      : Float := 0.0;
-      Sum2      : Float := 0.0;
-      SD        : Real_Float_Vector (1 .. 2);
+      M_Length   : constant Float := Float (M'Length);
+      Mean_Vals  : constant Real_Float_Vector := Means (M);
+      Errors_Sq  : Real_Float_Matrix (M'Range, M'Range (2));
+      Sum1       : Float := 0.0;
+      Sum2       : Float := 0.0;
+      SD         : Real_Float_Vector (1 .. 2);
    begin
       for row in M'Range loop
-         Diffs_Sq (row,1) := (M (row, 1) - Mean_Vals (1)) ** 2;
-         Diffs_Sq (row,2) := (M (row, 2) - Mean_Vals (2)) ** 2;
+         Errors_Sq (row,1) := (M (row, 1) - Mean_Vals (1)) ** 2;
+         Errors_Sq (row,2) := (M (row, 2) - Mean_Vals (2)) ** 2;
       end loop;
 
       for row in M'Range loop
-         Sum1 := Sum1 + Diffs_Sq (row,1);
-         Sum2 := Sum2 + Diffs_Sq (row,2);
+         Sum1 := Sum1 + Errors_Sq (row,1);
+         Sum2 := Sum2 + Errors_Sq (row,2);
       end loop;
 
       SD (1) := Sqrt (Sum1 / (M_Length - 1.0));
