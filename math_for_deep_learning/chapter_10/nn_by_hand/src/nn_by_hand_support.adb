@@ -1,6 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -129,7 +129,6 @@ package body NN_By_Hand_Support is
       Tp := 0;
 
       for index in Y'Range loop
-         Put_Line ("Result (index):  " & Float'Image (Result (index)));
          Assert (Y (index) = 0 or Y (index) = 1, "Evaluate, invalid Y value");
          C := Result (index) >= 0.5;
          if C then
@@ -183,22 +182,21 @@ package body NN_By_Hand_Support is
    procedure Gradient_Descent
      (Net : in out Network_Package.Map; X   : Real_Float_Matrix;
       Y   : Integer_Array; Epochs : Positive; Eta : Float) is
-      Eta_F   : constant Float := Eta / Float (Y'Length);
-      Y_Float : constant Real_Float_Vector := To_Real_Float_Vector (Y);
-      Node_11 : Float;
-      Node_12 : Float;
-      Node_2  : Float;
-      dw0     : Float;
-      dw1     : Float;
-      dw2     : Float;
-      dw3     : Float;
-      dw4     : Float;
-      dw5     : Float;
-      db0     : Float;
-      db1     : Float;
-      db2     : Float;
-      Error   : Float;
-      Average_Error   : Float := 0.0;
+      Eta_F         : constant Float := Eta / Float (Y'Length);
+      Y_Float       : constant Real_Float_Vector := To_Real_Float_Vector (Y);
+      Node_11       : Float;
+      Node_12       : Float;
+      Node_2        : Float;
+      dw0           : Float;
+      dw1           : Float;
+      dw2           : Float;
+      dw3           : Float;
+      dw4           : Float;
+      dw5           : Float;
+      db0           : Float;
+      db1           : Float;
+      db2           : Float;
+      Error         : Float;
    begin
       --  Pass over training set accumulating deltas
       for count in 1 .. Epochs loop
@@ -239,9 +237,6 @@ package body NN_By_Hand_Support is
               Error * Net ("w4") * Node_11 * (1.0 - Node_11) * X (row, 1);
             dw2 := dw2 +
               Error * Net ("w4") * Node_11 * (1.0 - Node_11) * X (row, 2);
-            if count = Epochs then
-               Average_Error := Average_Error + Error;
-            end if;
          end loop;
 
          --  Use average deltas to update the network
@@ -255,9 +250,6 @@ package body NN_By_Hand_Support is
          Net ("w0") := Net ("w0") - Eta_F * dw0;
          Net ("w2") := Net ("w2") - Eta_F * dw2;
       end loop;
-
-      Put_Line ("Average gradient descent error: " &
-                  Float'Image (Average_Error / float (X'Length)));
 
    end Gradient_Descent;
 
@@ -298,7 +290,7 @@ package body NN_By_Hand_Support is
       use Maths.Float_Math_Functions;
    begin
 
-      return 1.0 / (1.0 + Exp (Val));
+      return 1.0 / (1.0 + Exp (-Val));
 
    end Sigmoid;
 
