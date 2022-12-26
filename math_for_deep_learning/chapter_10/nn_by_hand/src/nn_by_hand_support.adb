@@ -22,7 +22,7 @@ package body NN_By_Hand_Support is
 
    function Build_Dataset return Dataset is
       Iris_Data         : constant Load_Dataset.Iris_Data_Record :=
-                            Load_Dataset.Load_Iris ("../../iris.csv");
+                            Load_Dataset.Load_Iris ("../../datasets/iris.csv");
       Features          : constant NL_Types.Float_List_2D := Iris_Data.Features;
       Target            : constant ML_Types.Integer_List := Iris_Data.Target;
       Train_Length      : constant Positive := 70;
