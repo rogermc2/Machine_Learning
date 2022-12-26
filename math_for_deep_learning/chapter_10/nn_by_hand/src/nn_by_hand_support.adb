@@ -10,8 +10,8 @@ package body NN_By_Hand_Support is
 
    type Net_Cursor is new Network_Package.Cursor;
 
-   Max_Initial_Weight : constant Float := 0.0005;
-   Neural_Network     : Network_Package.Map;
+   Max_Init_Weight : constant Float := 0.0005;
+   Neural_Network  : Network_Package.Map;
 
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector;
@@ -159,11 +159,11 @@ package body NN_By_Hand_Support is
       Result      : Real_Float_Vector (X'Range) := (others => 0.0);
    begin
       for row in X'Range loop
-         Node_11 := Sigmoid (Net ("w11") * X (row, 1) + Net ("w21") * X (row, 2) +
-                               Net ("b11"));
-         Node_12 := Sigmoid (Net ("w12") * X (row, 1) + Net ("w22") * X (row, 2) +
-                               Net ("b12"));
-         Result (row) := Net ("w13") * Node_11 + Net ("w23") * Node_12 + Net ("b2 ");
+         Node_11 := Sigmoid (Net ("w0") * X (row, 1) + Net ("w2") * X (row, 2) +
+                               Net ("b0"));
+         Node_12 := Sigmoid (Net ("w1") * X (row, 1) + Net ("w3") * X (row, 2) +
+                               Net ("b1"));
+         Result (row) := Net ("w4") * Node_11 + Net ("w5") * Node_12 + Net ("b2");
       end loop;
 
       return Result;
@@ -180,37 +180,37 @@ package body NN_By_Hand_Support is
       Node_11 : Float;
       Node_12 : Float;
       Node_2  : Float;
-      dw11    : Float;
-      dw12    : Float;
-      dw21    : Float;
-      dw22    : Float;
-      dw4     : Float;
-      dw5     : Float;
-      db11    : Float;
-      db12    : Float;
+      dw0    : Float;
+      dw1    : Float;
+      dw2    : Float;
+      dw3    : Float;
+      dw4    : Float;
+      dw5    : Float;
+      db0    : Float;
+      db1    : Float;
       db2     : Float;
       Error   : Float;
    begin
       --  Pass over training set accumulating deltas
       for count in 1 .. Epochs loop
-         dw11 := 0.0;
-         dw12 := 0.0;
-         dw21:= 0.0;
-         dw22 := 0.0;
+         dw0 := 0.0;
+         dw1 := 0.0;
+         dw2:= 0.0;
+         dw3 := 0.0;
          dw4 := 0.0;
          dw5 := 0.0;
-         db11 := 0.0;
-         db12 := 0.0;
+         db0 := 0.0;
+         db1 := 0.0;
          db2 := 0.0;
 
          for row in X'Range loop
             --  Forward pass for this row (sample)
-            Node_11 := Sigmoid (Net ("w11") * X (row, 1) + Net ("w21") * X (row, 2) +
-                                  Net ("b11"));
-            Node_12 := Sigmoid (Net ("w12") * X (row, 1) + Net ("w22") * X (row, 2) +
-                                  Net ("b12"));
+            Node_11 := Sigmoid (Net ("w0") * X (row, 1) +
+                                  Net ("w2") * X (row, 2) + Net ("b0"));
+            Node_12 := Sigmoid (Net ("w1") * X (row, 1) +
+                                  Net ("w3") * X (row, 2) + Net ("b1"));
             --  Result
-            Node_2 := Net ("w13") * Node_11 + Net ("w23") * Node_12 + Net ("b2 ");
+            Node_2 := Net ("w4") * Node_11 + Net ("w5") * Node_12 + Net ("b2");
 
             --  Backward pass
             --  Loss function L = 0.5 (Y - Node_2)^2
@@ -220,24 +220,28 @@ package body NN_By_Hand_Support is
             db2 := db2 + Error;
             dw4 := dw4 + Error * Node_11;
             dw5 := dw5 + Error * Node_12;
-            db12 := db12 + Error * Net ("w23") * Node_12 * (1.0 - Node_12);
-            dw12 := dw12 + Error * Net ("w23") * Node_12 * (1.0 - Node_12) * X (row, 1);
-            dw22 := dw22 + Error * Net ("w23") * Node_12 * (1.0 - Node_12) * X (row, 2);
-            db11 := db11 + Error * Net ("w13") * Node_11 * (1.0 - Node_11);
-            dw11 := dw11 + Error * Net ("w13") * Node_11 * (1.0 - Node_11) * X (row, 1);
-            dw21:= dw21+ Error * Net ("w13") * Node_11 * (1.0 - Node_11) * X (row, 2);
+            db1 := db1 + Error * Net ("w5") * Node_12 * (1.0 - Node_12);
+            dw1 := dw1 +
+              Error * Net ("w5") * Node_12 * (1.0 - Node_12) * X (row, 1);
+            dw3 := dw3 +
+              Error * Net ("w5") * Node_12 * (1.0 - Node_12) * X (row, 2);
+            db0 := db0 + Error * Net ("w4") * Node_11 * (1.0 - Node_11);
+            dw0 := dw0 +
+              Error * Net ("w4") * Node_11 * (1.0 - Node_11) * X (row, 1);
+            dw2 := dw2 +
+              Error * Net ("w4") * Node_11 * (1.0 - Node_11) * X (row, 2);
          end loop;
 
          --  Use average deltas to update the network
-         Net ("b2 ") := Net ("b2 ") - Eta_F * db2;
-         Net ("w13") := Net ("w13") - Eta_F * dw4;
-         Net ("w23") := Net ("w23") - Eta_F * dw5;
-         Net ("b12") := Net ("b12") - Eta_F * db12;
-         Net ("w12") := Net ("w12") - Eta_F * dw12;
-         Net ("w22") := Net ("w22") - Eta_F * dw22;
-         Net ("b11") := Net ("b11") - Eta_F * db11;
-         Net ("w11") := Net ("w11") - Eta_F * dw11;
-         Net ("w21") := Net ("w21") - Eta_F * dw21;
+         Net ("b2") := Net ("b2") - Eta_F * db2;
+         Net ("w4") := Net ("w4") - Eta_F * dw4;
+         Net ("w5") := Net ("w5") - Eta_F * dw5;
+         Net ("b1") := Net ("b1") - Eta_F * db1;
+         Net ("w1") := Net ("w1") - Eta_F * dw1;
+         Net ("w3") := Net ("w3") - Eta_F * dw3;
+         Net ("b0") := Net ("b0") - Eta_F * db0;
+         Net ("w0") := Net ("w0") - Eta_F * dw0;
+         Net ("w2") := Net ("w2") - Eta_F * dw2;
       end loop;
 
    end Gradient_Descent;
@@ -315,14 +319,14 @@ package body NN_By_Hand_Support is
    --  -------------------------------------------------------------------------
 
 begin
-   Neural_Network.Include("b2 ", 0.0);
-   Neural_Network.Include("b12", 0.0);
-   Neural_Network.Include("b11", 0.0);
-   Neural_Network.Include("w11", Max_Initial_Weight * Maths.Random_Float);
-   Neural_Network.Include("w12", Max_Initial_Weight * Maths.Random_Float);
-   Neural_Network.Include("w21", Max_Initial_Weight * Maths.Random_Float);
-   Neural_Network.Include("w22", Max_Initial_Weight * Maths.Random_Float);
-   Neural_Network.Include("w13", Max_Initial_Weight * Maths.Random_Float);
-   Neural_Network.Include("w23", Max_Initial_Weight * Maths.Random_Float);
+   Neural_Network.Include("b2", 0.0);
+   Neural_Network.Include("b1", 0.0);
+   Neural_Network.Include("b0", 0.0);
+   Neural_Network.Include("w0", Max_Init_Weight * Maths.Random_Float);
+   Neural_Network.Include("w1", Max_Init_Weight * Maths.Random_Float);
+   Neural_Network.Include("w2", Max_Init_Weight * Maths.Random_Float);
+   Neural_Network.Include("w3", Max_Init_Weight * Maths.Random_Float);
+   Neural_Network.Include("w4", Max_Init_Weight * Maths.Random_Float);
+   Neural_Network.Include("w5", Max_Init_Weight * Maths.Random_Float);
 
 end NN_By_Hand_Support;
