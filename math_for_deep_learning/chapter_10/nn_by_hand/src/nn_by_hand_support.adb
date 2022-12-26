@@ -11,7 +11,7 @@ package body NN_By_Hand_Support is
    type Net_Cursor is new Network_Package.Cursor;
 
    Max_Initial_Weight : constant Float := 0.0005;
-   Network            : Network_Package.Map;
+   Neural_Network     : Network_Package.Map;
 
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector;
@@ -151,7 +151,7 @@ package body NN_By_Hand_Support is
    end Evaluate;
 
    --  -------------------------------------------------------------------------
-
+   --  Forward runs the data X through the neural network defined by Net
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector is
       A0     : Float;
@@ -169,6 +169,61 @@ package body NN_By_Hand_Support is
       return Result;
 
    end Forward;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Gradient_Descent
+     (Net : in out Network_Package.Map; X   : Real_Float_Matrix;
+      Y   : Real_Float_Vector; Epochs : Positive; Eta : Float) is
+      A0     : Float;
+      A1     : Float;
+      A2     : Float;
+      dw0    : Float;
+      dw1    : Float;
+      dw2    : Float;
+      dw3    : Float;
+      dw4    : Float;
+      dw5    : Float;
+      db0    : Float;
+      db1    : Float;
+      db2    : Float;
+      Diff   : Float;
+   begin
+      --  Pass over training set accumulating deltas
+      for count in 1 .. Epochs loop
+         dw0 := 0.0;
+         dw1 := 0.0;
+         dw2 := 0.0;
+         dw3 := 0.0;
+         dw4 := 0.0;
+         dw5 := 0.0;
+         db0 := 0.0;
+         db1 := 0.0;
+         db2 := 0.0;
+
+         for row in X'Range loop
+            --  Forward pass
+            A0 := Sigmoid (Net ("w0") * X (row, 1) + Net ("w2") * X (row, 2) +
+                             Net ("b0"));
+            A1 := Sigmoid (Net ("w1") * X (row, 1) + Net ("w3") * X (row, 2) +
+                             Net ("b1"));
+            A2 := Net ("w4") * A0 + Net ("w5") * A1 + Net ("b2");
+
+            --  Backward pass
+            Diff := A2 - Y (row);
+            db2 := db2 + Diff;
+            dw4 := dw4 + Diff * A0;
+            dw5 := dw5 + Diff * A1;
+            db1 := db1 + Diff * Net ("w5") * A1 * (1.0 - A1);
+            dw1 := dw1 + Diff * Net ("w5") * A1 * (1.0 - A1) * X (row, 1);
+            dw3 := dw3 + Diff * Net ("w5") * A1 * (1.0 - A1) * X (row, 2);
+            db0 := db0 + Diff * Net ("w4") * A0 * (1.0 - A0);
+            dw0 := dw0 + Diff * Net ("w4") * A0 * (1.0 - A0) * X (row, 1);
+            dw2 := dw2 + Diff * Net ("w4") * A0 * (1.0 - A0) * X (row, 2);
+         end loop;
+      end loop;
+
+   end Gradient_Descent;
 
    --  -------------------------------------------------------------------------
 
@@ -194,12 +249,12 @@ package body NN_By_Hand_Support is
 
    --  -------------------------------------------------------------------------
 
-   function Net_Map return Network_Package.Map is
+   function Neural_Net return Network_Package.Map is
    begin
 
-      return Network;
+      return Neural_Network;
 
-   end Net_Map;
+   end Neural_Net;
 
    --  -------------------------------------------------------------------------
 
@@ -243,14 +298,14 @@ package body NN_By_Hand_Support is
    --  -------------------------------------------------------------------------
 
 begin
-   Network.Include("b2", 0.0);
-   Network.Include("b1", 0.0);
-   Network.Include("b0", 0.0);
-   Network.Include("w0", Max_Initial_Weight * Maths.Random_Float);
-   Network.Include("w1", Max_Initial_Weight * Maths.Random_Float);
-   Network.Include("w2", Max_Initial_Weight * Maths.Random_Float);
-   Network.Include("w3", Max_Initial_Weight * Maths.Random_Float);
-   Network.Include("w4", Max_Initial_Weight * Maths.Random_Float);
-   Network.Include("w5", Max_Initial_Weight * Maths.Random_Float);
+   Neural_Network.Include("b2", 0.0);
+   Neural_Network.Include("b1", 0.0);
+   Neural_Network.Include("b0", 0.0);
+   Neural_Network.Include("w0", Max_Initial_Weight * Maths.Random_Float);
+   Neural_Network.Include("w1", Max_Initial_Weight * Maths.Random_Float);
+   Neural_Network.Include("w2", Max_Initial_Weight * Maths.Random_Float);
+   Neural_Network.Include("w3", Max_Initial_Weight * Maths.Random_Float);
+   Neural_Network.Include("w4", Max_Initial_Weight * Maths.Random_Float);
+   Neural_Network.Include("w5", Max_Initial_Weight * Maths.Random_Float);
 
 end NN_By_Hand_Support;
