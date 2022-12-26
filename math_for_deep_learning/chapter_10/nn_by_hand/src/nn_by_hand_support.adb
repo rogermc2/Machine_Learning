@@ -154,16 +154,16 @@ package body NN_By_Hand_Support is
    --  Forward runs the data X through the neural network defined by Net
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector is
-      A0     : Float;
-      A1     : Float;
+      Node_11     : Float;
+      Node_12     : Float;
       Result : Real_Float_Vector (X'Range) := (others => 0.0);
    begin
       for row in X'Range loop
-         A0 := Sigmoid (Net ("w0") * X (row, 1) + Net ("w2") * X (row, 2) +
+         Node_11 := Sigmoid (Net ("w0") * X (row, 1) + Net ("w2") * X (row, 2) +
                           Net ("b0"));
-         A1 := Sigmoid (Net ("w1") * X (row, 1) + Net ("w3") * X (row, 2) +
+         Node_12 := Sigmoid (Net ("w1") * X (row, 1) + Net ("w3") * X (row, 2) +
                           Net ("b1"));
-         Result (row) := Net ("w4") * A0 + Net ("w5") * A1 + Net ("b2");
+         Result (row) := Net ("w4") * Node_11 + Net ("w5") * Node_12 + Net ("b2");
       end loop;
 
       return Result;
@@ -175,65 +175,66 @@ package body NN_By_Hand_Support is
    procedure Gradient_Descent
      (Net : in out Network_Package.Map; X   : Real_Float_Matrix;
       Y   : Integer_Array; Epochs : Positive; Eta : Float) is
-      Eta_F   : constant Float := Eta / Float (Y'Length);
-      Y_Float : constant Real_Float_Vector := To_Real_Float_Vector (Y);
-      A0          : Float;
-      A1          : Float;
-      A2          : Float;
-      dw0         : Float;
-      dw1         : Float;
-      dw2         : Float;
-      dw3         : Float;
+      Eta_F       : constant Float := Eta / Float (Y'Length);
+      Y_Float     : constant Real_Float_Vector := To_Real_Float_Vector (Y);
+      Node_11          : Float;
+      Node_12          : Float;
+      Node_2          : Float;
+      dw11         : Float;
+      dw12         : Float;
+      dw21        : Float;
+      dw22         : Float;
       dw4         : Float;
       dw5         : Float;
-      db0         : Float;
-      db1         : Float;
+      db11         : Float;
+       db12         : Float;
       db2         : Float;
       Diff        : Float;
    begin
       --  Pass over training set accumulating deltas
       for count in 1 .. Epochs loop
-         dw0 := 0.0;
-         dw1 := 0.0;
-         dw2 := 0.0;
-         dw3 := 0.0;
+         dw11 := 0.0;
+         dw12 := 0.0;
+         dw21:= 0.0;
+         dw22 := 0.0;
          dw4 := 0.0;
          dw5 := 0.0;
-         db0 := 0.0;
-         db1 := 0.0;
+         db11 := 0.0;
+          db12 := 0.0;
          db2 := 0.0;
 
          for row in X'Range loop
-            --  Forward pass
-            A0 := Sigmoid (Net ("w0") * X (row, 1) + Net ("w2") * X (row, 2) +
+            --  Forward pass for this row (sample)
+            Node_11 := Sigmoid (Net ("w0") * X (row, 1) + Net ("w2") * X (row, 2) +
                              Net ("b0"));
-            A1 := Sigmoid (Net ("w1") * X (row, 1) + Net ("w3") * X (row, 2) +
-                             Net ("b1"));
-            A2 := Net ("w4") * A0 + Net ("w5") * A1 + Net ("b2");
+            Node_12 := Sigmoid (Net ("w1") * X (row, 1) + Net ("w3") * X (row, 2) +
+                                  Net ("b1"));
+            --  Result
+            Node_2 := Net ("w4") * Node_11 + Net ("w5") * Node_12 + Net ("b2");
 
             --  Backward pass
-            Diff := A2 - Y_Float (row);
+            Diff := Node_2 - Y_Float (row);
             db2 := db2 + Diff;
-            dw4 := dw4 + Diff * A0;
-            dw5 := dw5 + Diff * A1;
-            db1 := db1 + Diff * Net ("w5") * A1 * (1.0 - A1);
-            dw1 := dw1 + Diff * Net ("w5") * A1 * (1.0 - A1) * X (row, 1);
-            dw3 := dw3 + Diff * Net ("w5") * A1 * (1.0 - A1) * X (row, 2);
-            db0 := db0 + Diff * Net ("w4") * A0 * (1.0 - A0);
-            dw0 := dw0 + Diff * Net ("w4") * A0 * (1.0 - A0) * X (row, 1);
-            dw2 := dw2 + Diff * Net ("w4") * A0 * (1.0 - A0) * X (row, 2);
+            dw4 := dw4 + Diff * Node_11;
+            dw5 := dw5 + Diff * Node_12;
+            db12 := db12 + Diff * Net ("w5") * Node_12 * (1.0 - Node_12);
+            dw12 := dw12 + Diff * Net ("w5") * Node_12 * (1.0 - Node_12) * X (row, 1);
+            dw22 := dw22 + Diff * Net ("w5") * Node_12 * (1.0 - Node_12) * X (row, 2);
+            db11 := db11 + Diff * Net ("w4") * Node_11 * (1.0 - Node_11);
+            dw11 := dw11 + Diff * Net ("w4") * Node_11 * (1.0 - Node_11) * X (row, 1);
+            dw21:= dw21+ Diff * Net ("w4") * Node_11 * (1.0 - Node_11) * X (row, 2);
          end loop;
 
          --  Use average deltas to update the network
          Net ("b2") := Net ("b2") - Eta_F * db2;
          Net ("w4") := Net ("w4") - Eta_F * dw4;
          Net ("w5") := Net ("w5") - Eta_F * dw5;
-         Net ("b1") := Net ("b1") - Eta_F * db1;
-         Net ("w1") := Net ("w1") - Eta_F * dw1;
-         Net ("w3") := Net ("w3") - Eta_F * dw3;
-         Net ("b0") := Net ("b0") - Eta_F * db0;
-         Net ("w0") := Net ("w0") - Eta_F * dw0;
-         Net ("w2") := Net ("w2") - Eta_F * dw2;
+         Net ("b1") := Net ("b1") - Eta_F * db12;
+         Net ("w1") := Net ("w1") - Eta_F * dw12;
+         Net ("w3") := Net ("w3") - Eta_F * dw22;
+         Net ("b0") := Net ("b0") - Eta_F * db11;
+         Net ("w0") := Net ("w0") - Eta_F * dw11;
+         Net ("w2") := Net ("w2") - Eta_F * dw21;
       end loop;
 
    end Gradient_Descent;
