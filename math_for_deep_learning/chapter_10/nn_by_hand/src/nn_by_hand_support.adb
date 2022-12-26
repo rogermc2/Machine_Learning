@@ -174,20 +174,22 @@ package body NN_By_Hand_Support is
 
    procedure Gradient_Descent
      (Net : in out Network_Package.Map; X   : Real_Float_Matrix;
-      Y   : Real_Float_Vector; Epochs : Positive; Eta : Float) is
-      A0     : Float;
-      A1     : Float;
-      A2     : Float;
-      dw0    : Float;
-      dw1    : Float;
-      dw2    : Float;
-      dw3    : Float;
-      dw4    : Float;
-      dw5    : Float;
-      db0    : Float;
-      db1    : Float;
-      db2    : Float;
-      Diff   : Float;
+      Y   : Integer_Array; Epochs : Positive; Eta : Float) is
+      Eta_F   : constant Float := Eta / Float (Y'Length);
+      Y_Float : constant Real_Float_Vector := To_Real_Float_Vector (Y);
+      A0          : Float;
+      A1          : Float;
+      A2          : Float;
+      dw0         : Float;
+      dw1         : Float;
+      dw2         : Float;
+      dw3         : Float;
+      dw4         : Float;
+      dw5         : Float;
+      db0         : Float;
+      db1         : Float;
+      db2         : Float;
+      Diff        : Float;
    begin
       --  Pass over training set accumulating deltas
       for count in 1 .. Epochs loop
@@ -210,7 +212,7 @@ package body NN_By_Hand_Support is
             A2 := Net ("w4") * A0 + Net ("w5") * A1 + Net ("b2");
 
             --  Backward pass
-            Diff := A2 - Y (row);
+            Diff := A2 - Y_Float (row);
             db2 := db2 + Diff;
             dw4 := dw4 + Diff * A0;
             dw5 := dw5 + Diff * A1;
@@ -221,6 +223,17 @@ package body NN_By_Hand_Support is
             dw0 := dw0 + Diff * Net ("w4") * A0 * (1.0 - A0) * X (row, 1);
             dw2 := dw2 + Diff * Net ("w4") * A0 * (1.0 - A0) * X (row, 2);
          end loop;
+
+         --  Use average deltas to update the network
+         Net ("b2") := Net ("b2") - Eta_F * db2;
+         Net ("w4") := Net ("w4") - Eta_F * dw4;
+         Net ("w5") := Net ("w5") - Eta_F * dw5;
+         Net ("b1") := Net ("b1") - Eta_F * db1;
+         Net ("w1") := Net ("w1") - Eta_F * dw1;
+         Net ("w3") := Net ("w3") - Eta_F * dw3;
+         Net ("b0") := Net ("b0") - Eta_F * db0;
+         Net ("w0") := Net ("w0") - Eta_F * dw0;
+         Net ("w2") := Net ("w2") - Eta_F * dw2;
       end loop;
 
    end Gradient_Descent;

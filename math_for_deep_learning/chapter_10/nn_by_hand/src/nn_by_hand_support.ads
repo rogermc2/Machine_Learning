@@ -22,6 +22,9 @@ package NN_By_Hand_Support is
       Y              : Integer_Array;
       Tn, Fp, Fn, Tp : out Natural;
       Pred           : out ML_Types.Integer_List);
+   procedure Gradient_Descent
+     (Net : in out Network_Package.Map; X   : Real_Float_Matrix;
+      Y   : Integer_Array; Epochs : Positive; Eta : Float);
    function Neural_Net return Network_Package.Map;
 
 end NN_By_Hand_Support;
