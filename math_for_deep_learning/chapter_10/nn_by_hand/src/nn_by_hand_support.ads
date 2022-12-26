@@ -7,7 +7,7 @@ with ML_Types;
 package NN_By_Hand_Support is
 
    package Network_Package is new Ada.Containers.Ordered_Maps
-     (Key_Type => String_2, Element_Type => Float);
+     (Key_Type => String_3, Element_Type => Float);
 
    type Dataset (Train_Length, Test_Length, Num_Features : Positive) is record
       X_Train : Real_Float_Matrix (1 .. Train_Length, 1 .. Num_Features);
