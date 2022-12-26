@@ -20,7 +20,7 @@ package NN_By_Hand_Support is
    procedure Evaluate
      (Net            : Network_Package.Map; X : Real_Float_Matrix;
       Y              : Integer_Array;
-      Tn, Fp, Fn, Tp : out Natural;
+      Tn, Fp, Fn, Tp : out Natural; Accuracy : out Float;
       Pred           : out ML_Types.Integer_List);
    procedure Gradient_Descent
      (Net : in out Network_Package.Map; X   : Real_Float_Matrix;

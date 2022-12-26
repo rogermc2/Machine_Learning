@@ -19,25 +19,30 @@ procedure NN_By_Hand is
    Fp           : Natural;
    Fn           : Natural;
    Tp           : Natural;
+   Accuracy     : Float;
    Pred         : ML_Types.Integer_List;
 --     Py_Module    : Module;
 begin
-   Evaluate (Net, Data.X_Test, Data.Y_Test, Tn, Fp, Fn, Tp, Pred);
+   Evaluate (Net, Data.X_Test, Data.Y_Test, Tn, Fp, Fn, Tp, Accuracy, Pred);
    Put_Line ("Pre-training results:");
    Put_Line ("Tn" & Integer'Image (Tn));
    Put_Line ("Fp" & Integer'Image (Fp));
    Put_Line ("Fn" & Integer'Image (Fn));
    Put_Line ("Tp" & Integer'Image (Tp));
+   Put_Line ("Accuracy " & Float'Image (Accuracy));
+   Print_Integer_List ("Pred", Pred);
    New_Line;
 
    Gradient_Descent (Net, Data.X_Train , Data.Y_Train, Epochs, Eta);
-   Evaluate (Net, Data.X_Test, Data.Y_Test, Tn, Fp, Fn, Tp, Pred);
+   Evaluate (Net, Data.X_Test, Data.Y_Test, Tn, Fp, Fn, Tp, Accuracy, Pred);
    Put_Line ("Gradient descent results:");
    Put_Line ("Tn" & Integer'Image (Tn));
    Put_Line ("Fp" & Integer'Image (Fp));
    Put_Line ("Fn" & Integer'Image (Fn));
    Put_Line ("Tp" & Integer'Image (Tp));
+   Put_Line ("Accuracy " & Float'Image (Accuracy));
    Print_Integer_List ("Pred", Pred);
+   New_Line;
 
 --     Python.Initialize;
 --     Py_Module := Import_File ("nn_by_hand");

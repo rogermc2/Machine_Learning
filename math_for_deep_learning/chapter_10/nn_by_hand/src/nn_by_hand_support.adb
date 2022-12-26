@@ -118,9 +118,9 @@ package body NN_By_Hand_Support is
    --  -------------------------------------------------------------------------
 
    procedure Evaluate
-     (Net            : Network_Package.Map; X : Real_Float_Matrix;
-      Y              : Integer_Array;
-      Tn, Fp, Fn, Tp : out Natural; Pred : out ML_Types.Integer_List) is
+     (Net      : Network_Package.Map; X : Real_Float_Matrix;
+      Y        : Integer_Array; Tn, Fp, Fn, Tp : out Natural;
+      Accuracy : out Float;     Pred : out ML_Types.Integer_List) is
       F_Data : constant Real_Float_Vector := Forward (Net, X);
       C      : Boolean;
    begin
@@ -148,22 +148,25 @@ package body NN_By_Hand_Support is
          end if;
       end loop;
 
+      Accuracy := Float (Tn + Tp) / Float (Tn + Tp + Fn + Fp);
+
    end Evaluate;
 
    --  -------------------------------------------------------------------------
    --  Forward runs the data X through the neural network defined by Net
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector is
-      Node_11     : Float;
-      Node_12     : Float;
-      Result      : Real_Float_Vector (X'Range) := (others => 0.0);
+      Node_11 : Float;
+      Node_12 : Float;
+      Result  : Real_Float_Vector (X'Range);
    begin
       for row in X'Range loop
          Node_11 := Sigmoid (Net ("w0") * X (row, 1) + Net ("w2") * X (row, 2) +
                                Net ("b0"));
          Node_12 := Sigmoid (Net ("w1") * X (row, 1) + Net ("w3") * X (row, 2) +
                                Net ("b1"));
-         Result (row) := Net ("w4") * Node_11 + Net ("w5") * Node_12 + Net ("b2");
+         Result (row) :=
+           Net ("w4") * Node_11 + Net ("w5") * Node_12 + Net ("b2");
       end loop;
 
       return Result;
@@ -180,14 +183,14 @@ package body NN_By_Hand_Support is
       Node_11 : Float;
       Node_12 : Float;
       Node_2  : Float;
-      dw0    : Float;
-      dw1    : Float;
-      dw2    : Float;
-      dw3    : Float;
-      dw4    : Float;
-      dw5    : Float;
-      db0    : Float;
-      db1    : Float;
+      dw0     : Float;
+      dw1     : Float;
+      dw2     : Float;
+      dw3     : Float;
+      dw4     : Float;
+      dw5     : Float;
+      db0     : Float;
+      db1     : Float;
       db2     : Float;
       Error   : Float;
    begin
@@ -195,7 +198,7 @@ package body NN_By_Hand_Support is
       for count in 1 .. Epochs loop
          dw0 := 0.0;
          dw1 := 0.0;
-         dw2:= 0.0;
+         dw2 := 0.0;
          dw3 := 0.0;
          dw4 := 0.0;
          dw5 := 0.0;
