@@ -1,6 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -129,6 +129,7 @@ package body NN_By_Hand_Support is
       Tp := 0;
 
       for index in Y'Range loop
+         Put_Line ("Result (index):  " & Float'Image (Result (index)));
          Assert (Y (index) = 0 or Y (index) = 1, "Evaluate, invalid Y value");
          C := Result (index) >= 0.5;
          if C then
@@ -197,6 +198,7 @@ package body NN_By_Hand_Support is
       db1     : Float;
       db2     : Float;
       Error   : Float;
+      Average_Error   : Float := 0.0;
    begin
       --  Pass over training set accumulating deltas
       for count in 1 .. Epochs loop
@@ -237,6 +239,9 @@ package body NN_By_Hand_Support is
               Error * Net ("w4") * Node_11 * (1.0 - Node_11) * X (row, 1);
             dw2 := dw2 +
               Error * Net ("w4") * Node_11 * (1.0 - Node_11) * X (row, 2);
+            if count = Epochs then
+               Average_Error := Average_Error + Error;
+            end if;
          end loop;
 
          --  Use average deltas to update the network
@@ -249,10 +254,10 @@ package body NN_By_Hand_Support is
          Net ("b0") := Net ("b0") - Eta_F * db0;
          Net ("w0") := Net ("w0") - Eta_F * dw0;
          Net ("w2") := Net ("w2") - Eta_F * dw2;
-         --           if count = Epochs then
-         --              Put_Line ("Gradient_Descent done");
-         --           end if;
       end loop;
+
+      Put_Line ("Average gradient descent error: " &
+                  Float'Image (Average_Error / float (X'Length)));
 
    end Gradient_Descent;
 

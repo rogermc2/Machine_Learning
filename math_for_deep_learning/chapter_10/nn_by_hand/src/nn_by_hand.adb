@@ -15,6 +15,12 @@ procedure NN_By_Hand is
    Eta          : constant Float := 0.1;
    Data         : constant Dataset := Build_Dataset;
    Net          : Network_Package.Map := Neural_Net;
+   Tn_0         : Natural;
+   Fp_0         : Natural;
+   Fn_0         : Natural;
+   Tp_0         : Natural;
+   Accuracy_0   : Float;
+   Pred_0       : ML_Types.Integer_List;
    Tn           : Natural;
    Fp           : Natural;
    Fn           : Natural;
@@ -23,24 +29,21 @@ procedure NN_By_Hand is
    Pred         : ML_Types.Integer_List;
 --     Py_Module    : Module;
 begin
---     Print_Integer_Array ("Data.Data.X_Test", Data.Y_Test);
-   Evaluate (Net, Data.X_Test, Data.Y_Test, Tn, Fp, Fn, Tp, Accuracy, Pred);
+   Print_Integer_Array ("Data.Data.Y_Test", Data.Y_Test);
+   Evaluate (Net, Data.X_Test, Data.Y_Test, Tn_0, Fp_0, Fn_0, Tp_0,
+             Accuracy_0, Pred_0);
    Put_Line ("Pre-training results:");
-   Put_Line ("Tn" & Integer'Image (Tn));
-   Put_Line ("Fp" & Integer'Image (Fp));
-   Put_Line ("Fn" & Integer'Image (Fn));
-   Put_Line ("Tp" & Integer'Image (Tp));
-   Put_Line ("Accuracy " & Float'Image (Accuracy));
-   Print_Integer_List ("Pred", Pred);
+   Put_Line ("Tn" & Integer'Image (Tn_0) & "    Fp" & Integer'Image (Fp_0));
+   Put_Line ("Fn" & Integer'Image (Fn_0) & "    Tp" & Integer'Image (Tp_0));
+   Put_Line ("Accuracy " & Float'Image (Accuracy_0));
+   Print_Integer_List ("Pred", Pred_0);
    New_Line;
 
    Gradient_Descent (Net, Data.X_Train, Data.Y_Train, Epochs, Eta);
    Evaluate (Net, Data.X_Test, Data.Y_Test, Tn, Fp, Fn, Tp, Accuracy, Pred);
    Put_Line ("Gradient descent results:");
-   Put_Line ("Tn" & Integer'Image (Tn));
-   Put_Line ("Fp" & Integer'Image (Fp));
-   Put_Line ("Fn" & Integer'Image (Fn));
-   Put_Line ("Tp" & Integer'Image (Tp));
+   Put_Line ("Tn" & Integer'Image (Tn) & "    Fp" & Integer'Image (Fp));
+   Put_Line ("Fn" & Integer'Image (Fn) & "    Tp" & Integer'Image (Tp));
    Put_Line ("Accuracy " & Float'Image (Accuracy));
    Print_Integer_List ("Pred", Pred);
    New_Line;
