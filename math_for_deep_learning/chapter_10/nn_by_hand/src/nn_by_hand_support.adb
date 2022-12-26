@@ -1,5 +1,6 @@
 
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -8,15 +9,13 @@ with NL_Types;
 
 package body NN_By_Hand_Support is
 
-   type Net_Cursor is new Network_Package.Cursor;
-
    Max_Init_Weight : constant Float := 0.0005;
    Neural_Network  : Network_Package.Map;
 
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector;
    function Means (M : Real_Float_Matrix) return Real_Float_Vector;
-   function Sigmoid (Val : Float) return float;
+   function Sigmoid (Val : Float) return Float;
    function Standard_Deviation (M : Real_Float_Matrix)
                                 return Real_Float_Vector;
    --  -------------------------------------------------------------------------
@@ -121,7 +120,7 @@ package body NN_By_Hand_Support is
      (Net      : Network_Package.Map; X : Real_Float_Matrix;
       Y        : Integer_Array; Tn, Fp, Fn, Tp : out Natural;
       Accuracy : out Float;     Pred : out ML_Types.Integer_List) is
-      F_Data : constant Real_Float_Vector := Forward (Net, X);
+      Result : constant Real_Float_Vector := Forward (Net, X);
       C      : Boolean;
    begin
       Tn := 0;
@@ -130,21 +129,26 @@ package body NN_By_Hand_Support is
       Tp := 0;
 
       for index in Y'Range loop
-         C :=  F_Data (index) >= 0.5;
+         Assert (Y (index) = 0 or Y (index) = 1, "Evaluate, invalid Y value");
+         C := Result (index) >= 0.5;
          if C then
             Pred.Append (1);
          else
             Pred.Append (0);
          end if;
 
-         if not C and then Y (index) = 0 then
-            Tn := Tn + 1;
-         elsif not C and then Y (index) = 1 then
-            Fn := Fn + 1;
-         elsif C and then Y (index) = 0 then
-            Fp := Fp + 1;
-         else
-            Tp := Tp + 1;
+         if C then  -- Result (index) >= 0.5
+            if Y (index) = 1 then
+               Tp := Tp + 1;
+            else
+               Fp := Fp + 1;
+            end if;
+         else  --  Result (index) < 0.5
+            if Y (index) = 0 then
+               Tn := Tn + 1;
+            else
+               Fn := Fn + 1;
+            end if;
          end if;
       end loop;
 
@@ -245,6 +249,9 @@ package body NN_By_Hand_Support is
          Net ("b0") := Net ("b0") - Eta_F * db0;
          Net ("w0") := Net ("w0") - Eta_F * dw0;
          Net ("w2") := Net ("w2") - Eta_F * dw2;
+         --           if count = Epochs then
+         --              Put_Line ("Gradient_Descent done");
+         --           end if;
       end loop;
 
    end Gradient_Descent;

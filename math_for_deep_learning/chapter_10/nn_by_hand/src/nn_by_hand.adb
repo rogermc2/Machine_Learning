@@ -23,6 +23,7 @@ procedure NN_By_Hand is
    Pred         : ML_Types.Integer_List;
 --     Py_Module    : Module;
 begin
+--     Print_Integer_Array ("Data.Data.X_Test", Data.Y_Test);
    Evaluate (Net, Data.X_Test, Data.Y_Test, Tn, Fp, Fn, Tp, Accuracy, Pred);
    Put_Line ("Pre-training results:");
    Put_Line ("Tn" & Integer'Image (Tn));
@@ -33,7 +34,7 @@ begin
    Print_Integer_List ("Pred", Pred);
    New_Line;
 
-   Gradient_Descent (Net, Data.X_Train , Data.Y_Train, Epochs, Eta);
+   Gradient_Descent (Net, Data.X_Train, Data.Y_Train, Epochs, Eta);
    Evaluate (Net, Data.X_Test, Data.Y_Test, Tn, Fp, Fn, Tp, Accuracy, Pred);
    Put_Line ("Gradient descent results:");
    Put_Line ("Tn" & Integer'Image (Tn));
