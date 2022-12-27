@@ -10,6 +10,7 @@ with Shuffler;
 
 package body Network is
 
+   Num_Samples : Positive;
    --     Neural_Network  : Network_Package.Map;
 
    procedure Add (Network : in out Network_Data; Layer : Layer_Data) is
@@ -71,6 +72,13 @@ package body Network is
       return Predictions;
 
    end Predict;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Set_Num_Samples (Number : Positive) is
+   begin
+      Num_Samples := Number;
+   end Set_Num_Samples;
 
    --  -------------------------------------------------------------------------
 
