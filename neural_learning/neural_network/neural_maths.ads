@@ -9,5 +9,6 @@ package Neural_Maths is
                    return Real_Float_Vector;
     function Mean (A : Real_Float_Matrix) return Real_Float_Vector;
     function Mean (A : Real_Float_Matrix) return Float;
+   function Sigmoid (Val : Float) return Float;
 
 end Neural_Maths;

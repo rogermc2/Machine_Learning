@@ -5,6 +5,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Maths;
 
 with Load_Dataset;
+with Neural_Maths;
 with NL_Types;
 
 package body NN_By_Hand_Support is
@@ -15,7 +16,7 @@ package body NN_By_Hand_Support is
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector;
    function Means (M : Real_Float_Matrix) return Real_Float_Vector;
-   function Sigmoid (Val : Float) return Float;
+--     function Sigmoid (Val : Float) return Float;
    function Standard_Deviation (M : Real_Float_Matrix)
                                 return Real_Float_Vector;
    --  -------------------------------------------------------------------------
@@ -160,6 +161,7 @@ package body NN_By_Hand_Support is
    --  Forward runs the data X through the neural network defined by Net
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector is
+      use Neural_Maths;
       Node_11 : Float;
       Node_12 : Float;
       Result  : Real_Float_Vector (X'Range);
@@ -182,6 +184,7 @@ package body NN_By_Hand_Support is
    procedure Gradient_Descent
      (Net : in out Network_Package.Map; X   : Real_Float_Matrix;
       Y   : Integer_Array; Epochs : Positive; Eta : Float) is
+      use Neural_Maths;
       Eta_F         : constant Float := Eta / Float (Y'Length);
       Y_Float       : constant Real_Float_Vector := To_Real_Float_Vector (Y);
       Node_11       : Float;
@@ -283,16 +286,6 @@ package body NN_By_Hand_Support is
       return Neural_Network;
 
    end Neural_Net;
-
-   --  -------------------------------------------------------------------------
-
-   function Sigmoid (Val : Float) return float is
-      use Maths.Float_Math_Functions;
-   begin
-
-      return 1.0 / (1.0 + Exp (-Val));
-
-   end Sigmoid;
 
    --  -------------------------------------------------------------------------
 

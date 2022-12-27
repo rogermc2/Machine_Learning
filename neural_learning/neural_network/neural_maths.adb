@@ -211,6 +211,16 @@ package body Neural_Maths is
     end Psi_Cephes;
 
     --  ------------------------------------------------------------------------
+
+   function Sigmoid (Val : Float) return Float is
+      use Maths.Float_Math_Functions;
+   begin
+
+      return 1.0 / (1.0 + Exp (-Val));
+
+   end Sigmoid;
+
+   --  -------------------------------------------------------------------------
     --  Riemann zeta function of two arguments
     function Zeta (X : Natural; Q : Float) return Float is
         Routine_Name : constant String := "Neural_Maths.Zeta ";

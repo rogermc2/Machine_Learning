@@ -28,7 +28,6 @@ begin
    --     New_Line;
    --     Python.Finalize;
 
-
    New_Line;
 
 end Neural_Net;
