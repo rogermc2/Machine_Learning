@@ -7,13 +7,15 @@ package body Fully_Connected_Layer is
 
    function Backward
      (Layer : Activation_Layer_Data; Out_Error : Real_Float_Vector)
-      return Real_Float_Vector is
+      return Real_Float_Matrix is
       use Neural_Maths;
-      Result : Real_Float_Vector (Layer.Input_Data'Range);
+      Result : Real_Float_Matrix (Layer.Input_Data'Range, Layer.Input_Data'Range (2));
    begin
-      for index in Layer.Input_Data'Range loop
-         Result (index) :=
-           D_Sigmoid (Layer.Input_Data (index)) * Out_Error (index);
+      for row in Layer.Input_Data'Range loop
+         for col in Layer.Input_Data'Range (2) loop
+            Result (row, col) :=
+              D_Sigmoid (Layer.Input_Data (row, col)) * Out_Error (row);
+         end loop;
       end loop;
 
       return Result;

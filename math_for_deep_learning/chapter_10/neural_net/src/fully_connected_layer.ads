@@ -19,7 +19,7 @@ package Fully_Connected_Layer is
 
    function Backward
      (Layer : Activation_Layer_Data; Out_Error : Real_Float_Vector)
-      return Real_Float_Vector;
+      return Real_Float_Matrix;
    function Backward
      (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
       return Real_Float_Vector;
