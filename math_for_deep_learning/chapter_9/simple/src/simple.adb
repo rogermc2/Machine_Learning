@@ -2,12 +2,12 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
-with Utilities;
+with Neural_Utilities;
 
 with Base;
 with ML_Types;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Test_Support; use Test_Support;
 
 procedure Simple is
@@ -51,7 +51,7 @@ begin
    for row in 1 ..Num_Samples loop
       Indicies (row) := row;
    end loop;
-   Utilities.Permute (Indicies);
+   Neural_Utilities.Permute (Indicies);
 
    for row in 1 .. 75 loop
       for col in X'Range (2) loop
