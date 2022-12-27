@@ -154,6 +154,33 @@ package body Neural_Utilities is
 
    --  ---------------------------------------------------------------------------
 
+   function Load_CSV_Data (File_Name : String) return Unbounded_List is
+      Data_File : File_Type;
+      Data      : Unbounded_List;
+   begin
+      Open (Data_File, In_File, File_Name);
+      Data := Load_CSV_Data (Data_File);
+      Close (Data_File);
+
+      return Data;
+
+   end Load_CSV_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_CSV_Data (Data_File : File_Type) return Unbounded_List is
+      Data : Unbounded_List;
+   begin
+      while not End_Of_File (Data_File) loop
+         Data.Append (To_Unbounded_String (Get_Line (Data_File)));
+      end loop;
+
+      return Data;
+
+   end Load_CSV_Data;
+
+   --  -------------------------------------------------------------------------
+
    function Load_Raw_CSV_Data (File_Name : String) return Raw_Data_Vector is
       Data_File : File_Type;
       Data      : Raw_Data_Vector;

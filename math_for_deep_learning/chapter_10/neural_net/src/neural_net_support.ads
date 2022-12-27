@@ -25,6 +25,9 @@ package Neural_Net_Support is
    procedure Gradient_Descent
      (Net : in out Network_Package.Map; X   : Real_Float_Matrix;
       Y   : Integer_Array; Epochs : Positive; Eta : Float);
+   function Load_Data (File_Name : String; Num_Columns : Positive)
+                       return Real_Float_Matrix;
+   function Load_Data (File_Name : String) return Real_Float_Vector;
    function Neural_Net return Network_Package.Map;
 
 end Neural_Net_Support;

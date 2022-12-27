@@ -1,10 +1,12 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Load_Dataset;
+with Neural_Utilities;
 with NL_Types;
 
 package body Neural_Net_Support is
@@ -252,6 +254,46 @@ package body Neural_Net_Support is
       end loop;
 
    end Gradient_Descent;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Data (File_Name : String; Num_Columns : Positive) return Real_Float_Matrix is
+      use  Ada.Strings.Unbounded;
+      CSV_Data  : constant ML_Types.Raw_Data_Vector :=
+                    Neural_Utilities.Load_Raw_CSV_Data (File_Name);
+      List_Row  : ML_Types.Unbounded_List;
+      Data      : ML_Arrays_And_Matrices.Real_Float_Matrix
+        (1 .. Positive (CSV_Data.Length), 1 .. Num_Columns);
+   begin
+      Put_Line ("Loading " & File_Name);
+      for row in Data'Range loop
+         List_Row := CSV_Data (row);
+         for col in Data'Range( 2) loop
+            Data (row, col) := Float'Value (To_String (List_Row (col)));
+         end loop;
+      end loop;
+
+      return Data;
+
+   end Load_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Data (File_Name : String) return Real_Float_Vector is
+      use  Ada.Strings.Unbounded;
+      CSV_Data : constant ML_Types.Unbounded_List :=
+                    Neural_Utilities.Load_CSV_Data (File_Name);
+      Data     : ML_Arrays_And_Matrices.Real_Float_Vector
+        (1 .. Positive (CSV_Data.Length));
+   begin
+      Put_Line ("Loading " & File_Name);
+      for index in CSV_Data.First_Index .. CSV_Data.Last_Index loop
+         Data (index) := Float'Value (To_String (CSV_Data (index)));
+      end loop;
+
+      return Data;
+
+   end Load_Data;
 
    --  -------------------------------------------------------------------------
 

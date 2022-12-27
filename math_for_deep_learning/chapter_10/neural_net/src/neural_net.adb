@@ -2,45 +2,33 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with ML_Types;
-with Python; use Python;
+--  with Neural_Utilities;
+--  with Python; use Python;
 
---  with Neural_Net_Support; use Neural_Net_Support;
+with Neural_Net_Support; use Neural_Net_Support;
 
 procedure Neural_Net is
+   X_Train  : constant Real_Float_Matrix :=
+                Load_Data ("../../datasets/x_train.csv", 14) / 255.0;
+   X_Test   : constant Real_Float_Matrix :=
+                Load_Data ("../../datasets/x_test.csv", 14) / 255.0;
+   Y_Train  : constant Real_Float_Matrix :=
+                Load_Data ("../../datasets/y_train.csv", 1);
+   Y_Test   : constant Real_Float_Vector :=
+                Load_Data ("../../datasets/y_test.csv");
+   --     Project_Name : constant String := "Neural_Net ";
 
---     Project_Name : constant String := "Neural_Net ";
---     Epochs       : constant Positive := 1000;
---     Eta          : constant Float := 0.1;
---     Data         : constant Dataset := Build_Dataset;
---     Net          : Network_Package.Map := Neural_Net;
---     Tn_0         : Natural;
---     Fp_0         : Natural;
---     Fn_0         : Natural;
---     Tp_0         : Natural;
---     Accuracy_0   : Float;
---     Pred_0       : ML_Types.Integer_List;
---     Tn           : Natural;
---     Fp           : Natural;
---     Fn           : Natural;
---     Tp           : Natural;
---     Accuracy     : Float;
---     Pred         : ML_Types.Integer_List;
-   Py_Module   : Module;
+   --     Py_Module   : Module;
 begin
-   Python.Initialize;
-   Py_Module := Import_File ("neural_net");
-   Python.Call (Py_Module, "load");
-   New_Line;
-   Python.Finalize;
+   --     Python.Initialize;
+   --     Py_Module := Import_File ("neural_net");
+   --     Python.Call (Py_Module, "load");
+   --     New_Line;
+   --     Python.Finalize;
 
---     Evaluate (Net, Data.X_Test, Data.Y_Test, Tn_0, Fp_0, Fn_0, Tp_0,
---               Accuracy_0, Pred_0);
---     Put_Line ("Pre-training results:");
---     Put_Line ("T0" & Integer'Image (Tn_0) & "    F1" & Integer'Image (Fp_0));
---     Put_Line ("F0" & Integer'Image (Fn_0) & "    T1" & Integer'Image (Tp_0));
---     Print_Integer_List ("Pred", Pred_0);
---     Put_Line ("Accuracy " & Float'Image (Accuracy_0));
+
    New_Line;
 
 end Neural_Net;
