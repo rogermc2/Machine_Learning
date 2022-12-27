@@ -1,10 +1,29 @@
 
 with Maths;
 
+with Neural_Maths;
+
 package body Fully_Connected_Layer is
 
+   function Backward
+     (Layer : Activation_Layer_Data; Out_Error : Real_Float_Vector)
+      return Real_Float_Vector is
+      use Neural_Maths;
+      Result : Real_Float_Vector (Layer.Input_Data'Range);
+   begin
+      for index in Layer.Input_Data'Range loop
+         Result (index) :=
+           D_Sigmoid (Layer.Input_Data (index)) * Out_Error (index);
+      end loop;
+
+      return Result;
+
+   end Backward;
+
+   --  --------------------------------------------------------------
+
    function Backward (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
-                     return Real_Float_Vector is
+                      return Real_Float_Vector is
       use Real_Float_Arrays;
       In_Error      : constant Real_Float_Vector :=
                         Out_Error * Transpose (Layer.Weights);
@@ -18,6 +37,22 @@ package body Fully_Connected_Layer is
       return In_Error;
 
    end Backward;
+
+   --  --------------------------------------------------------------
+
+   function Forward
+     (Layer : out Activation_Layer_Data; Input_Data : Real_Float_Matrix)
+      return Real_Float_Matrix is
+      Result : Real_Float_Vector (Input_Data'Range);
+   begin
+      Layer.Input_Data := Input_Data;
+      for index in Input_Data'Range loop
+         Result (index) := Neural_Maths.Sigmoid (Layer.Input_Data (index));
+      end loop;
+
+      return Result;
+
+   end Forward;
 
    --  --------------------------------------------------------------
 
@@ -42,6 +77,14 @@ package body Fully_Connected_Layer is
       end loop;
 
    end Initialize;
+
+   --  --------------------------------------------------------------
+
+   procedure Step (Layer : Activation_Layer_Data) is
+   begin
+      null;
+
+   end Step;
 
    --  --------------------------------------------------------------
 

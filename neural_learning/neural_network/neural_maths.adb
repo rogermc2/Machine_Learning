@@ -37,6 +37,15 @@ package body Neural_Maths is
 
     --  --------------------------------------------------------------------------
 
+   function D_Sigmoid (Val : Float) return Float is
+      Sig : constant Float := Sigmoid (Val);
+   begin
+      return Sig * (1.0 - Sig);
+
+   end D_Sigmoid;
+
+   --  --------------------------------------------------------------------------
+
     function Mean (A : Integer_Matrix) return Float is
         Length : constant Float := Float (A'Length * A'Length (2));
         Sum    : Integer := 0;
