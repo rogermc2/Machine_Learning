@@ -7,7 +7,7 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with Neural_Utilities;
 --  with Python; use Python;
 
-with Neural_Net_Support; use Neural_Net_Support;
+with Network; use Network;
 
 procedure Neural_Net is
    X_Train  : constant Real_Float_Matrix :=
