@@ -29,6 +29,9 @@ package Neural_Processes is
    function Forward (Layer : out Layer_Data; Input_Data : Real_Float_Matrix)
                      return Real_Float_Matrix;
    procedure Initialize (Layer : out Layer_Data);
+   function Loss (Y_True, Y_Pred : Real_Float_Vector) return Float;
+   function Loss_Deriv (Y_True, Y_Pred : Real_Float_Vector)
+                        return Real_Float_Vector;
    procedure Step (Layer : Activation_Layer_Data);
    procedure Step (Layer : in out Layer_Data; Eta : Float);
 

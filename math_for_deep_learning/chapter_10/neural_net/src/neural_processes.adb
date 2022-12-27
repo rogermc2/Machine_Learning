@@ -7,13 +7,16 @@ package body Neural_Processes is
 
    function Backward
      (Layer : Activation_Layer_Data; Out_Error : Real_Float_Vector)
-      return Real_Float_Vector is
+      return Real_Float_Matrix is
       use Neural_Maths;
-      Result : Real_Float_Vector (Layer.Input_Data'Range);
+      Result : Real_Float_Matrix
+        (Layer.Input_Data'Range, Layer.Input_Data'Range (2));
    begin
-      for index in Layer.Input_Data'Range loop
-         Result (index) :=
-           D_Sigmoid (Layer.Input_Data (index)) * Out_Error (index);
+      for row in Layer.Input_Data'Range loop
+         for col in Layer.Input_Data'Range (2) loop
+            Result (row, col) :=
+              Sigmoid_Deriv (Layer.Input_Data (row, col)) * Out_Error (row);
+         end loop;
       end loop;
 
       return Result;
@@ -43,11 +46,14 @@ package body Neural_Processes is
    function Forward
      (Layer : out Activation_Layer_Data; Input_Data : Real_Float_Matrix)
       return Real_Float_Matrix is
-      Result : Real_Float_Vector (Input_Data'Range);
+      Result : Real_Float_Matrix (Input_Data'Range, Input_Data'Range (2));
    begin
       Layer.Input_Data := Input_Data;
-      for index in Input_Data'Range loop
-         Result (index) := Neural_Maths.Sigmoid (Layer.Input_Data (index));
+      for row in Input_Data'Range loop
+         for col in Input_Data'Range (2) loop
+            Result (row, col) :=
+              Neural_Maths.Sigmoid (Layer.Input_Data (row, col));
+         end loop;
       end loop;
 
       return Result;
@@ -77,6 +83,25 @@ package body Neural_Processes is
       end loop;
 
    end Initialize;
+
+   --  --------------------------------------------------------------
+
+   function Loss (Y_True, Y_Pred : Real_Float_Vector) return Float is
+      use Real_Float_Arrays;
+   begin
+      return 0.5 * Neural_Maths.Mean ((Y_True - Y_Pred) ** 2);
+
+   end Loss;
+
+   --  ------------------------------------------------------------------------
+
+   function Loss_Deriv (Y_True, Y_Pred : Real_Float_Vector)
+                        return Real_Float_Vector is
+      use Real_Float_Arrays;
+   begin
+      return Y_True - Y_Pred;
+
+   end Loss_Deriv;
 
    --  --------------------------------------------------------------
 
