@@ -3,7 +3,25 @@ with Maths;
 
 package body Fully_Connected_Layer is
 
-   function Forward (Layer : out Layer_Data; Input_Data :  Real_Float_Matrix)
+   function Backward (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
+                     return Real_Float_Vector is
+      use Real_Float_Arrays;
+      In_Error      : constant Real_Float_Vector :=
+                        Out_Error * Transpose (Layer.Weights);
+      Weights_Error : constant Real_Float_Vector :=
+                        Transpose (Layer.Input_Data) * Out_Error;
+   begin
+      Layer.Delta_W := Layer.Delta_W + Weights_Error;
+      Layer.Bias := Layer.Bias + Out_Error;
+      Layer.Passes := Layer.Passes + 1;
+
+      return In_Error;
+
+   end Backward;
+
+   --  --------------------------------------------------------------
+
+   function Forward (Layer : out Layer_Data; Input_Data : Real_Float_Matrix)
                      return Real_Float_Matrix is
       use Real_Float_Arrays;
    begin
@@ -24,6 +42,22 @@ package body Fully_Connected_Layer is
       end loop;
 
    end Initialize;
+
+   --  --------------------------------------------------------------
+
+   procedure Step (Layer : in out Layer_Data; Eta : Float) is
+      use Real_Float_Arrays;
+   begin
+      Layer.Weights :=
+        Layer.Weights - Eta / Float (Layer.Passes) * Layer.Delta_W;
+      Layer.Bias :=
+        Layer.Bias - Eta * Layer.Delta_B / Float (Layer.Passes);
+      Layer.Delta_W :=
+        Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
+      Layer.Delta_B := Zero_Array (Layer.Delta_B'Length);
+      Layer.Passes := 0;
+
+   end Step;
 
    --  --------------------------------------------------------------
 

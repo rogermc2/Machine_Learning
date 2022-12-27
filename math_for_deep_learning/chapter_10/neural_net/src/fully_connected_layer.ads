@@ -13,8 +13,12 @@ package Fully_Connected_Layer is
       Passes     : Natural := 0;
    end record;
 
-   function Forward (Layer : out Layer_Data; Input_Data :  Real_Float_Matrix)
+   function Backward
+     (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
+      return Real_Float_Vector;
+   function Forward (Layer : out Layer_Data; Input_Data : Real_Float_Matrix)
                      return Real_Float_Matrix;
    procedure Initialize (Layer : out Layer_Data);
+   procedure Step (Layer : in out Layer_Data; Eta : Float);
 
 end Fully_Connected_Layer;
