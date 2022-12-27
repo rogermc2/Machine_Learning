@@ -45,11 +45,13 @@ package body Fully_Connected_Layer is
    function Forward
      (Layer : out Activation_Layer_Data; Input_Data : Real_Float_Matrix)
       return Real_Float_Matrix is
-      Result : Real_Float_Vector (Input_Data'Range);
+      Result : Real_Float_Matrix (Input_Data'Range, Input_Data'Range (2));
    begin
       Layer.Input_Data := Input_Data;
-      for index in Input_Data'Range loop
-         Result (index) := Neural_Maths.Sigmoid (Layer.Input_Data (index));
+      for row in Input_Data'Range loop
+         for col in Input_Data'Range (2) loop
+            Result (row, col) := Neural_Maths.Sigmoid (Layer.Input_Data (row, col));
+         end loop;
       end loop;
 
       return Result;
