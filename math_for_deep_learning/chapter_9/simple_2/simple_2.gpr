@@ -1,11 +1,12 @@
 project Simple_2 is
 
-   for Source_Dirs use ("src", "../../../datasets", "../../../neural_network", "../../../decision_tree_classifier/support", "../../../common", "../../../utils", "../../../export", "../../../model_selection", "../../../base", 
-      "../../../metrics", "../../../test", "../../../../scipy/optimise", "../../../../common");
+   for Source_Dirs use ("src", "../../../common", "../../../neural_learning/datasets", "../../../neural_learning/neural_network", "../../../scipy/optimise", "../../../common", "../../../neural_learning/test", 
+      "../../../neural_learning/model_selection", "../../../neural_learning/export", "../../../neural_learning/base", "../../../neural_learning/decision_tree_classifier/metrics", "../../../neural_learning/utils", 
+      "../../../tree_learning/decision_tree_classifier/support");
    for Object_Dir use "obj";
    for Main use ("simple_from_data");
    for Exec_Dir use ".";
-   for Languages use ("Ada", "Fortran");
+   for Languages use ("Ada");
 
    package Compiler is
       for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");

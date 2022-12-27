@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Base;
 with Load_Dataset;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Test_Support; use Test_Support;
 
