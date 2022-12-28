@@ -8,21 +8,22 @@ with Neural_Processes; use Neural_Processes;
 
 package Network is
 
-   type Node_Data (Num_Inputs, Num_Outputs : Positive) is record
-      Data : Real_Float_Matrix (1 .. Num_Inputs, 1 .. Num_Outputs);
-   end record;
+--     type Node_Data (Num_Inputs, Num_Outputs : Positive) is record
+--        Data : Real_Float_Matrix (1 .. Num_Inputs, 1 .. Num_Outputs);
+--     end record;
+--
+--     type Layer_Data  (Num_Samples, Num_Inputs, Num_Outputs : Positive) is record
+--        Node_Data : array (1 .. Num_Samples) of Node_Data (Num_Inputs, Num_Outputs);
+--     end record;
 
-   type Layer_Data  (Num_Samples, Num_Inputs, Num_Outputs : Positive) is record
-      Node_Data : array (1 .. Num_Samples) of Node_Data (Num_Inputs, Num_Outputs);
-   end record;
-
---     package Network_Layers is new Ada.Containers.Indefinite_Vectors
---       (Positive, Neural_Processes.Layer_Data);
---     subtype Network_List is Network_Layers.Vector;
+   package Network_Layers is new Ada.Containers.Indefinite_Vectors
+     (Positive, Neural_Processes.Layer_Data);
+   subtype Network_List is Network_Layers.Vector;
 
    type Network_Data (Num_Samples, Num_Inputs, Num_Outputs : Positive) is record
       Verbose : Boolean := False;
-      Layers  : Layer_Data (Num_Samples, Num_Inputs, Num_Outputs);
+      Layers  : Network_List;
+--        Layers  : Layer_Data (Num_Samples, Num_Inputs, Num_Outputs);
    end record;
 
    procedure Add (Network : in out Network_Data; Layer : Layer_Data);
