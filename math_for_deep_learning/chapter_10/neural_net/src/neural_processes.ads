@@ -9,19 +9,19 @@ package Neural_Processes is
    --        Input_Data : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size);
    --     end record;
 
-   type Layer_Data (Layer_Kind  : Layer_Type; Num_Samples : Natural;
-                    Input_Size  : Positive; Output_Size : Natural) is
+   type Layer_Data (Layer_Kind  : Layer_Type; Input_Size : Natural;
+                    Output_Size : Natural) is
       record
-         Input_Data : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size);
          case Layer_Kind is
          when Activation_Layer => null;
          when Hidden_Layer =>
-            Weights    : Real_Float_Matrix (1 .. Input_Size, 1 .. Output_Size);
-            Bias       : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size);
-            Delta_W    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size) :=
-                           (others => (others => 0.0));
-            Delta_B    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size) :=
-                           (others => (others => 0.0));
+            Data : Real_Float_Matrix (1 .. Input_Size, 1 .. Output_Size);
+--              Weights    : Real_Float_Matrix (1 .. Input_Size, 1 .. Output_Size);
+--              Bias       : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size);
+--              Delta_W    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size) :=
+--                             (others => (others => 0.0));
+--              Delta_B    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size) :=
+--                             (others => (others => 0.0));
             Passes     : Natural := 0;
          end case;
       end record;

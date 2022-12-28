@@ -19,11 +19,15 @@ procedure Neural_Net is
                 Load_Data ("../../datasets/y_train.csv", 1);
    Y_Test   : constant Real_Float_Vector :=
                 Load_Data ("../../datasets/y_test.csv");
-   Layer   : Layer_Data;
-   Net     : Network_List;
+   Net     : Network_Data;
    --     Py_Module   : Module;
 begin
-   Add_Fully_Connected_Layer (Net, Layer);
+   Add_Fully_Connected_Layer (Net.Layers, 14 * 14, 100);
+   Add_Activation_Layer (Net.Layers);
+   Add_Fully_Connected_Layer (Net.Layers, 100, 50);
+   Add_Activation_Layer (Net.Layers);
+   Add_Fully_Connected_Layer (Net.Layers, 50, 10);
+   Add_Activation_Layer (Net.Layers);
    --     Python.Initialize;
    --     Py_Module := Import_File ("neural_net");
    --     Python.Call (Py_Module, "load");

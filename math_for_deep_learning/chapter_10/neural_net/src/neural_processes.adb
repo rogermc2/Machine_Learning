@@ -14,13 +14,12 @@ package body Neural_Processes is
      (Layer : Layer_Data; Out_Error : Real_Float_Matrix)
       return Real_Float_Matrix is
       use Neural_Maths;
-      Result : Real_Float_Matrix
-        (Layer.Input_Data'Range, Layer.Input_Data'Range (2));
+      Result : Real_Float_Matrix (Layer.Data'Range, Layer.Data'Range (2));
    begin
-      for row in Layer.Input_Data'Range loop
-         for col in Layer.Input_Data'Range (2) loop
+      for row in Layer.Data'Range loop
+         for col in Layer.Data'Range (2) loop
             Result (row, col) :=
-              Sigmoid_Deriv (Layer.Input_Data (row, col)) * Out_Error (row, col);
+              Sigmoid_Deriv (Layer.Data (row, col)) * Out_Error (row, col);
          end loop;
       end loop;
 
@@ -52,7 +51,7 @@ package body Neural_Processes is
                      return Real_Float_Matrix is
       use Real_Float_Arrays;
    begin
-      Layer.Input_Data := Input_Data;
+      Layer.Data := Input_Data;
       return Input_Data * Layer.Weights + Layer.Bias;
 
    end Forward;

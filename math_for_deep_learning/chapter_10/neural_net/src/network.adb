@@ -7,24 +7,22 @@ package body Network is
 
    --     Num_Samples : Positive;
 
-   procedure Add_Fully_Connected_Layer
-     (Network     : in out Network_Data; Num_Samples, Input_Size,
-      Output_Size : Positive) is
-      Layer : Layer_Data (Hidden_Layer, Num_Samples, Input_Size, Output_Size);
+   procedure Add_Activation_Layer (Network : in out Network_List) is
+      Layer : Layer_Data (Activation_Layer, 0, 0);
    begin
-      Network.Layers.Append (Layer);
+      Network.Append (Layer);
 
-   end Add_Fully_Connected_Layer;
+   end Add_Activation_Layer;
 
    --  -------------------------------------------------------------------------
 
-   procedure Add_Activation_Layer (Network    : in out Network_Data;
-                                   Input_Size : Positive) is
-      Layer : Layer_Data (Activation_Layer, 0, Input_Size, 0);
+   procedure Add_Fully_Connected_Layer
+     (Network : in out Network_List; Input_Size, Output_Size : Positive) is
+      Layer : Layer_Data (Hidden_Layer, Input_Size, Output_Size);
    begin
-      Network.Layers.Append (Layer);
+      Network.Append (Layer);
 
-   end Add_Activation_Layer;
+   end Add_Fully_Connected_Layer;
 
    --  -------------------------------------------------------------------------
 
