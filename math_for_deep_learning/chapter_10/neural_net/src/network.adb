@@ -1,6 +1,8 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Maths;
+
 with Shuffler;
 
 package body Network is
@@ -19,7 +21,18 @@ package body Network is
    procedure Add_Fully_Connected_Layer
      (Network : in out Network_List; Input_Size, Output_Size : Positive) is
       Layer : Layer_Data (Hidden_Layer, Input_Size, Output_Size);
+      use Maths;
    begin
+      for row in Layer.Weights'Range loop
+         for col in Layer.Weights'Range (2) loop
+            Layer.Weights (row, col) := 0.5 * Random_Float;
+         end loop;
+      end loop;
+
+      for col in Layer.Bias'Range (2) loop
+         Layer.Bias (1, col) := 0.5 * Random_Float;
+      end loop;
+
       Network.Append (Layer);
 
    end Add_Fully_Connected_Layer;

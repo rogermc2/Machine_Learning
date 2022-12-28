@@ -16,12 +16,12 @@ package Neural_Processes is
          when Activation_Layer => null;
          when Hidden_Layer =>
             Data : Real_Float_Matrix (1 .. Input_Size, 1 .. Output_Size);
---              Weights    : Real_Float_Matrix (1 .. Input_Size, 1 .. Output_Size);
---              Bias       : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size);
---              Delta_W    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size) :=
---                             (others => (others => 0.0));
---              Delta_B    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size) :=
---                             (others => (others => 0.0));
+            Weights    : Real_Float_Matrix (1 .. Input_Size, 1 .. Output_Size);
+            Bias       : Real_Float_Matrix (1 .. 1, 1 .. Output_Size);
+            Delta_W    : Real_Float_Matrix (1 .. Input_Size, 1 .. Output_Size) :=
+                           (others => (others => 0.0));
+            Delta_B    : Real_Float_Matrix (1 .. 1, 1 .. Output_Size) :=
+                           (others => (others => 0.0));
             Passes     : Natural := 0;
          end case;
       end record;

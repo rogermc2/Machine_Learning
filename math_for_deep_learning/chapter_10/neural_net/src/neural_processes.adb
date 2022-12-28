@@ -29,13 +29,14 @@ package body Neural_Processes is
 
    --  --------------------------------------------------------------
 
-   function Backward (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
-                      return Real_Float_Vector is
+   function Backward
+     (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
+      return Real_Float_Vector is
       use Real_Float_Arrays;
       In_Error      : constant Real_Float_Vector :=
-        Out_Error * Transpose (Layer.Weights);
+                        Out_Error * Transpose (Layer.Weights);
       Weights_Error : constant Real_Float_Vector :=
-        Transpose (Layer.Input_Data) * Out_Error;
+                        Transpose (Layer.Data) * Out_Error;
    begin
       Layer.Delta_W := Layer.Delta_W + Weights_Error;
       Layer.Bias := Layer.Bias + Out_Error;
@@ -47,8 +48,9 @@ package body Neural_Processes is
 
    --  --------------------------------------------------------------
 
-   function Forward (Layer : out Layer_Data; Input_Data : Real_Float_Matrix)
-                     return Real_Float_Matrix is
+   function Forward
+     (Layer : out Layer_Data; Input_Data : Real_Float_Matrix)
+      return Real_Float_Matrix is
       use Real_Float_Arrays;
    begin
       Layer.Data := Input_Data;
@@ -75,7 +77,7 @@ package body Neural_Processes is
                        return Real_Float_Matrix is
       use Ada.Strings.Unbounded;
       CSV_Data  : constant ML_Types.Raw_Data_Vector :=
-        Neural_Utilities.Load_Raw_CSV_Data (File_Name);
+                    Neural_Utilities.Load_Raw_CSV_Data (File_Name);
       List_Row  : ML_Types.Unbounded_List;
       Data      : ML_Arrays_And_Matrices.Real_Float_Matrix
         (1 .. Positive (CSV_Data.Length), 1 .. Num_Columns);
@@ -97,7 +99,7 @@ package body Neural_Processes is
    function Load_Data (File_Name : String) return Real_Float_Vector is
       use  Ada.Strings.Unbounded;
       CSV_Data : constant ML_Types.Unbounded_List :=
-        Neural_Utilities.Load_CSV_Data (File_Name);
+                   Neural_Utilities.Load_CSV_Data (File_Name);
       Data     : ML_Arrays_And_Matrices.Real_Float_Vector
         (1 .. Positive (CSV_Data.Length));
    begin
@@ -149,7 +151,7 @@ package body Neural_Processes is
         Layer.Bias - Eta_Av * Layer.Delta_B;
       Layer.Delta_W :=
         Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
-      Layer.Delta_B := Zero_Matrix (Layer.Num_Samples,Layer.Delta_B'Length);
+      Layer.Delta_B := Zero_Matrix (Layer.Delta_B'Length, Layer.Delta_B'Length (2));
       Layer.Passes := 0;
 
    end Step;
