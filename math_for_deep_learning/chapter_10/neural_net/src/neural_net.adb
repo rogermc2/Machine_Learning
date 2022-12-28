@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with ML_Types;
---  with Neural_Utilities;
+with Neural_Processes; use Neural_Processes;
 --  with Python; use Python;
 
 with Network; use Network;

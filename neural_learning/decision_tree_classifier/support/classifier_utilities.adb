@@ -328,6 +328,7 @@ package body Classifier_Utilities is
       Close (Data_File);
 
       Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
+
       return Output_Data;
 
    end Load_Data;
