@@ -6,7 +6,7 @@ with Neural_Maths;
 package body Neural_Processes is
 
    function Backward
-     (Layer : Activation_Layer_Data; Out_Error : Real_Float_Vector)
+     (Layer : Activation_Layer_Data; Out_Error : Real_Float_Matrix)
       return Real_Float_Matrix is
       use Neural_Maths;
       Result : Real_Float_Matrix
@@ -15,7 +15,7 @@ package body Neural_Processes is
       for row in Layer.Input_Data'Range loop
          for col in Layer.Input_Data'Range (2) loop
             Result (row, col) :=
-              Sigmoid_Deriv (Layer.Input_Data (row, col)) * Out_Error (row);
+              Sigmoid_Deriv (Layer.Input_Data (row, col)) * Out_Error (row, col);
          end loop;
       end loop;
 
@@ -78,15 +78,15 @@ package body Neural_Processes is
       for row in Layer.Weights'Range loop
          for col in Layer.Weights'Range (2) loop
             Layer.Weights (row, col) := 0.5 * Maths.Random_Float;
+            Layer.Bias (row, col) := 0.5 * Maths.Random_Float;
          end loop;
-         Layer.Bias (row) := 0.5 * Maths.Random_Float;
       end loop;
 
    end Initialize;
 
    --  --------------------------------------------------------------
 
-   function Loss (Y_True, Y_Pred : Real_Float_Vector) return Float is
+   function Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float is
       use Real_Float_Arrays;
    begin
       return 0.5 * Neural_Maths.Mean ((Y_True - Y_Pred) ** 2);
@@ -95,8 +95,8 @@ package body Neural_Processes is
 
    --  ------------------------------------------------------------------------
 
-   function Loss_Deriv (Y_True, Y_Pred : Real_Float_Vector)
-                        return Real_Float_Vector is
+   function Loss_Deriv (Y_True, Y_Pred : Real_Float_Matrix)
+                        return Real_Float_Matrix is
       use Real_Float_Arrays;
    begin
       return Y_True - Y_Pred;
@@ -115,14 +115,15 @@ package body Neural_Processes is
 
    procedure Step (Layer : in out Layer_Data; Eta : Float) is
       use Real_Float_Arrays;
+      Eta_Av : constant Float := Eta / Float (Layer.Passes);
    begin
       Layer.Weights :=
-        Layer.Weights - Eta / Float (Layer.Passes) * Layer.Delta_W;
+        Layer.Weights - Eta_Av * Layer.Delta_W;
       Layer.Bias :=
-        Layer.Bias - Eta * Layer.Delta_B / Float (Layer.Passes);
+        Layer.Bias - Eta_Av * Layer.Delta_B;
       Layer.Delta_W :=
         Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
-      Layer.Delta_B := Zero_Array (Layer.Delta_B'Length);
+      Layer.Delta_B := Zero_Matrix (Layer.Num_Samples,Layer.Delta_B'Length);
       Layer.Passes := 0;
 
    end Step;
