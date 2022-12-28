@@ -11,7 +11,7 @@ with Neural_Utilities;
 package body Neural_Processes is
 
    function Backward
-     (Layer : Activation_Layer_Data; Out_Error : Real_Float_Matrix)
+     (Layer : Layer_Data; Out_Error : Real_Float_Matrix)
       return Real_Float_Matrix is
       use Neural_Maths;
       Result : Real_Float_Matrix
@@ -45,25 +45,6 @@ package body Neural_Processes is
       return In_Error;
 
    end Backward;
-
-   --  --------------------------------------------------------------
-
-   function Forward
-     (Layer : out Activation_Layer_Data; Input_Data : Real_Float_Matrix)
-      return Real_Float_Matrix is
-      Result : Real_Float_Matrix (Input_Data'Range, Input_Data'Range (2));
-   begin
-      Layer.Input_Data := Input_Data;
-      for row in Input_Data'Range loop
-         for col in Input_Data'Range (2) loop
-            Result (row, col) :=
-              Neural_Maths.Sigmoid (Layer.Input_Data (row, col));
-         end loop;
-      end loop;
-
-      return Result;
-
-   end Forward;
 
    --  --------------------------------------------------------------
 
@@ -151,7 +132,7 @@ package body Neural_Processes is
 
    --  --------------------------------------------------------------
 
-   procedure Step (Layer : Activation_Layer_Data) is
+   procedure Step (Layer : Layer_Data) is
    begin
       null;
 

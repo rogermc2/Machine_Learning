@@ -1,11 +1,11 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Shuffler;
 
 package body Network is
 
---     Num_Samples : Positive;
+   --     Num_Samples : Positive;
 
    procedure Add (Network : in out Network_Data; Layer : Layer_Data) is
    begin
@@ -56,6 +56,18 @@ package body Network is
            Network.Layers.Last_Index loop
             Back_Error := Backward (Network.Layers (layer), Back_Error);
          end loop;
+
+         --  update weights and biases
+         for layer in Network.Layers.First_Index ..
+           Network.Layers.Last_Index loop
+            Step (Network.Layers (layer), Learning_Rate);
+         end loop;
+
+         --  report mean loss over minibatch
+         if Network.Verbose and then count mod 10 = 0 then
+            Put_Line ("Minibatch" & Integer'Image (count) &
+                     " error: " & Float'Image (Error));
+         end if;
       end loop;
 
    end Fit;
@@ -79,10 +91,10 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
---     procedure Set_Num_Samples (Number : Positive) is
---     begin
---        Num_Samples := Number;
---     end Set_Num_Samples;
+   --     procedure Set_Num_Samples (Number : Positive) is
+   --     begin
+   --        Num_Samples := Number;
+   --     end Set_Num_Samples;
 
    --  -------------------------------------------------------------------------
 
