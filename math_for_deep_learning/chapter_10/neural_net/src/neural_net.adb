@@ -24,7 +24,7 @@ procedure Neural_Net is
    Minibatches   : constant Positive := 40000;
    Learning_Rate : constant Float := 1.0;
    Net           : Network_Data;
-   Predictions   : Real_Matrix_List;
+   Predictions   : Real_Vector_List;
    Confusion     : Integer_Matrix (1 .. 10, 1 .. 10) :=
    (others => (others => 0));
    --     Py_Module   : Module;
@@ -43,7 +43,7 @@ begin
    Fit (Net, X_Train, Y_Train, Minibatches, Learning_Rate);
 
    --  Build the confusion matrix using the test set predictions
---     Predictions := Predict (Net, X_Test);
+   Predictions := Predict (Net, X_Test);
 --     for index in Y_Test'Range loop
 --        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) :=
 --        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) + 1 ;

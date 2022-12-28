@@ -55,7 +55,7 @@ package body Neural_Processes is
    --  --------------------------------------------------------------
 
    function Forward
-     (Layer : out Layer_Data; Input_Data : Real_Float_Vector)
+     (Layer : in out Layer_Data; Input_Data : Real_Float_Vector)
       return Real_Float_Vector is
       use Real_Float_Arrays;
 

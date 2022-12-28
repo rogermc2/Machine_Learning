@@ -33,7 +33,7 @@ package Neural_Processes is
    function Backward
      (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
       return Real_Float_Vector;
-   function Forward (Layer : out Layer_Data; Input_Data : Real_Float_Vector)
+   function Forward (Layer : in out Layer_Data; Input_Data : Real_Float_Vector)
                      return Real_Float_Vector;
    procedure Initialize (Layer : out Layer_Data);
    function Load_Data (File_Name : String; Num_Columns : Positive)

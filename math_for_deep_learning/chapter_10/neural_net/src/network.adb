@@ -45,7 +45,7 @@ package body Network is
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Network.Fit ";
+--        Routine_Name : constant String := "Network.Fit ";
       X_Batch     : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch     : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
       Output_Data : Real_Float_Vector (X_Batch'Range (2));
