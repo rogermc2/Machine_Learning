@@ -10,22 +10,23 @@ with Neural_Utilities;
 
 package body Neural_Processes is
 
-   function Backward
-     (Layer : Layer_Data; Out_Error : Real_Float_Matrix)
-      return Real_Float_Matrix is
-      use Neural_Maths;
-      Result : Real_Float_Matrix (Layer.Data'Range, Layer.Data'Range (2));
-   begin
-      for row in Layer.Data'Range loop
-         for col in Layer.Data'Range (2) loop
-            Result (row, col) :=
-              Sigmoid_Deriv (Layer.Data (row, col)) * Out_Error (row, col);
-         end loop;
-      end loop;
+--     function Backward
+--       (Layer : Layer_Data; Out_Error : Real_Float_Matrix)
+--        return Real_Float_Matrix is
+--        use Neural_Maths;
+--        Result : Real_Float_Matrix (Layer.Input_Data'Range,
+--                                    Layer.Input_Data'Range (2));
+--     begin
+--        for row in Layer.Input_Data'Range loop
+--           for col in Layer.Input_Data'Range (2) loop
+--              Result (row, col) :=
+--                Sigmoid_Deriv (Layer.Input_Data (row, col)) * Out_Error (row, col);
+--           end loop;
+--        end loop;
+--
+--        return Result;
 
-      return Result;
-
-   end Backward;
+--     end Backward;
 
    --  --------------------------------------------------------------
 
@@ -35,9 +36,14 @@ package body Neural_Processes is
       use Real_Float_Arrays;
       In_Error      : constant Real_Float_Vector :=
                         Out_Error * Transpose (Layer.Weights);
-      Weights_Error : constant Real_Float_Vector :=
-                        Transpose (Layer.Data) * Out_Error;
+      In_Data       : Real_Float_Matrix (1 .. 1, Layer.Input_Data'Range);
+      Weights_Error : Real_Float_Vector (Layer.Input_Data'Range);
    begin
+      for index in Layer.Input_Data'Range loop
+         In_Data (1, index) := Layer.Input_Data (index);
+      end loop;
+
+      Weights_Error := Transpose (In_Data) * Out_Error;
       Layer.Delta_W := Layer.Delta_W + Weights_Error;
       Layer.Bias := Layer.Bias + Out_Error;
       Layer.Passes := Layer.Passes + 1;
@@ -49,11 +55,12 @@ package body Neural_Processes is
    --  --------------------------------------------------------------
 
    function Forward
-     (Layer : out Layer_Data; Input_Data : Real_Float_Matrix)
-      return Real_Float_Matrix is
+     (Layer : out Layer_Data; Input_Data : Real_Float_Vector)
+      return Real_Float_Vector is
       use Real_Float_Arrays;
+
    begin
-      Layer.Data := Input_Data;
+      Layer.Input_Data := Input_Data;
       return Input_Data * Layer.Weights + Layer.Bias;
 
    end Forward;
@@ -65,8 +72,8 @@ package body Neural_Processes is
       for row in Layer.Weights'Range loop
          for col in Layer.Weights'Range (2) loop
             Layer.Weights (row, col) := 0.5 * Maths.Random_Float;
-            Layer.Bias (row, col) := 0.5 * Maths.Random_Float;
          end loop;
+         Layer.Bias (row) := 0.5 * Maths.Random_Float;
       end loop;
 
    end Initialize;
@@ -114,7 +121,7 @@ package body Neural_Processes is
 
    --  -------------------------------------------------------------------------
 
-   function Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float is
+   function Loss (Y_True, Y_Pred : Real_Float_Vector) return Float is
       use Real_Float_Arrays;
    begin
       return 0.5 * Neural_Maths.Mean ((Y_True - Y_Pred) ** 2);
@@ -123,8 +130,8 @@ package body Neural_Processes is
 
    --  ------------------------------------------------------------------------
 
-   function Loss_Deriv (Y_True, Y_Pred : Real_Float_Matrix)
-                        return Real_Float_Matrix is
+   function Loss_Deriv (Y_True, Y_Pred : Real_Float_Vector)
+                        return Real_Float_Vector is
       use Real_Float_Arrays;
    begin
       return Y_True - Y_Pred;
@@ -151,7 +158,8 @@ package body Neural_Processes is
         Layer.Bias - Eta_Av * Layer.Delta_B;
       Layer.Delta_W :=
         Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
-      Layer.Delta_B := Zero_Matrix (Layer.Delta_B'Length, Layer.Delta_B'Length (2));
+      Layer.Delta_B :=
+        Zero_Array (Layer.Delta_B'Length);
       Layer.Passes := 0;
 
    end Step;

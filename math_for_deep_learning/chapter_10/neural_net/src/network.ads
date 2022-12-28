@@ -35,7 +35,7 @@ package Network is
       Learning_Rate : Float; Batch_Size : Positive := 64);
    function Predict (Network    : in out Network_Data;
                      Input_Data : Real_Float_Matrix)
-                     return Real_Matrix_List;
+                     return Real_Vector_List;
    --     procedure Set_Num_Samples (Number : Positive);
 
 end Network;
