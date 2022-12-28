@@ -5,21 +5,26 @@ package Neural_Processes is
 
    type Layer_Type is (Activation_Layer, Hidden_Layer);
 
---     type Activation_Layer_Data (Num_Samples, Input_Size : Positive) is record
---        Input_Data : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size);
---     end record;
+   --     type Activation_Layer_Data (Num_Samples, Input_Size : Positive) is record
+   --        Input_Data : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size);
+   --     end record;
 
-   type Layer_Data (Num_Samples, Input_Size, Output_Size : Positive) is record
-      Layer_Kind : Layer_Type := Hidden_Layer;
-      Weights    : Real_Float_Matrix (1 .. Input_Size, 1 .. Output_Size);
-      Bias       : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size);
-      Delta_W    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size) :=
-                     (others => (others => 0.0));
-      Delta_B    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size) :=
-                     (others => (others => 0.0));
-      Input_Data : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size);
-      Passes     : Natural := 0;
-   end record;
+   type Layer_Data (Layer_Kind  : Layer_Type; Num_Samples : Natural;
+                    Input_Size  : Positive; Output_Size : Natural) is
+      record
+         Input_Data : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size);
+         case Layer_Kind is
+         when Activation_Layer => null;
+         when Hidden_Layer =>
+            Weights    : Real_Float_Matrix (1 .. Input_Size, 1 .. Output_Size);
+            Bias       : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size);
+            Delta_W    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Input_Size) :=
+                           (others => (others => 0.0));
+            Delta_B    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Output_Size) :=
+                           (others => (others => 0.0));
+            Passes     : Natural := 0;
+         end case;
+      end record;
 
    function Backward
      (Layer : Layer_Data; Out_Error : Real_Float_Matrix)

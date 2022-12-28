@@ -7,10 +7,24 @@ package body Network is
 
    --     Num_Samples : Positive;
 
-   procedure Add (Network : in out Network_Data; Layer : Layer_Data) is
+   procedure Add_Fully_Connected_Layer
+     (Network     : in out Network_Data; Num_Samples, Input_Size,
+      Output_Size : Positive) is
+      Layer : Layer_Data (Hidden_Layer, Num_Samples, Input_Size, Output_Size);
    begin
       Network.Layers.Append (Layer);
-   end Add;
+
+   end Add_Fully_Connected_Layer;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Add_Activation_Layer (Network    : in out Network_Data;
+                                   Input_Size : Positive) is
+      Layer : Layer_Data (Activation_Layer, 0, Input_Size, 0);
+   begin
+      Network.Layers.Append (Layer);
+
+   end Add_Activation_Layer;
 
    --  -------------------------------------------------------------------------
 
@@ -66,7 +80,7 @@ package body Network is
          --  report mean loss over minibatch
          if Network.Verbose and then count mod 10 = 0 then
             Put_Line ("Minibatch" & Integer'Image (count) &
-                     " error: " & Float'Image (Error));
+                        " error: " & Float'Image (Error));
          end if;
       end loop;
 

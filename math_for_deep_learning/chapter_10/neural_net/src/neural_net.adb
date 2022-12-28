@@ -10,6 +10,7 @@ with Neural_Processes; use Neural_Processes;
 with Network; use Network;
 
 procedure Neural_Net is
+   --     Project_Name : constant String := "Neural_Net ";
    X_Train  : constant Real_Float_Matrix :=
                 Load_Data ("../../datasets/x_train.csv", 14) / 255.0;
    X_Test   : constant Real_Float_Matrix :=
@@ -18,10 +19,11 @@ procedure Neural_Net is
                 Load_Data ("../../datasets/y_train.csv", 1);
    Y_Test   : constant Real_Float_Vector :=
                 Load_Data ("../../datasets/y_test.csv");
-   --     Project_Name : constant String := "Neural_Net ";
-
+   Layer   : Layer_Data;
+   Net     : Network_List;
    --     Py_Module   : Module;
 begin
+   Add_Fully_Connected_Layer (Net, Layer);
    --     Python.Initialize;
    --     Py_Module := Import_File ("neural_net");
    --     Python.Call (Py_Module, "load");
