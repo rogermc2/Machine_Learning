@@ -49,11 +49,10 @@ package body Network is
       Routine_Name : constant String := "Network.Fit ";
       X_Batch     : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch     : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
---        Output_Data : Real_Float_Vector (X_Batch'Range (2));
       Output_Data : Real_Float_List;
       Y_Vector    : Real_Float_Vector (Y_Batch'Range (2));
       Error       : Float;
-      Back_Error  : Real_Float_Vector (X_Batch'Range (2));
+      Back_Error  : Real_Float_Vector (Y_Vector'Range);
    begin
       for count in 1 .. Minibatches loop
          Put_Line (Routine_Name & "Minibatch" & Integer'Image (count));
@@ -102,6 +101,7 @@ package body Network is
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
+               Put_Line (Routine_Name & "backward layer" & Integer'Image (layer));
                Back_Error := Backward (Network.Layers (layer), Back_Error);
             end loop;
          end loop;
