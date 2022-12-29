@@ -71,8 +71,8 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Input_Data : Real_Float_List)
       return Real_Float_List is
       use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Neural_Processes.Forward ";
-      Out_Data : Real_Float_List;
+      Routine_Name : constant String := "Neural_Processes.Forward ";
+      Out_Data     : Real_Float_List;
    begin
       --        Assert (Integer (Input_Data.Length) = Layer.Input_Data'Length,
       --                Routine_Name & "Input_Data Length" &
@@ -80,17 +80,23 @@ package body Neural_Processes is
       --                  " is different to Layer Input_Data Length" &
       --                    Integer'Image (Layer.Input_Data'Length));
       Layer.Input_Data := Input_Data;
+      Put_Line (Routine_Name & "Layer.Weights Size" &
+                  Integer'Image (Integer (Layer.Weights.Length)) & " x" &
+                  Integer'Image (Integer (Layer.Weights (1).Length)));
       declare
          New_Data : constant Real_Float_Vector :=
                       To_Real_Float_Vector (Layer.Input_Data) *
                       To_Real_Float_Matrix (Layer.Weights) +
                       To_Real_Float_Vector (Layer.Bias);
       begin
+         Put_Line (Routine_Name & "New_Data Length" &
+                     Integer'Image (Integer (New_Data'Length)));
          for index in New_Data'Range loop
             Out_Data.Append (New_Data (index));
          end loop;
       end;
 
+      Put_Line (Routine_Name & "done.");
       return Out_Data;
 
    end Forward;
@@ -186,7 +192,7 @@ package body Neural_Processes is
    --  --------------------------------------------------------------
 
    procedure Step (Layer : in out Layer_Data; Eta : Float) is
---        use Real_Float_Arrays;
+      --        use Real_Float_Arrays;
       Eta_Av      : constant Float := Eta / Float (Layer.Passes);
       Row_List    : Real_Float_List;
       Delta_W_Row : Real_Float_List;
@@ -203,11 +209,11 @@ package body Neural_Processes is
          --        Layer.Weights :=
          --          Layer.Weights - Eta_Av * Layer.Delta_W;
          --        Layer.Bias :=
---           --          Layer.Bias - Eta_Av * Layer.Delta_B;
---           Layer.Delta_W :=
---             Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
---           Layer.Delta_B :=
---             Zero_Array (Layer.Delta_B'Length);
+         --           --          Layer.Bias - Eta_Av * Layer.Delta_B;
+         --           Layer.Delta_W :=
+         --             Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
+         --           Layer.Delta_B :=
+         --             Zero_Array (Layer.Delta_B'Length);
       end loop;
       Layer.Delta_W.Clear;
       Layer.Delta_B.Clear;
