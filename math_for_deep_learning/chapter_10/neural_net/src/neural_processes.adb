@@ -38,9 +38,9 @@ package body Neural_Processes is
       return Real_Float_Vector is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Backward ";
-      Input_Length  : constant Positive := Integer (Layer.Input_Data.Length);
-      In_Error      : Real_Float_Vector (Out_Error'Range);
-      In_Data       : Real_Float_Matrix (1 .. 1, 1 .. Input_Length);
+      Input_Length : constant Positive := Layer.Input_Data'Length;
+      In_Error     : Real_Float_Vector (Out_Error'Range);
+      In_Data      : Real_Float_Matrix (1 .. 1, 1 .. Input_Length);
    begin
       for index in 1 .. Input_Length loop
          In_Data (1, index) := Layer.Input_Data (index);
@@ -50,22 +50,21 @@ package body Neural_Processes is
                   Layer_Type'Image (Layer.Layer_Kind));
       Put_Line (Routine_Name & "Out_Error Size" &
                   Integer'Image (Out_Error'Length));
-      Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
+      Put_Line (Routine_Name & "Layer.Input_Data" &
+                  Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             Weights_Error : constant Real_Float_Vector :=
                               Transpose (In_Data) * Out_Error;
-            Row_Data      : Real_Float_List;
          begin
             Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
             In_Error := Out_Error *
-                          Transpose (To_Real_Float_Matrix (Layer.Weights));
-            for row in 1 .. Integer (Layer.Delta_W.Length) loop
-               Row_Data := Layer.Delta_W (row);
-               for col in 1 .. Integer (Layer.Delta_W.Length) loop
-                  Row_Data (col) := Row_Data (col) + Weights_Error (col);
+              Transpose (Layer.Weights);
+            for row in Layer.Delta_W'Range loop
+               for col in Layer.Delta_W'Range (2) loop
+                  Layer.Delta_W (row,col) := Layer.Delta_W (row,col) +
+                    Weights_Error (col);
                end loop;
-               Layer.Delta_W (row) := Row_Data;
                Layer.Bias (row) := Layer.Bias (row) + Out_Error (row);
             end loop;
 
@@ -82,33 +81,32 @@ package body Neural_Processes is
    --  --------------------------------------------------------------
 
    function Forward
-     (Layer : in out Layer_Data; Input_Data : Real_Float_List)
-      return Real_Float_List is
+     (Layer : in out Layer_Data; Input_Data : Real_Float_Vector)
+      return Real_Float_Vector is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Forward ";
-      Out_Data     : Real_Float_List;
+      Out_Data     : Real_Float_Vector (Layer.Bias'Range);
    begin
       Layer.Input_Data := Input_Data;
       Put_Line (Routine_Name & "Layer Kind: " &
                   Layer_Type'Image (Layer.Layer_Kind));
       Put_Line (Routine_Name & "Layer Input_Data Size" &
-                  Integer'Image (Integer (Layer.Input_Data.Length)));
+                  Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
-         Put_Line (Routine_Name & "Layer.Weights Size" &
-                     Integer'Image (Integer (Layer.Weights.Length)) & " x" &
-                     Integer'Image (Integer (Layer.Weights (1).Length)));
-         declare
-            New_Data : constant Real_Float_Vector :=
-                         To_Real_Float_Vector (Layer.Input_Data) *
-                         To_Real_Float_Matrix (Layer.Weights) +
-                         To_Real_Float_Vector (Layer.Bias);
-         begin
-            Put_Line (Routine_Name & "New_Data Length" &
-                        Integer'Image (Integer (New_Data'Length)));
-            for index in New_Data'Range loop
-               Out_Data.Append (New_Data (index));
-            end loop;
-         end;
+         Print_Matrix_Dimensions
+           (Routine_Name & "Layer.Weights", Layer.Weights);
+         Out_Data := Layer.Input_Data * Layer.Weights + Layer.Bias;
+         --           declare
+         --              New_Data : constant Real_Float_Matrix :=
+         --                           Layer.Input_Data * Layer.Weights + Layer.Bias;
+         --           begin
+         --              Put_Line (Routine_Name & "New_Data Length" &
+         --                          Integer'Image (Integer (New_Data'Length)));
+         --              Out_Data := New_Data;
+         --              for index in New_Data'Range loop
+         --                 Out_Data.Append (New_Data (index));
+         --              end loop;
+         --           end;
 
       else  --  Activation_Layer
          Out_Data := Input_Data;
@@ -122,16 +120,12 @@ package body Neural_Processes is
 
    procedure Initialize
      (Layer : out Layer_Data; Input_Size, Output_Size : Positive) is
-      Row_List : Real_Float_List;
    begin
-      Layer.Weights.Clear;
-      Layer.Bias.Clear;
       for row in 1 .. Input_Size loop
          for col in 1 .. Output_Size loop
-            Row_List.Append (0.5 * Maths.Random_Float);
+            Layer.Weights (row, col) := 0.5 * Maths.Random_Float;
          end loop;
-         Layer.Weights.Append (Row_List);
-         Layer.Bias.Append (0.5 * Maths.Random_Float);
+         Layer.Bias (row) := 0.5 * Maths.Random_Float;
       end loop;
 
    end Initialize;
@@ -179,23 +173,21 @@ package body Neural_Processes is
 
    --  -------------------------------------------------------------------------
 
-   function Loss (Y_True : Real_Float_Vector; Y_Pred : Real_Float_List)
-                  return Float is
+   function Loss (Y_True, Y_Pred : Real_Float_Vector) return Float is
       use Real_Float_Arrays;
    begin
-      return 0.5 * Neural_Maths.Mean
-        ((Y_True - To_Real_Float_Vector (Y_Pred)) ** 2);
+      return 0.5 * Neural_Maths.Mean ((Y_True - Y_Pred) ** 2);
 
    end Loss;
 
    --  ------------------------------------------------------------------------
 
-   function Loss_Deriv (Y_True : Real_Float_Vector; Y_Pred : Real_Float_List)
+   function Loss_Deriv (Y_True, Y_Pred : Real_Float_Vector)
                         return Real_Float_Vector is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Neural_Processes.Loss_Deriv ";
    begin
-      return Y_True - To_Real_Float_Vector (Y_Pred);
+      return Y_True - Y_Pred;
 
    end Loss_Deriv;
 
@@ -212,29 +204,21 @@ package body Neural_Processes is
    procedure Step (Layer : in out Layer_Data; Eta : Float) is
       --        use Real_Float_Arrays;
       Eta_Av      : constant Float := Eta / Float (Layer.Passes);
-      Row_List    : Real_Float_List;
-      Delta_W_Row : Real_Float_List;
    begin
-      for row in 1 .. Integer (Layer.Weights.Length) loop
-         Row_List := Layer.Weights (row);
-         Delta_W_Row := Layer.Delta_W (row);
-         for col in 1 .. Integer (Row_List.Length) loop
-            Row_List (col) := Row_List (col)  - Eta_Av * Delta_W_Row (col);
+      for row in Layer.Weights'Range loop
+         for col in Layer.Weights'Range (2) loop
+            Layer.Weights (row, col) :=
+              Layer.Weights (row, col) - Eta_Av * Layer.Delta_W (row, col);
          end loop;
-         Layer.Weights (row) := Row_List;
+
          Layer.Bias (row) :=
            Layer.Bias (row) - Eta_Av * Layer.Delta_B (row);
-         --        Layer.Weights :=
-         --          Layer.Weights - Eta_Av * Layer.Delta_W;
-         --        Layer.Bias :=
-         --           --          Layer.Bias - Eta_Av * Layer.Delta_B;
-         --           Layer.Delta_W :=
-         --             Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
-         --           Layer.Delta_B :=
-         --             Zero_Array (Layer.Delta_B'Length);
+         Layer.Delta_W :=
+           Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
+         Layer.Delta_B :=
+           Zero_Array (Layer.Delta_B'Length);
       end loop;
-      Layer.Delta_W.Clear;
-      Layer.Delta_B.Clear;
+
       Layer.Passes := 0;
 
    end Step;

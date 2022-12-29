@@ -10,7 +10,7 @@ with Shuffler;
 package body Network is
 
    procedure Add_Activation_Layer (Network : in out Network_List) is
-      Layer : Layer_Data (Activation_Layer);
+      Layer : Layer_Data (Activation_Layer, 0, 0);
    begin
       Network.Append (Layer);
 
@@ -20,19 +20,17 @@ package body Network is
 
    procedure Add_Fully_Connected_Layer
      (Network : in out Network_List; Input_Size, Output_Size : Positive) is
-      Layer : Layer_Data (Hidden_Layer);
-      Weights_Row : Real_Float_List;
+      Layer : Layer_Data (Hidden_Layer, Input_Size, Output_Size);
       use Maths;
    begin
       for row in 1 ..Input_Size loop
          for col in 1 .. Output_Size loop
-            Weights_Row.Append (0.5 * Random_Float);
+            Layer.Weights (Row,Col) := 0.5 * Random_Float;
          end loop;
-         Layer.Weights.Append (Weights_Row);
       end loop;
 
       for index in 1 .. Output_Size loop
-         Layer.Bias.Append (0.5 * Random_Float);
+         Layer.Bias (index) := 0.5 * Random_Float;
       end loop;
 
       Network.Append (Layer);
@@ -49,7 +47,7 @@ package body Network is
       Routine_Name : constant String := "Network.Fit ";
       X_Batch     : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch     : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
-      Output_Data : Real_Float_List;
+      Output_Data : Real_Float_Vector (X_Batch'Range (2));
       Y_Vector    : Real_Float_Vector (Y_Batch'Range (2));
       Error       : Float;
       Back_Error  : Real_Float_Vector (Y_Vector'Range);
@@ -80,8 +78,9 @@ package body Network is
          for sample in X_Batch'Range loop
             Put_Line (Routine_Name & "sample" & Integer'Image (sample));
             for col in X_Batch'Range (2) loop
-               Output_Data.Append (X_Batch (Sample, col));
+               Output_Data (col) := X_Batch (Sample, col);
             end loop;
+
             for col in Y_Batch'Range (2) loop
                Y_Vector (col) := Y_Batch (Sample, col);
             end loop;
@@ -127,14 +126,14 @@ package body Network is
 
    function Predict (Network    : in out Network_Data;
                      Input_Data : Real_Float_Matrix)
-                     return Real_Float_List_2D is
-      Output_Data : Real_Float_List;
-      Predictions : Real_Float_List_2D;
+                     return Real_Vector_List is
+      Output_Data : Real_Float_Vector (Input_Data'Range);
+      Predictions : Real_Vector_List;
    begin
       --  For each sample
       for row in Input_Data'Range loop
          for col in Input_Data'Range (2) loop
-            Output_Data.Append (Input_Data (row, col));
+            Output_Data (col) := Input_Data (row, col);
          end loop;
 
          for layer in Network.Layers.First_Index ..
