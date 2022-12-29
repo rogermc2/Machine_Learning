@@ -1,4 +1,5 @@
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -60,9 +61,14 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Input_Data : Real_Float_List)
       return Real_Float_List is
       use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Neural_Processes.Forward ";
+      Routine_Name : constant String := "Neural_Processes.Forward ";
       Out_Data : Real_Float_List;
    begin
+      Assert (Integer (Input_Data.Length) = Layer.Input_Data'Length,
+              Routine_Name & "Input_Data Length" &
+                  Integer'Image (Integer (Input_Data.Length)) &
+                " is different to Layer Input_Data Length" &
+                  Integer'Image (Layer.Input_Data'Length));
       Layer.Input_Data := To_Real_Float_Vector (Input_Data);
       declare
          New_Data : constant Real_Float_Vector :=
