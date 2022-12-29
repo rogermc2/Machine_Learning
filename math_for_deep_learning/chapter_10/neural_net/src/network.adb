@@ -101,9 +101,11 @@ package body Network is
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line (Routine_Name & "backward layer" & Integer'Image (layer));
+               Put_Line (Routine_Name & "backward layer" &
+                           Integer'Image (layer));
                Back_Error := Backward (Network.Layers (layer), Back_Error);
             end loop;
+            Put_Line (Routine_Name & "backward layers done");
          end loop;
 
          --  update weights and biases

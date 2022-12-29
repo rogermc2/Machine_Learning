@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 --  with Classifier_Utilities;
 with ML_Types;
 with Neural_Maths;
@@ -37,6 +37,7 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
       return Real_Float_Vector is
       use Real_Float_Arrays;
+      Routine_Name : constant String := "Neural_Processes.Backward ";
       Input_Length  : constant Positive := Integer (Layer.Input_Data.Length);
       In_Error      : Real_Float_Vector (Out_Error'Range);
       In_Data       : Real_Float_Matrix (1 .. 1, 1 .. Input_Length);
@@ -45,12 +46,18 @@ package body Neural_Processes is
          In_Data (1, index) := Layer.Input_Data (index);
       end loop;
 
+      Put_Line (Routine_Name & "Layer Kind: " &
+                  Layer_Type'Image (Layer.Layer_Kind));
+      Put_Line (Routine_Name & "Out_Error Size" &
+                  Integer'Image (Out_Error'Length));
+      Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             Weights_Error : constant Real_Float_Vector :=
                               Transpose (In_Data) * Out_Error;
             Row_Data      : Real_Float_List;
          begin
+            Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
             In_Error := Out_Error *
                           Transpose (To_Real_Float_Matrix (Layer.Weights));
             for row in 1 .. Integer (Layer.Delta_W.Length) loop
@@ -67,7 +74,6 @@ package body Neural_Processes is
       else
          In_Error := Out_Error;
       end if;
-
 
       return In_Error;
 
