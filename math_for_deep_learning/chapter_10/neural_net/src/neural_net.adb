@@ -13,10 +13,11 @@ with Network; use Network;
 procedure Neural_Net is
    use Classifier_Utilities;
    Project_Name : constant String := "Neural_Net ";
-   X_Train       : constant Real_Float_Matrix :=
-                     Load_Data ("../../datasets/x_train.csv", 14) / 255.0;
+   Num_Train_Cols : constant Positive := 14 * 14;
+   X_Train      : constant Real_Float_Matrix :=
+                     Load_Data ("../../datasets/x_train.csv", Num_Train_Cols) / 255.0;
    X_Test        : constant Real_Float_Matrix :=
-                     Load_Data ("../../datasets/x_test.csv", 14) / 255.0;
+                     Load_Data ("../../datasets/x_test.csv", Num_Train_Cols) / 255.0;
    Y_Train       : constant Real_Float_Matrix :=
                      Load_Data ("../../datasets/y_train.csv", 10);
    Y_Test        : constant Real_Float_Vector :=
@@ -33,7 +34,7 @@ begin
    Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
    Print_Matrix_Dimensions (Project_Name & "X_Test", X_Test);
    Put_Line (Project_Name & "Y_Test length:" &  Integer'Image (Y_Test'Length));
-   Add_Fully_Connected_Layer (Net.Layers, 14 * 14, 100);
+   Add_Fully_Connected_Layer (Net.Layers, Num_Train_Cols, 100);
    Add_Activation_Layer (Net.Layers);
    Add_Fully_Connected_Layer (Net.Layers, 100, 50);
    Add_Activation_Layer (Net.Layers);

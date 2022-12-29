@@ -4,14 +4,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
+--  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
 
 package body Neural_Processes is
-
-   procedure Update_Layer (Layer : in out Layer_Data;
-                           Input_Data : Real_Float_Vector);
 
 --     function Backward
 --       (Layer : Layer_Data; Out_Error : Real_Float_Matrix)
@@ -61,8 +59,12 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Input_Data : Real_Float_Vector)
       return Real_Float_Vector is
       use Real_Float_Arrays;
+      Routine_Name : constant String := "Neural_Processes.Forward ";
    begin
-      Update_Layer (Layer, Input_Data);
+      Put_Line (Routine_Name & "Input_Data length" &
+                  Integer'Image (Input_Data'Length));
+      Layer.Input_Data := Input_Data;
+--        Update_Layer (Layer, Input_Data);
       return Input_Data * Layer.Weights + Layer.Bias;
 
    end Forward;
@@ -165,25 +167,6 @@ package body Neural_Processes is
       Layer.Passes := 0;
 
    end Step;
-
-   --  --------------------------------------------------------------
-
-   procedure Update_Layer (Layer : in out Layer_Data;
-                           Input_Data : Real_Float_Vector) is
-      Layer_2 : Layer_Data  (Layer.Layer_Kind, Input_Data'Length,
-                             Layer.Output_Size);
-   begin
-      Layer_2.Input_Data := Input_Data;
-      if Layer.Layer_Kind = Hidden_Layer then
-         Layer_2.Weights := Layer.Weights;
-            Layer_2.Bias := Layer.Bias;
-            Layer_2.Delta_W :=  Layer.Delta_W ;
-            Layer_2.Delta_B := Layer.Delta_B;
-            Layer_2.Passes := Layer.Passes;
-      end if;
-      Layer := Layer_2;
-
-   end Update_Layer;
 
    --  --------------------------------------------------------------
 
