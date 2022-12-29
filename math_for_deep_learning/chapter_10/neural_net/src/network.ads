@@ -23,7 +23,6 @@ package Network is
    type Network_Data is record
       Verbose : Boolean := False;
       Layers  : Network_List;
-      --        Layers  : Layer_Data (Num_Samples, Num_Inputs, Num_Outputs);
    end record;
 
    procedure Add_Activation_Layer (Network : in out Network_List);

@@ -11,7 +11,7 @@ package body Network is
    --     Num_Samples : Positive;
 
    procedure Add_Activation_Layer (Network : in out Network_List) is
-      Layer : Layer_Data (Activation_Layer, 0, 0);
+      Layer : Layer_Data (Activation_Layer);
    begin
       Network.Append (Layer);
 
@@ -21,17 +21,19 @@ package body Network is
 
    procedure Add_Fully_Connected_Layer
      (Network : in out Network_List; Input_Size, Output_Size : Positive) is
-      Layer : Layer_Data (Hidden_Layer, Input_Size, Output_Size);
+      Layer : Layer_Data (Hidden_Layer);
+      Weights_Row : Real_Float_List;
       use Maths;
    begin
-      for row in Layer.Weights'Range loop
-         for col in Layer.Weights'Range (2) loop
-            Layer.Weights (row, col) := 0.5 * Random_Float;
+      for row in 1 ..Input_Size loop
+         for col in 1 .. Output_Size loop
+            Weights_Row.Append (0.5 * Random_Float);
          end loop;
+         Layer.Weights.Append (Weights_Row);
       end loop;
 
-      for index in Layer.Bias'Range loop
-         Layer.Bias (index) := 0.5 * Random_Float;
+      for index in 1 .. Output_Size loop
+         Layer.Bias.Append (0.5 * Random_Float);
       end loop;
 
       Network.Append (Layer);
