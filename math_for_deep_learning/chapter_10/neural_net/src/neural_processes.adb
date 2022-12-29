@@ -74,12 +74,9 @@ package body Neural_Processes is
       Routine_Name : constant String := "Neural_Processes.Forward ";
       Out_Data     : Real_Float_List;
    begin
-      --        Assert (Integer (Input_Data.Length) = Layer.Input_Data'Length,
-      --                Routine_Name & "Input_Data Length" &
-      --                    Integer'Image (Integer (Input_Data.Length)) &
-      --                  " is different to Layer Input_Data Length" &
-      --                    Integer'Image (Layer.Input_Data'Length));
       Layer.Input_Data := Input_Data;
+      Put_Line (Routine_Name & "Layer.Input_Data Size" &
+                  Integer'Image (Integer (Layer.Input_Data.Length)));
       Put_Line (Routine_Name & "Layer.Weights Size" &
                   Integer'Image (Integer (Layer.Weights.Length)) & " x" &
                   Integer'Image (Integer (Layer.Weights (1).Length)));

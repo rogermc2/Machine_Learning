@@ -4,11 +4,10 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
+with Basic_Printing; use Basic_Printing;
 with Shuffler;
 
 package body Network is
-
-   --     Num_Samples : Positive;
 
    procedure Add_Activation_Layer (Network : in out Network_List) is
       Layer : Layer_Data (Activation_Layer);
@@ -47,7 +46,7 @@ package body Network is
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Network.Fit ";
+      Routine_Name : constant String := "Network.Fit ";
       X_Batch     : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch     : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
 --        Output_Data : Real_Float_Vector (X_Batch'Range (2));
@@ -57,6 +56,7 @@ package body Network is
       Back_Error  : Real_Float_Vector (X_Batch'Range (2));
    begin
       for count in 1 .. Minibatches loop
+         Put_Line (Routine_Name & "Minibatch" & Integer'Image (count));
          Error := 0.0;
          --  Select a random minibatch
          declare
@@ -79,6 +79,7 @@ package body Network is
 
          --  forward propagation
          for sample in X_Batch'Range loop
+            Put_Line (Routine_Name & "sample" & Integer'Image (sample));
             for col in X_Batch'Range (2) loop
                Output_Data.Append (X_Batch (Sample, col));
             end loop;
@@ -88,13 +89,16 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
+               Put_Line (Routine_Name & "layer" & Integer'Image (layer));
                Output_Data := Forward (Network.Layers (layer), Output_Data);
             end loop;
 
             Error := Error + Loss (Y_Vector, Output_Data);
+            Put_Line (Routine_Name & "Error" & Float'Image (Error));
 
             --  backward propagation
             Back_Error := Loss_Deriv (Y_Vector, Output_Data);
+            Print_Float_Vector (Routine_Name & "Back_Error", Back_Error);
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
