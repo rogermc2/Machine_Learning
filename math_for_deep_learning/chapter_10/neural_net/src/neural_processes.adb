@@ -75,7 +75,8 @@ package body Neural_Processes is
       Out_Data     : Real_Float_List;
    begin
       Layer.Input_Data := Input_Data;
-      Put_Line (Routine_Name & "Layer.Input_Data Size" &
+      Put_Line (Routine_Name & "Layer Kind: " & Layer_Type'Image (Layer.Layer_Kind));
+      Put_Line (Routine_Name & "Layer Input_Data Size" &
                   Integer'Image (Integer (Layer.Input_Data.Length)));
       Put_Line (Routine_Name & "Layer.Weights Size" &
                   Integer'Image (Integer (Layer.Weights.Length)) & " x" &
