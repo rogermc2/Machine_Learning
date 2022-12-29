@@ -47,7 +47,6 @@ package NL_Types is
    package Float_List_Package is new
      Ada.Containers.Vectors (Positive, Float_List);
    subtype Float_List_2D is Float_List_Package.Vector;
---     function ">" (L, R : Float_List_Package.Vector) return Boolean;
    function ">" (L, R : Float_List_2D) return Boolean;
    pragma Inline (">");
    function "*" (L : Float; R : Float_List_2D) return Float_List_2D;

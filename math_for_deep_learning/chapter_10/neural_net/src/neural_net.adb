@@ -2,7 +2,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with ML_Types;
 with Neural_Processes; use Neural_Processes;
@@ -11,7 +11,7 @@ with Neural_Processes; use Neural_Processes;
 with Network; use Network;
 
 procedure Neural_Net is
-   use Classifier_Utilities;
+--     use Classifier_Utilities;
    Project_Name : constant String := "Neural_Net ";
    Num_Train_Cols : constant Positive := 14 * 14;
    X_Train      : constant Real_Float_Matrix :=
@@ -25,7 +25,7 @@ procedure Neural_Net is
    Minibatches   : constant Positive := 40000;
    Learning_Rate : constant Float := 1.0;
    Net           : Network_Data;
-   Predictions   : Real_Vector_List;
+   Predictions   : Real_Float_List_2D;
    Confusion     : Integer_Matrix (1 .. 10, 1 .. 10) :=
    (others => (others => 0));
    --     Py_Module   : Module;

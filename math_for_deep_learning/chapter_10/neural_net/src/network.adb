@@ -48,7 +48,8 @@ package body Network is
 --        Routine_Name : constant String := "Network.Fit ";
       X_Batch     : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch     : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
-      Output_Data : Real_Float_Vector (X_Batch'Range (2));
+--        Output_Data : Real_Float_Vector (X_Batch'Range (2));
+      Output_Data : Real_Float_List;
       Y_Vector    : Real_Float_Vector (Y_Batch'Range (2));
       Error       : Float;
       Back_Error  : Real_Float_Vector (X_Batch'Range (2));
@@ -76,8 +77,8 @@ package body Network is
 
          --  forward propagation
          for sample in X_Batch'Range loop
-            for col in Output_Data'Range loop
-               Output_Data (col) := X_Batch (Sample, col);
+            for col in X_Batch'Range (2) loop
+               Output_Data.Append (X_Batch (Sample, col));
             end loop;
             for col in Y_Batch'Range (2) loop
                Y_Vector (col) := Y_Batch (Sample, col);
@@ -117,15 +118,15 @@ package body Network is
    --  -------------------------------------------------------------------------
 
    function Predict (Network    : in out Network_Data;
-                     Input_Data : Real_Float_Matrix) return Real_Vector_List is
-      use Real_Float_Arrays;
-      Output_Data : Real_Float_Vector (Input_Data'Range (2));
-      Predictions : Real_Vector_List;
+                     Input_Data : Real_Float_Matrix)
+                     return Real_Float_List_2D is
+      Output_Data : Real_Float_List;
+      Predictions : Real_Float_List_2D;
    begin
       --  For each sample
       for row in Input_Data'Range loop
          for col in Input_Data'Range (2) loop
-            Output_Data (col) := Input_Data (row, col);
+            Output_Data.Append (Input_Data (row, col));
          end loop;
 
          for layer in Network.Layers.First_Index ..
