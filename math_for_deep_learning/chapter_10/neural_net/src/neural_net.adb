@@ -40,7 +40,7 @@ begin
    Add_Fully_Connected_Layer (Net.Layers, 100, 50);
 --     Add_Activation_Layer (Net.Layers);
    Add_Fully_Connected_Layer (Net.Layers, 50, 10);
-   Add_Activation_Layer (Net.Layers);
+   Add_Activation_Layer (Net.Layers, 10);
 
    Fit (Net, X_Train, Y_Train, Minibatches, Learning_Rate);
 

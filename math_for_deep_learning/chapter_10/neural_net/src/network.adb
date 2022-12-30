@@ -59,7 +59,6 @@ package body Network is
       procedure Do_Layer (Layer : in out Layer_Data;
                           Data  : in out Real_Float_List) is
       begin
-         Put_Line (Routine_Name & "Do_Layer");
          Data := Forward (Layer, Data);
 
       end Do_Layer;
@@ -71,7 +70,6 @@ package body Network is
       Error        : Float;
       Back_Error   : Real_Float_Vector (Y_Vector'Range);
    begin
-      Put_Line (Routine_Name);
       for count in 1 .. Minibatches loop
          Put_Line (Routine_Name & "Minibatch" & Integer'Image (count));
          Error := 0.0;

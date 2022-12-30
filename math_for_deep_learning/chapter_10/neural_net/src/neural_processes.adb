@@ -8,7 +8,6 @@ with Maths;
 with Basic_Printing; use Basic_Printing;
 --  with Classifier_Utilities;
 with ML_Types;
-with Network;
 with Neural_Maths;
 with Neural_Utilities;
 
@@ -110,19 +109,13 @@ package body Neural_Processes is
                                    Real_Float_Vector (Layer.Bias));
 
       else  --  Activation_Layer
-         New_Line;
-         Put_Line (Routine_Name & "Activation_Layer");
-         declare
-            Act_Layer : Neural_Processes.Layer_Data
-              (Activation_Layer, Layer_Range (In_Data'Length), 0);
-         begin
-            Network.Print_Layer_Data (Routine_Name & "Layer", Layer);
-            Network.Print_Layer_Data (Routine_Name & "Act_Layer", Act_Layer);
-            Act_Layer.Input_Data := Layer_Vector (In_Data);
---              Network.Add_Activation_Layer
---                (Net.Layers, Layer_Range (In_Data'Length));
-            Layer := Act_Layer;
-         end;
+         --           declare
+         --              Act_Layer : Neural_Processes.Layer_Data
+         --                (Activation_Layer, Layer_Range (In_Data'Length), 0);
+         --           begin
+         Layer.Input_Data := Layer_Vector (In_Data);
+         --              Layer := Act_Layer;
+         --           end;
          Out_Data := To_Real_Float_List (Neural_Maths.Sigmoid (In_Data));
       end if;
 
