@@ -42,6 +42,8 @@ package Basic_Printing is
                                       aMatrix : Real_Float_Matrix);
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Unsigned_8_Array_3D);
+   procedure Print_Real_Float_List (Name  : String;
+                                    aList : Real_Float_List);
    procedure Print_Unbound_Array (Name : String;
                                    UB   : Unbounded_String_Array);
    procedure Print_Unbound_List (Name : String; UB : ML_Types.Unbounded_List);

@@ -330,6 +330,7 @@ package body Basic_Printing is
    end Print_Integer_Matrix;
 
    --  ------------------------------------------------------------------------
+
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Binary_Matrix) is
    begin
@@ -372,6 +373,24 @@ package body Basic_Printing is
                   Integer'Image (aMatrix'Length (3)));
 
    end Print_Matrix_Dimensions;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Real_Float_List (Name : String; aList : Real_Float_List) is
+      Count : Integer := 1;
+   begin
+      Put_Line (Name & ": ");
+      for Index in aList.First_Index .. aList.Last_Index loop
+         Put (Float'Image (aList (Index)) & "  ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Real_Float_List;
 
    --  ------------------------------------------------------------------------
 

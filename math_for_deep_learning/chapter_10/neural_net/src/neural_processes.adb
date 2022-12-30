@@ -34,12 +34,13 @@ package body Neural_Processes is
    --  --------------------------------------------------------------
 
    function Backward
-     (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
-      return Real_Float_Vector is
+     (Layer : in out Layer_Data; Out_Error : Real_Float_List)
+      return Real_Float_List is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Backward ";
       Input_Length : constant Positive := Layer.Input_Data'Length;
-      In_Error     : Real_Float_Vector (Out_Error'Range);
+      Out_Error_Vec : constant Real_Float_Vector := To_Real_Float_Vector (Out_Error);
+      In_Error     : Real_Float_Vector (1 .. Integer (Out_Error.Length));
       In_Data      : Real_Float_Matrix (1 .. 1, 1 .. Input_Length);
    begin
       for index in 1 .. Input_Length loop
@@ -49,16 +50,16 @@ package body Neural_Processes is
       Put_Line (Routine_Name & "Layer Kind: " &
                   Layer_Type'Image (Layer.Layer_Kind));
       Put_Line (Routine_Name & "Out_Error Size" &
-                  Integer'Image (Out_Error'Length));
+                  Integer'Image (Out_Error_Vec'Length));
       Put_Line (Routine_Name & "Layer.Input_Data" &
                   Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             Weights_Error : constant Real_Float_Vector :=
-                              Transpose (In_Data) * Out_Error;
+                              Transpose (In_Data) * Out_Error_Vec;
          begin
             Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
-            In_Error := Out_Error *
+            In_Error := Out_Error_Vec *
               Transpose (Real_Float_Matrix (Layer.Weights));
             for row in Layer.Delta_W'Range loop
                for col in Layer.Delta_W'Range (2) loop
@@ -70,12 +71,16 @@ package body Neural_Processes is
             end loop;
 
             Layer.Passes := Layer.Passes + 1;
-         end; --  declare block
-      else
-         In_Error := Out_Error;
+         end;  --  declare block
+      else  --  Actvation layer
+         for index in Out_Error_Vec'Range loop
+            In_Error (index) :=
+              Neural_Maths.Sigmoid_Deriv (Real_Float_Vector (Layer.Input_Data) (index)) *
+                Out_Error (index);
+         end loop;
       end if;
 
-      return In_Error;
+      return To_Real_Float_List (In_Error);
 
    end Backward;
 

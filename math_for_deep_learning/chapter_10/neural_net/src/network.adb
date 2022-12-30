@@ -68,7 +68,7 @@ package body Network is
       Output_Data  : Real_Float_List;
       Y_Vector     : Real_Float_Vector (Y_Batch'Range (2));
       Error        : Float;
-      Back_Error   : Real_Float_Vector (Y_Vector'Range);
+      Back_Error   : Real_Float_List;
    begin
       for count in 1 .. Minibatches loop
          Put_Line (Routine_Name & "Minibatch" & Integer'Image (count));
@@ -117,8 +117,9 @@ package body Network is
                Put_Line (Routine_Name & "Error" & Float'Image (Error));
 
                --  backward propagation
-               Back_Error := Loss_Deriv (Y_Vector, Output_Vector);
-               Print_Float_Vector (Routine_Name & "Back_Error", Back_Error);
+               Back_Error :=
+                 To_Real_Float_List (Loss_Deriv (Y_Vector, Output_Vector));
+               Print_Real_Float_List (Routine_Name & "Back_Error", Back_Error);
             end;
 
             for layer in reverse Network.Layers.First_Index ..

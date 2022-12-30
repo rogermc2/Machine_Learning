@@ -14,5 +14,7 @@ package Neural_Maths is
    function Sigmoid (V : Real_Float_Vector)
                      return Real_Float_Vector;
    function Sigmoid_Deriv (Val : Float) return Float;
+   function Sigmoid_Deriv (V : Real_Float_Vector)
+                           return Real_Float_Vector;
 
 end Neural_Maths;
