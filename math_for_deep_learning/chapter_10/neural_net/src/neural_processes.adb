@@ -37,16 +37,12 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Out_Error : Real_Float_List)
       return Real_Float_List is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Neural_Processes.Backward ";
-      Input_Length : constant Positive := Layer.Input_Data'Length;
-      Out_Error_Vec : constant Real_Float_Vector := To_Real_Float_Vector (Out_Error);
-      In_Error     : Real_Float_Vector (1 .. Integer (Out_Error.Length));
-      In_Data      : Real_Float_Matrix (1 .. 1, 1 .. Input_Length);
+      Routine_Name  : constant String := "Neural_Processes.Backward ";
+      Out_Error_Vec : constant Real_Float_Vector :=
+                        To_Real_Float_Vector (Out_Error);
+      In_Error      : Real_Float_Vector (Out_Error_Vec'Range);
+      Weights_Error : Real_Float_Vector (Out_Error_Vec'Range);
    begin
-      for index in 1 .. Input_Length loop
-         In_Data (1, index) := Layer.Input_Data (Layer_Range (index));
-      end loop;
-
       Put_Line (Routine_Name & "Layer Kind: " &
                   Layer_Type'Image (Layer.Layer_Kind));
       Put_Line (Routine_Name & "Out_Error Size" &
@@ -54,24 +50,25 @@ package body Neural_Processes is
       Put_Line (Routine_Name & "Layer.Input_Data" &
                   Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
-         declare
-            Weights_Error : constant Real_Float_Vector :=
-                              Transpose (In_Data) * Out_Error_Vec;
-         begin
-            Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
-            In_Error := Out_Error_Vec *
-              Transpose (Real_Float_Matrix (Layer.Weights));
-            for row in Layer.Delta_W'Range loop
-               for col in Layer.Delta_W'Range (2) loop
-                  Layer.Delta_W (row,col) := Layer.Delta_W (row,col) +
-                    Weights_Error (Integer (col));
-               end loop;
-               Layer.Bias (row) := Layer.Bias (row) +
-                 Out_Error (Integer (row));
-            end loop;
+         for index in Out_Error_Vec'Range loop
+            Weights_Error (index) :=
+              Layer.Input_Data (Layer_Range (index)) * Out_Error_Vec (index);
+         end loop;
+         Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
 
-            Layer.Passes := Layer.Passes + 1;
-         end;  --  declare block
+         In_Error := Out_Error_Vec *
+           Transpose (Real_Float_Matrix (Layer.Weights));
+
+         for row in Layer.Delta_W'Range loop
+            for col in Layer.Delta_W'Range (2) loop
+               Layer.Delta_W (row,col) := Layer.Delta_W (row,col) +
+                 Weights_Error (Integer (col));
+            end loop;
+            Layer.Bias (row) := Layer.Bias (row) +
+              Out_Error (Integer (row));
+         end loop;
+
+         Layer.Passes := Layer.Passes + 1;
       else  --  Actvation layer
          for index in Out_Error_Vec'Range loop
             In_Error (index) :=
