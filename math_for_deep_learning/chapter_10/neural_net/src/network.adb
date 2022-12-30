@@ -45,13 +45,23 @@ package body Network is
       Learning_Rate : Float; Batch_Size : Positive := 64) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Network.Fit ";
-      X_Batch     : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
-      Y_Batch     : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
-      Output_Data : Real_Float_List;
-      Y_Vector    : Real_Float_Vector (Y_Batch'Range (2));
-      Error       : Float;
-      Back_Error  : Real_Float_Vector (Y_Vector'Range);
+
+      procedure Do_Layer (Layer : in out Layer_Data;
+                          Data  : in out Real_Float_List) is
+      begin
+         Put_Line (Routine_Name & "Do_Layer");
+         Data := Forward (Layer, Data);
+
+      end Do_Layer;
+
+      X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
+      Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
+      Output_Data  : Real_Float_List;
+      Y_Vector     : Real_Float_Vector (Y_Batch'Range (2));
+      Error        : Float;
+      Back_Error   : Real_Float_Vector (Y_Vector'Range);
    begin
+      Put_Line (Routine_Name);
       for count in 1 .. Minibatches loop
          Put_Line (Routine_Name & "Minibatch" & Integer'Image (count));
          Error := 0.0;
@@ -68,6 +78,7 @@ package body Network is
                for col in X_Batch'Range (2) loop
                   X_Batch (row, col) := X_Train (Indices (row), col);
                end loop;
+
                for col in Y_Batch'Range (2) loop
                   Y_Batch (row, col) := Y_Train (Indices (row), col);
                end loop;
@@ -88,13 +99,7 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               declare
-                  thisLayer : Layer_Data := Network.Layers (layer);
-               begin
-                  Put_Line (Routine_Name & "layer" & Integer'Image (layer));
-                  Output_Data := Forward (thisLayer, Output_Data);
-                  Network.Layers (layer) := thisLayer;
-               end;
+               Do_Layer (Network.Layers (layer), Output_Data);
             end loop;
 
             declare
@@ -103,7 +108,7 @@ package body Network is
                Error := Error + Loss (Y_Vector, Output_Vector);
                Put_Line (Routine_Name & "Error" & Float'Image (Error));
 
-            --  backward propagation
+               --  backward propagation
                Back_Error := Loss_Deriv (Y_Vector, Output_Vector);
                Print_Float_Vector (Routine_Name & "Back_Error", Back_Error);
             end;
@@ -129,6 +134,8 @@ package body Network is
                         " error: " & Float'Image (Error));
          end if;
       end loop;
+
+      Put_Line (Routine_Name & "done");
 
    end Fit;
 
@@ -159,10 +166,30 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
-   --     procedure Set_Num_Samples (Number : Positive) is
-   --     begin
-   --        Num_Samples := Number;
-   --     end Set_Num_Samples;
+   procedure Print_Layer_Data (Network : Network_Data) is
+   begin
+      for index in Network.Layers.First_Index ..
+        Network.Layers.Last_Index loop
+         Put_Line ("Layer" & Integer'Image (index));
+         Put_Line ("Layer_Kind " & Layer_Type'Image
+                   (Network.Layers.Element (index).Layer_Kind));
+         Put_Line ("Input_Size" & Layer_Range'Image
+                   (Network.Layers (index).Input_Size));
+         if Network.Layers.Element (index).Layer_Kind = Hidden_Layer then
+            Print_Matrix_Dimensions
+              ("Weights Size", Real_Float_Matrix
+                 (Network.Layers.Element (index).Weights));
+            Put_Line ("Bias Size" & Layer_Range'Image
+                      (Network.Layers (index).Bias'Length));
+            Print_Matrix_Dimensions
+              ("Delta_W Size", Real_Float_Matrix
+                 (Network.Layers.Element (index).Delta_W));
+            Put_Line ("Bias Size" & Layer_Range'Image
+                      (Network.Layers.Element (index).Delta_B'Length));
+         end if;
+      end loop;
+
+   end Print_Layer_Data;
 
    --  -------------------------------------------------------------------------
 
