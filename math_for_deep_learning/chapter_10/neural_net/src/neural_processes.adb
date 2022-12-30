@@ -111,11 +111,17 @@ package body Neural_Processes is
 
       else  --  Activation_Layer
          declare
-            Act_Layer : Layer_Data (Activation_Layer, Natural (In_Data'Length),
-                                    0);
+            thisLayer : Neural_Processes.Layer_Data (Layer_Kind => Activation_Layer,
+                                    Input_Size => 0,
+                                    Output_Size => 0);
+            Act_Layer : Neural_Processes.Layer_Data (Layer_Kind => Activation_Layer,
+                                    Input_Size => Natural (In_Data'Length),
+                                    Output_Size => Natural (0));
          begin
+            thisLayer := Act_Layer;
             Act_Layer.Input_Data := In_Data;
-            Layer := Act_Layer;
+            thisLayer := Act_Layer;
+            Layer := thisLayer;
          end;
          Out_Data := To_Real_Float_List (Neural_Maths.Sigmoid (In_Data));
       end if;

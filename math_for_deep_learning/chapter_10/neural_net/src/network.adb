@@ -88,8 +88,13 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line (Routine_Name & "layer" & Integer'Image (layer));
-               Output_Data := Forward (Network.Layers (layer), Output_Data);
+               declare
+                  thisLayer : Layer_Data := Network.Layers (layer);
+               begin
+                  Put_Line (Routine_Name & "layer" & Integer'Image (layer));
+                  Output_Data := Forward (thisLayer, Output_Data);
+                  Network.Layers (layer) := thisLayer;
+               end;
             end loop;
 
             declare
