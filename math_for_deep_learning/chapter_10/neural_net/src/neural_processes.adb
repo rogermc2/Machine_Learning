@@ -81,13 +81,13 @@ package body Neural_Processes is
    --  --------------------------------------------------------------
 
    function Forward
-     (Layer : in out Layer_Data; Input_Data : Real_Float_Vector)
-      return Real_Float_Vector is
+     (Layer : in out Layer_Data; Input_Data : Real_Float_List)
+      return Real_Float_List is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Forward ";
-      Out_Data     : Real_Float_Vector (Layer.Bias'Range);
+      Out_Data     : Real_Float_List;
    begin
-      Layer.Input_Data := Input_Data;
+      Layer.Input_Data := To_Real_Float_Vector (Input_Data);
       Put_Line (Routine_Name & "Layer Kind: " &
                   Layer_Type'Image (Layer.Layer_Kind));
       Put_Line (Routine_Name & "Layer Input_Data Size" &
@@ -95,18 +95,7 @@ package body Neural_Processes is
       if Layer.Layer_Kind = Hidden_Layer then
          Print_Matrix_Dimensions
            (Routine_Name & "Layer.Weights", Layer.Weights);
-         Out_Data := Layer.Input_Data * Layer.Weights + Layer.Bias;
-         --           declare
-         --              New_Data : constant Real_Float_Matrix :=
-         --                           Layer.Input_Data * Layer.Weights + Layer.Bias;
-         --           begin
-         --              Put_Line (Routine_Name & "New_Data Length" &
-         --                          Integer'Image (Integer (New_Data'Length)));
-         --              Out_Data := New_Data;
-         --              for index in New_Data'Range loop
-         --                 Out_Data.Append (New_Data (index));
-         --              end loop;
-         --           end;
+         Out_Data := To_Real_Float_List (Layer.Input_Data * Layer.Weights + Layer.Bias);
 
       else  --  Activation_Layer
          Out_Data := Input_Data;

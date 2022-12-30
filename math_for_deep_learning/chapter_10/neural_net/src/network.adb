@@ -47,7 +47,7 @@ package body Network is
       Routine_Name : constant String := "Network.Fit ";
       X_Batch     : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch     : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
-      Output_Data : Real_Float_Vector (X_Batch'Range (2));
+      Output_Data : Real_Float_List;
       Y_Vector    : Real_Float_Vector (Y_Batch'Range (2));
       Error       : Float;
       Back_Error  : Real_Float_Vector (Y_Vector'Range);
@@ -76,9 +76,10 @@ package body Network is
 
          --  forward propagation
          for sample in X_Batch'Range loop
+            Output_Data.Clear;
             Put_Line (Routine_Name & "sample" & Integer'Image (sample));
             for col in X_Batch'Range (2) loop
-               Output_Data (col) := X_Batch (Sample, col);
+               Output_Data.Append (X_Batch (Sample, col));
             end loop;
 
             for col in Y_Batch'Range (2) loop
@@ -91,12 +92,16 @@ package body Network is
                Output_Data := Forward (Network.Layers (layer), Output_Data);
             end loop;
 
-            Error := Error + Loss (Y_Vector, Output_Data);
-            Put_Line (Routine_Name & "Error" & Float'Image (Error));
+            declare
+               Output_Vector : constant Real_Float_Vector := To_Real_Float_Vector (Output_Data);
+            begin
+               Error := Error + Loss (Y_Vector, Output_Vector);
+               Put_Line (Routine_Name & "Error" & Float'Image (Error));
 
             --  backward propagation
-            Back_Error := Loss_Deriv (Y_Vector, Output_Data);
-            Print_Float_Vector (Routine_Name & "Back_Error", Back_Error);
+               Back_Error := Loss_Deriv (Y_Vector, Output_Vector);
+               Print_Float_Vector (Routine_Name & "Back_Error", Back_Error);
+            end;
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
@@ -124,11 +129,11 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
-   function Predict (Network    : in out Network_Data;
-                     Input_Data : Real_Float_Matrix)
-                     return Real_Vector_List is
-      Output_Data : Real_Float_Vector (Input_Data'Range);
-      Predictions : Real_Vector_List;
+   function Predict
+     (Network : in out Network_Data; Input_Data : Real_Float_Matrix)
+      return Real_Float_List_2D is
+      Output_Data : Real_Float_List;
+      Predictions : Real_Float_List_2D;
    begin
       --  For each sample
       for row in Input_Data'Range loop

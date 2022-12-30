@@ -218,6 +218,7 @@ package ML_Arrays_And_Matrices is
    function To_Integer_Matrix (IA : Integer_Array) return Integer_Matrix;
    function To_Natural_Array (List : NL_Types.Natural_List)
                                return Natural_Array;
+   function To_Real_Float_List (V : Real_Float_Vector) return Real_Float_List;
    function To_Real_Float_Matrix (Matrix : Binary_Matrix)
                                    return Real_Float_Matrix;
    function To_Real_Float_Matrix (List : NL_Types.Float_List_2D)

@@ -1086,6 +1086,19 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Real_Float_List (V : Real_Float_Vector) return Real_Float_List is
+      F_List : Real_Float_List;
+   begin
+      for index in V'Range loop
+         F_List.Append (V (index));
+      end loop;
+
+      return F_List;
+
+   end To_Real_Float_List;
+
+   --  -------------------------------------------------------------------------
+
    function To_Real_Float_Matrix (Matrix : Binary_Matrix)
                                   return Real_Float_Matrix is
       Result : Real_Float_Matrix (Matrix'Range, Matrix'Range (2));

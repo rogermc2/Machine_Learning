@@ -25,7 +25,7 @@ procedure Neural_Net is
    Minibatches   : constant Positive := 40000;
    Learning_Rate : constant Float := 1.0;
    Net           : Network_Data;
-   Predictions   : Real_Vector_List;
+   Predictions   : Real_Float_List_2D;
    Confusion     : Integer_Matrix (1 .. 10, 1 .. 10) :=
    (others => (others => 0));
    --     Py_Module   : Module;
