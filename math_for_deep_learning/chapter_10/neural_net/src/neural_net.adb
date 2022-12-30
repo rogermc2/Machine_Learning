@@ -34,7 +34,7 @@ begin
    Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
    Print_Matrix_Dimensions (Project_Name & "X_Test", X_Test);
    Put_Line (Project_Name & "Y_Test length:" &  Integer'Image (Y_Test'Length));
-   Add_Fully_Connected_Layer (Net.Layers, Num_Train_Cols, 100);
+   Add_Fully_Connected_Layer (Net.Layers, Layer_Range (Num_Train_Cols), 100);
 --     Add_Activation_Layer (Net.Layers);
    Add_Fully_Connected_Layer (Net.Layers, 100, 50);
 --     Add_Activation_Layer (Net.Layers);

@@ -19,7 +19,7 @@ package Network is
 
    procedure Add_Activation_Layer (Network : in out Network_List);
    procedure Add_Fully_Connected_Layer
-     (Network : in out Network_List; Input_Size, Output_Size : Positive);
+     (Network : in out Network_List; Input_Size, Output_Size : Layer_Range);
    procedure Fit
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;

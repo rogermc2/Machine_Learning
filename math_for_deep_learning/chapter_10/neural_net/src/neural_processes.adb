@@ -34,13 +34,12 @@ package body Neural_Processes is
    --  --------------------------------------------------------------
 
    function Backward
-     (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
-      return Real_Float_Vector is
+     (Layer : in out Layer_Data; Out_Error : Layer_Vector) return Layer_Vector is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Backward ";
-      Input_Length : constant Positive := Layer.Input_Data'Length;
-      In_Error     : Real_Float_Vector (Out_Error'Range);
-      In_Data      : Real_Float_Matrix (1 .. 1, 1 .. Input_Length);
+      Input_Length : constant Layer_Range := Layer.Input_Data'Length;
+      In_Error     : Layer_Vector (Out_Error'Range);
+      In_Data      : Layer_Matrix (1 .. 1, 1 .. Input_Length);
    begin
       for index in 1 .. Input_Length loop
          In_Data (1, index) := Layer.Input_Data (index);
@@ -54,7 +53,7 @@ package body Neural_Processes is
                   Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
          declare
-            Weights_Error : constant Real_Float_Vector :=
+            Weights_Error : constant Layer_Vector :=
                               Transpose (In_Data) * Out_Error;
          begin
             Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
@@ -115,8 +114,8 @@ package body Neural_Processes is
                                     Input_Size => 0,
                                     Output_Size => 0);
             Act_Layer : Neural_Processes.Layer_Data (Layer_Kind => Activation_Layer,
-                                    Input_Size => Natural (In_Data'Length),
-                                    Output_Size => Natural (0));
+                                    Input_Size => Layer_Vector (In_Data'Length),
+                                    Output_Size => 0);
          begin
             thisLayer := Act_Layer;
             Act_Layer.Input_Data := In_Data;

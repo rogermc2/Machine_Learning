@@ -19,7 +19,7 @@ package body Network is
    --  -------------------------------------------------------------------------
 
    procedure Add_Fully_Connected_Layer
-     (Network : in out Network_List; Input_Size, Output_Size : Positive) is
+     (Network : in out Network_List; Input_Size, Output_Size : Layer_Range) is
       Layer : Layer_Data (Hidden_Layer, Input_Size, Output_Size);
       use Maths;
    begin
