@@ -236,6 +236,20 @@ package body Neural_Maths is
 
    --  -------------------------------------------------------------------------
 
+   function Sigmoid (V : Real_Float_Vector)
+                     return Real_Float_Vector is
+      Result : Real_Float_Vector (V'Range);
+   begin
+      for index in V'Range loop
+         Result (index) := Sigmoid (V (index));
+      end loop;
+
+      return Result;
+
+   end Sigmoid;
+
+   --  -------------------------------------------------------------------------
+
    function Sigmoid_Deriv (Val : Float) return Float is
       Sig : constant Float := Sigmoid (Val);
    begin

@@ -1,5 +1,5 @@
 
---  with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -85,20 +85,39 @@ package body Neural_Processes is
       return Real_Float_List is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Forward ";
+      In_Data      : constant Real_Float_Vector :=
+                       To_Real_Float_Vector (Input_Data);
       Out_Data     : Real_Float_List;
    begin
-      Layer.Input_Data := To_Real_Float_Vector (Input_Data);
       Put_Line (Routine_Name & "Layer Kind: " &
                   Layer_Type'Image (Layer.Layer_Kind));
+      --        Assert (Layer.Input_Data'Length = Integer (Input_Data.Length),
+      --                Routine_Name & "Input_Data length" &
+      --                  Integer'Image (Integer (Input_Data.Length)) &
+      --                  " differs from layer Input_Data length" &
+      --                  Integer'Image (Layer.Input_Data'Length));
       Put_Line (Routine_Name & "Layer Input_Data Size" &
                   Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
+         Assert (Layer.Input_Data'Length = Integer (Input_Data.Length),
+                 Routine_Name & "Input_Data length" &
+                   Integer'Image (Integer (Input_Data.Length)) &
+                   " differs from hidden layer Input_Data length" &
+                   Integer'Image (Layer.Input_Data'Length));
          Print_Matrix_Dimensions
            (Routine_Name & "Layer.Weights", Layer.Weights);
+         Layer.Input_Data := In_Data;
          Out_Data := To_Real_Float_List (Layer.Input_Data * Layer.Weights + Layer.Bias);
 
       else  --  Activation_Layer
-         Out_Data := Input_Data;
+         declare
+            Act_Layer : Layer_Data (Activation_Layer, Natural (In_Data'Length),
+                                    0);
+         begin
+            Act_Layer.Input_Data := In_Data;
+            Layer := Act_Layer;
+         end;
+         Out_Data := To_Real_Float_List (Neural_Maths.Sigmoid (In_Data));
       end if;
 
       return Out_Data;

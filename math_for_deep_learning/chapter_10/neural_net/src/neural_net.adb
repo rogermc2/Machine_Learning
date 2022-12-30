@@ -11,23 +11,23 @@ with Neural_Processes; use Neural_Processes;
 with Network; use Network;
 
 procedure Neural_Net is
---     use Classifier_Utilities;
-   Project_Name : constant String := "Neural_Net ";
+   --     use Classifier_Utilities;
+   Project_Name   : constant String := "Neural_Net ";
    Num_Train_Cols : constant Positive := 14 * 14;
-   X_Train      : constant Real_Float_Matrix :=
-                     Load_Data ("../../datasets/x_train.csv", Num_Train_Cols) / 255.0;
-   X_Test        : constant Real_Float_Matrix :=
-                     Load_Data ("../../datasets/x_test.csv", Num_Train_Cols) / 255.0;
-   Y_Train       : constant Real_Float_Matrix :=
-                     Load_Data ("../../datasets/y_train.csv", 10);
-   Y_Test        : constant Real_Float_Vector :=
-                     Load_Data ("../../datasets/y_test.csv");
-   Minibatches   : constant Positive := 40000;
-   Learning_Rate : constant Float := 1.0;
-   Net           : Network_Data;
-   Predictions   : Real_Float_List_2D;
-   Confusion     : Integer_Matrix (1 .. 10, 1 .. 10) :=
-   (others => (others => 0));
+   X_Train        : constant Real_Float_Matrix :=
+                      Load_Data ("../../datasets/x_train.csv", Num_Train_Cols) / 255.0;
+   X_Test         : constant Real_Float_Matrix :=
+                      Load_Data ("../../datasets/x_test.csv", Num_Train_Cols) / 255.0;
+   Y_Train        : constant Real_Float_Matrix :=
+                      Load_Data ("../../datasets/y_train.csv", 10);
+   Y_Test         : constant Real_Float_Vector :=
+                      Load_Data ("../../datasets/y_test.csv");
+   Minibatches    : constant Positive := 40000;
+   Learning_Rate  : constant Float := 1.0;
+   Net            : Network_Data;
+   Predictions    : Real_Float_List_2D;
+   Confusion      : Integer_Matrix (1 .. 10, 1 .. 10) :=
+                      (others => (others => 0));
    --     Py_Module   : Module;
 begin
    Print_Matrix_Dimensions (Project_Name & "X_Train" , X_Train);
@@ -45,10 +45,10 @@ begin
 
    --  Build the confusion matrix using the test set predictions
    Predictions := Predict (Net, X_Test);
---     for index in Y_Test'Range loop
---        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) :=
---        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) + 1 ;
---     end loop;
+   --     for index in Y_Test'Range loop
+   --        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) :=
+   --        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) + 1 ;
+   --     end loop;
    --     Python.Initialize;
    --     Py_Module := Import_File ("neural_net");
    --     Python.Call (Py_Module, "load");
