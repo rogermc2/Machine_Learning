@@ -8,7 +8,7 @@ package Neural_Processes is
      array (Layer_Range range <>, Layer_Range range <>) of Float;
    type Layer_Vector is array (Layer_Range range <>) of Float;
 
-   type Layer_Data (Layer_Kind              : Layer_Type := Hidden_Layer;
+   type Layer_Data (Layer_Kind              : Layer_Type := Activation_Layer;
                     Input_Size, Output_Size : Layer_Range := 0) is
       record
          Input_Data : Layer_Vector (1 .. Input_Size);
@@ -25,12 +25,12 @@ package Neural_Processes is
       end record;
 
    function Backward
-     (Layer : in out Layer_Data; Out_Error : Layer_Vector)
-      return Layer_Vector;
+     (Layer : in out Layer_Data; Out_Error : Real_Float_Vector)
+      return Real_Float_Vector;
    function Forward (Layer : in out Layer_Data; Input_Data : Real_Float_List)
                      return Real_Float_List;
    procedure Initialize
-     (Layer : out Layer_Data; Input_Size, Output_Size : Positive);
+     (Layer : out Layer_Data; Input_Size, Output_Size : Layer_Range);
    function Load_Data (File_Name : String; Num_Columns : Positive)
                        return Real_Float_Matrix;
    function Load_Data (File_Name : String) return Real_Float_Vector;
