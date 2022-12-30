@@ -166,8 +166,27 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
-   procedure Print_Layer_Data (Network : Network_Data) is
+   procedure Print_Layer_Data (Name : String; Layer : Layer_Data) is
    begin
+      Put_Line (Name);
+      Put_Line ("Layer_Kind " & Layer_Type'Image (Layer.Layer_Kind));
+      Put_Line ("Input_Size" & Layer_Range'Image (Layer.Input_Size));
+      if Layer.Layer_Kind = Hidden_Layer then
+         Print_Matrix_Dimensions ("Weights Size", Real_Float_Matrix
+                                  (Layer.Weights));
+         Put_Line ("Bias Size" & Layer_Range'Image (Layer.Bias'Length));
+         Print_Matrix_Dimensions
+           ("Delta_W Size", Real_Float_Matrix (Layer.Delta_W));
+         Put_Line ("Bias Size" & Layer_Range'Image (Layer.Delta_B'Length));
+      end if;
+
+   end Print_Layer_Data;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Print_Network_Data (Name : String; Network : Network_Data) is
+   begin
+      Put_Line (Name);
       for index in Network.Layers.First_Index ..
         Network.Layers.Last_Index loop
          Put_Line ("Layer" & Integer'Image (index));
@@ -189,7 +208,7 @@ package body Network is
          end if;
       end loop;
 
-   end Print_Layer_Data;
+   end Print_Network_Data;
 
    --  -------------------------------------------------------------------------
 

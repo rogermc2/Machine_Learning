@@ -26,6 +26,7 @@ package Network is
       Learning_Rate : Float; Batch_Size : Positive := 64);
    function Predict (Network    : in out Network_Data;
                      Input_Data : Real_Float_Matrix) return Real_Float_List_2D;
-   procedure Print_Layer_Data (Network : Network_Data);
+   procedure Print_Layer_Data (Name : String; Layer : Layer_Data);
+   procedure Print_Network_Data (Name : String; Network : Network_Data);
 
 end Network;

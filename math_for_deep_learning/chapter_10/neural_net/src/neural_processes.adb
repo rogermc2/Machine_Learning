@@ -8,6 +8,7 @@ with Maths;
 with Basic_Printing; use Basic_Printing;
 --  with Classifier_Utilities;
 with ML_Types;
+with Network;
 with Neural_Maths;
 with Neural_Utilities;
 
@@ -92,11 +93,6 @@ package body Neural_Processes is
    begin
       Put_Line (Routine_Name & "Layer Kind: " &
                   Layer_Type'Image (Layer.Layer_Kind));
-      --        Assert (Layer.Input_Data'Length = Integer (Input_Data.Length),
-      --                Routine_Name & "Input_Data length" &
-      --                  Integer'Image (Integer (Input_Data.Length)) &
-      --                  " differs from layer Input_Data length" &
-      --                  Integer'Image (Layer.Input_Data'Length));
       Put_Line (Routine_Name & "Layer Input_Data Size" &
                   Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
@@ -114,10 +110,14 @@ package body Neural_Processes is
                                    Real_Float_Vector (Layer.Bias));
 
       else  --  Activation_Layer
+         New_Line;
+         Put_Line (Routine_Name & "Activation_Layer");
          declare
             Act_Layer : Neural_Processes.Layer_Data
               (Activation_Layer, Layer_Range (In_Data'Length), 0);
          begin
+            Network.Print_Layer_Data (Routine_Name & "Layer", Layer);
+            Network.Print_Layer_Data (Routine_Name & "Act_Layer", Act_Layer);
             Act_Layer.Input_Data := Layer_Vector (In_Data);
             Layer := Act_Layer;
          end;

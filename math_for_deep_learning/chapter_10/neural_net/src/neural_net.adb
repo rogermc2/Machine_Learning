@@ -23,7 +23,7 @@ procedure Neural_Net is
    Y_Test         : constant Real_Float_Vector :=
                       Load_Data ("../../datasets/y_test.csv");
 --     Minibatches    : constant Positive := 40000;
-   Minibatches    : constant Positive := 40;
+   Minibatches    : constant Positive := 20;
    Learning_Rate  : constant Float := 1.0;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;
