@@ -18,6 +18,16 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
+   procedure Add_Activation_Layer (Network    : in out Network_List;
+                                   Input_Size : Layer_Range) is
+      Layer : Layer_Data (Activation_Layer, Input_Size, 0);
+   begin
+      Network.Append (Layer);
+
+   end Add_Activation_Layer;
+
+   --  -------------------------------------------------------------------------
+
    procedure Add_Fully_Connected_Layer
      (Network : in out Network_List; Input_Size, Output_Size : Layer_Range) is
       Layer : Layer_Data (Hidden_Layer, Input_Size, Output_Size);

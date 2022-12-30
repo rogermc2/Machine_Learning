@@ -119,6 +119,8 @@ package body Neural_Processes is
             Network.Print_Layer_Data (Routine_Name & "Layer", Layer);
             Network.Print_Layer_Data (Routine_Name & "Act_Layer", Act_Layer);
             Act_Layer.Input_Data := Layer_Vector (In_Data);
+--              Network.Add_Activation_Layer
+--                (Net.Layers, Layer_Range (In_Data'Length));
             Layer := Act_Layer;
          end;
          Out_Data := To_Real_Float_List (Neural_Maths.Sigmoid (In_Data));

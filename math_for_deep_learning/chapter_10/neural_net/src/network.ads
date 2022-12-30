@@ -18,6 +18,8 @@ package Network is
    end record;
 
    procedure Add_Activation_Layer (Network : in out Network_List);
+   procedure Add_Activation_Layer (Network    : in out Network_List;
+                                   Input_Size : Layer_Range);
    procedure Add_Fully_Connected_Layer
      (Network : in out Network_List; Input_Size, Output_Size : Layer_Range);
    procedure Fit
