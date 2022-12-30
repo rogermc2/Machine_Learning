@@ -40,7 +40,7 @@ package body Neural_Processes is
       Routine_Name  : constant String := "Neural_Processes.Backward ";
       Out_Error_Vec : constant Real_Float_Vector :=
                         To_Real_Float_Vector (Out_Error);
-      In_Error      : Real_Float_Vector (Out_Error_Vec'Range);
+      In_Error      : Real_Float_Vector (1 .. Integer (Layer.Input_Size));
       Weights_Error : Real_Float_Vector (Out_Error_Vec'Range);
    begin
       Put_Line (Routine_Name & "Layer Kind: " &
