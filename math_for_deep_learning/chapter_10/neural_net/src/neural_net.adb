@@ -2,7 +2,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
---  with Classifier_Utilities;
+with Classifier_Utilities;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with ML_Types;
 with Neural_Processes; use Neural_Processes;
@@ -11,7 +11,7 @@ with Neural_Processes; use Neural_Processes;
 with Network; use Network;
 
 procedure Neural_Net is
-   --     use Classifier_Utilities;
+   use Classifier_Utilities;
    Project_Name   : constant String := "Neural_Net ";
    Num_Train_Cols : constant Positive := 14 * 14;
    X_Train        : constant Real_Float_Matrix :=
@@ -22,11 +22,11 @@ procedure Neural_Net is
                       Load_Data ("../../datasets/y_train.csv", 10);
    Y_Test         : constant Real_Float_Vector :=
                       Load_Data ("../../datasets/y_test.csv");
---     Minibatches    : constant Positive := 40000;
+   --     Minibatches    : constant Positive := 40000;
    Minibatches    : constant Positive := 20;
    Learning_Rate  : constant Float := 1.0;
    Net            : Network_Data;
-   Predictions    : Real_Float_List_2D;
+   Predictions    : Real_Float_List_2D;  --  out
    Confusion      : Integer_Matrix (1 .. 10, 1 .. 10) :=
                       (others => (others => 0));
    --     Py_Module   : Module;
@@ -45,11 +45,15 @@ begin
    Fit (Net, X_Train, Y_Train, Minibatches, Learning_Rate);
 
    --  Build the confusion matrix using the test set predictions
-   Predictions := Predict (Net, X_Test);
-   --     for index in Y_Test'Range loop
-   --        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) :=
-   --        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) + 1 ;
-   --     end loop;
+   Predictions := Predict (Net, X_Test);  --  out
+   Put_Line (Project_Name & "Predictions size" &
+               Integer'Image (Integer (Predictions.Length)) & " x" &
+               Integer'Image (Integer (Predictions (1).Length)));
+   for index in Y_Test'Range loop
+      Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) :=
+        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) + 1 ;
+   end loop;
+
    --     Python.Initialize;
    --     Py_Module := Import_File ("neural_net");
    --     Python.Call (Py_Module, "load");

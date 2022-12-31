@@ -77,6 +77,25 @@ package body Classifier_Utilities is
    end Arg_Max;
 
    --  ------------------------------------------------------------------------
+
+   function Arg_Max (Values : Real_Float_List) return Positive is
+      Max_Value  : Float := Float'Safe_First;
+      Max_Index  : Positive := 1;
+      Value      : Float;
+   begin
+      for index in Values.First_Index .. Values.Last_Index loop
+         Value := Values.Element (index);
+         if Value > Max_Value then
+            Max_Index := index;
+            Max_Value := Value;
+         end if;
+      end loop;
+
+      return Max_Index;
+
+   end Arg_Max;
+
+   --  ------------------------------------------------------------------------
    --  Arg_Max returns the index of the maximum value in a row for each row.
    function Arg_Max (Values : Real_Float_Matrix) return Integer_Array is
       --        Routine_Name : constant String :=
