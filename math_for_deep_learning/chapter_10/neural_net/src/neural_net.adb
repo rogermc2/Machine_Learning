@@ -23,12 +23,13 @@ procedure Neural_Net is
    Y_Test         : constant Real_Float_Vector :=
                       Load_Data ("../../datasets/y_test.csv");
    --     Minibatches    : constant Positive := 40000;
-   Minibatches    : constant Positive := 20;
+   Minibatches    : constant Positive := 500;
    Learning_Rate  : constant Float := 1.0;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
    Confusion      : Integer_Matrix (0 .. 9, 0 .. 9) :=
                       (others => (others => 0));
+   CM_Col         : Natural;
 begin
    Print_Matrix_Dimensions (Project_Name & "X_Train" , X_Train);
    Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
@@ -47,17 +48,19 @@ begin
    Predictions := Predict (Net, X_Test);  --  out
    Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
              & "x" & Integer'Image (Integer (Predictions (1).Length)));
-   Put_Line ("Predictions:");
+
    for count in 1 .. 8 loop
+      Put_Line ("Y_Test (" & Integer'Image (count)  & "): " &
+                             Float'Image (Y_Test (count)));
       Print_Real_Float_List ("Predictions (" & Integer'Image (count)  & ")",
                              Predictions (count));
    end loop;
 
    --  Y_Test values range is the digits 0 .. 9
    for index in Y_Test'Range loop
-      Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index)) - 1) :=
-        Confusion (Integer (Y_Test (index)),
-                   Arg_Max (Predictions (index)) - 1) + 1 ;
+      CM_Col := Arg_Max (Predictions (index)) - 1;
+      Confusion (Integer (Y_Test (index)), CM_Col) :=
+        Confusion (Integer (Y_Test (index)), CM_Col) + 1 ;
    end loop;
 
    Print_Integer_Matrix ("Confusion matrix", Confusion);

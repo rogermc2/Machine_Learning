@@ -70,8 +70,11 @@ package body Network is
       Error        : Float;
       Back_Error   : Real_Float_List;
    begin
+      Put_Line ("Running" & Integer'Image (Minibatches) & " minibatches");
       for count in 1 .. Minibatches loop
---           Put_Line (Routine_Name & "Minibatch" & Integer'Image (count));
+         if count mod 40 = 0 then
+            Put ("*");
+         end if;
          Error := 0.0;
          --  Select a random minibatch
          declare
@@ -142,6 +145,7 @@ package body Network is
                         " error: " & Float'Image (Error));
          end if;
       end loop;
+      New_Line;
 
    end Fit;
 
