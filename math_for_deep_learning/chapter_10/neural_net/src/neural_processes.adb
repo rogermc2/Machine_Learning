@@ -214,25 +214,31 @@ package body Neural_Processes is
 
    procedure Step (Layer : in out Layer_Data; Eta : Float) is
       use Real_Float_Arrays;
-      Eta_Av : constant Float := Eta / Float (Layer.Passes);
-      ZM     : constant Real_Float_Matrix :=
-        Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
+      Routine_Name : constant String := "Neural_Processes.Step Hidden_Layer ";
    begin
-      for row in Layer.Weights'Range loop
-         for col in Layer.Weights'Range (2) loop
-            Layer.Weights (row, col) :=
-              Layer.Weights (row, col) - Eta_Av * Layer.Delta_W (row, col);
+      Assert (Layer.Layer_Kind = Hidden_Layer, Routine_Name &
+                "attempt to process Activation layer!");
+      declare
+         Eta_Av : constant Float := Eta / Float (Layer.Passes);
+         ZM     : constant Real_Float_Matrix :=
+           Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
+      begin
+         for row in Layer.Weights'Range loop
+            for col in Layer.Weights'Range (2) loop
+               Layer.Weights (row, col) :=
+                 Layer.Weights (row, col) - Eta_Av * Layer.Delta_W (row, col);
+            end loop;
          end loop;
 
-         Layer.Bias (row) :=
-           Layer.Bias (row) - Eta_Av * Layer.Delta_B (row);
-      end loop;
+         for index in Layer.Bias'Range loop
+            Layer.Bias (index) := Layer.Bias (index) - Eta_Av * Layer.Delta_B (index);
+         end loop;
 
-      Layer.Delta_W := Layer_Matrix (ZM);
-      Layer.Delta_B :=
-        Layer_Vector (Zero_Array (Layer.Delta_B'Length));
+         Layer.Delta_W := Layer_Matrix (ZM);
+         Layer.Delta_B := Layer_Vector (Zero_Array (Layer.Delta_B'Length));
 
-      Layer.Passes := 0;
+         Layer.Passes := 0;
+      end;  -- declare block
 
    end Step;
 
