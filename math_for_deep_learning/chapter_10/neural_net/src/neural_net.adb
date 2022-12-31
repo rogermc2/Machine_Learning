@@ -45,6 +45,14 @@ begin
 
    --  Build the confusion matrix using the test set predictions
    Predictions := Predict (Net, X_Test);  --  out
+   Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
+             & "x" & Integer'Image (Integer (Predictions (1).Length)));
+   Put_Line ("Predictions:");
+   for count in 1 .. 8 loop
+      Print_Real_Float_List ("Predictions (" & Integer'Image (count)  & ")",
+                             Predictions (count));
+   end loop;
+
    --  Y_Test values range is 0 .. 9
    for index in Y_Test'Range loop
       Confusion (Integer (Y_Test (index)) + 1, Arg_Max (Predictions (index))) :=
