@@ -152,23 +152,23 @@ package body Network is
    function Predict
      (Network : in out Network_Data; Input_Data : Real_Float_Matrix)
       return Real_Float_List_2D is
-      Routine_Name : constant String := "Network.Fit ";
+      Routine_Name : constant String := "Network.Predict ";
       Output_Data : Real_Float_List;
       Predictions : Real_Float_List_2D;
    begin
       --  For each sample
       for row in Input_Data'Range loop
          for col in Input_Data'Range (2) loop
-            Put_Line (Routine_Name & "row, col:" & Integer'Image (row) & "," &
-                     Integer'Image (col));
-            Output_Data (col) := Input_Data (row, col);
+            Output_Data.Append (Input_Data (row, col));
          end loop;
          Put_Line (Routine_Name & "Output_Data set");
 
          for layer in Network.Layers.First_Index ..
            Network.Layers.Last_Index loop
-            Output_Data := Forward (Network.Layers (layer), Output_Data);
+            Put_Line (Routine_Name & "layer" & Integer'Image (layer));
+            Output_Data.Append (Forward (Network.Layers (layer), Output_Data));
          end loop;
+         Put_Line (Routine_Name & "forward Output_Data set");
          Predictions.Append (Output_Data);
       end loop;
 
