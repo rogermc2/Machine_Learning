@@ -27,7 +27,7 @@ procedure Neural_Net is
    Learning_Rate  : constant Float := 1.0;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
-   Confusion      : Integer_Matrix (1 .. 10, 1 .. 10) :=
+   Confusion      : Integer_Matrix (0 .. 9, 0 .. 9) :=
                       (others => (others => 0));
 begin
    Print_Matrix_Dimensions (Project_Name & "X_Train" , X_Train);
@@ -53,11 +53,11 @@ begin
                              Predictions (count));
    end loop;
 
-   --  Y_Test values range is 0 .. 9
+   --  Y_Test values range is the digits 0 .. 9
    for index in Y_Test'Range loop
-      Confusion (Integer (Y_Test (index)) + 1, Arg_Max (Predictions (index))) :=
-        Confusion (Integer (Y_Test (index)) + 1,
-                   Arg_Max (Predictions (index))) + 1 ;
+      Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index)) - 1) :=
+        Confusion (Integer (Y_Test (index)),
+                   Arg_Max (Predictions (index)) - 1) + 1 ;
    end loop;
 
    Print_Integer_Matrix ("Confusion matrix", Confusion);

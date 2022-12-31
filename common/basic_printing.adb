@@ -304,17 +304,18 @@ package body Basic_Printing is
 
    procedure Print_Integer_Matrix
      (Name  : String; aMatrix : Integer_Matrix;
-      Start : Integer := 1; Finish : Integer := 0) is
+      Start : Natural := 0; Finish : Integer := 0) is
+      First : constant Integer := aMatrix'First;
       Last  : Integer;
    begin
       if Finish > 0 then
          Last := Finish;
       else
-         Last := Integer (aMatrix'Length);
+         Last := aMatrix'Last;
       end if;
 
       Put_Line (Name & ": ");
-      if Start >= aMatrix'First and then Finish <= aMatrix'Last then
+      if Start >= First and then Finish <= aMatrix'Last then
          for row in Start .. Last loop
             for col in aMatrix'Range (2) loop
                Put (Integer'Image (aMatrix (row, col)) & "  ");

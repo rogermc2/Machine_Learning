@@ -33,7 +33,7 @@ package Basic_Printing is
    procedure Print_Integer_Map (Name : String;
                                 aMap : ML_Types.Integer_Label_Map);
    procedure Print_Integer_Matrix (Name : String; aMatrix : Integer_Matrix;
-                                   Start : Integer := 1; Finish : Integer := 0);
+                                   Start : Natural := 0; Finish : Integer := 0);
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Binary_Matrix);
    procedure Print_Matrix_Dimensions (Name    : String;
