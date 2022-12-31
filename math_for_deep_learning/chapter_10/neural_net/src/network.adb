@@ -54,7 +54,7 @@ package body Network is
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Network.Fit ";
+--        Routine_Name : constant String := "Network.Fit ";
 
       procedure Do_Layer (Layer : in out Layer_Data;
                           Data  : in out Real_Float_List) is
@@ -142,8 +142,6 @@ package body Network is
                         " error: " & Float'Image (Error));
          end if;
       end loop;
-
-      Put_Line (Routine_Name & "done");
 
    end Fit;
 

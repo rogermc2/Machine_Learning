@@ -46,12 +46,10 @@ begin
 
    --  Build the confusion matrix using the test set predictions
    Predictions := Predict (Net, X_Test);  --  out
-   Put_Line (Project_Name & "Predictions size" &
-               Integer'Image (Integer (Predictions.Length)) & " x" &
-               Integer'Image (Integer (Predictions (1).Length)));
+   --  Y_Test values range is 0 .. 9
    for index in Y_Test'Range loop
-      Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) :=
-        Confusion (Integer (Y_Test (index)), Arg_Max (Predictions (index))) + 1 ;
+      Confusion (Integer (Y_Test (index)) + 1, Arg_Max (Predictions (index))) :=
+        Confusion (Integer (Y_Test (index)) + 1, Arg_Max (Predictions (index))) + 1 ;
    end loop;
 
    --     Python.Initialize;
@@ -60,6 +58,7 @@ begin
    --     New_Line;
    --     Python.Finalize;
 
+   Put_Line (Project_Name & "done.");
    New_Line;
 
 end Neural_Net;
