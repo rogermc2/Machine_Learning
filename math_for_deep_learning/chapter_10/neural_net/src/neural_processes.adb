@@ -16,24 +16,24 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Out_Error : Real_Float_List)
       return Real_Float_List is
       use Real_Float_Arrays;
---        Routine_Name  : constant String := "Neural_Processes.Backward ";
+      --        Routine_Name  : constant String := "Neural_Processes.Backward ";
       Out_Error_Vec : constant Real_Float_Vector :=
                         To_Real_Float_Vector (Out_Error);
       In_Error      : Real_Float_Vector (1 .. Integer (Layer.Input_Size));
       Weights_Error : Real_Float_Vector (Out_Error_Vec'Range);
    begin
---        Put_Line (Routine_Name & "Layer Kind: " &
---                    Layer_Type'Image (Layer.Layer_Kind));
---        Put_Line (Routine_Name & "Out_Error Size" &
---                    Integer'Image (Out_Error_Vec'Length));
---        Put_Line (Routine_Name & "Layer.Input_Data" &
---                    Integer'Image (Layer.Input_Data'Length));
+      --        Put_Line (Routine_Name & "Layer Kind: " &
+      --                    Layer_Type'Image (Layer.Layer_Kind));
+      --        Put_Line (Routine_Name & "Out_Error Size" &
+      --                    Integer'Image (Out_Error_Vec'Length));
+      --        Put_Line (Routine_Name & "Layer.Input_Data" &
+      --                    Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
          for index in Out_Error_Vec'Range loop
             Weights_Error (index) :=
               Layer.Input_Data (Layer_Range (index)) * Out_Error_Vec (index);
          end loop;
---           Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
+         --           Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
 
          In_Error := Out_Error_Vec *
            Transpose (Real_Float_Matrix (Layer.Weights));
@@ -73,17 +73,14 @@ package body Neural_Processes is
                        To_Real_Float_Vector (Input_Data);
       Out_Data     : Real_Float_List;
    begin
---        Put_Line (Routine_Name & "Layer Kind: " &
---                    Layer_Type'Image (Layer.Layer_Kind));
---        Put_Line (Routine_Name & "Layer Input_Data Size" &
---                    Integer'Image (Layer.Input_Data'Length));
+      --        Put_Line (Routine_Name & "Layer Kind: " &
+      --                    Layer_Type'Image (Layer.Layer_Kind));
+      Assert (Layer.Input_Data'Length = Integer (Input_Data.Length),
+              Routine_Name & "Input_Data length" &
+                Integer'Image (Integer (Input_Data.Length)) &
+                " differs from layer Input_Data length" &
+                Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
-         Assert (Layer.Input_Data'Length = Integer (Input_Data.Length),
-                 Routine_Name & "Input_Data length" &
-                   Integer'Image (Integer (Input_Data.Length)) &
-                   " differs from hidden layer Input_Data length" &
-                   Integer'Image (Layer.Input_Data'Length));
-
          Layer.Input_Data := Layer_Vector (In_Data);
          Out_Data :=
            To_Real_Float_List (Real_Float_Vector (Layer.Input_Data) *
@@ -179,7 +176,7 @@ package body Neural_Processes is
 
    procedure Step (Layer : in out Layer_Data; Eta : Float) is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Neural_Processes.Step Hidden_Layer ";
+      --        Routine_Name : constant String := "Neural_Processes.Step Hidden_Layer ";
    begin
       if Layer.Layer_Kind = Hidden_Layer then
          declare
