@@ -5,56 +5,35 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
---  with Classifier_Utilities;
+--  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
 
 package body Neural_Processes is
 
-   --     function Backward
-   --       (Layer : Layer_Data; Out_Error : Real_Float_Matrix)
-   --        return Real_Float_Matrix is
-   --        use Neural_Maths;
-   --        Result : Real_Float_Matrix (Layer.Input_Data'Range,
-   --                                    Layer.Input_Data'Range (2));
-   --     begin
-   --        for row in Layer.Input_Data'Range loop
-   --           for col in Layer.Input_Data'Range (2) loop
-   --              Result (row, col) :=
-   --                Sigmoid_Deriv (Layer.Input_Data (row, col)) * Out_Error (row, col);
-   --           end loop;
-   --        end loop;
-   --
-   --        return Result;
-
-   --     end Backward;
-
-   --  --------------------------------------------------------------
-
    function Backward
      (Layer : in out Layer_Data; Out_Error : Real_Float_List)
       return Real_Float_List is
       use Real_Float_Arrays;
-      Routine_Name  : constant String := "Neural_Processes.Backward ";
+--        Routine_Name  : constant String := "Neural_Processes.Backward ";
       Out_Error_Vec : constant Real_Float_Vector :=
-        To_Real_Float_Vector (Out_Error);
+                        To_Real_Float_Vector (Out_Error);
       In_Error      : Real_Float_Vector (1 .. Integer (Layer.Input_Size));
       Weights_Error : Real_Float_Vector (Out_Error_Vec'Range);
    begin
-      Put_Line (Routine_Name & "Layer Kind: " &
-                  Layer_Type'Image (Layer.Layer_Kind));
-      Put_Line (Routine_Name & "Out_Error Size" &
-                  Integer'Image (Out_Error_Vec'Length));
-      Put_Line (Routine_Name & "Layer.Input_Data" &
-                  Integer'Image (Layer.Input_Data'Length));
+--        Put_Line (Routine_Name & "Layer Kind: " &
+--                    Layer_Type'Image (Layer.Layer_Kind));
+--        Put_Line (Routine_Name & "Out_Error Size" &
+--                    Integer'Image (Out_Error_Vec'Length));
+--        Put_Line (Routine_Name & "Layer.Input_Data" &
+--                    Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
          for index in Out_Error_Vec'Range loop
             Weights_Error (index) :=
               Layer.Input_Data (Layer_Range (index)) * Out_Error_Vec (index);
          end loop;
-         Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
+--           Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
 
          In_Error := Out_Error_Vec *
            Transpose (Real_Float_Matrix (Layer.Weights));
@@ -91,21 +70,20 @@ package body Neural_Processes is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Forward ";
       In_Data      : constant Real_Float_Vector :=
-        To_Real_Float_Vector (Input_Data);
+                       To_Real_Float_Vector (Input_Data);
       Out_Data     : Real_Float_List;
    begin
-      Put_Line (Routine_Name & "Layer Kind: " &
-                  Layer_Type'Image (Layer.Layer_Kind));
-      Put_Line (Routine_Name & "Layer Input_Data Size" &
-                  Integer'Image (Layer.Input_Data'Length));
+--        Put_Line (Routine_Name & "Layer Kind: " &
+--                    Layer_Type'Image (Layer.Layer_Kind));
+--        Put_Line (Routine_Name & "Layer Input_Data Size" &
+--                    Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
          Assert (Layer.Input_Data'Length = Integer (Input_Data.Length),
                  Routine_Name & "Input_Data length" &
                    Integer'Image (Integer (Input_Data.Length)) &
                    " differs from hidden layer Input_Data length" &
                    Integer'Image (Layer.Input_Data'Length));
-         Print_Matrix_Dimensions
-           (Routine_Name & "Layer.Weights", Real_Float_Matrix (Layer.Weights));
+
          Layer.Input_Data := Layer_Vector (In_Data);
          Out_Data :=
            To_Real_Float_List (Real_Float_Vector (Layer.Input_Data) *
@@ -113,13 +91,8 @@ package body Neural_Processes is
                                    Real_Float_Vector (Layer.Bias));
 
       else  --  Activation_Layer
-         --           declare
-         --              Act_Layer : Neural_Processes.Layer_Data
-         --                (Activation_Layer, Layer_Range (In_Data'Length), 0);
-         --           begin
          Layer.Input_Data := Layer_Vector (In_Data);
-         --              Layer := Act_Layer;
-         --           end;
+
          Out_Data := To_Real_Float_List (Neural_Maths.Sigmoid (In_Data));
       end if;
 
@@ -147,7 +120,7 @@ package body Neural_Processes is
                        return Real_Float_Matrix is
       use Ada.Strings.Unbounded;
       CSV_Data  : constant ML_Types.Raw_Data_Vector :=
-        Neural_Utilities.Load_Raw_CSV_Data (File_Name);
+                    Neural_Utilities.Load_Raw_CSV_Data (File_Name);
       List_Row  : ML_Types.Unbounded_List;
       Data      : ML_Arrays_And_Matrices.Real_Float_Matrix
         (1 .. Positive (CSV_Data.Length), 1 .. Num_Columns);
@@ -169,7 +142,7 @@ package body Neural_Processes is
    function Load_Data (File_Name : String) return Real_Float_Vector is
       use  Ada.Strings.Unbounded;
       CSV_Data : constant ML_Types.Unbounded_List :=
-        Neural_Utilities.Load_CSV_Data (File_Name);
+                   Neural_Utilities.Load_CSV_Data (File_Name);
       Data     : ML_Arrays_And_Matrices.Real_Float_Vector
         (1 .. Positive (CSV_Data.Length));
    begin
@@ -204,41 +177,33 @@ package body Neural_Processes is
 
    --  --------------------------------------------------------------
 
-   procedure Step (Layer : Layer_Data) is
-   begin
-      null;
-
-   end Step;
-
-   --  --------------------------------------------------------------
-
    procedure Step (Layer : in out Layer_Data; Eta : Float) is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Neural_Processes.Step Hidden_Layer ";
+--        Routine_Name : constant String := "Neural_Processes.Step Hidden_Layer ";
    begin
-      Assert (Layer.Layer_Kind = Hidden_Layer, Routine_Name &
-                "attempt to process Activation layer!");
-      declare
-         Eta_Av : constant Float := Eta / Float (Layer.Passes);
-         ZM     : constant Real_Float_Matrix :=
-           Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
-      begin
-         for row in Layer.Weights'Range loop
-            for col in Layer.Weights'Range (2) loop
-               Layer.Weights (row, col) :=
-                 Layer.Weights (row, col) - Eta_Av * Layer.Delta_W (row, col);
+      if Layer.Layer_Kind = Hidden_Layer then
+         declare
+            Eta_Av : constant Float := Eta / Float (Layer.Passes);
+            ZM     : constant Real_Float_Matrix :=
+                       Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
+         begin
+            for row in Layer.Weights'Range loop
+               for col in Layer.Weights'Range (2) loop
+                  Layer.Weights (row, col) :=
+                    Layer.Weights (row, col) - Eta_Av * Layer.Delta_W (row, col);
+               end loop;
             end loop;
-         end loop;
 
-         for index in Layer.Bias'Range loop
-            Layer.Bias (index) := Layer.Bias (index) - Eta_Av * Layer.Delta_B (index);
-         end loop;
+            for index in Layer.Bias'Range loop
+               Layer.Bias (index) := Layer.Bias (index) - Eta_Av * Layer.Delta_B (index);
+            end loop;
 
-         Layer.Delta_W := Layer_Matrix (ZM);
-         Layer.Delta_B := Layer_Vector (Zero_Array (Layer.Delta_B'Length));
+            Layer.Delta_W := Layer_Matrix (ZM);
+            Layer.Delta_B := Layer_Vector (Zero_Array (Layer.Delta_B'Length));
 
-         Layer.Passes := 0;
-      end;  -- declare block
+            Layer.Passes := 0;
+         end;  -- declare block
+      end if;
 
    end Step;
 

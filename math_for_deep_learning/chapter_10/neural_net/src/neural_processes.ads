@@ -38,7 +38,6 @@ package Neural_Processes is
    function Loss (Y_True,Y_Pred : Real_Float_Vector) return Float;
    function Loss_Deriv (Y_True, Y_Pred : Real_Float_Vector)
                         return Real_Float_Vector;
-   procedure Step (Layer : Layer_Data);
    procedure Step (Layer : in out Layer_Data; Eta : Float);
 
 end Neural_Processes;

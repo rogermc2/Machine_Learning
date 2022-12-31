@@ -71,7 +71,7 @@ package body Network is
       Back_Error   : Real_Float_List;
    begin
       for count in 1 .. Minibatches loop
-         Put_Line (Routine_Name & "Minibatch" & Integer'Image (count));
+--           Put_Line (Routine_Name & "Minibatch" & Integer'Image (count));
          Error := 0.0;
          --  Select a random minibatch
          declare
@@ -96,7 +96,7 @@ package body Network is
          --  forward propagation
          for sample in X_Batch'Range loop
             Output_Data.Clear;
-            Put_Line (Routine_Name & "sample" & Integer'Image (sample));
+--              Put_Line (Routine_Name & "sample" & Integer'Image (sample));
             for col in X_Batch'Range (2) loop
                Output_Data.Append (X_Batch (Sample, col));
             end loop;
@@ -114,21 +114,20 @@ package body Network is
                Output_Vector : constant Real_Float_Vector := To_Real_Float_Vector (Output_Data);
             begin
                Error := Error + Loss (Y_Vector, Output_Vector);
-               Put_Line (Routine_Name & "Error" & Float'Image (Error));
+--                 Put_Line (Routine_Name & "Error" & Float'Image (Error));
 
                --  backward propagation
                Back_Error :=
                  To_Real_Float_List (Loss_Deriv (Y_Vector, Output_Vector));
-               Print_Real_Float_List (Routine_Name & "Back_Error", Back_Error);
+--                 Print_Real_Float_List (Routine_Name & "Back_Error", Back_Error);
             end;
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line (Routine_Name & "backward layer" &
-                           Integer'Image (layer));
+--                 Put_Line (Routine_Name & "backward layer" &
+--                             Integer'Image (layer));
                Back_Error := Backward (Network.Layers (layer), Back_Error);
             end loop;
-            Put_Line (Routine_Name & "backward layers done");
          end loop;
 
          --  update weights and biases
@@ -153,14 +152,18 @@ package body Network is
    function Predict
      (Network : in out Network_Data; Input_Data : Real_Float_Matrix)
       return Real_Float_List_2D is
+      Routine_Name : constant String := "Network.Fit ";
       Output_Data : Real_Float_List;
       Predictions : Real_Float_List_2D;
    begin
       --  For each sample
       for row in Input_Data'Range loop
          for col in Input_Data'Range (2) loop
+            Put_Line (Routine_Name & "row, col:" & Integer'Image (row) & "," &
+                     Integer'Image (col));
             Output_Data (col) := Input_Data (row, col);
          end loop;
+         Put_Line (Routine_Name & "Output_Data set");
 
          for layer in Network.Layers.First_Index ..
            Network.Layers.Last_Index loop
