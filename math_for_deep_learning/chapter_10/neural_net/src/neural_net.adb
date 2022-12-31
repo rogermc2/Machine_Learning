@@ -29,7 +29,6 @@ procedure Neural_Net is
    Predictions    : Real_Float_List_2D;  --  out
    Confusion      : Integer_Matrix (1 .. 10, 1 .. 10) :=
                       (others => (others => 0));
-   --     Py_Module   : Module;
 begin
    Print_Matrix_Dimensions (Project_Name & "X_Train" , X_Train);
    Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
@@ -49,14 +48,16 @@ begin
    --  Y_Test values range is 0 .. 9
    for index in Y_Test'Range loop
       Confusion (Integer (Y_Test (index)) + 1, Arg_Max (Predictions (index))) :=
-        Confusion (Integer (Y_Test (index)) + 1, Arg_Max (Predictions (index))) + 1 ;
+        Confusion (Integer (Y_Test (index)) + 1,
+                   Arg_Max (Predictions (index))) + 1 ;
    end loop;
 
-   --     Python.Initialize;
-   --     Py_Module := Import_File ("neural_net");
-   --     Python.Call (Py_Module, "load");
-   --     New_Line;
-   --     Python.Finalize;
+   Print_Integer_Matrix ("Confusion matrix", Confusion);
+   Put_Line ("Confusion diagonal sum:" &
+               Integer'Image (Sum_Diagonal (Confusion)));
+   Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
+   Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
+               Float (Sum (Confusion))));
 
    Put_Line (Project_Name & "done.");
    New_Line;

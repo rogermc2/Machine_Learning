@@ -923,6 +923,21 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Sum (Data : Integer_Matrix) return Integer is
+      Result : Integer := 0;
+   begin
+      for row in Data'Range loop
+         for col in Data'Range (2) loop
+            Result := Result + Data (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Sum;
+
+   --  ------------------------------------------------------------------------
+
    function Sum (Data : Real_Float_Matrix) return Float is
       Result : Float := 0.0;
    begin
@@ -969,8 +984,21 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Sum_Diagonal (Data : Integer_Matrix) return Integer is
+      Result : Integer := 0;
+   begin
+      for row in Data'Range loop
+         Result := Result + Data (row, row);
+      end loop;
+
+      return Result;
+
+   end Sum_Diagonal;
+
+   --  ------------------------------------------------------------------------
+
    function Sum_Each_Column (Data : Real_Float_Matrix)
-                              return Real_Float_Vector is
+                             return Real_Float_Vector is
       Val    : Float;
       Result : Real_Float_Vector (Data'Range (2));
    begin
