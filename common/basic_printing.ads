@@ -34,6 +34,9 @@ package Basic_Printing is
                                 aMap : ML_Types.Integer_Label_Map);
    procedure Print_Integer_Matrix (Name : String; aMatrix : Integer_Matrix;
                                    Start : Natural := 0; Finish : Integer := 0);
+   procedure Print_List_Dimensions (Name : String; aList : Real_Float_List);
+   procedure Print_List_Dimensions (Name  : String;
+                                    aList : Real_Float_List_2D);
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Binary_Matrix);
    procedure Print_Matrix_Dimensions (Name    : String;
@@ -42,8 +45,9 @@ package Basic_Printing is
                                       aMatrix : Real_Float_Matrix);
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Unsigned_8_Array_3D);
-   procedure Print_Real_Float_List (Name  : String;
-                                    aList : Real_Float_List);
+   procedure Print_Real_Float_List
+     (Name  : String; aList : Real_Float_List;
+      Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Unbound_Array (Name : String;
                                    UB   : Unbounded_String_Array);
    procedure Print_Unbound_List (Name : String; UB : ML_Types.Unbounded_List);

@@ -23,7 +23,7 @@ procedure Neural_Net is
    Y_Test         : constant Real_Float_Vector :=
                       Load_Data ("../../datasets/y_test.csv");
    --     Minibatches    : constant Positive := 40000;
-   Minibatches    : constant Positive := 500;
+   Minibatches    : constant Positive := 1;
    Learning_Rate  : constant Float := 1.0;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
@@ -41,6 +41,7 @@ begin
    Add_Activation_Layer (Net.Layers, 50);
    Add_Fully_Connected_Layer (Net.Layers, 50, 10);
    Add_Activation_Layer (Net.Layers, 10);
+   Net.Verbose := True;
 
    Fit (Net, X_Train, Y_Train, Minibatches, Learning_Rate);
 
@@ -49,12 +50,12 @@ begin
    Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
              & "x" & Integer'Image (Integer (Predictions (1).Length)));
 
-   for count in 1 .. 8 loop
-      Put_Line ("Y_Test (" & Integer'Image (count)  & "): " &
-                             Float'Image (Y_Test (count)));
-      Print_Real_Float_List ("Predictions (" & Integer'Image (count)  & ")",
-                             Predictions (count));
-   end loop;
+--     for count in 1 .. 8 loop
+--        Put_Line ("Y_Test (" & Integer'Image (count)  & "): " &
+--                               Float'Image (Y_Test (count)));
+--        Print_Real_Float_List ("Predictions (" & Integer'Image (count)  & ")",
+--                               Predictions (count));
+--     end loop;
 
    --  Y_Test values range is the digits 0 .. 9
    for index in Y_Test'Range loop

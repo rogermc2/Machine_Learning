@@ -1,6 +1,7 @@
 
 with Interfaces;
 
+with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 package body Basic_Printing is
@@ -38,14 +39,14 @@ package body Basic_Printing is
       Count : Positive := 1;
    begin
       Put_Line (Name & ": ");
-         for Index in aList.First_Index .. aList.Last_Index loop
-            Put (Boolean'Image (aList (Index)) & "  ");
-            Count := Count + 1;
-            if Count > 10 then
-               New_Line;
-               Count := 1;
-            end if;
-         end loop;
+      for Index in aList.First_Index .. aList.Last_Index loop
+         Put (Boolean'Image (aList (Index)) & "  ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
       New_Line;
 
    end Print_Boolean_List;
@@ -332,6 +333,28 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_List_Dimensions (Name : String; aList : Real_Float_List) is
+      use Ada.Containers;
+   begin
+      Put (Name & " length: ");
+      Put_Line (Count_Type'Image (aList.Length));
+
+   end Print_List_Dimensions;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_List_Dimensions (Name  : String;
+                                    aList : Real_Float_List_2D) is
+      use Ada.Containers;
+   begin
+      Put (Name & " size: ");
+      Put_Line (Count_Type'Image (aList.Length) & "  x" &
+                  Count_Type'Image (aList (1).Length));
+
+   end Print_List_Dimensions;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Binary_Matrix) is
    begin
@@ -377,18 +400,31 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Real_Float_List (Name : String; aList : Real_Float_List) is
-      Count : Integer := 1;
+   procedure Print_Real_Float_List
+     (Name  : String; aList : Real_Float_List;
+      Start : Positive := 1; Finish : Natural := 0) is
+      Last  : Positive;
+      Count : Positive := 1;
    begin
+      if Finish > 0 and Finish <= aList.Last_Index then
+         Last := Finish;
+      else
+         Last := Integer (aList.Last_Index);
+      end if;
+
       Put_Line (Name & ": ");
-      for Index in aList.First_Index .. aList.Last_Index loop
-         Put (Float'Image (aList (Index)) & "  ");
-         Count := Count + 1;
-         if Count > 10 then
-            New_Line;
-            Count := 1;
-         end if;
-      end loop;
+      if Start >= aList.First_Index and Last >= Start then
+         for Index in Start .. Last loop
+            Put (Float'Image (aList (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+      else
+         Put_Line ("Print_Real_Float_List called with invalid start index.");
+      end if;
       New_Line;
 
    end Print_Real_Float_List;

@@ -54,13 +54,12 @@ package body Network is
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Network.Fit ";
+      Routine_Name : constant String := "Network.Fit ";
 
       procedure Do_Layer (Layer : in out Layer_Data;
                           Data  : in out Real_Float_List) is
       begin
          Data := Forward (Layer, Data);
-
       end Do_Layer;
 
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
@@ -99,7 +98,7 @@ package body Network is
          --  forward propagation
          for sample in X_Batch'Range loop
             Output_Data.Clear;
---              Put_Line (Routine_Name & "sample" & Integer'Image (sample));
+            --              Put_Line (Routine_Name & "sample" & Integer'Image (sample));
             for col in X_Batch'Range (2) loop
                Output_Data.Append (X_Batch (Sample, col));
             end loop;
@@ -110,25 +109,33 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
+               Put_Line (Routine_Name &
+                           Layer_Type'Image (Network.Layers (layer).Layer_Kind)
+                            & " layer:" & Integer'Image (layer));
                Do_Layer (Network.Layers (layer), Output_Data);
+               Print_List_Dimensions (Routine_Name & "Output_Data",
+                                      Output_Data);
+               Print_Real_Float_List (Routine_Name & "Output_Data",
+                                      Output_Data, 1, 14);
             end loop;
 
             declare
-               Output_Vector : constant Real_Float_Vector := To_Real_Float_Vector (Output_Data);
+               Output_Vector : constant Real_Float_Vector :=
+                                 To_Real_Float_Vector (Output_Data);
             begin
                Error := Error + Loss (Y_Vector, Output_Vector);
---                 Put_Line (Routine_Name & "Error" & Float'Image (Error));
+               --                 Put_Line (Routine_Name & "Error" & Float'Image (Error));
 
                --  backward propagation
                Back_Error :=
                  To_Real_Float_List (Loss_Deriv (Y_Vector, Output_Vector));
---                 Print_Real_Float_List (Routine_Name & "Back_Error", Back_Error);
+               --                 Print_Real_Float_List (Routine_Name & "Back_Error", Back_Error);
             end;
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
---                 Put_Line (Routine_Name & "backward layer" &
---                             Integer'Image (layer));
+               --                 Put_Line (Routine_Name & "backward layer" &
+               --                             Integer'Image (layer));
                Back_Error := Backward (Network.Layers (layer), Back_Error);
             end loop;
          end loop;
@@ -154,7 +161,7 @@ package body Network is
    function Predict
      (Network : in out Network_Data; Input_Data : Real_Float_Matrix)
       return Real_Float_List_2D is
---        Routine_Name : constant String := "Network.Predict ";
+      --        Routine_Name : constant String := "Network.Predict ";
       Output_Data : Real_Float_List;
       Predictions : Real_Float_List_2D;  --  Result
    begin
