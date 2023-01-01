@@ -29,15 +29,17 @@ package body Neural_Processes is
       --        Put_Line (Routine_Name & "Layer.Input_Data" &
       --                    Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
+
+         In_Error := Out_Error_Vec *
+           Transpose (Real_Float_Matrix (Layer.Weights));
+
          for index in Out_Error_Vec'Range loop
             Weights_Error (index) :=
               Layer.Input_Data (Layer_Range (index)) * Out_Error_Vec (index);
          end loop;
          --           Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
 
-         In_Error := Out_Error_Vec *
-           Transpose (Real_Float_Matrix (Layer.Weights));
-
+         --  accumulate the error over a minibatch
          for row in Layer.Delta_W'Range loop
             for col in Layer.Delta_W'Range (2) loop
                Layer.Delta_W (row,col) := Layer.Delta_W (row,col) +
@@ -46,7 +48,8 @@ package body Neural_Processes is
          end loop;
 
          for index in Layer.Bias'Range loop
-            Layer.Bias (index) := Layer.Bias (index) + Out_Error (Integer (index));
+            Layer.Bias (index) :=
+              Layer.Bias (index) + Out_Error (Integer (index));
          end loop;
 
          Layer.Passes := Layer.Passes + 1;
