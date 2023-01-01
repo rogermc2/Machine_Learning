@@ -56,12 +56,6 @@ package body Network is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Network.Fit ";
 
-      procedure Do_Layer (Layer : in out Layer_Data;
-                          Data  : in out Real_Float_List) is
-      begin
-         Data := Forward (Layer, Data);
-      end Do_Layer;
-
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
       Output_Data  : Real_Float_List;
@@ -71,6 +65,7 @@ package body Network is
    begin
       Put_Line ("Running" & Integer'Image (Minibatches) & " minibatches");
       for count in 1 .. Minibatches loop
+         New_Line;
          Put_Line ("minibatch" & Integer'Image (count));
          if count mod 40 = 0 then
             Put ("*");
@@ -83,7 +78,9 @@ package body Network is
             for index in Indices'Range loop
                Indices (index) := index;
             end loop;
+--              Print_Integer_Array (Routine_Name & "Indices", Indices, 1, 50);
             Shuffler.Shuffle (Indices);
+--              Print_Integer_Array (Routine_Name & "shuffled Indices", Indices, 1, 50);
 
             for row in X_Batch'Range loop
                for col in X_Batch'Range (2) loop
@@ -95,7 +92,7 @@ package body Network is
                end loop;
             end loop;
          end;  --  declare block
-         Print_Float_Matrix (Routine_Name & "X_Batch", X_Batch, 1, 5, 42, 56);
+--           Print_Float_Matrix (Routine_Name & "X_Batch", X_Batch, 1, 5, 42, 56);
 --           Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, 1, 5);
 
          --  forward propagation
@@ -105,8 +102,8 @@ package body Network is
             for col in X_Batch'Range (2) loop
                Output_Data.Append (X_Batch (Sample, col));
             end loop;
-            Print_Float_Vector (Routine_Name & "Output_Data",
-                                To_Real_Float_Vector (Output_Data), 42, 56);
+--              Print_Float_Vector (Routine_Name & "Output_Data",
+--                                  To_Real_Float_Vector (Output_Data), 42, 56);
 
             for col in Y_Batch'Range (2) loop
                Y_Vector (col) := Y_Batch (Sample, col);
@@ -117,14 +114,16 @@ package body Network is
 --                 Put_Line (Routine_Name &
 --                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
 --                              & " layer:" & Integer'Image (layer));
-               Do_Layer (Network.Layers (layer), Output_Data);
+               Output_Data := Forward (Network.Layers (layer), Output_Data);
 --                 Print_List_Dimensions (Routine_Name & "Output_Data",
 --                                        Output_Data);
 --                 Print_Real_Float_List (Routine_Name & "Output_Data",
 --                                        Output_Data, 1, 14);
             end loop;
-            Print_Float_Vector (Routine_Name & "Post process Output_Data",
-                                To_Real_Float_Vector (Output_Data), 42, 56);
+--              Print_List_Dimensions (Routine_Name & "Post process Output_Data",
+--                                     Output_Data);
+--              Print_Real_Float_List (Routine_Name & "Post process Output_Data",
+--                                     Output_Data);
 
             declare
                Output_Vector : constant Real_Float_Vector :=

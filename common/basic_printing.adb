@@ -252,7 +252,7 @@ package body Basic_Printing is
          for Index in Start .. Last loop
             Put (Integer'Image (anArray (Index)) & "  ");
             Count := Count + 1;
-            if Count > 4 then
+            if Count > 10 then
                New_Line;
                Count := 1;
             end if;
