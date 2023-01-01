@@ -184,23 +184,20 @@ package body Neural_Processes is
             ZM     : constant Real_Float_Matrix :=
                        Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
          begin
-            for row in Layer.Weights'Range loop
-               for col in Layer.Weights'Range (2) loop
-                  Layer.Weights (row, col) :=
-                    Layer.Weights (row, col) - Eta_Av * Layer.Delta_W (row, col);
-               end loop;
-            end loop;
+            Layer.Weights :=
+             Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
+                               Eta_Av * Real_Float_Matrix (Layer.Delta_W));
 
-            for index in Layer.Bias'Range loop
-               Layer.Bias (index) := Layer.Bias (index) - Eta_Av * Layer.Delta_B (index);
-            end loop;
+            Layer.Bias :=
+              Layer_Vector (Real_Float_Vector (Layer.Bias) -
+                             Eta_Av * Real_Float_Vector (Layer.Delta_B));
 
             Layer.Delta_W := Layer_Matrix (ZM);
             Layer.Delta_B := Layer_Vector (Zero_Array (Layer.Delta_B'Length));
 
             Layer.Passes := 0;
          end;  -- declare block
-      end if;
+      end if;  --  Hidden layer
 
    end Step;
 
