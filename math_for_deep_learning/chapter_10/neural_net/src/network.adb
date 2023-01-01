@@ -71,6 +71,7 @@ package body Network is
    begin
       Put_Line ("Running" & Integer'Image (Minibatches) & " minibatches");
       for count in 1 .. Minibatches loop
+         Put_Line ("minibatch" & Integer'Image (count));
          if count mod 40 = 0 then
             Put ("*");
          end if;
@@ -94,6 +95,8 @@ package body Network is
                end loop;
             end loop;
          end;  --  declare block
+         Print_Float_Matrix (Routine_Name & "X_Batch", X_Batch, 1, 5, 42, 56);
+--           Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, 1, 5);
 
          --  forward propagation
          for sample in X_Batch'Range loop
@@ -102,6 +105,8 @@ package body Network is
             for col in X_Batch'Range (2) loop
                Output_Data.Append (X_Batch (Sample, col));
             end loop;
+            Print_Float_Vector (Routine_Name & "Output_Data",
+                                To_Real_Float_Vector (Output_Data), 42, 56);
 
             for col in Y_Batch'Range (2) loop
                Y_Vector (col) := Y_Batch (Sample, col);
@@ -109,15 +114,17 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line (Routine_Name &
-                           Layer_Type'Image (Network.Layers (layer).Layer_Kind)
-                            & " layer:" & Integer'Image (layer));
+--                 Put_Line (Routine_Name &
+--                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
+--                              & " layer:" & Integer'Image (layer));
                Do_Layer (Network.Layers (layer), Output_Data);
-               Print_List_Dimensions (Routine_Name & "Output_Data",
-                                      Output_Data);
-               Print_Real_Float_List (Routine_Name & "Output_Data",
-                                      Output_Data, 1, 14);
+--                 Print_List_Dimensions (Routine_Name & "Output_Data",
+--                                        Output_Data);
+--                 Print_Real_Float_List (Routine_Name & "Output_Data",
+--                                        Output_Data, 1, 14);
             end loop;
+            Print_Float_Vector (Routine_Name & "Post process Output_Data",
+                                To_Real_Float_Vector (Output_Data), 42, 56);
 
             declare
                Output_Vector : constant Real_Float_Vector :=
@@ -147,7 +154,8 @@ package body Network is
          end loop;
 
          --  report mean loss over minibatch
-         if Network.Verbose and then count mod 10 = 0 then
+         if Network.Verbose and then count mod 1000 = 0 then
+            New_Line;
             Put_Line ("Minibatch" & Integer'Image (count) &
                         " error: " & Float'Image (Error));
          end if;

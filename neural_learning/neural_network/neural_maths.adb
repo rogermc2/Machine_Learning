@@ -119,14 +119,13 @@ package body Neural_Maths is
    --  ------------------------------------------------------------------------
 
    function Mean (A : Real_Float_Vector) return Float is
-      Length  : constant Float := Float (A'Length);
-      Sum     : Float := 0.0;
+      Sum : Float := 0.0;
    begin
       for index in A'Range loop
          Sum := Sum + A (index);
       end loop;
 
-      return Sum / Length;
+      return Sum / Float (A'Length);
 
    end Mean;
 

@@ -4,7 +4,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Basic_Printing; use Basic_Printing;
 with Classifier_Utilities;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
---  with ML_Types;
 with Neural_Processes; use Neural_Processes;
 with Python; use Python;
 
@@ -15,16 +14,18 @@ procedure Neural_Net is
    Project_Name   : constant String := "Neural_Net ";
    Num_Train_Cols : constant Positive := 14 * 14;
    X_Train        : constant Real_Float_Matrix :=
-                      Load_Data ("../../datasets/x_train.csv", Num_Train_Cols);
+                      Load_Data ("../../datasets/x_train.csv",
+                                 Num_Train_Cols) / 255.0;
    X_Test         : constant Real_Float_Matrix :=
-                      Load_Data ("../../datasets/x_test.csv", Num_Train_Cols);
+                      Load_Data ("../../datasets/x_test.csv",
+                                 Num_Train_Cols) / 255.0;
    Y_Train        : constant Real_Float_Matrix :=
                       Load_Data ("../../datasets/y_train.csv", 10);
    Y_Test         : constant Real_Float_Vector :=
                       Load_Data ("../../datasets/y_test.csv");
    X_Train_Image  : Real_Float_Vector (X_Train'Range (2));
    --     Minibatches    : constant Positive := 40000;
-   Minibatches    : constant Positive := 1;
+   Minibatches    : constant Positive := 2;
    Learning_Rate  : constant Float := 1.0;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
@@ -60,7 +61,7 @@ begin
    --  Build the confusion matrix using the test set predictions
    Predictions := Predict (Net, X_Test);  --  out
    Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
-             & "x" & Integer'Image (Integer (Predictions (1).Length)));
+             & " x" & Integer'Image (Integer (Predictions (1).Length)));
 
    --     for count in 1 .. 8 loop
    --        Put_Line ("Y_Test (" & Integer'Image (count)  & "): " &
