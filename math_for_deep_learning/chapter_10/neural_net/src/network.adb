@@ -33,6 +33,27 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
+   function Accumulate_Loss
+     (Sample      : Positive; Y_Batch : Real_Float_Matrix;
+      Output_Data : Real_Float_List;
+      Error       : in out Float) return Real_Float_List is
+      Output_Vector : constant Real_Float_Vector :=
+                        To_Real_Float_Vector (Output_Data);
+      Y_Vector      : Real_Float_Vector (Y_Batch'Range (2));
+   begin
+      for col in Y_Batch'Range (2) loop
+         Y_Vector (col) := Y_Batch (Sample, col);
+      end loop;
+      Error := Error + Loss (Y_Vector, Output_Vector);
+      --                 Put_Line (Routine_Name & "Error" & Float'Image (Error));
+
+      --  backward propagate Error
+      return To_Real_Float_List (Loss_Deriv (Y_Vector, Output_Vector));
+      --                 Print_Real_Float_List (Routine_Name & "Back_Error", Back_Error);
+   end Accumulate_Loss;
+
+   --  -------------------------------------------------------------------------
+
    procedure Add_Fully_Connected_Layer
      (Network : in out Network_List; Input_Size, Output_Size : Layer_Range) is
       Layer : Layer_Data (Hidden_Layer, Input_Size, Output_Size);
@@ -58,14 +79,13 @@ package body Network is
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
-      use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Network.Fit ";
+--        Routine_Name : constant String := "Network.Fit ";
 
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
       Output_Data  : Real_Float_List;
       Error        : Float;
-      Back_Error   : Real_Float_List;
+      Loss         : Real_Float_List;
    begin
       Put_Line ("Running" & Integer'Image (Minibatches) & " minibatches");
       for count in 1 .. Minibatches loop
@@ -96,26 +116,11 @@ package body Network is
             end loop;
 
             --  accumulate loss
-            declare
-               Output_Vector : constant Real_Float_Vector :=
-                                 To_Real_Float_Vector (Output_Data);
-               Y_Vector      : Real_Float_Vector (Y_Batch'Range (2));
-            begin
-               for col in Y_Batch'Range (2) loop
-                  Y_Vector (col) := Y_Batch (Sample, col);
-               end loop;
-               Error := Error + Loss (Y_Vector, Output_Vector);
-               --                 Put_Line (Routine_Name & "Error" & Float'Image (Error));
-
-               --  backward propagation
-               Back_Error :=
-                 To_Real_Float_List (Loss_Deriv (Y_Vector, Output_Vector));
-               --                 Print_Real_Float_List (Routine_Name & "Back_Error", Back_Error);
-            end;  --  declare block
+            Loss := Accumulate_Loss (Sample, Y_Batch, Output_Data, Error);
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Back_Error := Backward (Network.Layers (layer), Back_Error);
+               Loss := Backward (Network.Layers (layer), Loss);
             end loop;
          end loop;  --  Sample
 
