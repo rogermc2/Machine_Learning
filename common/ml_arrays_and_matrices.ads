@@ -170,6 +170,11 @@ package ML_Arrays_And_Matrices is
    pragma Inline (Flatten);
    --  Hadamard product
    function H_Product (L, R : Real_Float_Vector) return Real_Float_Vector;
+   function H_Product (L : Real_Float_Vector; R : Real_Float_List)
+                       return Real_Float_Vector;
+   function H_Product (L : Real_Float_List; R : Real_Float_Vector)
+                       return Real_Float_Vector;
+   function H_Product (L, R : Real_Float_List) return Real_Float_Vector;
    pragma Inline (H_Product);
    function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    function Multiply_Elements (L, R : Real_Float_Matrix)

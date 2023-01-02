@@ -645,6 +645,51 @@ package body ML_Arrays_And_Matrices is
 
    --  ----------------------------------------------------------------------------
 
+   function H_Product (L : Real_Float_Vector; R : Real_Float_List)
+                       return Real_Float_Vector is
+      Product : Real_Float_Vector (L'Range);
+   begin
+      Assert (L'Length = Integer (R.Length), "H_Product, L and R have different lengths");
+      for index in L'Range loop
+         Product (index) := L (index) * R (index);
+      end loop;
+
+      return Product;
+
+   end H_Product;
+
+   --  ----------------------------------------------------------------------------
+
+   function H_Product (L : Real_Float_List; R : Real_Float_Vector)
+                       return Real_Float_Vector is
+      Product : Real_Float_Vector (R'Range);
+   begin
+      Assert (Integer (L.Length) = R'Length, "H_Product, L and R have different lengths");
+      for index in R'Range loop
+         Product (index) := L (index) * R (index);
+      end loop;
+
+      return Product;
+
+   end H_Product;
+
+   --  ----------------------------------------------------------------------------
+
+   function H_Product (L, R : Real_Float_List) return Real_Float_Vector is
+      use Ada.Containers;
+      Product : Real_Float_Vector (1 .. Integer (L.Length));
+   begin
+      Assert (L.Length = R.Length, "H_Product, L and R have different lengths");
+      for index in L.First_Index .. L.Last_Index loop
+         Product (index) := L (index) * R (index);
+      end loop;
+
+      return Product;
+
+   end H_Product;
+
+   --  ----------------------------------------------------------------------------
+
    function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
       Result : Real_Float_Vector (R'Range);
    begin
