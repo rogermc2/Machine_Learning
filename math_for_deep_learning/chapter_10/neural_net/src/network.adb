@@ -131,7 +131,7 @@ package body Network is
             Put_Line ("Minibatch" & Integer'Image (count) &
                         " error: " & Float'Image (Error));
          end if;
-      end loop;
+      end loop;  --  Minibatches
       New_Line;
 
    end Fit;
