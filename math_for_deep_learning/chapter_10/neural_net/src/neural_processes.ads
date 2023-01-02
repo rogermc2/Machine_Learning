@@ -26,7 +26,7 @@ package Neural_Processes is
       end record;
 
    procedure Backward
-     (Layer : in out Layer_Data; Out_Error : in out Real_Float_List);
+     (Layer : in out Layer_Data; Error : in out Real_Float_List);
    procedure Forward (Layer : in out Layer_Data; Data : in out Real_Float_List);
    procedure Initialize
      (Layer : out Layer_Data; Input_Size, Output_Size : Layer_Range);
