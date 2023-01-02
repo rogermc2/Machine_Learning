@@ -157,23 +157,23 @@ package body Neural_Processes is
 
    --  -------------------------------------------------------------------------
 
-   function Loss (Y_True, Y_Pred : Real_Float_Vector) return Float is
+   function Mean_Square_Error (Y_True, Y_Pred : Real_Float_Vector) return Float is
       use Real_Float_Arrays;
    begin
       return 0.5 * Neural_Maths.Mean ((Y_True - Y_Pred) ** 2);
 
-   end Loss;
+   end Mean_Square_Error;
 
    --  ------------------------------------------------------------------------
 
-   function Loss_Deriv (Y_True, Y_Pred : Real_Float_Vector)
-                        return Real_Float_Vector is
+   function MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
+                            return Real_Float_Vector is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Neural_Processes.Loss_Deriv ";
    begin
-      return Y_True - Y_Pred;
+      return Y_Pred - Y_True;
 
-   end Loss_Deriv;
+   end MSE_Derivative;
 
    --  --------------------------------------------------------------
 
@@ -188,12 +188,12 @@ package body Neural_Processes is
                        Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
          begin
             Layer.Weights :=
-             Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
-                               Eta_Av * Real_Float_Matrix (Layer.Delta_W));
+              Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
+                                Eta_Av * Real_Float_Matrix (Layer.Delta_W));
 
             Layer.Bias :=
               Layer_Vector (Real_Float_Vector (Layer.Bias) -
-                             Eta_Av * Real_Float_Vector (Layer.Delta_B));
+                                Eta_Av * Real_Float_Vector (Layer.Delta_B));
 
             Layer.Delta_W := Layer_Matrix (ZM);
             Layer.Delta_B := Layer_Vector (Zero_Array (Layer.Delta_B'Length));

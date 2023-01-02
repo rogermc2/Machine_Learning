@@ -25,9 +25,10 @@ package body Network is
       for col in Y_Batch'Range (2) loop
          Y_Vector (col) := Y_Batch (Sample, col);
       end loop;
-      Error := Error + Loss (Y_Vector, Output_Vector);
+      Error := Error + Mean_Square_Error (Y_Vector, Output_Vector);
 
-      return To_Real_Float_List (Loss_Deriv (Y_Vector, Output_Vector));
+      return To_Real_Float_List (MSE_Derivative (Y_Vector, Output_Vector));
+
    end Accumulate_Error;
 
    --  -------------------------------------------------------------------------
@@ -76,7 +77,7 @@ package body Network is
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
-      Routine_Name : constant String := "Network.Fit ";
+--        Routine_Name : constant String := "Network.Fit ";
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
       Output_Data  : Real_Float_List;
