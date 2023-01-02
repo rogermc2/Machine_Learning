@@ -28,7 +28,8 @@ package body Network is
       end loop;
       Error := Error + Mean_Square_Error (Y_Vector, Output_Vector);
 
-      return To_Real_Float_List (- MSE_Derivative (Y_Vector, Output_Vector));
+      return To_Real_Float_List
+        (Minus_MSE_Derivative (Y_Vector, Output_Vector));
 
    end Accumulate_Error;
 

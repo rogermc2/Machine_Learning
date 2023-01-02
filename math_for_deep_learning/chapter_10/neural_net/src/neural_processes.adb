@@ -164,16 +164,14 @@ package body Neural_Processes is
 
    --  ------------------------------------------------------------------------
 
-   function MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
-                            return Real_Float_Vector is
+   function Minus_MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
+                                  return Real_Float_Vector is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Neural_Processes.Loss_Deriv ";
    begin
-      --  original code had Y_Pred - Y_True which is inconsistent with
-      --  Mean_Square_Error declaration
-      return Y_True - Y_Pred;
+      return Y_Pred - Y_True;
 
-   end MSE_Derivative;
+   end Minus_MSE_Derivative;
 
    --  --------------------------------------------------------------
 

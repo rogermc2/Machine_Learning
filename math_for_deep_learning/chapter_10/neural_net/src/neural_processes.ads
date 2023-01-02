@@ -35,8 +35,8 @@ package Neural_Processes is
    function Load_Data (File_Name : String) return Real_Float_Vector;
    function Mean_Square_Error (Y_True,Y_Pred : Real_Float_Vector)
                                return Float;
-   function MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
-                            return Real_Float_Vector;
+   function Minus_MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
+                                  return Real_Float_Vector;
    procedure Step (Layer : in out Layer_Data; Eta : Float);
 
 end Neural_Processes;
