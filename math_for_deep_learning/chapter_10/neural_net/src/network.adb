@@ -18,6 +18,7 @@ package body Network is
      (Sample      : Positive; Y_Batch : Real_Float_Matrix;
       Output_Data : Real_Float_List; Error : in out Float)
       return Real_Float_List is
+      use Real_Float_Arrays;
       Output_Vector : constant Real_Float_Vector :=
                         To_Real_Float_Vector (Output_Data);
       Y_Vector      : Real_Float_Vector (Y_Batch'Range (2));
@@ -27,7 +28,7 @@ package body Network is
       end loop;
       Error := Error + Mean_Square_Error (Y_Vector, Output_Vector);
 
-      return To_Real_Float_List (MSE_Derivative (Y_Vector, Output_Vector));
+      return To_Real_Float_List (- MSE_Derivative (Y_Vector, Output_Vector));
 
    end Accumulate_Error;
 

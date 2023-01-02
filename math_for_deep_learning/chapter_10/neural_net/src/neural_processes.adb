@@ -171,7 +171,9 @@ package body Neural_Processes is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Neural_Processes.Loss_Deriv ";
    begin
-      return Y_Pred - Y_True;
+      --  original code had Y_Pred - Y_True which is inconsistent with
+      --  Mean_Square_Error declaration
+      return Y_True - Y_Pred;
 
    end MSE_Derivative;
 
