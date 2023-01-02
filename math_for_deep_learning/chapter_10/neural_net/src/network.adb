@@ -9,6 +9,11 @@ with Shuffler;
 
 package body Network is
 
+   procedure Generate_Minibatch (X_Train,Y_Train  : Real_Float_Matrix;
+                                 X_Batch, Y_Batch : out Real_Float_Matrix);
+
+   --  -------------------------------------------------------------------------
+
    procedure Add_Activation_Layer (Network : in out Network_List) is
       Layer : Layer_Data (Activation_Layer, 0, 0);
    begin
@@ -54,7 +59,7 @@ package body Network is
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Network.Fit ";
+      --        Routine_Name : constant String := "Network.Fit ";
 
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
@@ -71,28 +76,9 @@ package body Network is
          end if;
          Error := 0.0;
          --  Select a random minibatch
-         declare
-            Indices : Integer_Array (X_Train'Range);
-         begin
-            for index in Indices'Range loop
-               Indices (index) := index;
-            end loop;
---              Print_Integer_Array (Routine_Name & "Indices", Indices, 1, 50);
-            Shuffler.Shuffle (Indices);
---              Print_Integer_Array (Routine_Name & "shuffled Indices", Indices, 1, 50);
-
-            for row in X_Batch'Range loop
-               for col in X_Batch'Range (2) loop
-                  X_Batch (row, col) := X_Train (Indices (row), col);
-               end loop;
-
-               for col in Y_Batch'Range (2) loop
-                  Y_Batch (row, col) := Y_Train (Indices (row), col);
-               end loop;
-            end loop;
-         end;  --  declare block
---           Print_Float_Matrix (Routine_Name & "X_Batch", X_Batch, 1, 5, 42, 56);
---           Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, 1, 5);
+         Generate_Minibatch (X_Train, Y_Train, X_Batch, Y_Batch);
+         --           Print_Float_Matrix (Routine_Name & "X_Batch", X_Batch, 1, 5, 42, 56);
+         --           Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, 1, 5);
 
          --  forward propagation
          for sample in X_Batch'Range loop
@@ -103,9 +89,9 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
---                 Put_Line (Routine_Name &
---                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
---                              & " layer:" & Integer'Image (layer));
+               --                 Put_Line (Routine_Name &
+               --                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
+               --                              & " layer:" & Integer'Image (layer));
                Output_Data := Forward (Network.Layers (layer), Output_Data);
             end loop;
 
@@ -149,6 +135,31 @@ package body Network is
       New_Line;
 
    end Fit;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Generate_Minibatch (X_Train, Y_Train  : Real_Float_Matrix;
+                                 X_Batch, Y_Batch  : out Real_Float_Matrix) is
+      Indices : Integer_Array (X_Train'Range);
+   begin
+      for index in Indices'Range loop
+         Indices (index) := index;
+      end loop;
+      --              Print_Integer_Array (Routine_Name & "Indices", Indices, 1, 50);
+      Shuffler.Shuffle (Indices);
+      --              Print_Integer_Array (Routine_Name & "shuffled Indices", Indices, 1, 50);
+
+      for row in X_Batch'Range loop
+         for col in X_Batch'Range (2) loop
+            X_Batch (row, col) := X_Train (Indices (row), col);
+         end loop;
+
+         for col in Y_Batch'Range (2) loop
+            Y_Batch (row, col) := Y_Train (Indices (row), col);
+         end loop;
+      end loop;
+
+   end Generate_Minibatch;
 
    --  -------------------------------------------------------------------------
 
