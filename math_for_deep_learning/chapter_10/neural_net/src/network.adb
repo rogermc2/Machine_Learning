@@ -106,14 +106,14 @@ package body Network is
                --                 Put_Line (Routine_Name &
                --                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
                --                              & " layer:" & Integer'Image (layer));
-               Output_Data := Forward (Network.Layers (layer), Output_Data);
+               Forward (Network.Layers (layer), Output_Data);
             end loop;
 
             --  accumulate error by backward propagate
             Loss := Accumulate_Error (Sample, Y_Batch, Output_Data, Error);
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Loss := Backward (Network.Layers (layer), Loss);
+               Backward (Network.Layers (layer), Loss);
             end loop;
 --              Put_Line (Routine_Name & "Error" & Float'Image (Error));
 
@@ -181,7 +181,7 @@ package body Network is
 
          for layer in Network.Layers.First_Index ..
            Network.Layers.Last_Index loop
-            Output_Data := Forward (Network.Layers (layer), Output_Data);
+            Forward (Network.Layers (layer), Output_Data);
          end loop;
 
          Predictions.Append (Output_Data);

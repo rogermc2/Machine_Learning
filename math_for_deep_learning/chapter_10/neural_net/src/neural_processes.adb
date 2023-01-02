@@ -12,9 +12,8 @@ with Neural_Utilities;
 
 package body Neural_Processes is
 
-   function Backward
-     (Layer : in out Layer_Data; Out_Error : Real_Float_List)
-      return Real_Float_List is
+   procedure Backward
+     (Layer : in out Layer_Data; Out_Error : in out Real_Float_List) is
       use Real_Float_Arrays;
       --        Routine_Name  : constant String := "Neural_Processes.Backward ";
       Out_Error_Vec : constant Real_Float_Vector :=
@@ -61,26 +60,25 @@ package body Neural_Processes is
          end loop;
       end if;
 
-      return To_Real_Float_List (In_Error);
+      Out_Error := To_Real_Float_List (In_Error);
 
    end Backward;
 
    --  --------------------------------------------------------------
 
-   function Forward
-     (Layer : in out Layer_Data; Input_Data : Real_Float_List)
-      return Real_Float_List is
+   procedure Forward
+     (Layer : in out Layer_Data; Data : in out Real_Float_List) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Forward ";
       In_Data      : constant Real_Float_Vector :=
-                       To_Real_Float_Vector (Input_Data);
+                       To_Real_Float_Vector (Data);
       Out_Data     : Real_Float_List;
    begin
       --        Put_Line (Routine_Name & "Layer Kind: " &
       --                    Layer_Type'Image (Layer.Layer_Kind));
-      Assert (Layer.Input_Data'Length = Integer (Input_Data.Length),
-              Routine_Name & "Input_Data length" &
-                Integer'Image (Integer (Input_Data.Length)) &
+      Assert (Layer.Input_Data'Length = Integer (Data.Length),
+              Routine_Name & "Data length" &
+                Integer'Image (Integer (Data.Length)) &
                 " differs from layer Input_Data length" &
                 Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
@@ -96,7 +94,7 @@ package body Neural_Processes is
          Out_Data := To_Real_Float_List (Neural_Maths.Sigmoid (In_Data));
       end if;
 
-      return Out_Data;
+      Data := Out_Data;
 
    end Forward;
 
