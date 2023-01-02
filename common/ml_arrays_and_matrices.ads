@@ -205,13 +205,17 @@ package ML_Arrays_And_Matrices is
                    return Integer_Matrix;
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                                return Boolean_Array;
+   pragma Inline (To_Boolean_Array);
    function To_Boolean_Array_Of_Lists (List : NL_Types.Boolean_List_2D)
                               return NL_Types.Boolean_Array_Of_Lists;
+   pragma Inline (To_Boolean_Array_Of_Lists);
    function To_Boolean_Matrix (List : NL_Types.Boolean_List_2D)
                                return Boolean_Matrix;
    function To_Boolean_Matrix (IM : Integer_Matrix) return Boolean_Matrix;
+   pragma Inline (To_Boolean_Matrix);
    function To_Integer_Array (List : ML_Types.Integer_List)
                                return Integer_Array;
+   pragma Inline (To_Integer_Array);
    function To_Integer_Matrix (List : ML_Types.Integer_List_2D)
                                 return Integer_Matrix;
    function To_Integer_Matrix (List : ML_Types.Value_Data_Lists_2D)
@@ -219,9 +223,14 @@ package ML_Arrays_And_Matrices is
    function To_Integer_Matrix (Bin : Binary_Matrix) return Integer_Matrix;
    function To_Integer_Matrix (Bool : Boolean_Matrix)  return Integer_Matrix;
    function To_Integer_Matrix (IA : Integer_Array) return Integer_Matrix;
+   pragma Inline (To_Integer_Matrix);
    function To_Natural_Array (List : NL_Types.Natural_List)
                                return Natural_Array;
+   pragma Inline (To_Natural_Array);
+   function To_Real_Float_List (M : Real_Float_Matrix; row : Integer)
+                                return Real_Float_List;
    function To_Real_Float_List (V : Real_Float_Vector) return Real_Float_List;
+   pragma Inline (To_Real_Float_List);
    function To_Real_Float_Matrix (Matrix : Binary_Matrix)
                                    return Real_Float_Matrix;
    function To_Real_Float_Matrix (List : NL_Types.Float_List_2D)
@@ -232,12 +241,15 @@ package ML_Arrays_And_Matrices is
                                    return Real_Float_Matrix;
    function To_Real_Float_Matrix (IM : Integer_Matrix)
                                    return Real_Float_Matrix;
+   pragma Inline (To_Real_Float_Matrix);
    function To_Real_Float_Vector (List : Integer_Array)
                                   return Real_Float_Vector;
    function To_Real_Float_Vector (List : Real_Float_List)
                                    return Real_Float_Vector;
+   pragma Inline (To_Real_Float_Vector);
    function To_Unbound_Array (UB_List : ML_Types.Unbounded_List)
                                return Unbounded_String_Array;
+   pragma Inline (To_Unbound_Array);
    function Transpose (Values : Boolean_Matrix) return Boolean_Matrix;
    pragma Inline (Transpose);
    function Transpose (Values : Integer_Matrix) return Integer_Matrix;

@@ -102,10 +102,7 @@ package body Network is
 
          --  forward propagation
          for sample in X_Batch'Range loop
-            Output_Data.Clear;
-            for col in X_Batch'Range (2) loop
-               Output_Data.Append (X_Batch (Sample, col));
-            end loop;
+            Output_Data := To_Real_Float_List (X_Batch, Sample);
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
