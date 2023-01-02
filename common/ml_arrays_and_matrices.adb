@@ -629,7 +629,21 @@ package body ML_Arrays_And_Matrices is
 
    end Flatten;
 
-   --  ------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
+   --  Hadamard product
+   function H_Product (L, R : Real_Float_Vector) return Real_Float_Vector is
+      Product : Real_Float_Vector (L'Range);
+   begin
+      Assert (L'Length = R'Length, "H_Product, L and R have different lengths");
+      for index in L'Range loop
+         Product (index) := L (index) * R (index);
+      end loop;
+
+      return Product;
+
+   end H_Product;
+
+   --  ----------------------------------------------------------------------------
 
    function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
       Result : Real_Float_Vector (R'Range);
