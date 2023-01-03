@@ -83,15 +83,13 @@ package body Neural_Processes is
                 Integer'Image (Integer (Data.Length)) &
                 " differs from layer Input_Data length" &
                 Integer'Image (Layer.Input_Data'Length));
+      Layer.Input_Data := Layer_Matrix (In_Data);
       if Layer.Layer_Kind = Hidden_Layer then
-         Layer.Input_Data := Layer_Matrix (In_Data);
          Out_Data :=
-           To_Real_Float_List (Real_Float_Matrix (Layer.Input_Data) *
-                                   Real_Float_Matrix (Layer.Weights) +
+           To_Real_Float_List (In_Data * Real_Float_Matrix (Layer.Weights) +
                                    Real_Float_Vector (Layer.Bias));
 
       else  --  Activation_Layer
-         Layer.Input_Data := Layer_Vector (In_Data);
          Out_Data := To_Real_Float_List (Neural_Maths.Sigmoid (In_Data));
       end if;
 
