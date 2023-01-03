@@ -15,49 +15,54 @@ package body Neural_Processes is
    procedure Backward
      (Layer : in out Layer_Data; Error : in out Real_Float_List) is
       use Real_Float_Arrays;
-      Routine_Name  : constant String := "Neural_Processes.Backward ";
-      Data_Vec      : constant Real_Float_Vector :=
-                        Real_Float_Vector (Layer.Input_Data);
-      Error_Vec     : constant Real_Float_Vector :=
-                        To_Real_Float_Vector (Error);
-      In_Error      : Real_Float_Vector (1 .. Integer (Layer.Input_Size));
-      Weights_Error : Real_Float_Matrix (Data_Vec'Range, Error_Vec'Range);
+      --        Routine_Name  : constant String := "Neural_Processes.Backward ";
+      Data_Mat      : constant Real_Float_Matrix :=
+                        Real_Float_Matrix (Layer.Input_Data);
+      Error_Mat     : constant Real_Float_Matrix :=
+                        To_Real_Float_Matrix (Error);
    begin
---        Put_Line (Routine_Name & "Layer Kind: " &
---                    Layer_Type'Image (Layer.Layer_Kind));
---        Put_Line (Routine_Name & "Error Size" & Integer'Image (Error_Vec'Length));
---        Put_Line (Routine_Name & "Layer.Input_Data" &
---                    Integer'Image (Layer.Input_Data'Length));
+      --        Put_Line (Routine_Name & "Layer Kind: " &
+      --                    Layer_Type'Image (Layer.Layer_Kind));
+      --        Put_Line (Routine_Name & "Error Size" & Integer'Image (Error_Mat'Length));
+      --        Put_Line (Routine_Name & "Layer.Input_Data" &
+      --                    Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
-         In_Error := Error_Vec * Transpose (Real_Float_Matrix (Layer.Weights));
---           Print_Float_Vector (Routine_Name & "In_Error", In_Error);
+         declare
+            In_Error      : constant Real_Float_Matrix :=
+                              Error_Mat * Transpose
+                                (Real_Float_Matrix (Layer.Weights));
+            Weights_Error : constant Real_Float_Matrix := Data_Mat * Error_Mat;
+         begin
+            --           Print_Float_Vector (Routine_Name & "In_Error", In_Error);
 
-         for row in Data_Vec'Range loop
-            for col in Error_Vec'Range loop
-               Weights_Error (row, col) := Data_Vec (row) * Error_Vec (col);
+            --           Print_Float_Matrix (Routine_Name & "Weights_Error", Weights_Error);
+
+            --  accumulate the error over a minibatch
+            Layer.Delta_W :=
+              Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) + Weights_Error);
+
+            for index in Layer.Bias'Range loop
+               Layer.Bias (index) :=
+                 Layer.Bias (index) + Error (Integer (index));
             end loop;
-         end loop;
---           Print_Float_Matrix (Routine_Name & "Weights_Error", Weights_Error);
-
-         --  accumulate the error over a minibatch
-         for row in Layer.Delta_W'Range loop
-            for col in Layer.Delta_W'Range (2) loop
-               Layer.Delta_W (row,col) := Layer.Delta_W (row,col) +
-                 Weights_Error (Integer (row), Integer (col));
+            Layer.Passes := Layer.Passes + 1;
+            Error.Clear;
+            for col in In_Error'Range (2) loop
+               Error.Append (In_Error (1, col));
             end loop;
-         end loop;
-
-         for index in Layer.Bias'Range loop
-            Layer.Bias (index) :=
-              Layer.Bias (index) + Error (Integer (index));
-         end loop;
-         Layer.Passes := Layer.Passes + 1;
+         end;
 
       else  --  Actvation layer
-          In_Error := H_Product (Neural_Maths.Sigmoid_Deriv (Data_Vec), Error);
+         declare
+            In_Error : constant Real_Float_Matrix :=
+                         Neural_Maths.Sigmoid_Deriv (Data_Mat) * Error_Mat;
+         begin
+            Error.Clear;
+            for col in In_Error'Range (2) loop
+               Error.Append (In_Error (1, col));
+            end loop;
+         end;
       end if;
-
-      Error := To_Real_Float_List (In_Error);
 
    end Backward;
 
@@ -67,8 +72,8 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Data : in out Real_Float_List) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Forward ";
-      In_Data      : constant Real_Float_Vector :=
-                       To_Real_Float_Vector (Data);
+      In_Data      : constant Real_Float_Matrix :=
+                       To_Real_Float_Matrix (Data);
       Out_Data     : Real_Float_List;
    begin
       --        Put_Line (Routine_Name & "Layer Kind: " &
@@ -79,9 +84,9 @@ package body Neural_Processes is
                 " differs from layer Input_Data length" &
                 Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
-         Layer.Input_Data := Layer_Vector (In_Data);
+         Layer.Input_Data := Layer_Matrix (In_Data);
          Out_Data :=
-           To_Real_Float_List (Real_Float_Vector (Layer.Input_Data) *
+           To_Real_Float_List (Real_Float_Matrix (Layer.Input_Data) *
                                    Real_Float_Matrix (Layer.Weights) +
                                    Real_Float_Vector (Layer.Bias));
 

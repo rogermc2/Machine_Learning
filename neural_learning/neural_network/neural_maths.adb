@@ -54,7 +54,7 @@ package body Neural_Maths is
    --  ------------------------------------------------------------------------
 
    function Mean (A : Real_Float_Matrix; Axis : Positive)
-                   return Real_Float_Vector is
+                  return Real_Float_Vector is
       use Real_Float_Arrays;
 
       function Do_Mean (FM : Real_Float_Matrix) return Real_Float_Vector is
@@ -136,7 +136,7 @@ package body Neural_Maths is
    --  Coefficients are stored in reverse order:
    --  coef [0] = CN  , ..., coef[N] = C0
    function Pol_Eval (X : Float; Coeff : Real_Float_Vector; N : Positive)
-                       return Float is
+                      return Float is
       Result : Float := 0.0;
    begin
       for index in Coeff'First .. Coeff'Last loop
@@ -235,12 +235,14 @@ package body Neural_Maths is
 
    --  -------------------------------------------------------------------------
 
-   function Sigmoid (V : Real_Float_Vector)
-                     return Real_Float_Vector is
-      Result : Real_Float_Vector (V'Range);
+   function Sigmoid (V : Real_Float_Matrix)
+                     return Real_Float_Matrix is
+      Result : Real_Float_Matrix (V'Range, V'Range (2));
    begin
-      for index in V'Range loop
-         Result (index) := Sigmoid (V (index));
+      for row in V'Range loop
+         for col in V'Range (2) loop
+            Result (row, col) := Sigmoid (V (row, col));
+         end loop;
       end loop;
 
       return Result;
@@ -258,12 +260,14 @@ package body Neural_Maths is
 
    --  --------------------------------------------------------------------------
 
-   function Sigmoid_Deriv (V : Real_Float_Vector)
-                           return Real_Float_Vector is
-      Result : Real_Float_Vector (V'Range);
+   function Sigmoid_Deriv (V : Real_Float_Matrix)
+                           return Real_Float_Matrix is
+      Result : Real_Float_Matrix (V'Range, V'Range (2));
    begin
-      for index in V'Range loop
-         Result (index) := Sigmoid_Deriv (V (index));
+      for row in V'Range loop
+         for col in V'Range (2) loop
+            Result (row, col) := Sigmoid_Deriv (V (row, col));
+         end loop;
       end loop;
 
       return Result;

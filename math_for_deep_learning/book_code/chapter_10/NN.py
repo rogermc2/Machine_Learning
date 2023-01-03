@@ -72,6 +72,7 @@ class FullyConnectedLayer:
         self.delta_w += np.dot(self.input.T, output_error)
         self.delta_b += output_error
         self.passes += 1
+        print ("backward input_error", input_error.shape)
         return input_error
 
     def step(self, eta):
