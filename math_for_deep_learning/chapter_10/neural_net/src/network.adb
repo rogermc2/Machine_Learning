@@ -79,7 +79,7 @@ package body Network is
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
---        Routine_Name : constant String := "Network.Fit ";
+      Routine_Name : constant String := "Network.Fit ";
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
       Output_Data  : Real_Float_List;
@@ -112,6 +112,8 @@ package body Network is
 
             --  accumulate error by backward propagate
             Loss := Accumulate_Error (Sample, Y_Batch, Output_Data, Error);
+            Print_Real_Float_List (Routine_Name & "Sample" & Integer'Image (Sample) &
+                                     " Loss", Loss);
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
                Backward (Network.Layers (layer), Loss);
