@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -15,7 +15,7 @@ package body Neural_Processes is
    procedure Backward
      (Layer : in out Layer_Data; Error : in out Real_Float_List) is
       use Real_Float_Arrays;
---        Routine_Name  : constant String := "Neural_Processes.Backward ";
+      Routine_Name  : constant String := "Neural_Processes.Backward ";
       Data_Vec      : constant Real_Float_Vector :=
                         Real_Float_Vector (Layer.Input_Data);
       Error_Vec     : constant Real_Float_Vector :=
@@ -57,6 +57,7 @@ package body Neural_Processes is
           In_Error := H_Product (Neural_Maths.Sigmoid_Deriv (Data_Vec), Error);
       end if;
 
+      Print_Float_Vector (Routine_Name & "In_Error", In_Error, 1, 6);
       Error := To_Real_Float_List (In_Error);
 
    end Backward;
