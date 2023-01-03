@@ -634,7 +634,9 @@ package body ML_Arrays_And_Matrices is
    function H_Product (L, R : Real_Float_Vector) return Real_Float_Vector is
       Product : Real_Float_Vector (L'Range);
    begin
-      Assert (L'Length = R'Length, "H_Product, L and R have different lengths");
+      Assert (L'Length = R'Length, "H_Product, L and R lengths, " &
+                Integer'Image (L'Length) & "," & Integer'Image (R'Length) &
+                " are different.");
       for index in L'Range loop
          Product (index) := L (index) * R (index);
       end loop;
@@ -649,7 +651,9 @@ package body ML_Arrays_And_Matrices is
                        return Real_Float_Vector is
       Product : Real_Float_Vector (L'Range);
    begin
-      Assert (L'Length = Integer (R.Length), "H_Product, L and R have different lengths");
+      Assert (L'Length = Integer (R.Length), "H_Product, L and R lengths, " &
+                Integer'Image (L'Length) & "," &
+                Integer'Image (Integer (R.Length)) & " are different.");
       for index in L'Range loop
          Product (index) := L (index) * R (index);
       end loop;
@@ -664,7 +668,9 @@ package body ML_Arrays_And_Matrices is
                        return Real_Float_Vector is
       Product : Real_Float_Vector (R'Range);
    begin
-      Assert (Integer (L.Length) = R'Length, "H_Product, L and R have different lengths");
+      Assert (Integer (L.Length) = R'Length, "H_Product, L and R lengths, " &
+                Integer'Image (Integer (L.Length)) & "," &
+                Integer'Image (R'Length) & " are different.");
       for index in R'Range loop
          Product (index) := L (index) * R (index);
       end loop;

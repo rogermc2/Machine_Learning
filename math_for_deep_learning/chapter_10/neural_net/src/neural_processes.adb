@@ -16,23 +16,21 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Error : in out Real_Float_List) is
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Neural_Processes.Backward ";
-      Error_Vec : constant Real_Float_Vector :=
+      Data_Vec      : constant Real_Float_Vector :=
+                        Real_Float_Vector (Layer.Input_Data);
+      Error_Vec     : constant Real_Float_Vector :=
                         To_Real_Float_Vector (Error);
       In_Error      : Real_Float_Vector (1 .. Integer (Layer.Input_Size));
       Weights_Error : Real_Float_Vector (Error_Vec'Range);
    begin
-      --        Put_Line (Routine_Name & "Layer Kind: " &
-      --                    Layer_Type'Image (Layer.Layer_Kind));
---        Put_Line (Routine_Name & "Error Size" & Integer'Image (Error_Vec'Length));
-      --        Put_Line (Routine_Name & "Layer.Input_Data" &
-      --                    Integer'Image (Layer.Input_Data'Length));
+      Put_Line (Routine_Name & "Layer Kind: " &
+                  Layer_Type'Image (Layer.Layer_Kind));
+      Put_Line (Routine_Name & "Error Size" & Integer'Image (Error_Vec'Length));
+      Put_Line (Routine_Name & "Layer.Input_Data" &
+                  Integer'Image (Layer.Input_Data'Length));
       if Layer.Layer_Kind = Hidden_Layer then
          In_Error := Error_Vec * Transpose (Real_Float_Matrix (Layer.Weights));
-
-         for index in Error_Vec'Range loop
-            Weights_Error (index) :=
-              Layer.Input_Data (Layer_Range (index)) * Error_Vec (index);
-         end loop;
+         Weights_Error := H_Product (Data_Vec, Error_Vec);
          --     Print_Float_Vector (Routine_Name & "Weights_Error", Weights_Error);
 
          --  accumulate the error over a minibatch
@@ -47,14 +45,10 @@ package body Neural_Processes is
             Layer.Bias (index) :=
               Layer.Bias (index) + Error (Integer (index));
          end loop;
-
          Layer.Passes := Layer.Passes + 1;
+
       else  --  Actvation layer
-         for index in Error_Vec'Range loop
-            In_Error (index) :=
-              Neural_Maths.Sigmoid_Deriv (Real_Float_Vector (Layer.Input_Data) (index)) *
-                Error (index);
-         end loop;
+          In_Error := H_Product (Neural_Maths.Sigmoid_Deriv (Data_Vec), Error);
       end if;
 
       Error := To_Real_Float_List (In_Error);
@@ -87,7 +81,6 @@ package body Neural_Processes is
 
       else  --  Activation_Layer
          Layer.Input_Data := Layer_Vector (In_Data);
-
          Out_Data := To_Real_Float_List (Neural_Maths.Sigmoid (In_Data));
       end if;
 
