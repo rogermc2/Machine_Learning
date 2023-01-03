@@ -65,8 +65,8 @@ package body Network is
          end loop;
       end loop;
 
-      for index in 1 .. Output_Size loop
-         Layer.Bias (index) := 0.5 * Random_Float;
+      for col in 1 .. Output_Size loop
+         Layer.Bias (1, col) := 0.5 * Random_Float;
       end loop;
 
       Network.Append (Layer);
