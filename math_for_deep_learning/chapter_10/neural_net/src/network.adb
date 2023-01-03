@@ -129,7 +129,8 @@ package body Network is
          end loop;
 
          --  report mean loss over minibatch
-         if Network.Verbose and then count mod (Minibatches / 10) = 0 then
+--           if Network.Verbose and then count mod (Minibatches / 10) = 0 then
+         if Network.Verbose then
             New_Line;
             Put_Line ("Minibatch" & Integer'Image (count) &
                         " error: " & Float'Image (Error));
