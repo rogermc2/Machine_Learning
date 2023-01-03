@@ -57,7 +57,6 @@ package body Neural_Processes is
           In_Error := H_Product (Neural_Maths.Sigmoid_Deriv (Data_Vec), Error);
       end if;
 
-      Print_Float_Vector (Routine_Name & "In_Error", In_Error, 1, 6);
       Error := To_Real_Float_List (In_Error);
 
    end Backward;

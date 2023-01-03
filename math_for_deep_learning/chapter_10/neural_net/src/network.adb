@@ -14,7 +14,7 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
-   function Accumulate_Error
+   function Accumulate_MS_Error
      (Sample      : Positive; Y_Batch : Real_Float_Matrix;
       Output_Data : Real_Float_List; Error : in out Float)
       return Real_Float_List is
@@ -31,7 +31,7 @@ package body Network is
       return To_Real_Float_List
         (Minus_MSE_Derivative (Y_Vector, Output_Vector));
 
-   end Accumulate_Error;
+   end Accumulate_MS_Error;
 
    --  -------------------------------------------------------------------------
 
@@ -83,15 +83,15 @@ package body Network is
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
       Output_Data  : Real_Float_List;
-      Error        : Float;
-      Loss         : Real_Float_List;
+      Accum_Error  : Float;
+      Error        : Real_Float_List;
    begin
       Put_Line ("Running" & Integer'Image (Minibatches) & " minibatches");
       for count in 1 .. Minibatches loop
          if count mod 40 = 0 then
             Put ("*");
          end if;
-         Error := 0.0;
+         Accum_Error := 0.0;
          --  Select a random minibatch
          Generate_Minibatch (X_Train, Y_Train, X_Batch, Y_Batch);
          --           Print_Float_Matrix (Routine_Name & "X_Batch", X_Batch, 1, 5, 42, 56);
@@ -111,18 +111,31 @@ package body Network is
             end loop;
 
             --  accumulate error by backward propagate
-            Loss := Accumulate_Error (Sample, Y_Batch, Output_Data, Error);
-            Print_Real_Float_List (Routine_Name & "Sample" & Integer'Image (Sample) &
-                                     " Loss", Loss);
+            Error :=
+              Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Accum_Error);
+
+            Put_Line (Routine_Name & "accumulated Error" &
+                        Float'Image (Accum_Error));
+            Print_Real_Float_List (Routine_Name & "Sample" &
+                                     Integer'Image (Sample) &
+                                     " Error derivative", Error);
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Backward (Network.Layers (layer), Loss);
+               Backward (Network.Layers (layer), Error);
+               if sample = 1 then
+                  Print_Real_Float_List
+                    (Routine_Name & "sample 1 layer" & Integer'Image (layer) &
+                       " Error", Error, 1, 6);
+               end if;
             end loop;
---              Put_Line (Routine_Name & "Error" & Float'Image (Error));
+            if sample = 1 then
+               Put_Line (Routine_Name & "sample 1 Accumulated Error" &
+                           Float'Image (Accum_Error));
+            end if;
 
          end loop;  --  Sample
---           Print_List_Dimensions (Routine_Name & "minibatch Loss", Loss);
---           Print_Real_Float_List (Routine_Name & "minibatch Loss", Loss, 1, 6);
+         --           Print_List_Dimensions (Routine_Name & "minibatch Loss", Loss);
+         --           Print_Real_Float_List (Routine_Name & "minibatch Loss", Loss, 1, 6);
 
          --  update weights and biases
          for layer in Network.Layers.First_Index ..
@@ -131,11 +144,11 @@ package body Network is
          end loop;
 
          --  report mean loss over minibatch
---           if Network.Verbose and then count mod (Minibatches / 10) = 0 then
+         --           if Network.Verbose and then count mod (Minibatches / 10) = 0 then
          if Network.Verbose then
             New_Line;
             Put_Line ("Minibatch" & Integer'Image (count) &
-                        " error: " & Float'Image (Error));
+                        " accumulated error: " & Float'Image (Accum_Error));
          end if;
       end loop;  --  Minibatches
       New_Line;
