@@ -197,8 +197,12 @@ package body Neural_Processes is
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             Eta_Av : constant Float := Eta / Float (Layer.Passes);
-            ZM     : Real_Float_Matrix :=
-                       Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
+            ZMW    : constant Real_Float_Matrix :=
+                       Zero_Matrix (Layer.Delta_W'Length,
+                                    Layer.Delta_W'Length (2));
+            ZMD    : constant Real_Float_Matrix :=
+                       Zero_Matrix (Layer.Delta_B'Length,
+                                    Layer.Delta_B'Length (2));
          begin
             Layer.Weights :=
               Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
@@ -207,10 +211,8 @@ package body Neural_Processes is
             Layer.Bias :=
               Layer_Matrix (Real_Float_Matrix (Layer.Bias) -
                                 Eta_Av * Real_Float_Matrix (Layer.Delta_B));
-
-            Layer.Delta_W := Layer_Matrix (ZM);
-            ZM := Zero_Matrix (Layer.Delta_B'Length, Layer.Delta_B'Length (2));
-            Layer.Delta_B := Layer_Matrix (ZM);
+            Layer.Delta_W := Layer_Matrix (ZMW);
+            Layer.Delta_B := Layer_Matrix (ZMD);
             Layer.Passes := 0;
          end;  -- declare block
       end if;  --  Hidden layer
