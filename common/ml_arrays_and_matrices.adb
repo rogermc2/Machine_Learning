@@ -696,6 +696,27 @@ package body ML_Arrays_And_Matrices is
 
    --  ----------------------------------------------------------------------------
 
+   function H_Product (L, R : Real_Float_Matrix) return Real_Float_Matrix is
+      Product : Real_Float_Matrix (L'Range, L'Range (2));
+   begin
+      Assert (L'Length = R'Length, "H_Product, L and R lengths, " &
+                Integer'Image (L'Length) & "," & Integer'Image (R'Length) &
+                " are different.");
+      Assert (L'Length (2) = R'Length (2), "H_Product, L and R widths, " &
+                Integer'Image (L'Length (2)) & "," &
+                Integer'Image (R'Length (2)) & " are different.");
+      for row in L'Range loop
+         for col in L'Range (2) loop
+            Product (row, col) := L (row, col) * R (row, col);
+         end loop;
+      end loop;
+
+      return Product;
+
+   end H_Product;
+
+   --  ----------------------------------------------------------------------------
+
    function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
       Result : Real_Float_Vector (R'Range);
    begin
@@ -1261,7 +1282,7 @@ package body ML_Arrays_And_Matrices is
               (1 .. 1, List.First_Index .. List.Last_Index);
          begin
             for col in Result'Range (2) loop
-                  Result (1, col) := List (col);
+               Result (1, col) := List (col);
             end loop;
             return Result;
          end;

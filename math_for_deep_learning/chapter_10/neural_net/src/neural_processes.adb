@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -15,28 +15,35 @@ package body Neural_Processes is
    procedure Backward
      (Layer : in out Layer_Data; Error : in out Real_Float_List) is
       use Real_Float_Arrays;
-      --        Routine_Name  : constant String := "Neural_Processes.Backward ";
+      Routine_Name  : constant String := "Neural_Processes.Backward ";
       Data_Mat      : constant Real_Float_Matrix :=
                         Real_Float_Matrix (Layer.Input_Data);
       Error_Mat     : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix (Error);
    begin
-      --        Put_Line (Routine_Name & "Layer Kind: " &
-      --                    Layer_Type'Image (Layer.Layer_Kind));
-      --        Put_Line (Routine_Name & "Error Size" & Integer'Image (Error_Mat'Length));
-      --        Put_Line (Routine_Name & "Layer.Input_Data" &
-      --                    Integer'Image (Layer.Input_Data'Length));
+      Put_Line (Routine_Name & "Layer Kind: " &
+                  Layer_Type'Image (Layer.Layer_Kind));
+      Print_Matrix_Dimensions (Routine_Name & "Data_Mat", Data_Mat);
+      Print_Matrix_Dimensions (Routine_Name & "Error_Mat", Error_Mat);
       if Layer.Layer_Kind = Hidden_Layer then
+         Assert (Layer.Weights'Length (2) = Error_Mat'Length (2),
+                 Routine_Name & "Weights num cols" &
+                   Integer'Image (Layer.Weights'Length (2)) &
+                   " differs from Error_Mat num cols" &
+                   Integer'Image (Error_Mat'Length (2)));
          declare
             In_Error      : constant Real_Float_Matrix :=
                               Error_Mat * Transpose
                                 (Real_Float_Matrix (Layer.Weights));
-            Weights_Error : constant Real_Float_Matrix := Data_Mat * Error_Mat;
+            Weights_Error : constant Real_Float_Matrix :=
+                              Transpose (Data_Mat) * Error_Mat;
          begin
-            --           Print_Float_Vector (Routine_Name & "In_Error", In_Error);
+            Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
+                                     Real_Float_Matrix (Layer.Weights));
 
             --           Print_Float_Matrix (Routine_Name & "Weights_Error", Weights_Error);
 
+            Print_Float_Matrix (Routine_Name & "In_Error", In_Error, 1, 1, 1, 8);
             --  accumulate the error over a minibatch
             Layer.Delta_W :=
               Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) + Weights_Error);
@@ -46,6 +53,7 @@ package body Neural_Processes is
                  Layer.Bias (1, index) + Error (Integer (index));
             end loop;
             Layer.Passes := Layer.Passes + 1;
+
             Error.Clear;
             for col in In_Error'Range (2) loop
                Error.Append (In_Error (1, col));
@@ -54,8 +62,8 @@ package body Neural_Processes is
 
       else  --  Actvation layer
          declare
-            In_Error : constant Real_Float_Matrix :=
-                         Neural_Maths.Sigmoid_Deriv (Data_Mat) * Error_Mat;
+            In_Error : constant Real_Float_Matrix
+              := H_Product (Neural_Maths.Sigmoid_Deriv (Data_Mat), Error_Mat);
          begin
             Error.Clear;
             for col in In_Error'Range (2) loop
