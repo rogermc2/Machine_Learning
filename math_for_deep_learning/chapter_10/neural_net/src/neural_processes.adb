@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -15,16 +15,16 @@ package body Neural_Processes is
    procedure Backward
      (Layer : in out Layer_Data; Error : in out Real_Float_List) is
       use Real_Float_Arrays;
---        Routine_Name  : constant String := "Neural_Processes.Backward ";
+      Routine_Name  : constant String := "Neural_Processes.Backward ";
       Data_Mat      : constant Real_Float_Matrix :=
                         Real_Float_Matrix (Layer.Input_Data);
       Error_Mat     : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix (Error);
    begin
---        Put_Line (Routine_Name & "Layer Kind: " &
---                    Layer_Type'Image (Layer.Layer_Kind));
---        Print_Matrix_Dimensions (Routine_Name & "Data_Mat", Data_Mat);
---        Print_Matrix_Dimensions (Routine_Name & "Error_Mat", Error_Mat);
+      --        Put_Line (Routine_Name & "Layer Kind: " &
+      --                    Layer_Type'Image (Layer.Layer_Kind));
+      --        Print_Matrix_Dimensions (Routine_Name & "Data_Mat", Data_Mat);
+      --        Print_Matrix_Dimensions (Routine_Name & "Error_Mat", Error_Mat);
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             In_Error      : constant Real_Float_Matrix :=
@@ -33,12 +33,12 @@ package body Neural_Processes is
             Weights_Error : constant Real_Float_Matrix :=
                               Transpose (Data_Mat) * Error_Mat;
          begin
---              Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
---                                       Real_Float_Matrix (Layer.Weights));
+            --              Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
+            --                                       Real_Float_Matrix (Layer.Weights));
 
             --           Print_Float_Matrix (Routine_Name & "Weights_Error", Weights_Error);
 
---              Print_Float_Matrix (Routine_Name & "In_Error", In_Error, 1, 1, 1, 8);
+            --              Print_Float_Matrix (Routine_Name & "In_Error", In_Error, 1, 1, 1, 8);
             --  accumulate the error over a minibatch
             Layer.Delta_W :=
               Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) + Weights_Error);
@@ -64,8 +64,8 @@ package body Neural_Processes is
             for col in In_Error'Range (2) loop
                Error.Append (In_Error (1, col));
             end loop;
---              Print_Real_Float_List (Routine_Name & "Activation Error",
---                                     Error, 1, 8);
+            --              Print_Real_Float_List (Routine_Name & "Activation Error",
+            --                                     Error, 1, 8);
          end;
       end if;
 
@@ -76,7 +76,7 @@ package body Neural_Processes is
    procedure Forward
      (Layer : in out Layer_Data; Data : in out Real_Float_List) is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Neural_Processes.Forward ";
+      --        Routine_Name : constant String := "Neural_Processes.Forward ";
       In_Data      : constant Real_Float_Matrix :=
                        To_Real_Float_Matrix (Data);
       Out_Data     : Real_Float_List;
@@ -102,6 +102,7 @@ package body Neural_Processes is
       end if;
 
       Data := Out_Data;
+--        Print_Real_Float_List ("Data", Data, 1, 2);
 
    end Forward;
 
