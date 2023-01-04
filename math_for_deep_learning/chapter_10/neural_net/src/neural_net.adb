@@ -62,13 +62,8 @@ begin
    Predictions := Predict (Net, X_Test);  --  out
    Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
              & " x" & Integer'Image (Integer (Predictions (1).Length)));
-
-   --     for count in 1 .. 8 loop
-   --        Put_Line ("Y_Test (" & Integer'Image (count)  & "): " &
-   --                               Float'Image (Y_Test (count)));
-   --        Print_Real_Float_List ("Predictions (" & Integer'Image (count)  & ")",
-   --                               Predictions (count));
-   --     end loop;
+   Print_Float_Vector ("Y_Test", Y_Test, 1, 2);
+   Print_Real_Float_List_2D ("Predictions", Predictions, 1, 2);
 
    --  Y_Test values range is the digits 0 .. 9
    for index in Y_Test'Range loop

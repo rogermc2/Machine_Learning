@@ -48,6 +48,9 @@ package Basic_Printing is
    procedure Print_Real_Float_List
      (Name  : String; aList : Real_Float_List;
       Start : Positive := 1; Finish : Natural := 0);
+   procedure Print_Real_Float_List_2D
+     (Name  : String; aList : Real_Float_List_2D;
+      Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Unbound_Array (Name : String;
                                    UB   : Unbounded_String_Array);
    procedure Print_Unbound_List (Name : String; UB : ML_Types.Unbounded_List);

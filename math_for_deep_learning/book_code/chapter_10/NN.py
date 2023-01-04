@@ -40,9 +40,6 @@ class ActivationLayer:
         return sigmoid(input_data)
 
     def backward(self, output_error):
-        print ("backward self.input ", self.input.shape)
-        print ("backward sigmoid_prime ", sigmoid_prime(self.input).shape)
-        print ("backward output_error ", output_error.shape)
         return sigmoid_prime(self.input) * output_error
     
     def step(self, eta):

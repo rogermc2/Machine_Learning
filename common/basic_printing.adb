@@ -431,6 +431,43 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Real_Float_List_2D
+     (Name  : String; aList : Real_Float_List_2D;
+      Start : Positive := 1; Finish : Natural := 0) is
+      Row_List : Real_Float_List;
+      Last  : Positive;
+      Count : Positive;
+   begin
+      if Finish > 0 and Finish <= aList.Last_Index then
+         Last := Finish;
+      else
+         Last := Integer (aList.Last_Index);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= aList.First_Index and Last >= Start then
+         for row in Start .. Last loop
+            Row_List := aList (row);
+            Count := 1;
+            for col in Row_List.First_Index .. Row_List.Last_Index loop
+               Put (Float'Image (Row_List (col)) & "  ");
+               Count := Count + 1;
+               if Count > 10 and col /= Row_List.Last_Index then
+                  New_Line;
+                  Count := 1;
+               end if;
+            end loop;
+            New_Line;
+         end loop;
+      else
+         Put_Line ("Print_Real_Float_List called with invalid start index.");
+      end if;
+      New_Line;
+
+   end Print_Real_Float_List_2D;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Unbound_Array (Name : String;
                                   UB   : Unbounded_String_Array) is
       Count : Integer := 1;

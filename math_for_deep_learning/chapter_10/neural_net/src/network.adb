@@ -116,22 +116,22 @@ package body Network is
 
             Put_Line (Routine_Name & "accumulated Error" &
                         Float'Image (Accum_Error));
-            Print_Real_Float_List (Routine_Name & "Sample" &
-                                     Integer'Image (Sample) &
-                                     " Error derivative", Error);
+--              Print_Real_Float_List (Routine_Name & "Sample" &
+--                                       Integer'Image (Sample) &
+--                                       " Error derivative", Error);
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
                Backward (Network.Layers (layer), Error);
-               if sample = 1 then
-                  Print_Real_Float_List
-                    (Routine_Name & "sample 1 layer" & Integer'Image (layer) &
-                       " Error", Error, 1, 6);
-               end if;
+--                 if sample = 1 then
+--                    Print_Real_Float_List
+--                      (Routine_Name & "sample 1 layer" & Integer'Image (layer) &
+--                         " Error", Error, 1, 6);
+--                 end if;
             end loop;
-            if sample = 1 then
-               Put_Line (Routine_Name & "sample 1 Accumulated Error" &
-                           Float'Image (Accum_Error));
-            end if;
+--              if sample = 1 then
+--                 Put_Line (Routine_Name & "sample 1 Accumulated Error" &
+--                             Float'Image (Accum_Error));
+--              end if;
 
          end loop;  --  Sample
          --           Print_List_Dimensions (Routine_Name & "minibatch Loss", Loss);
