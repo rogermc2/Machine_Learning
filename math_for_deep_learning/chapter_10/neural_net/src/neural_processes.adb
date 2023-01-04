@@ -60,7 +60,7 @@ package body Neural_Processes is
             end loop;
          end;
 
-      else  --  Actvation layer
+      else  --  Activation layer
          declare
             In_Error : constant Real_Float_Matrix
               := H_Product (Neural_Maths.Sigmoid_Deriv (Data_Mat), Error_Mat);
@@ -69,6 +69,10 @@ package body Neural_Processes is
             for col in In_Error'Range (2) loop
                Error.Append (In_Error (1, col));
             end loop;
+            Print_Matrix_Dimensions (Routine_Name & "Activation Data_Mat", Data_Mat);
+            Print_Matrix_Dimensions (Routine_Name & "Activation Error_Mat", Error_Mat);
+            Print_Matrix_Dimensions (Routine_Name & "Activation In_Error", In_Error);
+            Print_Float_Matrix (Routine_Name & "Activation In_Error", In_Error, 1, 2, 1, 8);
          end;
       end if;
 
