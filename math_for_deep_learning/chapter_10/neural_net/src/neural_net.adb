@@ -59,25 +59,25 @@ begin
    Fit (Net, X_Train, Y_Train, Minibatches, Learning_Rate);
 
    --  Build the confusion matrix using the test set predictions
-   Predictions := Predict (Net, X_Test);  --  out
+--     Predictions := Predict (Net, X_Test);  --  out
 --     Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
 --               & " x" & Integer'Image (Integer (Predictions (1).Length)));
-   Print_Float_Vector ("Y_Test", Y_Test, 1, 1);
-   Print_Real_Float_List_2D ("Predictions", Predictions, 1, 1);
+--     Print_Float_Vector ("Y_Test", Y_Test, 1, 1);
+--     Print_Real_Float_List_2D ("Predictions", Predictions, 1, 1);
 
    --  Y_Test values range is the digits 0 .. 9
-   for index in Y_Test'Range loop
-      CM_Col := Arg_Max (Predictions (index)) - 1;
-      Confusion (Integer (Y_Test (index)), CM_Col) :=
-        Confusion (Integer (Y_Test (index)), CM_Col) + 1 ;
-   end loop;
+--     for index in Y_Test'Range loop
+--        CM_Col := Arg_Max (Predictions (index)) - 1;
+--        Confusion (Integer (Y_Test (index)), CM_Col) :=
+--          Confusion (Integer (Y_Test (index)), CM_Col) + 1 ;
+--     end loop;
 
-   Print_Integer_Matrix ("Confusion matrix", Confusion);
-   Put_Line ("Confusion diagonal sum:" &
-               Integer'Image (Sum_Diagonal (Confusion)));
-   Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
-   Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
-               Float (Sum (Confusion))));
+--     Print_Integer_Matrix ("Confusion matrix", Confusion);
+--     Put_Line ("Confusion diagonal sum:" &
+--                 Integer'Image (Sum_Diagonal (Confusion)));
+--     Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
+--     Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
+--                 Float (Sum (Confusion))));
 
    Put_Line (Project_Name & "done.");
    New_Line;

@@ -106,9 +106,9 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               --                 Put_Line (Routine_Name &
-               --                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
-               --                              & " layer:" & Integer'Image (layer));
+               Put_Line (Routine_Name &
+                           Layer_Type'Image (Network.Layers (layer).Layer_Kind)
+                         & " layer:" & Integer'Image (layer));
                Forward (Network.Layers (layer), Output_Data);
             end loop;
             --              Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, sample, sample);
@@ -117,7 +117,6 @@ package body Network is
             --  accumulate error by backward propagate
             Error :=
               Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Accum_Error);
-            --  Correct so far
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
@@ -181,7 +180,7 @@ package body Network is
 
    function Predict
      (Network : in out Network_Data; Input_Data : Real_Float_Matrix)
-         return Real_Float_List_2D is
+      return Real_Float_List_2D is
       --        Routine_Name : constant String := "Network.Predict ";
       Output_Data : Real_Float_List;
       Predictions : Real_Float_List_2D;  --  Result
