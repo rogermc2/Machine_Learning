@@ -99,6 +99,7 @@ package body Network is
 
          --  forward propagation
          for sample in X_Batch'Range loop
+            Put_Line ("sample" & Integer'Image (sample));
             --  Get a sample from X_Batch
             Output_Data := To_Real_Float_List (X_Batch, Sample);
 
@@ -109,7 +110,7 @@ package body Network is
                --                              & " layer:" & Integer'Image (layer));
                Forward (Network.Layers (layer), Output_Data);
             end loop;
-            Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, 1, 2);
+            Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, sample, sample);
             Print_Real_Float_List(Routine_Name & "Output_Data", Output_Data);
 
             --  accumulate error by backward propagate
