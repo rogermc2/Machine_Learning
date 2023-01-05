@@ -120,14 +120,12 @@ class Network:
                 output = x_batch[j]
                 for layer in self.layers:
                     output = layer.forward(output)
-                print ("y_batch[j]", y_batch[j])
 
                 # accumulate loss
-                # err += mse(y_batch[j], output)
+                err += mse(y_batch[j], output)
 
                 # backward propagation
                 error = mse_prime(y_batch[j], output)
-                print ("forward error", error.shape)
                 for layer in reversed(self.layers):
                     error = layer.backward(error)
             
@@ -136,9 +134,9 @@ class Network:
                 layer.step(learning_rate)
 
             # report mean loss over minibatch
-            # if (self.verbose) and ((i%10) == 0):
-            #     err /= batch_size
-            #     print('minibatch %5d/%d   error=%0.9f' % (i, minibatches, err))
+            if (self.verbose) and ((i%10) == 0):
+                err /= batch_size
+                print('minibatch %5d/%d   error=%0.9f' % (i, minibatches, err))
 
 # end NN.py
 
