@@ -109,6 +109,8 @@ package body Network is
                --                              & " layer:" & Integer'Image (layer));
                Forward (Network.Layers (layer), Output_Data);
             end loop;
+            Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, 1, 2);
+            Print_Real_Float_List(Routine_Name & "Output_Data", Output_Data);
 
             --  accumulate error by backward propagate
             Error :=
