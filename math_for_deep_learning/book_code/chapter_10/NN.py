@@ -120,16 +120,17 @@ class Network:
                 output = x_batch[j]
                 for layer in self.layers:
                     output = layer.forward(output)
+                print ("y_batch[j]", y_batch[j])
 
                 # accumulate loss
                 # err += mse(y_batch[j], output)
 
                 # backward propagation
                 error = mse_prime(y_batch[j], output)
-                if (j == 0):
-                    print ("error", error)
+                print ("forward error", error.shape)
                 for layer in reversed(self.layers):
                     error = layer.backward(error)
+                print ("backward error", error.shape)
             
             #  update weights and biases
             for layer in self.layers:
