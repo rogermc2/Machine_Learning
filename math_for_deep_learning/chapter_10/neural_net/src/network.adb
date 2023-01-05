@@ -125,6 +125,9 @@ package body Network is
                Backward (Network.Layers (layer), Error);
             end loop;
             Print_List_Dimensions (Routine_Name & "backward Error", Error);
+--              if sample = 1 then
+--                 Print_Real_Float_List (Routine_Name & "backward Error", Error);
+--              end if;
 
          end loop;  --  Sample
          --           Print_List_Dimensions (Routine_Name & "minibatch Loss", Loss);

@@ -32,10 +32,16 @@ net.add(FullyConnectedLayer(50, 10))
 net.add(ActivationLayer())
 
 #  Loss and train
-net.fit(x_train, y_train, minibatches=2, learning_rate=1.0)
+net.fit(x_train, y_train, minibatches=20, learning_rate=1.0)
 
 #  Build the confusion matrix using the test set predictions
 out = net.predict(x_test)
+print ("y_test: ", y_test[0])
+print ("predictions: ", out[0])
+print ("y_test: ", y_test[1])
+print ("predictions: ", out[1])
+print ("y_test: ", y_test[2])
+print ("predictions: ", out[2])
 cm = np.zeros((10,10), dtype="uint32")
 for i in range(len(y_test)):
     cm[y_test[i],np.argmax(out[i])] += 1

@@ -403,27 +403,32 @@ package body Basic_Printing is
    procedure Print_Real_Float_List
      (Name  : String; aList : Real_Float_List;
       Start : Positive := 1; Finish : Natural := 0) is
-      Last  : Positive;
-      Count : Positive := 1;
+      Routine_Name : constant String := "Print_Real_Float_List ";
+      Last         : Positive;
+      Count        : Positive := 1;
    begin
-      if Finish > 0 and Finish <= aList.Last_Index then
-         Last := Finish;
-      else
-         Last := Integer (aList.Last_Index);
-      end if;
+      if Integer (aList.Length) > 0 then
+         if Finish > 0 and Finish <= aList.Last_Index then
+            Last := Finish;
+         else
+            Last := Integer (aList.Last_Index);
+         end if;
 
-      Put_Line (Name & ": ");
-      if Start >= aList.First_Index and Last >= Start then
-         for Index in Start .. Last loop
-            Put (Float'Image (aList (Index)) & "  ");
-            Count := Count + 1;
-            if Count > 10 then
-               New_Line;
-               Count := 1;
-            end if;
-         end loop;
+         Put_Line (Name & ": ");
+         if Start >= aList.First_Index and Last >= Start then
+            for Index in Start .. Last loop
+               Put (Float'Image (aList (Index)) & "  ");
+               Count := Count + 1;
+               if Count > 10 then
+                  New_Line;
+                  Count := 1;
+               end if;
+            end loop;
+         else
+            Put_Line (Routine_Name & "called with invalid start index.");
+         end if;
       else
-         Put_Line ("Print_Real_Float_List called with invalid start index.");
+         Put_Line (Routine_Name & "called with empty list");
       end if;
       New_Line;
 
@@ -434,33 +439,42 @@ package body Basic_Printing is
    procedure Print_Real_Float_List_2D
      (Name  : String; aList : Real_Float_List_2D;
       Start : Positive := 1; Finish : Natural := 0) is
-      Row_List : Real_Float_List;
-      Last  : Positive;
-      Count : Positive;
+      Routine_Name : constant String := "Print_Real_Float_List_2D ";
+      Row_List     : Real_Float_List;
+      Last         : Integer;
+      Count        : Positive;
    begin
-      if Finish > 0 and Finish <= aList.Last_Index then
-         Last := Finish;
-      else
-         Last := Integer (aList.Last_Index);
-      end if;
+      if Integer (aList.Length) > 0 then
+         if Finish > 0 and Finish <= aList.Last_Index then
+            Last := Finish;
+         else
+            Last := Integer (aList.Last_Index);
+         end if;
 
-      Put_Line (Name & ": ");
-      if Start >= aList.First_Index and Last >= Start then
-         for row in Start .. Last loop
-            Row_List := aList (row);
-            Count := 1;
-            for col in Row_List.First_Index .. Row_List.Last_Index loop
-               Put (Float'Image (Row_List (col)) & "  ");
-               Count := Count + 1;
-               if Count > 10 and col /= Row_List.Last_Index then
-                  New_Line;
-                  Count := 1;
-               end if;
+         Put_Line (Name & ": ");
+         if Start >= aList.First_Index and Last >= Start then
+            for row in Start .. Last loop
+               Row_List := aList (row);
+               Count := 1;
+               for col in Row_List.First_Index .. Row_List.Last_Index loop
+                  Put (Float'Image (Row_List (col)) & "  ");
+                  Count := Count + 1;
+                  if Count > 10 and col /= Row_List.Last_Index then
+                     New_Line;
+                     Count := 1;
+                  end if;
+               end loop;
+               New_Line;
             end loop;
-            New_Line;
-         end loop;
+         elsif Start < aList.First_Index then
+            Put_Line (Routine_Name & "called with invalid start index:" &
+                        Integer'Image (Start));
+         else
+            Put_Line (Routine_Name & "called with invalid Last index:" &
+                        Integer'Image (Last));
+         end if;
       else
-         Put_Line ("Print_Real_Float_List called with invalid start index.");
+         Put_Line (Routine_Name & "called with empty list");
       end if;
       New_Line;
 

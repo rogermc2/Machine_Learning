@@ -130,7 +130,6 @@ class Network:
                 print ("forward error", error.shape)
                 for layer in reversed(self.layers):
                     error = layer.backward(error)
-                print ("backward error", error.shape)
             
             #  update weights and biases
             for layer in self.layers:
