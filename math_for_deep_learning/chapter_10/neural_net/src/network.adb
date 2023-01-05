@@ -79,14 +79,15 @@ package body Network is
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
-      --        Routine_Name : constant String := "Network.Fit ";
+      Routine_Name : constant String := "Network.Fit ";
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
       Output_Data  : Real_Float_List;
       Accum_Error  : Float;
       Error        : Real_Float_List;
    begin
-      Put_Line ("Running" & Integer'Image (Minibatches) & " minibatches");
+      Put_Line (Routine_Name & "running" & Integer'Image (Minibatches) &
+                  " minibatches");
       for count in 1 .. Minibatches loop
          if count mod 40 = 0 then
             Put ("*");
@@ -99,7 +100,7 @@ package body Network is
 
          --  forward propagation
          for sample in X_Batch'Range loop
-            --              Put_Line ("sample" & Integer'Image (sample));
+            Put_Line ("sample" & Integer'Image (sample));
             --  Get a sample from X_Batch
             Output_Data := To_Real_Float_List (X_Batch, Sample);
 
@@ -120,6 +121,7 @@ package body Network is
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
+               Put_Line ("layer" & Integer'Image (layer));
                Backward (Network.Layers (layer), Error);
             end loop;
             --              Print_List_Dimensions (Routine_Name & "backward Error", Error);
