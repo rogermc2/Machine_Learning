@@ -99,7 +99,7 @@ package body Network is
 
          --  forward propagation
          for sample in X_Batch'Range loop
-            Put_Line ("sample" & Integer'Image (sample));
+--              Put_Line ("sample" & Integer'Image (sample));
             --  Get a sample from X_Batch
             Output_Data := To_Real_Float_List (X_Batch, Sample);
 
@@ -117,14 +117,14 @@ package body Network is
             Error :=
               Accumulate_MS_Error (Sample, Y_Batch, Output_Data);
             --                Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Accum_Error);
-            Print_Real_Float_List (Routine_Name & "forward Error", Error);
+--              Print_Real_Float_List (Routine_Name & "forward Error", Error);
             --  Correct so far
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
                Backward (Network.Layers (layer), Error);
             end loop;
-            Print_List_Dimensions (Routine_Name & "backward Error", Error);
+--              Print_List_Dimensions (Routine_Name & "backward Error", Error);
 --              if sample = 1 then
 --                 Print_Real_Float_List (Routine_Name & "backward Error", Error);
 --              end if;

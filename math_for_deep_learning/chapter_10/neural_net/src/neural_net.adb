@@ -25,7 +25,7 @@ procedure Neural_Net is
                       Load_Data ("../../datasets/y_test.csv");
    X_Train_Image  : Real_Float_Vector (X_Train'Range (2));
    --     Minibatches    : constant Positive := 40000;
-   Minibatches    : constant Positive := 2;
+   Minibatches    : constant Positive := 1;
    Learning_Rate  : constant Float := 1.0;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
@@ -59,10 +59,10 @@ begin
    Fit (Net, X_Train, Y_Train, Minibatches, Learning_Rate);
 
    --  Build the confusion matrix using the test set predictions
-   Predictions := Predict (Net, X_Test);  --  out
+   Predictions := Predict (Net, X_Train);  --  out
 --     Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
 --               & " x" & Integer'Image (Integer (Predictions (1).Length)));
-   Print_Float_Vector ("Y_Test", Y_Test, 1, 1);
+   Print_Float_Matrix ("Y_Test", Y_Train, 1, 1);
    Print_Real_Float_List_2D ("Predictions", Predictions, 1, 1);
 
    --  Y_Test values range is the digits 0 .. 9
