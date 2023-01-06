@@ -385,12 +385,38 @@ package body ML_Arrays_And_Matrices is
 
    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                  return Real_Float_Matrix is
-      Result : Real_Float_Matrix := L;
+      Result : Real_Float_Matrix (L'Range, L'Range (2));
    begin
       for row in L'Range loop
          for col in L'Range (2) loop
-            Result (row, col) := Result (row, col) - R (row);
+            Result (row, col) := L (row, col) - R (row);
          end loop;
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ------------------------------------------------------------------------
+
+   function "-" (L : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector (L'Range);
+   begin
+      for index in L'Range loop
+         Result (index) := -L (index);
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ------------------------------------------------------------------------
+
+   function "-" (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector (R'Range);
+   begin
+      for index in R'Range loop
+         Result (index) := R (index) - L;
       end loop;
 
       return Result;
@@ -402,8 +428,8 @@ package body ML_Arrays_And_Matrices is
    function "-" (L : Real_Float_Vector; R : Float) return Real_Float_Vector is
       Result : Real_Float_Vector := L;
    begin
-      for row in L'Range loop
-         Result (row) := L (row) - R;
+      for index in L'Range loop
+         Result (index) := L (index) - R;
       end loop;
 
       return Result;
@@ -716,6 +742,20 @@ package body ML_Arrays_And_Matrices is
    end H_Product;
 
    --  ----------------------------------------------------------------------------
+
+   function Log (V : Real_Float_Vector) return Real_Float_Vector is
+      use Maths.Float_Math_Functions;
+      Result : Real_Float_Vector (V'Range);
+   begin
+      for index in V'Range loop
+         Result (index) := Log (V (index));
+      end loop;
+
+      return Result;
+
+   end Log;
+
+   --  ------------------------------------------------------------------------
 
    function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
       Result : Real_Float_Vector (R'Range);

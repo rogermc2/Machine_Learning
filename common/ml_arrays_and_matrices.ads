@@ -143,6 +143,8 @@ package ML_Arrays_And_Matrices is
    function "-" (L : Real_Float_Matrix; R : Boolean_Matrix)
                   return Real_Float_Matrix;
    function "-" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix;
+   function "-" (L : Real_Float_Vector) return Real_Float_Vector;
+   function "-" (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    function "-" (L : Real_Float_Vector; R : Float) return Real_Float_Vector;
    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
@@ -177,6 +179,8 @@ package ML_Arrays_And_Matrices is
    function H_Product (L, R : Real_Float_List) return Real_Float_Vector;
    function H_Product (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline (H_Product);
+   function Log (V : Real_Float_Vector) return Real_Float_Vector;
+   pragma Inline (Log);
    function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    function Multiply_Elements (L, R : Real_Float_Matrix)
                                 return Real_Float_Matrix;

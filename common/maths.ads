@@ -23,4 +23,5 @@ package Maths is
    function Random_Integer return Integer;
    function Random_Integer (First, Last : Integer) return Integer;
    function Round (Num : Float; Places : Natural) return Float;
+
 end Maths;
