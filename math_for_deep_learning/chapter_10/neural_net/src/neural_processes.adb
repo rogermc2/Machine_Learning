@@ -29,18 +29,14 @@ package body Neural_Processes is
             Weights_Error : constant Real_Float_Matrix :=
                               Transpose (Data_Mat) * Error_Mat;
          begin
-            Print_Matrix_Dimensions (Routine_Name & "Transpose (Data_Mat)",
-                                      Real_Float_Matrix (Transpose (Data_Mat)));
-            Print_Matrix_Dimensions (Routine_Name & "Error_Mat",
-                                      Real_Float_Matrix (Error_Mat));
+--              Print_Matrix_Dimensions (Routine_Name & "Transpose (Data_Mat)",
+--                                        Real_Float_Matrix (Transpose (Data_Mat)));
+--              Print_Matrix_Dimensions (Routine_Name & "Error_Mat",
+--                                        Real_Float_Matrix (Error_Mat));
 
-            Print_Float_Matrix (Routine_Name & "Transpose (Data_Mat)",
-                                Transpose (Data_Mat));
-            Print_Real_Float_List (Routine_Name & "Error", Error);
-            Print_Float_Matrix (Routine_Name & "Weights_Error",
-                                Weights_Error, 20, 20);
-
-            --  accumulate the error over a minibatch
+            --  accumulate the error over the minibatch
+            Print_Float_Matrix (Routine_Name & "pre update Delta_W",
+                                   Real_Float_Matrix (Layer.Delta_W), 1, 1, 1, 10);
             Layer.Delta_W :=
               Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) + Weights_Error);
 
@@ -55,6 +51,8 @@ package body Neural_Processes is
                Error.Append (In_Error (1, col));
             end loop;
          end;
+         Print_Float_Matrix (Routine_Name & "exit Delta_W",
+                             Real_Float_Matrix (Layer.Delta_W), 1, 1, 1, 10);
 
       else  --  Activation layer
          declare

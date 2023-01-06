@@ -100,15 +100,15 @@ package body Network is
 
          --  forward propagation
          for sample in X_Batch'Range loop
-            Put_Line ("sample" & Integer'Image (sample));
+--              Put_Line ("sample" & Integer'Image (sample));
             --  Get a sample from X_Batch
             Output_Data := To_Real_Float_List (X_Batch, Sample);
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line (Routine_Name &
-                           Layer_Type'Image (Network.Layers (layer).Layer_Kind)
-                         & " layer:" & Integer'Image (layer));
+--                 Put_Line (Routine_Name &
+--                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
+--                           & " layer:" & Integer'Image (layer));
                Forward (Network.Layers (layer), Output_Data);
             end loop;
             --              Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, sample, sample);
@@ -120,7 +120,7 @@ package body Network is
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line ("layer" & Integer'Image (layer));
+               Put_Line ("backward layer" & Integer'Image (layer));
                Backward (Network.Layers (layer), Error);
             end loop;
             --              Print_List_Dimensions (Routine_Name & "backward Error", Error);
