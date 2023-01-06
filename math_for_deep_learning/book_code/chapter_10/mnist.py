@@ -32,7 +32,7 @@ net.add(FullyConnectedLayer(50, 10))
 net.add(ActivationLayer())
 
 #  Loss and train
-net.fit(x_train, y_train, minibatches=2, learning_rate=1.0)
+net.fit(x_train, y_train, minibatches=4, learning_rate=1.0)
 
 #  Build the confusion matrix using the test set predictions
 out = net.predict(x_test)

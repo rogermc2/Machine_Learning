@@ -35,8 +35,8 @@ package body Neural_Processes is
 --                                        Real_Float_Matrix (Error_Mat));
 
             --  accumulate the error over the minibatch
-            Print_Float_Matrix (Routine_Name & "pre update Delta_W",
-                                   Real_Float_Matrix (Layer.Delta_W), 1, 1, 1, 10);
+--              Print_Float_Matrix (Routine_Name & "pre update Delta_W",
+--                                     Real_Float_Matrix (Layer.Delta_W), 1, 1, 1, 10);
             Layer.Delta_W :=
               Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) + Weights_Error);
 
@@ -51,8 +51,8 @@ package body Neural_Processes is
                Error.Append (In_Error (1, col));
             end loop;
          end;
-         Print_Float_Matrix (Routine_Name & "exit Delta_W",
-                             Real_Float_Matrix (Layer.Delta_W), 1, 1, 1, 10);
+--           Print_Float_Matrix (Routine_Name & "exit Delta_W",
+--                               Real_Float_Matrix (Layer.Delta_W), 1, 1, 1, 10);
 
       else  --  Activation layer
          declare
@@ -63,8 +63,6 @@ package body Neural_Processes is
             for col in In_Error'Range (2) loop
                Error.Append (In_Error (1, col));
             end loop;
-            --              Print_Real_Float_List (Routine_Name & "Activation Error",
-            --                                     Error, 1, 8);
          end;
       end if;
 
