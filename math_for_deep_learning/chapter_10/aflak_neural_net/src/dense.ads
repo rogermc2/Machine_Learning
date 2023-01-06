@@ -1,7 +1,7 @@
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
-package Neural_Processes is
+package Dense is
    type Layer_Type is (Activation_Layer, Hidden_Layer);
    type Layer_Range is new Integer range 0 .. Integer'Last / 2;
    type Layer_Matrix is
@@ -27,11 +27,9 @@ package Neural_Processes is
       end record;
 
    procedure Backward
-     (Layer : in out Layer_Data; Error : in out Real_Float_List);
-   procedure Forward (Layer : in out Layer_Data; Data : in out Real_Float_List);
-   function Load_Data (File_Name : String; Num_Columns : Positive)
-                       return Real_Float_Matrix;
-   function Load_Data (File_Name : String) return Real_Float_Vector;
-   procedure Step (Layer : in out Layer_Data; Eta : Float);
+     (Layer         : in out Layer_Data; Gradient : in out Real_Float_List;
+      Learning_Rate : Float);
+   procedure Forward (Layer : in out Layer_Data;
+                      Data  : in out Real_Float_List);
 
-end Neural_Processes;
+end Dense;

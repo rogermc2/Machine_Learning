@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Basic_Printing; use Basic_Printing;
 with Classifier_Utilities;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with Neural_Processes; use Neural_Processes;
+with Dense; use Dense;
 with Support_4;
 
 with Network; use Network;
