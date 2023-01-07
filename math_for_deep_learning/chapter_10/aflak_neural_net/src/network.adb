@@ -115,9 +115,9 @@ package body Network is
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
       Y_Train       : Binary_Matrix; Epochs : Positive := 1000;
       Learning_Rate : Float := 0.01; Verbose : Boolean := True) is
-      Routine_Name : constant String := "Network.Train ";
+--        Routine_Name : constant String := "Network.Train ";
       Output_Data  : Real_Float_List;
-      Grad         : Real_Float_Vector (Y_Train'Range (2));
+      Grad         : Real_Float_List;
       Error        : Float;
    begin
       for count in 1 .. Epochs loop
@@ -132,40 +132,25 @@ package body Network is
               Predict (Network, Output_Data);
             Error := Error + Losses.MSE (Get_Row (Y_Train, sample),
                                          Output_Data);
-            Grad := Losses.MSE_Prime (Get_Row (Y_Train, sample), Output_Data);
-
-            for layer in Network.Layers.First_Index ..
-              Network.Layers.Last_Index loop
---                 Put_Line (Routine_Name &
---                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
---                           & " layer:" & Integer'Image (layer));
-               Forward (Network.Layers (layer), Output_Data);
-            end loop;
-            --              Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, sample, sample);
-            --              Print_Real_Float_List(Routine_Name & "Output_Data", Output_Data);
+            Grad := To_Real_Float_List
+              (Losses.MSE_Prime (Get_Row (Y_Train, sample), Output_Data));
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line ("backward layer" & Integer'Image (layer));
-               Backward (Network.Layers (layer), Error);
+--                 Put_Line ("backward layer" & Integer'Image (layer));
+               Backward (Network.Layers (layer), Grad, Learning_Rate);
             end loop;
-            --              Print_List_Dimensions (Routine_Name & "backward Error", Error);
-            --              if sample = 1 then
-            --                 Print_Real_Float_List (Routine_Name & "backward Error", Error);
-            --              end if;
 
          end loop;  --  Sample
-         --           Print_List_Dimensions (Routine_Name & "minibatch Loss", Loss);
-         --           Print_Real_Float_List (Routine_Name & "minibatch Loss", Loss, 1, 6);
 
-         --  report mean loss over minibatch
-         if Network.Verbose and then
+         --  report mean loss over Epochs
+         if Verbose and then
            (Epochs < 10 or else count mod (Epochs / 10) = 0) then
             New_Line;
             Put_Line ("Epoch" & Integer'Image (count) &
                         " mean error: " & Float'Image (Error));
          end if;
-      end loop;  --  Minibatches
+      end loop;  --  Epochs
       New_Line;
 
    end Train;
