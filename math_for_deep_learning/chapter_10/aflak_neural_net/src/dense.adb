@@ -50,15 +50,8 @@ package body Dense is
             end loop;
          end;
 
-      else  --  Tanh layer
-         declare
-            use Maths.Float_Math_Functions;
-         begin
-            for index in Gradient.First_Index .. Gradient.Last_Index loop
-               Gradient.Replace_Element
-                 (index, Gradient (index) * (1.0 - Tanh (Gradient (index))) ** 2);
-            end loop;
-         end;
+      else  --  Activation layer
+         null;
       end if;
 
    end Backward;
