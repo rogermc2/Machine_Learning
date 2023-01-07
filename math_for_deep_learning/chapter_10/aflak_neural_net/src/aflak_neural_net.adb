@@ -18,21 +18,33 @@ procedure Aflak_Neural_Net is
    Dataset_Name   : constant String := "mnist_784";
    Test_Size      : constant Positive := 20;
    Train_Size     : constant Positive := 1000;
+
+   function Categorize (Labels : Integer_Matrix) return Binary_Matrix is
+      Result : Binary_Matrix (Labels'Range, 0 .. 9) :=
+        (others => (others => 0));
+   begin
+      for row in Labels'Range loop
+         Result (row, Labels (row, 1)) := 1;
+      end loop;
+      return Result;
+
+   end Categorize;
+
    Epochs         : constant Positive := 100;
    Learning_Rate  : constant Float := 0.1;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
    Confusion      : Integer_Matrix (0 .. 9, 0 .. 9) :=
-                      (others => (others => 0));
+     (others => (others => 0));
    CM_Col         : Natural;
 begin
    declare
       Data          : constant Base_State :=
-                        Get_State (Dataset_Name, Train_Size, Test_Size);
+        Get_State (Dataset_Name, Train_Size, Test_Size);
       X_Train       : constant Real_Float_Matrix := Data.Train_X / 255.0;
       Y_Train       : constant Integer_Matrix := Data.Train_Y;
       X_Test        : constant Real_Float_Matrix := Data.Test_X / 255.0;
-      Y_Test        : constant Integer_Matrix := Data.Test_Y;
+      Y_Test        : constant Binary_Matrix := Categorize (Data.Test_Y);
    begin
       Put_Line ("Train X length: " & Count_Type'Image (X_Train'Length) & " x" &
                   Count_Type'Image (X_Train'Length (2)));
