@@ -123,9 +123,9 @@ package ML_Arrays_And_Matrices is
    function "**" (L : Real_Float_Matrix; R : Natural) return Real_Float_Matrix;
    function "**" (L : Real_Float_Vector; R : Natural) return Real_Float_Vector;
    pragma Inline ("**");
+   function "/" (L, R : Binary_Array) return Real_Float_Vector;
    function "/" (L : Float; R : Real_Float_Matrix) return Real_Float_Matrix;
    function "/" (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
-   function "/" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix;
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
@@ -137,12 +137,15 @@ package ML_Arrays_And_Matrices is
    function "+" (L : Float; R : Real_Float_Matrix) return Real_Float_Matrix;
    function "+" (L, R : Integer_Matrix) return Integer_Matrix;
    pragma Inline ("+");
+   function "-" (L, R : Binary_Array) return Binary_Array;
    function "-" (L, R : Binary_Matrix) return Binary_Matrix;
    function "-" (M : Integer_Matrix) return Integer_Matrix;
    function "-" (L, R : Integer_Matrix) return Integer_Matrix;
    function "-" (L : Real_Float_Matrix; R : Boolean_Matrix)
                   return Real_Float_Matrix;
    function "-" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix;
+   function "-" (L : Real_Float_Vector) return Real_Float_Vector;
+   function "-" (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    function "-" (L : Real_Float_Vector; R : Float) return Real_Float_Vector;
    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
@@ -168,7 +171,15 @@ package ML_Arrays_And_Matrices is
    function Flatten (M : Integer_Matrix) return Integer_Array;
    function Flatten (M : Real_Float_Matrix) return Real_Float_Vector;
    pragma Inline (Flatten);
+   function Get_Row (Matrix : Binary_Matrix; Row : Integer)
+                     return Binary_Array;
+   function Get_Row (Matrix : Integer_Matrix; Row : Integer)
+                     return Integer_Array;
+   function Get_Row (Matrix : Real_Float_Matrix; Row : Integer)
+                     return Real_Float_Vector;
+   pragma Inline (Get_Row);
    --  Hadamard product
+   function H_Product (L, R : Binary_Array) return Binary_Array;
    function H_Product (L, R : Real_Float_Vector) return Real_Float_Vector;
    function H_Product (L : Real_Float_Vector; R : Real_Float_List)
                        return Real_Float_Vector;
@@ -177,6 +188,8 @@ package ML_Arrays_And_Matrices is
    function H_Product (L, R : Real_Float_List) return Real_Float_Vector;
    function H_Product (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline (H_Product);
+   function Log (V : Real_Float_Vector) return Real_Float_Vector;
+   pragma Inline (Log);
    function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    function Multiply_Elements (L, R : Real_Float_Matrix)
                                 return Real_Float_Matrix;
@@ -254,6 +267,8 @@ package ML_Arrays_And_Matrices is
    function To_Real_Float_Matrix (IM : Integer_Matrix)
                                    return Real_Float_Matrix;
    pragma Inline (To_Real_Float_Matrix);
+   function To_Real_Float_Vector (List : Binary_Array)
+                                  return Real_Float_Vector;
    function To_Real_Float_Vector (List : Integer_Array)
                                   return Real_Float_Vector;
    function To_Real_Float_Vector (List : Real_Float_List)

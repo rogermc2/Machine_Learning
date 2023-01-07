@@ -1,6 +1,10 @@
 *.adb1
 *.ads1
 *.orig
+*.oml
+*.sta
+*.ada
+*.arff
 *.clang-format
 *.rtf
 *.csv

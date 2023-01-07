@@ -158,6 +158,19 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "/" (L, R : Binary_Array) return Real_Float_Vector is
+      Result : Real_Float_Vector (R'Range);
+   begin
+      for index in R'Range loop
+         Result (index) := Float (L (index)) / Float (R (index));
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  ------------------------------------------------------------------------
+
    function "/" (L : Float; R : Real_Float_Matrix) return Real_Float_Matrix is
       Result : Real_Float_Matrix (R'Range, R'Range (2));
    begin
@@ -185,21 +198,6 @@ package body ML_Arrays_And_Matrices is
    end "/";
 
    --  ------------------------------------------------------------------------
-
-   function "/" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix is
-      Result : Real_Float_Matrix (L'Range, L'Range (2));
-   begin
-      for row in L'Range loop
-         for col in L'Range (2) loop
-            Result (row, col) := L (row, col) / R;
-         end loop;
-      end loop;
-
-      return Result;
-
-   end "/";
-
-   --  ----------------------------------------------------------------------------
 
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix is
       Result : Real_Float_Matrix := L;
@@ -306,8 +304,21 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "-" (L, R : Binary_Array) return Binary_Array is
+      Result : Binary_Array (L'Range);
+   begin
+      for index in L'Range loop
+            Result (index) := L (index) - R (index);
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ----------------------------------------------------------------------------
+
    function "-" (L, R : Binary_Matrix) return Binary_Matrix is
-      Result : Binary_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
+      Result : Binary_Matrix (L'Range, L'Range (2));
    begin
       for row in L'Range loop
          for col in L'Range (2) loop
@@ -385,12 +396,38 @@ package body ML_Arrays_And_Matrices is
 
    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                  return Real_Float_Matrix is
-      Result : Real_Float_Matrix := L;
+      Result : Real_Float_Matrix (L'Range, L'Range (2));
    begin
       for row in L'Range loop
          for col in L'Range (2) loop
-            Result (row, col) := Result (row, col) - R (row);
+            Result (row, col) := L (row, col) - R (row);
          end loop;
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ------------------------------------------------------------------------
+
+   function "-" (L : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector (L'Range);
+   begin
+      for index in L'Range loop
+         Result (index) := -L (index);
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ------------------------------------------------------------------------
+
+   function "-" (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector (R'Range);
+   begin
+      for index in R'Range loop
+         Result (index) := R (index) - L;
       end loop;
 
       return Result;
@@ -402,8 +439,8 @@ package body ML_Arrays_And_Matrices is
    function "-" (L : Real_Float_Vector; R : Float) return Real_Float_Vector is
       Result : Real_Float_Vector := L;
    begin
-      for row in L'Range loop
-         Result (row) := L (row) - R;
+      for index in L'Range loop
+         Result (index) := L (index) - R;
       end loop;
 
       return Result;
@@ -630,7 +667,65 @@ package body ML_Arrays_And_Matrices is
    end Flatten;
 
    --  -------------------------------------------------------------------------
+
+   function Get_Row (Matrix : Binary_Matrix; Row : Integer)
+                     return Binary_Array is
+      Result : Binary_Array (Matrix'Range (2));
+   begin
+      for col in Matrix'Range (2) loop
+         Result (col) := Matrix  (Row, col);
+      end loop;
+
+      return Result;
+
+   end Get_Row;
+
+   --  ------------------------------------------------------------------------
+
+   function Get_Row (Matrix : Integer_Matrix; Row : Integer)
+                     return Integer_Array is
+      Result : Integer_Array (Matrix'Range (2));
+   begin
+      for col in Matrix'Range (2) loop
+         Result (col) := Matrix  (Row, col);
+      end loop;
+
+      return Result;
+
+   end Get_Row;
+
+   --  ------------------------------------------------------------------------
+
+   function Get_Row (Matrix : Real_Float_Matrix; Row : Integer)
+                     return Real_Float_Vector is
+      Result : Real_Float_Vector (Matrix'Range (2));
+   begin
+      for col in Matrix'Range (2) loop
+         Result (col) := Matrix  (Row, col);
+      end loop;
+
+      return Result;
+
+   end Get_Row;
+
+   --  ------------------------------------------------------------------------
    --  Hadamard product
+   function H_Product (L, R : Binary_Array) return Binary_Array is
+      Product : Binary_Array (L'Range);
+   begin
+      Assert (L'Length = R'Length, "H_Product, L and R lengths, " &
+                Integer'Image (L'Length) & "," & Integer'Image (R'Length) &
+                " are different.");
+      for index in L'Range loop
+         Product (index) := L (index) * R (index);
+      end loop;
+
+      return Product;
+
+   end H_Product;
+
+   --  ----------------------------------------------------------------------------
+
    function H_Product (L, R : Real_Float_Vector) return Real_Float_Vector is
       Product : Real_Float_Vector (L'Range);
    begin
@@ -716,6 +811,20 @@ package body ML_Arrays_And_Matrices is
    end H_Product;
 
    --  ----------------------------------------------------------------------------
+
+   function Log (V : Real_Float_Vector) return Real_Float_Vector is
+      use Maths.Float_Math_Functions;
+      Result : Real_Float_Vector (V'Range);
+   begin
+      for index in V'Range loop
+         Result (index) := Log (V (index));
+      end loop;
+
+      return Result;
+
+   end Log;
+
+   --  ------------------------------------------------------------------------
 
    function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
       Result : Real_Float_Vector (R'Range);
@@ -1530,6 +1639,20 @@ package body ML_Arrays_And_Matrices is
       return Result;
 
    end To_Real_Float_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   function To_Real_Float_Vector (List : Binary_Array)
+                                  return Real_Float_Vector is
+      Vec : Real_Float_Vector (List'Range);
+   begin
+      for index in List'Range loop
+         Vec (index) := Float (List (index));
+      end loop;
+
+      return Vec;
+
+   end To_Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
 
