@@ -117,6 +117,7 @@ package body Network is
       Learning_Rate : Float := 0.01; Verbose : Boolean := True) is
       Routine_Name : constant String := "Network.Train ";
       Output_Data  : Real_Float_List;
+      Grad         : Real_Float_Vector (Y_Train'Range (2));
       Error        : Float;
    begin
       for count in 1 .. Epochs loop
@@ -129,7 +130,10 @@ package body Network is
 --  forward propagate
             Output_Data := To_Real_Float_List (Get_Row (X_Train, sample));
               Predict (Network, Output_Data);
-            Error := Error + Losses.MSE (Y_Train (sample, 1), Output_Data);
+            Error := Error + Losses.MSE (Get_Row (Y_Train, sample),
+                                         Output_Data);
+            Grad := Losses.MSE_Prime (Get_Row (Y_Train, sample), Output_Data);
+
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
 --                 Put_Line (Routine_Name &

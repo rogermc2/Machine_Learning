@@ -172,6 +172,8 @@ package ML_Arrays_And_Matrices is
    function Flatten (M : Integer_Matrix) return Integer_Array;
    function Flatten (M : Real_Float_Matrix) return Real_Float_Vector;
    pragma Inline (Flatten);
+   function Get_Row (Matrix : Binary_Matrix; Row : Integer)
+                     return Binary_Array;
    function Get_Row (Matrix : Integer_Matrix; Row : Integer)
                      return Integer_Array;
    function Get_Row (Matrix : Real_Float_Matrix; Row : Integer)

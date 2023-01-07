@@ -683,6 +683,20 @@ package body ML_Arrays_And_Matrices is
 
    --  -------------------------------------------------------------------------
 
+   function Get_Row (Matrix : Binary_Matrix; Row : Integer)
+                     return Binary_Array is
+      Result : Binary_Array (Matrix'Range (2));
+   begin
+      for col in Matrix'Range (2) loop
+         Result (col) := Matrix  (Row, col);
+      end loop;
+
+      return Result;
+
+   end Get_Row;
+
+   --  ------------------------------------------------------------------------
+
    function Get_Row (Matrix : Integer_Matrix; Row : Integer)
                      return Integer_Array is
       Result : Integer_Array (Matrix'Range (2));

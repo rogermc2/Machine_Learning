@@ -33,7 +33,7 @@ network = [
 ]
 
 # train
-train(network, mse, mse_prime, x_train, y_train, epochs=100, learning_rate=0.1)
+train(network, mse, mse_prime, x_train, y_train, epochs=2, learning_rate=0.1)
 
 # test
 for x, y in zip(x_test, y_test):
