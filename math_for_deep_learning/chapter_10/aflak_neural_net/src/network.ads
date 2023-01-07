@@ -24,10 +24,9 @@ package Network is
      (Network : in out Network_List; Input_Size, Output_Size : Layer_Range);
    procedure Train
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
-      Y_Train       : Real_Float_Matrix; Epochs : Positive := 1000;
+      Y_Train       : Binary_Matrix; Epochs : Positive := 1000;
       Learning_Rate : Float := 0.01; Verbose : Boolean := True);
-   function Predict (Network    : in out Network_Data;
-                     Input_Data : Real_Float_Matrix) return Real_Float_List_2D;
+   procedure Predict (Network : in out Network_Data; Data : Real_Float_List);
    procedure Print_Layer_Data (Name : String; Layer : Layer_Data);
    procedure Print_Network_Data (Name : String; Network : Network_Data);
 

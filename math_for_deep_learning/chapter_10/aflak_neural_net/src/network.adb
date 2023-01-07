@@ -5,6 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Basic_Printing; use Basic_Printing;
+with Losses;
 
 package body Network is
 
@@ -50,21 +51,15 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
-   function Predict
-     (Network : in out Network_Data; Input_Data : Real_Float_Matrix)
-      return Real_Float_List_2D is
+   procedure Predict
+     (Network : in out Network_Data; Data : Real_Float_List) is
       --        Routine_Name : constant String := "Network.Predict ";
-      Output_Data : Real_Float_List;
-      Predictions : Real_Float_List_2D;  --  Result
+      Output_Data : Real_Float_List := Data;
    begin
          for layer in Network.Layers.First_Index ..
            Network.Layers.Last_Index loop
             Forward (Network.Layers (layer), Output_Data);
          end loop;
-
-         Predictions.Append (Output_Data);
-
-      return Predictions;
 
    end Predict;
 
@@ -118,7 +113,7 @@ package body Network is
 
    procedure Train
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
-      Y_Train       : Real_Float_Matrix; Epochs : Positive := 1000;
+      Y_Train       : Binary_Matrix; Epochs : Positive := 1000;
       Learning_Rate : Float := 0.01; Verbose : Boolean := True) is
       Routine_Name : constant String := "Network.Train ";
       Output_Data  : Real_Float_List;
@@ -129,11 +124,12 @@ package body Network is
             Put ("*");
          end if;
          Error := 0.0;
-         for X in X_Train'Range loop
+         for sample in X_Train'Range loop
 --              Put_Line ("sample" & Integer'Image (sample));
 --  forward propagate
-            Output_Data := Predict (Network, X);
-
+            Output_Data := To_Real_Float_List (Get_Row (X_Train, sample));
+              Predict (Network, Output_Data);
+            Error := Error + Losses.MSE (Y_Train (sample, 1), Output_Data);
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
 --                 Put_Line (Routine_Name &
@@ -143,10 +139,6 @@ package body Network is
             end loop;
             --              Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, sample, sample);
             --              Print_Real_Float_List(Routine_Name & "Output_Data", Output_Data);
-
-            --  accumulate error by backward propagate
-            Error :=
-              Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Accum_Error);
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
@@ -162,19 +154,12 @@ package body Network is
          --           Print_List_Dimensions (Routine_Name & "minibatch Loss", Loss);
          --           Print_Real_Float_List (Routine_Name & "minibatch Loss", Loss, 1, 6);
 
-         --  update weights and biases
-         for layer in Network.Layers.First_Index ..
-           Network.Layers.Last_Index loop
-            Step (Network.Layers (layer), Learning_Rate);
-         end loop;
-
          --  report mean loss over minibatch
          if Network.Verbose and then
-           (Minibatches < 10 or else count mod (Minibatches / 10) = 0) then
-            Accum_Error := Accum_Error / Float (Batch_Size);
+           (Epochs < 10 or else count mod (Epochs / 10) = 0) then
             New_Line;
-            Put_Line ("Minibatch" & Integer'Image (count) &
-                        " mean error: " & Float'Image (Accum_Error));
+            Put_Line ("Epoch" & Integer'Image (count) &
+                        " mean error: " & Float'Image (Error));
          end if;
       end loop;  --  Minibatches
       New_Line;
