@@ -1,5 +1,5 @@
 
---  with Ada.Containers;
+with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
@@ -11,7 +11,7 @@ with Support_4;
 with Network; use Network;
 
 procedure Aflak_Neural_Net is
---     use  Ada.Containers;
+   use  Ada.Containers;
    use Support_4;
    use Classifier_Utilities;
    Project_Name   : constant String := "Aflak_Neural_Net ";
@@ -39,6 +39,7 @@ procedure Aflak_Neural_Net is
    CM_Col         : Natural;
 begin
    declare
+      use Real_Float_Arrays;
       Data          : constant Base_State :=
         Get_State (Dataset_Name, Train_Size, Test_Size);
       X_Train       : constant Real_Float_Matrix := Data.Train_X / 255.0;
@@ -55,33 +56,33 @@ begin
       Print_Matrix_Dimensions (Project_Name & "X_Test", X_Test);
       Put_Line (Project_Name & "Y_Test length:" &  Integer'Image (Y_Test'Length));
 
-      Add_Fully_Connected_Layer (Net.Layers, 28 * 28, 40);
-      Add_Activation_Layer (Net.Layers, 40);
-      Add_Fully_Connected_Layer (Net.Layers, 40, 10);
-      Add_Activation_Layer (Net.Layers, 10);
+      Add_Dense_Layer (Net.Layers, 28 * 28, 40);
+      Add_Tanh_Layer (Net.Layers, 40);
+      Add_Dense_Layer (Net.Layers, 40, 10);
+      Add_Tanh_Layer (Net.Layers, 10);
 
       Train (Net, X_Train, Y_Train, Epochs, Learning_Rate);
 
       --  Build the confusion matrix using the test set predictions
-      Predictions := Predict (Net, X_Test);  --  out
-      Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
-                & " x" & Integer'Image (Integer (Predictions (1).Length)));
-      Print_Binary_Matrix ("Y_Test", Y_Test, 1, 1);
-      Print_Real_Float_List_2D ("Predictions", Predictions, 1, 1);
-
-      --  Y_Test values range is the digits 0 .. 9
-      for index in Y_Test'Range loop
-         CM_Col := Arg_Max (Predictions (index)) - 1;
-         Confusion (Integer (Y_Test (index, CM_Col)), CM_Col) :=
-           Confusion (Integer (Y_Test (index, CM_Col)), CM_Col) + 1 ;
-      end loop;
-
-      Print_Integer_Matrix ("Confusion matrix", Confusion);
-      Put_Line ("Confusion diagonal sum:" &
-                  Integer'Image (Sum_Diagonal (Confusion)));
-      Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
-      Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
-                  Float (Sum (Confusion))));
+--        Predictions := Predict (Net, X_Test);  --  out
+--        Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
+--                  & " x" & Integer'Image (Integer (Predictions (1).Length)));
+--        Print_Binary_Matrix ("Y_Test", Y_Test, 1, 1);
+--        Print_Real_Float_List_2D ("Predictions", Predictions, 1, 1);
+--
+--        --  Y_Test values range is the digits 0 .. 9
+--        for index in Y_Test'Range loop
+--           CM_Col := Arg_Max (Predictions (index)) - 1;
+--           Confusion (Integer (Y_Test (index, CM_Col)), CM_Col) :=
+--             Confusion (Integer (Y_Test (index, CM_Col)), CM_Col) + 1 ;
+--        end loop;
+--
+--        Print_Integer_Matrix ("Confusion matrix", Confusion);
+--        Put_Line ("Confusion diagonal sum:" &
+--                    Integer'Image (Sum_Diagonal (Confusion)));
+--        Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
+--        Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
+--                    Float (Sum (Confusion))));
    end;
 
    Put_Line (Project_Name & "done.");

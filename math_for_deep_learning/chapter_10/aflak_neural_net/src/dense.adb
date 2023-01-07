@@ -10,6 +10,7 @@ package body Dense is
    procedure Backward
      (Layer         : in out Layer_Data; Gradient : in out Real_Float_List;
       Learning_Rate : Float) is
+      use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Dense.Backward ";
       Data_Mat      : constant Real_Float_Matrix :=
@@ -51,7 +52,11 @@ package body Dense is
          end;
 
       else  --  Activation layer
-         null;
+
+         for index in Gradient.First_Index .. Gradient.Last_Index loop
+            Gradient.Replace_Element
+              (index, Gradient (index) * (1.0 - Tanh (Gradient (index) ** 2)));
+         end loop;
       end if;
 
    end Backward;
@@ -62,23 +67,23 @@ package body Dense is
      (Layer : in out Layer_Data; Data : in out Real_Float_List) is
       use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Dense.Forward ";
+      --        Routine_Name : constant String := "Dense.Forward ";
       In_Data      : constant Real_Float_Matrix :=
                        To_Real_Float_Matrix (Data);
    begin
---        Put_Line (Routine_Name & "Layer Kind: " &
---                    Layer_Type'Image (Layer.Layer_Kind));
---        Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
---                                 Real_Float_Matrix (Layer.Input_Data));
---        Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
+      --        Put_Line (Routine_Name & "Layer Kind: " &
+      --                    Layer_Type'Image (Layer.Layer_Kind));
+      --        Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
+      --                                 Real_Float_Matrix (Layer.Input_Data));
+      --        Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
       Layer.Input_Data := Layer_Matrix (In_Data);
       if Layer.Layer_Kind = Dense_Layer then
---           Print_Matrix_Dimensions (Routine_Name & "Weights",
---                                    Real_Float_Matrix (Layer.Weights));
+         --           Print_Matrix_Dimensions (Routine_Name & "Weights",
+         --                                    Real_Float_Matrix (Layer.Weights));
          declare
             Out_Mat : constant Real_Float_Matrix :=
                         Real_Float_Matrix (Layer.Weights) * Transpose (In_Data)
-                        + Real_Float_Matrix (Layer.Bias);
+                      + Real_Float_Matrix (Layer.Bias);
          begin
             Data.Clear;
             for row in Out_Mat'Range loop
@@ -88,7 +93,7 @@ package body Dense is
 
       else  --  Tanh Layer
          for index in Data.First_Index .. Data.Last_Index loop
-           Data (index) := Tanh (Data (index));
+            Data (index) := Tanh (Data (index));
          end loop;
       end if;
 
