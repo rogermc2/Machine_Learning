@@ -42,7 +42,7 @@ begin
       Data          : constant Base_State :=
         Get_State (Dataset_Name, Train_Size, Test_Size);
       X_Train       : constant Real_Float_Matrix := Data.Train_X / 255.0;
-      Y_Train       : constant Integer_Matrix := Data.Train_Y;
+      Y_Train       : constant Binary_Matrix := Categorize (Data.Train_Y);
       X_Test        : constant Real_Float_Matrix := Data.Test_X / 255.0;
       Y_Test        : constant Binary_Matrix := Categorize (Data.Test_Y);
    begin
