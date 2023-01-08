@@ -47,7 +47,6 @@ package body Load_Dataset is
          Features_Row    : ML_Types.Integer_List;
          Data            : Digits_Data_Record (Num_Samples, Num_Features,
                                                Num_Classes);
-         Count           : Positive := 1;
       begin
          Assert (Num_Samples > 0, Routine_Name &
                    " called with empty Features vector.");
@@ -90,23 +89,13 @@ package body Load_Dataset is
                for col in List_Row.First_Index .. List_Row.Last_Index loop
                   Data.Features (row, col) := List_Row.Element (col);
                end loop;
-               if Count mod 2000 = 0 then
-                  Put ("*");
-               end if;
-               Count := Count + 1;
             end loop;
-            New_Line;
             Put_Line (File_Name & " features loaded");
 
             for row in Digit_Values.First_Index .. Digit_Values.Last_Index loop
                Data.Target (row) :=
                  Digit_Values.Element (row).Element (1).Integer_Value;
-               if Count mod 2000 = 0 then
-                  Put ("*");
-               end if;
-               Count := Count + 1;
             end loop;
-            New_Line;
 
             return Data;
          end if;

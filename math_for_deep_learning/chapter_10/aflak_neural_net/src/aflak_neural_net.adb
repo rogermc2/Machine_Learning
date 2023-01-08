@@ -42,8 +42,6 @@ begin
       use Real_Float_Arrays;
       Data          : constant Digits_Data_Record :=
                         Load_Digits ("../mnist_784.csv", Max_Lines => 2000);
-      --        Data          : constant Base_State :=
-      --          Get_State (Dataset_Name, Train_Size, Test_Size);
       X_Train       : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix
                           (Slice (Data.Features, 1, Train_Size));
