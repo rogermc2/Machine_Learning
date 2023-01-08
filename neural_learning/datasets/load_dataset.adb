@@ -18,7 +18,8 @@ package body Load_Dataset is
    --  Features             integers 0-16
    --  =================   ==============
    --  Target: num outputs x num classes
-   function Load_Digits (File_Name : String; Num_Classes : Natural := 10)
+   function Load_Digits (File_Name : String; Num_Classes : Natural := 10;
+                         Max_Lines : Positive := 20000)
                          return Digits_Data_Record is
       use Classifier_Utilities;
       Routine_Name    : constant String := "Load_Dataset.Load_Digits ";
@@ -28,7 +29,7 @@ package body Load_Dataset is
       Put_Line (Routine_Name & "loading " & File_Name);
       declare
          Digits_Data : constant ML_Types.Multi_Output_Data_Record :=
-                         Load_Data (File_Name);
+                         Load_Data (File_Name, Max_Lines => Max_Lines);
       begin
          Digit_Features := Digits_Data.Feature_Values;
          Digit_Values := Digits_Data.Label_Values;

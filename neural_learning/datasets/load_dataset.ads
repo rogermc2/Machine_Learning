@@ -23,7 +23,8 @@ package Load_Dataset is
 
     end record;
 
-    function Load_Digits (File_Name : String; Num_Classes : Natural := 10)
+    function Load_Digits (File_Name : String; Num_Classes : Natural := 10;
+                          Max_Lines : Positive := 20000)
                          return Digits_Data_Record;
     function Load_Features (File_Name : String; Num_Features : Positive)
                            return Real_Float_Matrix;

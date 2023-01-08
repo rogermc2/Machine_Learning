@@ -14,7 +14,6 @@ procedure Aflak_Neural_Net is
    use  Ada.Containers;
    use Classifier_Utilities;
    Project_Name   : constant String := "Aflak_Neural_Net ";
---     Dataset_Name   : constant String := "mnist_784";
    Test_Size      : constant Positive := 20;
    Train_Size     : constant Positive := 1000;
 
@@ -42,7 +41,7 @@ begin
       use Load_Dataset;
       use Real_Float_Arrays;
       Data          : constant Digits_Data_Record :=
-                        Load_Digits ("../mnist_784.csv");
+                        Load_Digits ("../mnist_784.csv", Max_Lines => 2000);
 --        Data          : constant Base_State :=
 --          Get_State (Dataset_Name, Train_Size, Test_Size);
       X_Train       : constant Real_Float_Matrix :=
