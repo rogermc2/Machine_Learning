@@ -19,7 +19,7 @@ procedure Aflak_Neural_Net is
 
    function Categorize (Labels : Integer_Matrix) return Binary_Matrix is
       Result : Binary_Matrix (Labels'Range, 0 .. 9) :=
-        (others => (others => 0));
+                 (others => (others => 0));
    begin
       for row in Labels'Range loop
          Result (row, Labels (row, 1)) := 1;
@@ -33,7 +33,7 @@ procedure Aflak_Neural_Net is
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
    Confusion      : Integer_Matrix (0 .. 9, 0 .. 9) :=
-     (others => (others => 0));
+                      (others => (others => 0));
    CM_Col         : Natural;
 begin
    Put_Line (Project_Name);
@@ -42,20 +42,22 @@ begin
       use Real_Float_Arrays;
       Data          : constant Digits_Data_Record :=
                         Load_Digits ("../mnist_784.csv", Max_Lines => 2000);
---        Data          : constant Base_State :=
---          Get_State (Dataset_Name, Train_Size, Test_Size);
+      --        Data          : constant Base_State :=
+      --          Get_State (Dataset_Name, Train_Size, Test_Size);
       X_Train       : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix
                           (Slice (Data.Features, 1, Train_Size));
       Y_Train       : constant Binary_Matrix :=
                         Categorize ((Slice (To_Integer_Matrix
-                                     (Data.Target), 1, Train_Size)));
+                                    (Data.Target), 1, Train_Size)));
       X_Test        : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix
-                          (Slice (Data.Features, Train_Size + 1, Test_Size));
+                          (Slice (Data.Features, Train_Size + 1,
+                           Train_Size + Test_Size));
       Y_Test        : constant Binary_Matrix :=
                         Categorize ((Slice (To_Integer_Matrix
-                                     (Data.Target), Train_Size + 1, Test_Size)));
+                                    (Data.Target), Train_Size + 1,
+                                    Train_Size + Test_Size)));
       Output_Data   : Real_Float_List;
    begin
       Put_Line ("Train X length: " & Count_Type'Image (X_Train'Length) & " x" &
@@ -65,7 +67,7 @@ begin
       Print_Matrix_Dimensions (Project_Name & "X_Train" , X_Train);
       Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
       Print_Matrix_Dimensions (Project_Name & "X_Test", X_Test);
-      Put_Line (Project_Name & "Y_Test length:" &  Integer'Image (Y_Test'Length));
+      Print_Matrix_Dimensions (Project_Name & "Y_Test", Y_Test);
 
       Add_Dense_Layer (Net.Layers, 28 * 28, 40);
       Add_Tanh_Layer (Net.Layers, 40);
