@@ -4,18 +4,17 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
 with Classifier_Utilities;
+with Load_Dataset;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Dense; use Dense;
-with Support_4;
 
 with Network; use Network;
 
 procedure Aflak_Neural_Net is
    use  Ada.Containers;
-   use Support_4;
    use Classifier_Utilities;
    Project_Name   : constant String := "Aflak_Neural_Net ";
-   Dataset_Name   : constant String := "mnist_784";
+--     Dataset_Name   : constant String := "mnist_784";
    Test_Size      : constant Positive := 20;
    Train_Size     : constant Positive := 1000;
 
@@ -38,14 +37,26 @@ procedure Aflak_Neural_Net is
      (others => (others => 0));
    CM_Col         : Natural;
 begin
+   Put_Line (Project_Name);
    declare
+      use Load_Dataset;
       use Real_Float_Arrays;
-      Data          : constant Base_State :=
-        Get_State (Dataset_Name, Train_Size, Test_Size);
-      X_Train       : constant Real_Float_Matrix := Data.Train_X / 255.0;
-      Y_Train       : constant Binary_Matrix := Categorize (Data.Train_Y);
-      X_Test        : constant Real_Float_Matrix := Data.Test_X / 255.0;
-      Y_Test        : constant Binary_Matrix := Categorize (Data.Test_Y);
+      Data          : constant Digits_Data_Record :=
+                        Load_Digits ("../mnist_784.csv");
+--        Data          : constant Base_State :=
+--          Get_State (Dataset_Name, Train_Size, Test_Size);
+      X_Train       : constant Real_Float_Matrix :=
+                        To_Real_Float_Matrix
+                          (Slice (Data.Features, 1, Train_Size));
+      Y_Train       : constant Binary_Matrix :=
+                        Categorize ((Slice (To_Integer_Matrix
+                                     (Data.Target), 1, Train_Size)));
+      X_Test        : constant Real_Float_Matrix :=
+                        To_Real_Float_Matrix
+                          (Slice (Data.Features, Train_Size + 1, Test_Size));
+      Y_Test        : constant Binary_Matrix :=
+                        Categorize ((Slice (To_Integer_Matrix
+                                     (Data.Target), Train_Size + 1, Test_Size)));
       Output_Data   : Real_Float_List;
    begin
       Put_Line ("Train X length: " & Count_Type'Image (X_Train'Length) & " x" &

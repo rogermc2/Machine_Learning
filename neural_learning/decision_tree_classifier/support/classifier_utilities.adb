@@ -337,16 +337,20 @@ package body Classifier_Utilities is
 
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return ML_Types.Multi_Output_Data_Record is
---        Routine_Name : constant String := "Classifier_Utilities.Load_Data ";
+      Routine_Name : constant String := "Classifier_Utilities.Load_Data ";
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
       Output_Data  : ML_Types.Multi_Output_Data_Record;
    begin
+      Put_Line (Routine_Name & "loading " & File_Name);
       Open (Data_File, In_File, File_Name);
       Raw_CSV_Data := Neural_Utilities.Load_Raw_CSV_Data (Data_File);
       Close (Data_File);
 
+      Put_Line (Routine_Name & "splitting " & File_Name);
+
       Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
+      Put_Line (Routine_Name & File_Name & " split");
 
       return Output_Data;
 

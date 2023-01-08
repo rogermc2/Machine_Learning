@@ -181,12 +181,14 @@ package body Neural_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Load_Raw_CSV_Data (File_Name : String) return Raw_Data_Vector is
+   function Load_Raw_CSV_Data (File_Name : String;
+                               Max_Lines : Positive := 20000)
+                               return Raw_Data_Vector is
       Data_File : File_Type;
       Data      : Raw_Data_Vector;
    begin
       Open (Data_File, In_File, File_Name);
-      Data := Load_Raw_CSV_Data (Data_File);
+      Data := Load_Raw_CSV_Data (Data_File, Max_Lines);
       Close (Data_File);
 
       return Data;
@@ -195,17 +197,20 @@ package body Neural_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Load_Raw_CSV_Data (Data_File : File_Type)
+   function Load_Raw_CSV_Data (Data_File : File_Type;
+                               Max_Lines : Positive := 20000)
                                return Raw_Data_Vector is
       use String_Package;
       Data_Line : Unbounded_String;
       CSV_Line  : String_List;
       Curs      : String_Package.Cursor;
+      Num_Lines : Natural := 0;
       Values    : Unbounded_List;
       Data      : Raw_Data_Vector;
    begin
-      while not End_Of_File (Data_File) loop
+      while not End_Of_File (Data_File) and Num_Lines <= Max_Lines loop
          Data_Line := To_Unbounded_String (Get_Line (Data_File));
+         Num_Lines := Num_Lines + 1;
          CSV_Line := Split_String (To_String (Data_Line), ",");
          Curs := CSV_Line.First;
          Values.Clear;
