@@ -137,6 +137,7 @@ package body Network is
             New_Line;
             Grad := To_Real_Float_List
               (Losses.MSE_Prime (Get_Row (Y_Train, sample), Output_Data));
+            Print_List_Dimensions (Routine_Name & "Grad", Grad);
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
