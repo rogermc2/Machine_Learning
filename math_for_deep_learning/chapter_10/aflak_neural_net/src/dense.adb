@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 
 package body Dense is
 
@@ -67,19 +67,17 @@ package body Dense is
      (Layer : in out Layer_Data; Data : in out Real_Float_List) is
       use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Dense.Forward ";
+--        Routine_Name : constant String := "Dense.Forward ";
       In_Data      : constant Real_Float_Matrix :=
         To_Real_Float_Matrix (Data);
    begin
-      Put_Line (Routine_Name & "Layer Kind: " &
-                  Layer_Type'Image (Layer.Layer_Kind));
-      Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
-                               Real_Float_Matrix (Layer.Input_Data));
-      Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
+--        Put_Line (Routine_Name & "Layer Kind: " &
+--                    Layer_Type'Image (Layer.Layer_Kind));
+--        Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
+--                                 Real_Float_Matrix (Layer.Input_Data));
+--        Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
       Layer.Input_Data := Layer_Matrix (In_Data);
       if Layer.Layer_Kind = Dense_Layer then
-         --           Print_Matrix_Dimensions (Routine_Name & "Weights",
-         --                                    Real_Float_Matrix (Layer.Weights));
          declare
             Out_Mat : constant Real_Float_Matrix :=
               Real_Float_Matrix (Layer.Weights) * Transpose (In_Data)
@@ -93,9 +91,10 @@ package body Dense is
 
       else  --  Tanh Layer
          for index in Data.First_Index .. Data.Last_Index loop
-            Data (index) := Tanh (Data (index));
+            Data.Replace_Element (index, Tanh (Data (index)));
          end loop;
       end if;
+--        Print_List_Dimensions (Routine_Name & "Data out", Data);
 
    end Forward;
 

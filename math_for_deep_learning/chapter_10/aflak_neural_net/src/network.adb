@@ -51,14 +51,13 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
-   procedure Predict
-     (Network : in out Network_Data; Data : Real_Float_List) is
+   procedure Predict (Network : in out Network_Data;
+                      Data    : in out Real_Float_List) is
 --        Routine_Name : constant String := "Network.Predict ";
-      Output_Data : Real_Float_List := Data;
    begin
       for layer in Network.Layers.First_Index ..
         Network.Layers.Last_Index loop
-         Forward (Network.Layers (layer), Output_Data);
+         Forward (Network.Layers (layer), Data);
       end loop;
 
    end Predict;
@@ -130,9 +129,12 @@ package body Network is
             --  forward propagate
             Output_Data := To_Real_Float_List (Get_Row (X_Train, sample));
             Predict (Network, Output_Data);
-            Put_Line (Routine_Name & "Error");
+            Print_Matrix_Dimensions (Routine_Name & "Y_Train", Y_Train);
+            Print_List_Dimensions (Routine_Name & "Output_Data", Output_Data);
             Error := Error + Losses.MSE (Get_Row (Y_Train, sample),
                                          Output_Data);
+            Put_Line (Routine_Name & "Error: " & Float'Image (Error));
+            New_Line;
             Grad := To_Real_Float_List
               (Losses.MSE_Prime (Get_Row (Y_Train, sample), Output_Data));
 
