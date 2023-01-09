@@ -27,8 +27,8 @@ package Dense is
       end record;
 
    procedure Backward
-     (Layer         : in out Layer_Data; Gradient : in out Real_Float_List;
-      Learning_Rate : Float);
+     (Layer        : in out Layer_Data;
+      Out_Gradient : in out Real_Float_List; Learning_Rate : Float);
    procedure Forward (Layer : in out Layer_Data;
                       Data  : in out Real_Float_List);
 

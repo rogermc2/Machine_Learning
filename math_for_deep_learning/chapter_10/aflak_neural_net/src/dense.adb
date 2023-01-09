@@ -8,7 +8,7 @@ with Basic_Printing; use Basic_Printing;
 package body Dense is
 
    procedure Backward
-     (Layer         : in out Layer_Data; Gradient : in out Real_Float_List;
+     (Layer         : in out Layer_Data; Out_Gradient : in out Real_Float_List;
       Learning_Rate : Float) is
       use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
@@ -16,7 +16,7 @@ package body Dense is
       Data_Mat      : constant Real_Float_Matrix :=
                         Transpose (Real_Float_Matrix (Layer.Input_Data));
       Gradient_Mat  : constant Real_Float_Matrix :=
-                        To_Real_Float_Matrix (Gradient);
+                        To_Real_Float_Matrix (Out_Gradient);
    begin
       New_Line;
       Put_Line (Routine_Name & "Layer Kind: " &
@@ -29,33 +29,34 @@ package body Dense is
             Weights_Gradient :  constant Real_Float_Matrix :=
                                  Data_Mat * Gradient_Mat;
             Input_Gradient   : constant Real_Float_Matrix :=
-                                 Transpose (Real_Float_Matrix (Layer.Weights)) *
-                                 Gradient_Mat;
+                                 Gradient_Mat *
+                                   (Real_Float_Matrix (Layer.Weights));
          begin
+            Print_Matrix_Dimensions (Routine_Name & "Layer.Weights)",
+                                     Real_Float_Matrix (Layer.Weights));
             Print_Matrix_Dimensions (Routine_Name & "Input_Gradient",
                                      Input_Gradient);
             Layer.Weights :=
               Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
-                                Learning_Rate * Weights_Gradient);
+                                Learning_Rate * Transpose (Weights_Gradient));
+            Print_Matrix_Dimensions (Routine_Name & "Layer.Bias",
+                                     Real_Float_Matrix (Layer.Bias));
             Layer.Bias :=
               Layer_Matrix (Real_Float_Matrix (Layer.Bias) -
-                                Learning_Rate * Gradient_Mat);
+                                Learning_Rate * Transpose (Gradient_Mat));
 
-            --              for index in Layer.Bias'Range (2) loop
-            --                 Layer.Bias (1, index) :=
-            --                   Layer.Bias (1, index) + Error (Integer (index));
-            --              end loop;
-            Gradient.Clear;
+            Out_Gradient.Clear;
             for col in Input_Gradient'Range loop
-               Gradient.Append (Input_Gradient (1, col));
+               Out_Gradient.Append (Input_Gradient (1, col));
             end loop;
          end;
 
       else  --  Activation layer
 
-         for index in Gradient.First_Index .. Gradient.Last_Index loop
-            Gradient.Replace_Element
-              (index, Gradient (index) * (1.0 - Tanh (Gradient (index) ** 2)));
+         for index in Out_Gradient.First_Index .. Out_Gradient.Last_Index loop
+            Out_Gradient.Replace_Element
+              (index, Out_Gradient (index) *
+               (1.0 - Tanh (Out_Gradient (index) ** 2)));
          end loop;
       end if;
 
