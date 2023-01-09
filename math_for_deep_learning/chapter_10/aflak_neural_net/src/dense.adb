@@ -14,25 +14,26 @@ package body Dense is
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Dense.Backward ";
       Data_Mat      : constant Real_Float_Matrix :=
-                        Real_Float_Matrix (Layer.Input_Data);
+                        Transpose (Real_Float_Matrix (Layer.Input_Data));
       Gradient_Mat  : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix (Gradient);
    begin
+      New_Line;
       Put_Line (Routine_Name & "Layer Kind: " &
                   Layer_Type'Image (Layer.Layer_Kind));
-      Print_Matrix_Dimensions (Routine_Name & "Transpose (Data_Mat)",
-                               Real_Float_Matrix (Transpose (Data_Mat)));
+      Print_Matrix_Dimensions (Routine_Name & "Data_Mat", Data_Mat);
       Print_Matrix_Dimensions (Routine_Name & "Gradient_Mat",
                                Real_Float_Matrix (Gradient_Mat));
       if Layer.Layer_Kind = Dense_Layer then
          declare
             Weights_Gradient :  constant Real_Float_Matrix :=
-                                 Gradient_Mat * Transpose (Data_Mat);
-
+                                 Data_Mat * Gradient_Mat;
             Input_Gradient   : constant Real_Float_Matrix :=
                                  Transpose (Real_Float_Matrix (Layer.Weights)) *
                                  Gradient_Mat;
          begin
+            Print_Matrix_Dimensions (Routine_Name & "Input_Gradient",
+                                     Input_Gradient);
             Layer.Weights :=
               Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
                                 Learning_Rate * Weights_Gradient);
@@ -45,7 +46,7 @@ package body Dense is
             --                   Layer.Bias (1, index) + Error (Integer (index));
             --              end loop;
             Gradient.Clear;
-            for col in Input_Gradient'Range (2) loop
+            for col in Input_Gradient'Range loop
                Gradient.Append (Input_Gradient (1, col));
             end loop;
          end;
