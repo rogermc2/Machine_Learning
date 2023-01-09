@@ -114,7 +114,7 @@ package body Network is
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
       Y_Train       : Binary_Matrix; Epochs : Positive := 1000;
       Learning_Rate : Float := 0.01; Verbose : Boolean := True) is
-      Routine_Name : constant String := "Network.Train ";
+--        Routine_Name : constant String := "Network.Train ";
       Output_Data  : Real_Float_List;
       Grad         : Real_Float_List;
       Error        : Float;
@@ -125,19 +125,19 @@ package body Network is
          end if;
          Error := 0.0;
          for sample in X_Train'Range loop
-            Put_Line ("sample" & Integer'Image (sample));
+--              Put_Line ("sample" & Integer'Image (sample));
             --  forward propagate
             Output_Data := To_Real_Float_List (Get_Row (X_Train, sample));
             Predict (Network, Output_Data);
-            Print_Matrix_Dimensions (Routine_Name & "Y_Train", Y_Train);
-            Print_List_Dimensions (Routine_Name & "Output_Data", Output_Data);
+--              Print_Matrix_Dimensions (Routine_Name & "Y_Train", Y_Train);
+--              Print_List_Dimensions (Routine_Name & "Output_Data", Output_Data);
             Error := Error + Losses.MSE (Get_Row (Y_Train, sample),
                                          Output_Data);
-            Put_Line (Routine_Name & "Error: " & Float'Image (Error));
-            New_Line;
+--              Put_Line (Routine_Name & "Error: " & Float'Image (Error));
+--              New_Line;
             Grad := To_Real_Float_List
               (Losses.MSE_Prime (Get_Row (Y_Train, sample), Output_Data));
-            Print_List_Dimensions (Routine_Name & "Grad", Grad);
+--              Print_List_Dimensions (Routine_Name & "Grad", Grad);
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop

@@ -28,7 +28,8 @@ procedure Aflak_Neural_Net is
 
    end Categorize;
 
-   Epochs         : constant Positive := 100;
+--     Epochs         : constant Positive := 100;
+   Epochs         : constant Positive := 2;
    Learning_Rate  : constant Float := 0.1;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
@@ -80,10 +81,13 @@ begin
          Predict (Net, Output_Data);
          Predictions.Append (Output_Data);
       end loop;
-      Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
-                & " x" & Integer'Image (Integer (Predictions (1).Length)));
-      Print_Binary_Matrix ("Y_Test", Y_Test, 1, 1);
-      Print_Real_Float_List_2D ("Predictions", Predictions, 1, 1);
+      Put_Line ("Predictions size:" &
+                  Integer'Image (Integer (Predictions.Length))
+                & " samples x" &
+                  Integer'Image (Integer (Predictions (1).Length)) &
+                  " classes");
+--        Print_Binary_Matrix ("Y_Test", Y_Test, 1, 1);
+      Print_Real_Float_List_2D ("Predictions 1", Predictions, 1, 1);
 
       --  Y_Test values range is the digits 0 .. 9
       for index in Y_Test'Range loop
