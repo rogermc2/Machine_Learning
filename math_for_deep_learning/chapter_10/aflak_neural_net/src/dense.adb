@@ -1,9 +1,9 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 
 package body Dense is
 
@@ -12,39 +12,39 @@ package body Dense is
       Learning_Rate : Float) is
       use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
---        Routine_Name  : constant String := "Dense.Backward ";
+      Routine_Name  : constant String := "Dense.Backward ";
       Data_Mat      : constant Real_Float_Matrix :=
-                        Transpose (Real_Float_Matrix (Layer.Input_Data));
+                        Real_Float_Matrix (Layer.Input_Data);
       Gradient_Mat  : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix (Out_Gradient);
    begin
---        New_Line;
---        Put_Line (Routine_Name & "Layer Kind: " &
---                    Layer_Type'Image (Layer.Layer_Kind));
---        Print_Matrix_Dimensions (Routine_Name & "Data_Mat", Data_Mat);
---        Print_Matrix_Dimensions (Routine_Name & "Gradient_Mat",
---                                 Real_Float_Matrix (Gradient_Mat));
+      New_Line;
+      Put_Line (Routine_Name & "Layer Kind: " &
+                  Layer_Type'Image (Layer.Layer_Kind));
+      Print_Matrix_Dimensions (Routine_Name & "Data_Mat", Data_Mat);
+      Print_Matrix_Dimensions (Routine_Name & "Gradient_Mat",
+                               Real_Float_Matrix (Gradient_Mat));
       if Layer.Layer_Kind = Dense_Layer then
          declare
             Weights_Gradient :  constant Real_Float_Matrix :=
-                                 Data_Mat * Gradient_Mat;
+                                 Gradient_Mat * Transpose (Data_Mat);
             Input_Gradient   : constant Real_Float_Matrix :=
-                                 Gradient_Mat *
-                                   (Real_Float_Matrix (Layer.Weights));
+                                 Transpose (Real_Float_Matrix (Layer.Weights)  *
+                                              Gradient_Mat);
          begin
---              Print_Matrix_Dimensions (Routine_Name & "Layer.Weights)",
---                                       Real_Float_Matrix (Layer.Weights));
---              Print_Matrix_Dimensions (Routine_Name & "Input_Gradient",
---                                       Input_Gradient);
+            Print_Matrix_Dimensions (Routine_Name & "Layer.Weights)",
+                                     Real_Float_Matrix (Layer.Weights));
+            Print_Matrix_Dimensions (Routine_Name & "Input_Gradient",
+                                     Input_Gradient);
             Layer.Weights :=
               Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
-                                Learning_Rate * Transpose (Weights_Gradient));
---              Print_Matrix_Dimensions (Routine_Name & "Layer.Bias",
---                                       Real_Float_Matrix (Layer.Bias));
+                                Learning_Rate * Weights_Gradient);
+            Print_Matrix_Dimensions (Routine_Name & "Layer.Bias",
+                                     Real_Float_Matrix (Layer.Bias));
             Layer.Bias :=
               Layer_Matrix (Real_Float_Matrix (Layer.Bias) -
-                                Learning_Rate * Transpose (Gradient_Mat));
---              Put_Line (Routine_Name & "Layer.Bias set");
+                                Learning_Rate * Gradient_Mat);
+            Put_Line (Routine_Name & "Layer.Bias set");
 
             Out_Gradient.Clear;
             for col in Input_Gradient'Range (2) loop
@@ -82,8 +82,8 @@ package body Dense is
       if Layer.Layer_Kind = Dense_Layer then
          declare
             Out_Mat : constant Real_Float_Matrix :=
-                        Real_Float_Matrix (Layer.Weights) * Transpose (In_Data)
-                      + Real_Float_Matrix (Layer.Bias);
+                        Real_Float_Matrix (Layer.Weights) * In_Data +
+                        Real_Float_Matrix (Layer.Bias);
          begin
             Data.Clear;
             for row in Out_Mat'Range loop

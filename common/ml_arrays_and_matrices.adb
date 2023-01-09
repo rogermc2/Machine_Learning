@@ -1388,7 +1388,7 @@ package body ML_Arrays_And_Matrices is
       if not List.Is_Empty then
          declare
             Result   : Real_Float_Matrix
-              (1 .. 1, List.First_Index .. List.Last_Index);
+              (List.First_Index .. List.Last_Index, 1 .. 1);
          begin
             for col in Result'Range (2) loop
                Result (1, col) := List (col);

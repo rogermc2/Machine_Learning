@@ -11,7 +11,7 @@ package Dense is
    type Layer_Data (Layer_Kind              : Layer_Type := Tanh_Layer;
                     Input_Size, Output_Size : Layer_Range := 0) is
       record
-         Input_Data : Layer_Matrix (1 .. 1, 1 .. Input_Size);
+         Input_Data : Layer_Matrix (1 .. Input_Size, 1 .. 1);
          case Layer_Kind is
             when Dense_Layer =>
                Weights : Layer_Matrix (1 .. Output_Size, 1 .. Input_Size);
