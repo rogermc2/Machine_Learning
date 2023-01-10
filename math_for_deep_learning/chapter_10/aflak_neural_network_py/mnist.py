@@ -32,17 +32,8 @@ network = [
     Tanh()
 ]
 
-print ("network[0].weights", network[0].weights.shape)
-print ("network[0].bias", network[0].bias.shape)
-print ("network[0].weights", network[2].weights.shape)
-print ("network[0].bias", network[2].bias.shape)
-
 # train
 train(network, mse, mse_prime, x_train, y_train, epochs=2, learning_rate=0.1)
-print ("network[0].input", network[0].input.shape)
-print ("network[1].input", network[1].input.shape)
-print ("network[2].input", network[2].input.shape)
-print ("network[3].input", network[3].input.shape)
 
 # test
 # for x, y in zip(x_test, y_test):

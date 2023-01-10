@@ -29,7 +29,7 @@ procedure Aflak_Neural_Net is
    end Categorize;
 
 --     Epochs         : constant Positive := 100;
-   Epochs         : constant Positive := 50;
+   Epochs         : constant Positive := 2;
    Learning_Rate  : constant Float := 0.1;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out

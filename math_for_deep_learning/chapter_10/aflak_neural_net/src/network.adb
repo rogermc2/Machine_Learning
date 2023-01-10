@@ -114,7 +114,7 @@ package body Network is
      (Network       : in out Network_Data; X_Train : Real_Float_Matrix;
       Y_Train       : Binary_Matrix; Epochs : Positive := 1000;
       Learning_Rate : Float := 0.01; Verbose : Boolean := True) is
---        Routine_Name : constant String := "Network.Train ";
+      Routine_Name : constant String := "Network.Train ";
       Output_Data  : Real_Float_List;
       Grad         : Real_Float_List;
       Error        : Float;
@@ -151,8 +151,9 @@ package body Network is
          if Verbose and then
            (Epochs < 10 or else count mod (Epochs / 10) = 0) then
             New_Line;
-            Put_Line ("Epoch" & Integer'Image (count) &
-                        " mean error: " & Float'Image (Error));
+            Put_Line (Routine_Name & "Epoch" & Integer'Image (count) &
+                        " mean error: " &
+                        Float'Image (Error / Float (X_Train'Length)));
          end if;
       end loop;  --  Epochs
       New_Line;
