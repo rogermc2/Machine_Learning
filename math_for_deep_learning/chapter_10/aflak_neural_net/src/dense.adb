@@ -1,9 +1,9 @@
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 
 package body Dense is
 
@@ -12,20 +12,21 @@ package body Dense is
       Learning_Rate : Float) is
       use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Dense.Backward ";
+--        Routine_Name : constant String := "Dense.Backward ";
       Input_Data_T : constant Real_Float_Matrix :=
                        Transpose (Real_Float_Matrix (Layer.Input_Data));
       Out_Grad     : constant Real_Float_Matrix :=
                        To_Real_Float_Matrix (Out_Gradient);
    begin
-      New_Line;
-      Put_Line (Routine_Name & "Layer Kind: " &
-                  Layer_Type'Image (Layer.Layer_Kind));
-      Print_Real_Float_List (Routine_Name & "Out_Gradient input",
-                             Out_Gradient, 1, 8);
+--        New_Line;
+--        Put_Line (Routine_Name & "Layer Kind: " &
+--                    Layer_Type'Image (Layer.Layer_Kind));
+--        Print_List_Dimensions (Routine_Name & "Out_Gradient input", Out_Gradient);
+--        Print_Real_Float_List (Routine_Name & "Out_Gradient input",
+--                               Out_Gradient, 1, 100);
       --        Print_Matrix_Dimensions (Routine_Name & "Input_Data_T", Input_Data_T);
-      --        Print_Matrix_Dimensions (Routine_Name & "Out_Grad",
-      --                                 Real_Float_Matrix (Out_Grad));
+--        Print_Matrix_Dimensions (Routine_Name & "Out_Grad", Out_Grad);
+--        Print_Float_Matrix (Routine_Name & "Out_Grad", Out_Grad, 1, 8);
       if Layer.Layer_Kind = Dense_Layer then
          --           Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
          --                                    Real_Float_Matrix (Layer.Weights));
@@ -37,19 +38,18 @@ package body Dense is
             Input_Gradient   : constant Real_Float_Matrix :=
                                  Weights_T * Out_Grad;
          begin
-            Print_Matrix_Dimensions (Routine_Name & "Weights_T", Weights_T);
-            Print_Float_Matrix (Routine_Name & "Weights_T", Weights_T, 1, 1);
-            Print_Float_Matrix (Routine_Name & "Out_Grad", Out_Grad, 1, 10);
-            Print_Matrix_Dimensions (Routine_Name & "Input_Gradient",
-                                     Input_Gradient);
-            Print_Float_Matrix (Routine_Name & "Input_Gradient",
-                                Input_Gradient, 1, 4);
+--              Print_Matrix_Dimensions (Routine_Name & "Weights_T", Weights_T);
+--              Print_Float_Matrix (Routine_Name & "Weights_T", Weights_T, 1, 1);
+--              Print_Matrix_Dimensions (Routine_Name & "Input_Gradient",
+--                                       Input_Gradient);
+--              Print_Float_Matrix (Routine_Name & "Input_Gradient",
+--                                  Input_Gradient, 1, 4);
 
             Layer.Weights :=
               Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
                                 Learning_Rate * Weights_Gradient);
-            Print_Float_Matrix (Routine_Name & "updated Weights",
-                                Real_Float_Matrix (Layer.Weights), 1, 1, 15, 21);
+--              Print_Float_Matrix (Routine_Name & "updated Weights",
+--                                  Real_Float_Matrix (Layer.Weights), 1, 1, 15, 21);
             --              Print_Matrix_Dimensions (Routine_Name & "Layer.Bias",
             --                                       Real_Float_Matrix (Layer.Bias));
             Layer.Bias :=
@@ -69,8 +69,8 @@ package body Dense is
                (1.0 - Tanh (Out_Gradient (index) ** 2)));
          end loop;
       end if;
-      Print_Real_Float_List (Routine_Name & "Out_Gradient result",
-                             Out_Gradient, 1, 8);
+--        Print_Real_Float_List (Routine_Name & "Out_Gradient result",
+--                               Out_Gradient, 1, 8);
 
    end Backward;
 

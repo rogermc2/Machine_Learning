@@ -1390,8 +1390,8 @@ package body ML_Arrays_And_Matrices is
             Result   : Real_Float_Matrix
               (List.First_Index .. List.Last_Index, 1 .. 1);
          begin
-            for col in Result'Range (2) loop
-               Result (1, col) := List (col);
+            for col in Result'Range loop
+               Result (col, 1) := List (col);
             end loop;
             return Result;
          end;
