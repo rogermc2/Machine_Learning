@@ -3,7 +3,7 @@
 
 with Maths;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 
 package body Dense is
 
@@ -12,21 +12,21 @@ package body Dense is
       Learning_Rate : Float) is
       use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Dense.Backward ";
+      Routine_Name : constant String := "Dense.Backward ";
       Input_Data_T : constant Real_Float_Matrix :=
                        Transpose (Real_Float_Matrix (Layer.Input_Data));
       Gradient_Mat : constant Real_Float_Matrix :=
                        To_Real_Float_Matrix (Out_Gradient);
    begin
---        New_Line;
---        Put_Line (Routine_Name & "Layer Kind: " &
---                    Layer_Type'Image (Layer.Layer_Kind));
---        Print_Matrix_Dimensions (Routine_Name & "Input_Data_T", Input_Data_T);
---        Print_Matrix_Dimensions (Routine_Name & "Gradient_Mat",
---                                 Real_Float_Matrix (Gradient_Mat));
+      --        New_Line;
+      --        Put_Line (Routine_Name & "Layer Kind: " &
+      --                    Layer_Type'Image (Layer.Layer_Kind));
+      --        Print_Matrix_Dimensions (Routine_Name & "Input_Data_T", Input_Data_T);
+      --        Print_Matrix_Dimensions (Routine_Name & "Gradient_Mat",
+      --                                 Real_Float_Matrix (Gradient_Mat));
       if Layer.Layer_Kind = Dense_Layer then
---           Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
---                                    Real_Float_Matrix (Layer.Weights));
+         --           Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
+         --                                    Real_Float_Matrix (Layer.Weights));
          declare
             Weights_T        :  constant Real_Float_Matrix :=
                                  Transpose (Real_Float_Matrix (Layer.Weights));
@@ -35,19 +35,26 @@ package body Dense is
             Input_Gradient   : constant Real_Float_Matrix :=
                                  Weights_T * Gradient_Mat;
          begin
---              Print_Matrix_Dimensions (Routine_Name & "Weights_Gradient",
---                                       Weights_Gradient);
---              Print_Matrix_Dimensions (Routine_Name & "Input_Gradient",
---                                       Input_Gradient);
+            Print_Matrix_Dimensions (Routine_Name & "Weights_T", Weights_T);
+            Print_Float_Matrix (Routine_Name & "Weights_T", Weights_T, 1, 1);
+            Print_Float_Matrix (Routine_Name & "Gradient_Mat",
+                                Gradient_Mat, 1, 10);
+            Print_Matrix_Dimensions (Routine_Name & "Input_Gradient",
+                                                 Input_Gradient);
+            Print_Float_Matrix (Routine_Name & "Input_Gradient",
+                                Input_Gradient, 1, 1);
+
             Layer.Weights :=
               Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
                                 Learning_Rate * Weights_Gradient);
---              Print_Matrix_Dimensions (Routine_Name & "Layer.Bias",
---                                       Real_Float_Matrix (Layer.Bias));
+            Print_Float_Matrix (Routine_Name & "updated Weights",
+                                Real_Float_Matrix (Layer.Weights), 1, 1, 15, 21);
+            --              Print_Matrix_Dimensions (Routine_Name & "Layer.Bias",
+            --                                       Real_Float_Matrix (Layer.Bias));
             Layer.Bias :=
               Layer_Matrix (Real_Float_Matrix (Layer.Bias) -
                                 Learning_Rate * Gradient_Mat);
---              Put_Line (Routine_Name & "Layer.Bias set");
+            --              Put_Line (Routine_Name & "Layer.Bias set");
 
             Out_Gradient.Clear;
             for row in Input_Gradient'Range loop
@@ -56,7 +63,6 @@ package body Dense is
          end;
 
       else  --  Activation layer
-
          for index in Out_Gradient.First_Index .. Out_Gradient.Last_Index loop
             Out_Gradient.Replace_Element
               (index, Out_Gradient (index) *

@@ -115,6 +115,7 @@ package body Network is
       Y_Train       : Binary_Matrix; Epochs : Positive := 1000;
       Learning_Rate : Float := 0.01; Verbose : Boolean := True) is
       Routine_Name : constant String := "Network.Train ";
+      Y_Row        : Binary_Array (Y_Train'Range (2));
       Output_Data  : Real_Float_List;
       Grad         : Real_Float_List;
       Error        : Float;
@@ -123,20 +124,20 @@ package body Network is
          if count mod 40 = 0 then
             Put ("*");
          end if;
+
          Error := 0.0;
          for sample in X_Train'Range loop
 --              Put_Line ("sample" & Integer'Image (sample));
             --  forward propagate
             Output_Data := To_Real_Float_List (Get_Row (X_Train, sample));
             Predict (Network, Output_Data);
+            Y_Row := Get_Row (Y_Train, sample);
 --              Print_Matrix_Dimensions (Routine_Name & "Y_Train", Y_Train);
 --              Print_List_Dimensions (Routine_Name & "Output_Data", Output_Data);
-            Error := Error + Losses.MSE (Get_Row (Y_Train, sample),
-                                         Output_Data);
+            Error := Error + Losses.MSE (Y_Row, Output_Data);
 --              Put_Line (Routine_Name & "Error: " & Float'Image (Error));
 --              New_Line;
-            Grad := To_Real_Float_List
-              (Losses.MSE_Prime (Get_Row (Y_Train, sample), Output_Data));
+            Grad := To_Real_Float_List (Losses.MSE_Prime (Y_Row, Output_Data));
 --              Print_List_Dimensions (Routine_Name & "Grad", Grad);
 
             for layer in reverse Network.Layers.First_Index ..
