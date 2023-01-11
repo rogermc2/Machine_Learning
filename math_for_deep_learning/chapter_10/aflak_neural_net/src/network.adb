@@ -1,5 +1,4 @@
 
---  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -127,22 +126,15 @@ package body Network is
 
          Error := 0.0;
          for sample in X_Train'Range loop
---              Put_Line ("sample" & Integer'Image (sample));
             --  forward propagate
             Output_Data := To_Real_Float_List (Get_Row (X_Train, sample));
             Predict (Network, Output_Data);
             Y_Row := Get_Row (Y_Train, sample);
---              Print_Matrix_Dimensions (Routine_Name & "Y_Train", Y_Train);
---              Print_List_Dimensions (Routine_Name & "Output_Data", Output_Data);
             Error := Error + Losses.MSE (Y_Row, Output_Data);
---              Put_Line (Routine_Name & "Error: " & Float'Image (Error));
---              New_Line;
             Grad := To_Real_Float_List (Losses.MSE_Prime (Y_Row, Output_Data));
---              Print_List_Dimensions (Routine_Name & "Grad", Grad);
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               --                 Put_Line ("backward layer" & Integer'Image (layer));
                Backward (Network.Layers (layer), Grad, Learning_Rate);
             end loop;
 
@@ -150,7 +142,7 @@ package body Network is
 
          --  report mean loss over Epochs
          if Verbose and then
-           (Epochs < 10 or else count mod (Epochs / 10) = 0) then
+           (Epochs < 10 or else count mod (Epochs / 10) = 1) then
             New_Line;
             Put_Line (Routine_Name & "Epoch" & Integer'Image (count) &
                         " mean error: " &

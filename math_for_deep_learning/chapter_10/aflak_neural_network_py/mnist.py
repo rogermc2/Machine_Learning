@@ -21,8 +21,7 @@ def preprocess_data(x, y, limit):
 
 # load MNIST from server
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
-x_train, y_train = preprocess_data(x_train, y_train, 8)
-# x_train, y_train = preprocess_data(x_train, y_train, 1000)
+x_train, y_train = preprocess_data(x_train, y_train, 1000)
 x_test, y_test = preprocess_data(x_test, y_test, 20)
 
 # neural network
@@ -34,10 +33,9 @@ network = [
 ]
 
 # train
-train(network, mse, mse_prime, x_train, y_train, epochs=1, learning_rate=0.1)
-# train(network, mse, mse_prime, x_train, y_train, epochs=100, learning_rate=0.1)
+train(network, mse, mse_prime, x_train, y_train, epochs=100, learning_rate=0.1)
 
 # test
-# for x, y in zip(x_test, y_test):
-#     output = predict(network, x)
-#     print('pred:', np.argmax(output), '\ttrue:', np.argmax(y))
+for x, y in zip(x_test, y_test):
+    output = predict(network, x)
+    print('pred:', np.argmax(output), '\ttrue:', np.argmax(y))

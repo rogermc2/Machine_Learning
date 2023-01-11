@@ -19,11 +19,29 @@ package body Classifier_Utilities is
                             return ML_Types.Multi_Output_Data_Record;
 
    --  ------------------------------------------------------------------------
+   --  Arg_Max returns the index of the first maximum value.
+   function Arg_Max (Values : Binary_Array) return Integer is
+      Max_Value  : Natural := 0;
+      Max_Index  : Integer := Values'First;
+      Value      : Natural;
+   begin
+      for index in Values'Range loop
+         Value := Values (index);
+         if Value > Max_Value then
+            Max_Index := index;
+            Max_Value := Value;
+         end if;
+      end loop;
 
-   --  Arg_Max returns the index of the true values along an axis.
-   function Arg_Max (Values : Boolean_Array) return Positive is
+      return Max_Index;
+
+   end Arg_Max;
+
+   --  -------------------------------------------------------------------------
+   --  Arg_Max returns the index of the first true value.
+   function Arg_Max (Values : Boolean_Array) return Integer is
       Max_Value  : Boolean := False;
-      Max_Index  : Positive := 1;
+      Max_Index  : Integer := Values'First;
       Value      : Boolean;
    begin
       for index in Values'Range loop

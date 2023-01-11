@@ -1382,13 +1382,14 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Real_Float_Matrix (List : Real_Float_List)
-                                  return Real_Float_Matrix is
+   function To_Real_Float_Matrix
+     (List : Real_Float_List; First_Index : Integer := 1)
+      return Real_Float_Matrix is
    begin
       if not List.Is_Empty then
          declare
             Result   : Real_Float_Matrix
-              (List.First_Index .. List.Last_Index, 1 .. 1);
+              (First_Index .. First_Index + Integer (List.Length) - 1, 1 .. 1);
          begin
             for col in Result'Range loop
                Result (col, 1) := List (col);

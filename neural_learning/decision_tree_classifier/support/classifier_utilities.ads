@@ -10,7 +10,8 @@ package Classifier_Utilities is
 
    Value_Error : exception;
 
-   function Arg_Max (Values : Boolean_Array) return Positive;
+   function Arg_Max (Values : Binary_Array) return Integer;
+   function Arg_Max (Values : Boolean_Array) return Integer;
    function Arg_Max (Values : NL_Types.Boolean_List) return Positive;
    function Arg_Max (Values : NL_Types.Float_List) return Positive;
    function Arg_Max (Values : Real_Float_List) return Positive;
