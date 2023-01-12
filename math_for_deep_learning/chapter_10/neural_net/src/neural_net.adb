@@ -32,7 +32,7 @@ procedure Neural_Net is
    Confusion      : Integer_Matrix (0 .. 9, 0 .. 9) :=
                       (others => (others => 0));
    CM_Col         : Natural;
---     Py_Module      : Module;
+   Py_Module      : Module;
 begin
    Print_Matrix_Dimensions (Project_Name & "X_Train" , X_Train);
    Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
@@ -43,10 +43,10 @@ begin
 --        X_Train_Image (index) := X_Train (1520, index);
 --     end loop;
 
---     Python.Initialize;
---     Py_Module := Import_File ("neural_net");
---     Python.Call (Py_Module, "show_image", X_Train_Image);
---     Python.Finalize;
+   Python.Initialize;
+   Py_Module := Import_File ("neural_net");
+   Python.Call (Py_Module, "show_image", X_Train_Image);
+   Python.Finalize;
 
    Add_Fully_Connected_Layer (Net.Layers, Layer_Range (Num_Train_Cols), 100);
    Add_Activation_Layer (Net.Layers, 100);
