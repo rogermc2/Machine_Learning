@@ -15,12 +15,14 @@ def preprocess_data(x, y, limit):
     y = y.reshape(y.shape[0], 10, 1)
     return x[:limit], y[:limit]
 
-def load_data():
+def load_data(num_train, num_test):
     mnist = tf.keras.datasets.mnist
-    result =[[][][][]]
-    result [[0]], result [[2]] = preprocess_data(x_train, y_train, 1000)
-    result [[1]], result [[3]] = preprocess_data(x_test, y_test, 20)
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    data =[[],[],[],[]]
+    data [0], data [2] = preprocess_data(x_train, y_train, num_train)
+    data [1], data [3] = preprocess_data(x_test, y_test, num_test)
     #x_train, y_train = preprocess_data(x_train, y_train, 1000)
     #x_test, y_test = preprocess_data(x_test, y_test, 20)
-    return result
+    
+    return tuple(tuple(list) for list in data)
 
