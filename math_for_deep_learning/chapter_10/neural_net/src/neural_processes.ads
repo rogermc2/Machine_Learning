@@ -11,14 +11,14 @@ package Neural_Processes is
    type Layer_Data (Layer_Kind              : Layer_Type := Activation_Layer;
                     Input_Size, Output_Size : Layer_Range := 0) is
       record
-         Input_Data : Layer_Matrix (1 .. 1, 1 .. Input_Size);
+         Input_Data : Layer_Matrix (1 .. Input_Size, 1 .. 1);
          case Layer_Kind is
             when Hidden_Layer =>
-               Weights : Layer_Matrix (1 .. Input_Size, 1 .. Output_Size);
-               Bias    : Layer_Matrix (1 .. 1, 1 .. Output_Size);
-               Delta_W : Layer_Matrix (1 .. Input_Size, 1 .. Output_Size) :=
+               Weights : Layer_Matrix (1 .. Output_Size, 1 .. Input_Size);
+               Bias    : Layer_Matrix (1 .. Output_Size, 1 .. 1);
+               Delta_W : Layer_Matrix (1 .. Output_Size, 1 .. Input_Size) :=
                            (others => (others => 0.0));
-               Delta_B : Layer_Matrix (1 .. 1, 1 .. Output_Size) :=
+               Delta_B : Layer_Matrix (1 .. Output_Size, 1 .. 1) :=
                            (others =>  (others => 0.0));
                Passes  : Natural := 0;
             when Activation_Layer =>

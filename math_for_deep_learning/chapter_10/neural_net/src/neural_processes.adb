@@ -3,7 +3,7 @@
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -14,8 +14,8 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Error : in out Real_Float_List) is
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Neural_Processes.Backward ";
-      Data_Mat      : constant Real_Float_Matrix :=
-                        Real_Float_Matrix (Layer.Input_Data);
+      Data_T      : constant Real_Float_Matrix :=
+                        Transpose (Real_Float_Matrix (Layer.Input_Data));
       Error_Mat     : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix (Error);
    begin
@@ -23,45 +23,35 @@ package body Neural_Processes is
                  Layer_Type'Image (Layer.Layer_Kind));
       if Layer.Layer_Kind = Hidden_Layer then
          declare
-            In_Error      : constant Real_Float_Matrix :=
-                              Error_Mat * Transpose
-                                (Real_Float_Matrix (Layer.Weights));
-            Weights_Error : constant Real_Float_Matrix :=
-                              Transpose (Data_Mat) * Error_Mat;
+--              Weights_T      :  constant Real_Float_Matrix :=
+--                                   Transpose (Real_Float_Matrix (Layer.Weights));
+            Weights_Error  :  constant Real_Float_Matrix := Error_Mat * Data_T;
          begin
---              Print_Matrix_Dimensions (Routine_Name & "Transpose (Data_Mat)",
---                                        Real_Float_Matrix (Transpose (Data_Mat)));
---              Print_Matrix_Dimensions (Routine_Name & "Error_Mat",
---                                        Real_Float_Matrix (Error_Mat));
-
             --  accumulate the error over the minibatch
---              Print_Float_Matrix (Routine_Name & "pre update Delta_W",
---                                     Real_Float_Matrix (Layer.Delta_W), 1, 1, 1, 10);
             Layer.Delta_W :=
               Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) + Weights_Error);
 
-            for index in Layer.Bias'Range (2) loop
-               Layer.Bias (1, index) :=
-                 Layer.Bias (1, index) + Error (Integer (index));
+            for row in Layer.Bias'Range loop
+               Layer.Bias (row, 1) :=
+                 Layer.Bias (row, 1) + Error (Integer (row));
             end loop;
             Layer.Passes := Layer.Passes + 1;
 
             Error.Clear;
-            for col in In_Error'Range (2) loop
-               Error.Append (In_Error (1, col));
+            for row in Layer.Weights'Range loop
+               Error.Append (Layer.Weights (row, 1));
             end loop;
          end;
---           Print_Float_Matrix (Routine_Name & "exit Delta_W",
---                               Real_Float_Matrix (Layer.Delta_W), 1, 1, 1, 10);
 
       else  --  Activation layer
          declare
             In_Error : constant Real_Float_Matrix
-              := H_Product (Neural_Maths.Sigmoid_Deriv (Data_Mat), Error_Mat);
+              := H_Product (Neural_Maths.Sigmoid_Deriv
+                            (Real_Float_Matrix (Layer.Input_Data)), Error_Mat);
          begin
             Error.Clear;
-            for col in In_Error'Range (2) loop
-               Error.Append (In_Error (1, col));
+            for row in In_Error'Range loop
+               Error.Append (In_Error (row, 1));
             end loop;
          end;
       end if;
@@ -76,7 +66,6 @@ package body Neural_Processes is
 --        Routine_Name : constant String := "Neural_Processes.Forward ";
       In_Data      : constant Real_Float_Matrix :=
                        To_Real_Float_Matrix (Data);
-      Out_Data     : Real_Float_List;
    begin
       --        Put_Line (Routine_Name & "Layer Kind: " &
       --                    Layer_Type'Image (Layer.Layer_Kind));
@@ -84,21 +73,21 @@ package body Neural_Processes is
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             Out_Mat : constant Real_Float_Matrix :=
-                        In_Data * Real_Float_Matrix (Layer.Weights) +
+                         Real_Float_Matrix (Layer.Weights) * In_Data +
                         Real_Float_Matrix (Layer.Bias);
          begin
-            for col in Out_Mat'Range (2) loop
-               Out_Data.Append (Out_Mat (1, col));
+            Data.Clear;
+            for row in Out_Mat'Range loop
+               Data.Append (Out_Mat (row, 1));
             end loop;
          end;
 
       else  --  Activation_Layer
-         for col in In_Data'Range (2) loop
-            Out_Data.Append (Neural_Maths.Sigmoid (In_Data) (1, col));
+         for row in Data.First_Index .. Data.Last_Index loop
+            Data.Replace_Element (row, Neural_Maths.Sigmoid (In_Data) (row, 1));
          end loop;
       end if;
 
-      Data := Out_Data;
 --        Print_Real_Float_List ("Data", Data, 1, 2);
 
    end Forward;

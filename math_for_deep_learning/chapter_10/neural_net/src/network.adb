@@ -59,14 +59,14 @@ package body Network is
       Layer : Layer_Data (Hidden_Layer, Input_Size, Output_Size);
       use Maths;
    begin
-      for row in 1 ..Input_Size loop
-         for col in 1 .. Output_Size loop
-            Layer.Weights (Row,Col) := 0.5 * Random_Float;
+      for row in 1 .. Output_Size loop
+         for col in 1 .. Input_Size loop
+            Layer.Weights (Row, Col) := 0.5 * Random_Float;
          end loop;
       end loop;
 
-      for col in 1 .. Output_Size loop
-         Layer.Bias (1, col) := 0.5 * Random_Float;
+      for row in 1 .. Output_Size loop
+         Layer.Bias (row, 1) := 0.5 * Random_Float;
       end loop;
 
       Network.Append (Layer);
