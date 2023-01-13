@@ -17,7 +17,10 @@ def preprocess_data(x, y, limit):
 
 def load_data():
     mnist = tf.keras.datasets.mnist
-
-    x_train, y_train = preprocess_data(x_train, y_train, 1000)
-    x_test, y_test = preprocess_data(x_test, y_test, 20)
+    result =[[][][][]]
+    result [[0]], result [[2]] = preprocess_data(x_train, y_train, 1000)
+    result [[1]], result [[3]] = preprocess_data(x_test, y_test, 20)
+    #x_train, y_train = preprocess_data(x_train, y_train, 1000)
+    #x_test, y_test = preprocess_data(x_test, y_test, 20)
+    return result
 
