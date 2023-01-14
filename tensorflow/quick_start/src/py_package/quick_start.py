@@ -29,8 +29,6 @@ def load_data(num_train, num_test):
     print ("data 1 shape", data[1].shape)
     print ("data 2 shape", data[2].shape)
     print ("data 3 shape", data[3].shape)
-    #x_train, y_train = preprocess_data(x_train, y_train, 1000)
-    #x_test, y_test = preprocess_data(x_test, y_test, 20)
     
     return tuple(tuple(list) for list in data)
 
