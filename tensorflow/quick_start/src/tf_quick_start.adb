@@ -26,7 +26,7 @@ begin
    Python.Call (TF_Module, "version");
    Python.Call (TF_Module, "load_data");
    TF_Result := Python.Call (TF_Module, "load_data", Train_Size, Test_Size);
---     Python.Call (TF_Module, "load_data", X_Train, Y_Train, X_Test, Y_Test);
+   Python.Call (TF_Module, "load_data", X_Train, Y_Train, X_Test, Y_Test);
    Put_Line (Routine_Name & "TF_Result: " & Integer'Image (TF_Result));
 
    Python.Close_Module (TF_Module);
