@@ -826,6 +826,10 @@ package body Python is
       Py_Func  : PyObject;
       A_Length : constant int := int (A'Length);
       C_Length : constant int := int (C'Length);
+      A_Tuple  : PyObject;
+      B_Tuple  : PyObject;
+      C_Tuple  : PyObject;
+      D_Tuple  : PyObject;
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased int;
@@ -840,7 +844,23 @@ package body Python is
 
       Result := PyTuple_Size (PyResult);
       Put_Line (Routine_Name & "Tuple size: " & int'Image (Result));
+      A_Tuple := PyTuple_GetItem (PyResult, 0);
+      B_Tuple := PyTuple_GetItem (PyResult, 1);
+      C_Tuple := PyTuple_GetItem (PyResult, 2);
+      D_Tuple := PyTuple_GetItem (PyResult, 3);
+      Put_Line (Routine_Name & "A_Tuple size: " &
+                  int'Image (PyTuple_Size (A_Tuple)));
+                Put_Line (Routine_Name & "B_Tuple size: " &
+                    int'Image (PyTuple_Size (B_Tuple)));
+                  Put_Line (Routine_Name & "C_Tuple size: " &
+                      int'Image (PyTuple_Size (C_Tuple)));
+                    Put_Line (Routine_Name & "D_Tuple size: " &
+                        int'Image (PyTuple_Size (D_Tuple)));
       Py_DecRef (PyResult);
+--        Py_DecRef (A_Tuple);
+--        Py_DecRef (B_Tuple);
+--        Py_DecRef (C_Tuple);
+--        Py_DecRef (D_Tuple);
 
    end Call;
 

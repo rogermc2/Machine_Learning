@@ -108,6 +108,10 @@ package Python_API is
    procedure PySys_SetPath (Path : Interfaces.C.char_array);
    pragma Import (C, PySys_SetPath, "PySys_SetPath");
    
+   function PyTuple_GetItem (Tuple : PyObject; Pos : Interfaces.C.int)
+                             return PyObject;
+   pragma Import (C, PyTuple_GetItem, "PyTuple_GetItem");
+   
    function PyTuple_New (Length : Interfaces.C.int) return PyObject;
    pragma Import (C, PyTuple_New, "PyTuple_New");
    
