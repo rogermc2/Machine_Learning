@@ -17,6 +17,8 @@ procedure TF_Quick_Start is
    TF_Module      : Python.Module;
    TF_Result      : Integer;
 begin
+   --  on High Sierra, TF_Quick_Start must be run with GPS started from
+   --  conda activate tf3.9
    Put_Line (Routine_Name);
 
    Python.Initialize;
