@@ -25,10 +25,10 @@ def load_data(num_train, num_test):
     data =[[],[],[],[]]
     data [0], data [2] = preprocess_data(x_train, y_train, num_train)
     data [1], data [3] = preprocess_data(x_test, y_test, num_test)
-    print ("data 0 length", len (data[0]))
-    print ("data 1 length", len (data[1]))
-    print ("data 2 length", len (data[2]))
-    print ("data 3 length", len (data[3]))
+    print ("data 0 shape", data[0].shape)
+    print ("data 1 shape", data[1].shape)
+    print ("data 2 shape", data[2].shape)
+    print ("data 3 shape", data[3].shape)
     #x_train, y_train = preprocess_data(x_train, y_train, 1000)
     #x_test, y_test = preprocess_data(x_test, y_test, 20)
     

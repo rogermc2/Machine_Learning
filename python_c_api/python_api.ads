@@ -6,6 +6,10 @@ package Python_API is
    
    subtype PyObject is System.Address;
    
+   function PyArg_ParseTuple (Obj : PyObject; Format : Interfaces.C.char_array)
+                              return Interfaces.C.Int;
+   pragma Import (C, PyArg_ParseTuple, "PyArg_ParseTuple");
+   
    function PyArray_SimpleNewFromData (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyArray_SimpleNewFromData, "PyArray_SimpleNewFromData");
 
@@ -90,8 +94,9 @@ package Python_API is
    --                                   return PyObject;
    --     pragma Import (C, PyObject_VectorCall, "PyObject_Vectorcall");
    
-   function PyParse_Tuple (Args : PyObject; Index : Interfaces.C.char_array; Obj : PyObject)
-                           return Interfaces.C.int;  --  returns Boolean
+   function PyParse_Tuple
+     (Args : PyObject; Index : Interfaces.C.char_array; Obj : PyObject)
+      return Interfaces.C.int;  --  returns Boolean
    pragma Import (C, PyParse_Tuple, "PyArg_ParseTuple");
      
    function PyRun_SimpleString (Command : Interfaces.C.char_array)

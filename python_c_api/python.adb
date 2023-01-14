@@ -855,7 +855,8 @@ package body Python is
                   Put_Line (Routine_Name & "C_Tuple size: " &
                       int'Image (PyTuple_Size (C_Tuple)));
                     Put_Line (Routine_Name & "D_Tuple size: " &
-                        int'Image (PyTuple_Size (D_Tuple)));
+                                int'Image (PyTuple_Size (D_Tuple)));
+--        PyParse_Tuple (A_Tuple, "(items)", A'Access);
       Py_DecRef (PyResult);
 --        Py_DecRef (A_Tuple);
 --        Py_DecRef (B_Tuple);
