@@ -17,18 +17,17 @@ def preprocess_data(x, y, limit):
     # e.g. number 3 will become [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
     y = np_utils.to_categorical(y)
     y = y.reshape(y.shape[0], 10, 1)
-    return x[:limit], y[:limit]
+    return tuple (x[:limit]), tuple (y[:limit])
 
 def load_data(num_train, num_test):
     mnist = tf.keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    data =[[],[],[],[]]
-    data [0], data [2] = preprocess_data(x_train, y_train, num_train)
-    data [1], data [3] = preprocess_data(x_test, y_test, num_test)
-    print ("data 0 shape", data[0].shape)
-    print ("data 1 shape", data[1].shape)
-    print ("data 2 shape", data[2].shape)
-    print ("data 3 shape", data[3].shape)
+    data0, data2 = preprocess_data(x_train, y_train, num_train)
+    data1, data3 = preprocess_data(x_test, y_test, num_test)
+    print ("data 0 length", len (data0))
+    print ("data 1 length", len (data1))
+    print ("data 2 length", len (data2))
+    print ("data 3 length", len (data3))
     
-    return tuple(tuple(list) for list in data)
+    return data0, data1, data2, data3
 

@@ -22,9 +22,9 @@ package body Python is
       if Program_Name /= "" then
          declare
             C_Name           : constant Interfaces.C.char_array :=
-                                 To_C (Program_Name);
+              To_C (Program_Name);
             Program_Name_Ptr : constant access Interfaces.C.char_array :=
-                                 new char_array'(C_Name);
+              new char_array'(C_Name);
          begin
             Py_SetProgramName (Program_Name_Ptr.all);
          end;
@@ -68,7 +68,7 @@ package body Python is
       use type System.Address;
       Routine_Name : constant String := "Python.Import_File ";
       PyFileName   : constant PyObject :=
-                       PyString_FromString (Interfaces.C.To_C (File_Name));
+        PyString_FromString (Interfaces.C.To_C (File_Name));
    begin
       Execute_String ("cwd = os.getcwd()");
       Execute_String ("os.path.join (cwd, '/src/py_package')");
@@ -108,8 +108,8 @@ package body Python is
       --  PyObject_GetAttrString retrieves the attribute named Function_Name
       --  from the object PyModule.
       F            : constant PyObject :=
-                       PyObject_GetAttrString
-                         (PyModule, Interfaces.C.To_C (Function_Name));
+        PyObject_GetAttrString
+          (PyModule, Interfaces.C.To_C (Function_Name));
    begin
       if F = System.Null_Address then
          Put_Line (Routine_Name & "Python error message:");
@@ -686,7 +686,7 @@ package body Python is
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple  : constant PyObject := To_Tuple (A);
       PyParams : constant PyObject := 
-                   Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
@@ -714,7 +714,7 @@ package body Python is
       A_Tuple  : constant PyObject := To_Tuple (A);
       B_Tuple  : constant PyObject := To_Tuple (B);
       PyParams : constant PyObject := 
-                   Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
@@ -771,43 +771,43 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
---     procedure Call (M    : Module; Function_Name : String;
---                     A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
---                     B    : ML_Arrays_And_Matrices.Integer_Matrix;
---                     C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
---                     D    : ML_Arrays_And_Matrices.Integer_Matrix) is
---        --        Routine_Name : constant String := "Python.Call ABCD ";
---  
---        function Py_BuildValue (Format          : Interfaces.C.char_array;
---                                T1, T2, T3, T4  : PyObject) return PyObject;
---        pragma Import (C, Py_BuildValue, "Py_BuildValue");
---  
---        Py_Func  : PyObject;
---        A_Tuple  : constant PyObject := To_Tuple (A);
---        B_Tuple  : constant PyObject := To_Tuple (B);
---        C_Tuple  : constant PyObject := To_Tuple (C);
---        D_Tuple  : constant PyObject := To_Tuple (D);
---        PyParams : PyObject;
---        PyResult : PyObject;
---        Result   : aliased Interfaces.C.long;
---     begin
---        Py_Func := Get_Symbol (M, Function_Name);
---        PyParams :=
---          Py_BuildValue (Interfaces.C.To_C ("OOOO"),
---                         A_Tuple, B_Tuple, C_Tuple, D_Tuple);
---        Py_DecRef (A_Tuple);
---        Py_DecRef (B_Tuple);
---        Py_DecRef (C_Tuple);
---        Py_DecRef (D_Tuple);
---  
---        PyResult := Call_Object (Py_Func, PyParams);
---        Py_DecRef (Py_Func);
---        Py_DecRef (PyParams);
---  
---        Result := PyInt_AsLong (PyResult);     
---        Py_DecRef (PyResult);
---  
---     end Call;
+   --     procedure Call (M    : Module; Function_Name : String;
+   --                     A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+   --                     B    : ML_Arrays_And_Matrices.Integer_Matrix;
+   --                     C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+   --                     D    : ML_Arrays_And_Matrices.Integer_Matrix) is
+   --        --        Routine_Name : constant String := "Python.Call ABCD ";
+   --  
+   --        function Py_BuildValue (Format          : Interfaces.C.char_array;
+   --                                T1, T2, T3, T4  : PyObject) return PyObject;
+   --        pragma Import (C, Py_BuildValue, "Py_BuildValue");
+   --  
+   --        Py_Func  : PyObject;
+   --        A_Tuple  : constant PyObject := To_Tuple (A);
+   --        B_Tuple  : constant PyObject := To_Tuple (B);
+   --        C_Tuple  : constant PyObject := To_Tuple (C);
+   --        D_Tuple  : constant PyObject := To_Tuple (D);
+   --        PyParams : PyObject;
+   --        PyResult : PyObject;
+   --        Result   : aliased Interfaces.C.long;
+   --     begin
+   --        Py_Func := Get_Symbol (M, Function_Name);
+   --        PyParams :=
+   --          Py_BuildValue (Interfaces.C.To_C ("OOOO"),
+   --                         A_Tuple, B_Tuple, C_Tuple, D_Tuple);
+   --        Py_DecRef (A_Tuple);
+   --        Py_DecRef (B_Tuple);
+   --        Py_DecRef (C_Tuple);
+   --        Py_DecRef (D_Tuple);
+   --  
+   --        PyResult := Call_Object (Py_Func, PyParams);
+   --        Py_DecRef (Py_Func);
+   --        Py_DecRef (PyParams);
+   --  
+   --        Result := PyInt_AsLong (PyResult);     
+   --        Py_DecRef (PyResult);
+   --  
+   --     end Call;
 
    --  -------------------------------------------------------------------------
 
@@ -830,6 +830,7 @@ package body Python is
       B_Tuple  : PyObject;
       C_Tuple  : PyObject;
       D_Tuple  : PyObject;
+      A0_Tuple : PyObject;
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased int;
@@ -845,23 +846,25 @@ package body Python is
       Result := PyTuple_Size (PyResult);
       Put_Line (Routine_Name & "Tuple size: " & int'Image (Result));
       A_Tuple := PyTuple_GetItem (PyResult, 0);
+      A0_Tuple := PyTuple_GetItem (A_Tuple, 0);
       B_Tuple := PyTuple_GetItem (PyResult, 1);
       C_Tuple := PyTuple_GetItem (PyResult, 2);
       D_Tuple := PyTuple_GetItem (PyResult, 3);
       Put_Line (Routine_Name & "A_Tuple size: " &
                   int'Image (PyTuple_Size (A_Tuple)));
-                Put_Line (Routine_Name & "B_Tuple size: " &
-                    int'Image (PyTuple_Size (B_Tuple)));
-                  Put_Line (Routine_Name & "C_Tuple size: " &
-                      int'Image (PyTuple_Size (C_Tuple)));
-                    Put_Line (Routine_Name & "D_Tuple size: " &
-                                int'Image (PyTuple_Size (D_Tuple)));
---        PyParse_Tuple (A_Tuple, "(items)", A'Access);
+      Put_Line (Routine_Name & "A0_Tuple size: " &
+                  int'Image (PyTuple_Size (A0_Tuple)));
+      Put_Line (Routine_Name & "B_Tuple size: " &
+                  int'Image (PyTuple_Size (B_Tuple)));
+      Put_Line (Routine_Name & "C_Tuple size: " &
+                  int'Image (PyTuple_Size (C_Tuple)));
+      Put_Line (Routine_Name & "D_Tuple size: " &
+                  int'Image (PyTuple_Size (D_Tuple)));
       Py_DecRef (PyResult);
---        Py_DecRef (A_Tuple);
---        Py_DecRef (B_Tuple);
---        Py_DecRef (C_Tuple);
---        Py_DecRef (D_Tuple);
+      --        Py_DecRef (A_Tuple);
+      --        Py_DecRef (B_Tuple);
+      --        Py_DecRef (C_Tuple);
+      --        Py_DecRef (D_Tuple);
 
    end Call;
 
@@ -1026,7 +1029,7 @@ package body Python is
                               I1      : int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
---        Routine_Name : constant String := "Python.Call U8_3D ";
+      --        Routine_Name : constant String := "Python.Call U8_3D ";
       F            : PyObject;
       Row_Length   : constant int := int (A'Length (2));
       A_Tuple      : PyObject;
