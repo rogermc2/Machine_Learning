@@ -817,8 +817,37 @@ package body Python is
                    C : in out ML_Arrays_And_Matrices.Real_Float_Matrix;
                    D : in out ML_Arrays_And_Matrices.Integer_Matrix) is
       use Interfaces.C;
+      use ML_Arrays_And_Matrices; 
       Routine_Name : constant String := "Python.Call ABCD out ";
 
+      procedure Parse_Tuple (Tuple : PyObject; M : in out Real_Float_Matrix) is
+         T_Row : PyObject;
+         T_Col : PyObject;
+      begin
+         for row in 1 .. PyTuple_Size (Tuple) loop
+            T_Row := PyTuple_GetItem (Tuple, row - 1);
+            for col in 1 .. PyTuple_Size (T_Row) loop
+               T_Col := PyTuple_GetItem (T_Row, col - 1);
+               M (Integer (row), Integer (col)) :=
+                 Float (PyFloat_AsDouble (PyTuple_GetItem (T_Col, 0)));
+            end loop;
+         end loop;
+      end Parse_Tuple;
+      
+      procedure Parse_Tuple (Tuple : PyObject; M : in out Integer_Matrix) is
+         T_Row : PyObject;
+         T_Col : PyObject;
+      begin
+         for row in 1 .. PyTuple_Size (Tuple) loop
+            T_Row := PyTuple_GetItem (Tuple, row - 1);
+            for col in 1 .. PyTuple_Size (T_Row) loop
+               T_Col := PyTuple_GetItem (T_Row, col - 1);
+               M (Integer (row), Integer (col)) :=
+                 Integer (PyLong_AsLong (PyTuple_GetItem (T_Col, 0)));
+            end loop;
+         end loop;
+      end Parse_Tuple;
+      
       function Py_BuildValue (Format : char_array;
                               T1, T2 : int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -831,6 +860,7 @@ package body Python is
       C_Tuple  : PyObject;
       D_Tuple  : PyObject;
       A0_Tuple : PyObject;
+      A00_Tuple : PyObject;
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased int;
@@ -847,17 +877,17 @@ package body Python is
       Put_Line (Routine_Name & "Tuple size: " & int'Image (Result));
       A_Tuple := PyTuple_GetItem (PyResult, 0);
       A0_Tuple := PyTuple_GetItem (A_Tuple, 0);
+      A00_Tuple := PyTuple_GetItem (A0_Tuple, 0);
       B_Tuple := PyTuple_GetItem (PyResult, 1);
       C_Tuple := PyTuple_GetItem (PyResult, 2);
       D_Tuple := PyTuple_GetItem (PyResult, 3);
---        Put_Line (Routine_Name & "A_Tuple is tuple: " &
---                    int'Image (PyTuple_Check (A_Tuple)));
---        Put_Line (Routine_Name & "A0_Tuple is tuple: " &
---                    int'Image (PyCheck_Tuple (A0_Tuple)));
+      
       Put_Line (Routine_Name & "A_Tuple size: " &
                   int'Image (PyTuple_Size (A_Tuple)));
       Put_Line (Routine_Name & "A0_Tuple size: " &
                   int'Image (PyTuple_Size (A0_Tuple)));
+      Put_Line (Routine_Name & "A00_Tuple size: " &
+                  int'Image (PyTuple_Size (A00_Tuple)));
       Put_Line (Routine_Name & "B_Tuple size: " &
                   int'Image (PyTuple_Size (B_Tuple)));
       Put_Line (Routine_Name & "C_Tuple size: " &

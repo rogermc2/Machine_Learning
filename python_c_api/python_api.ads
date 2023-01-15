@@ -46,6 +46,9 @@ package Python_API is
    procedure Py_Finalize;
    pragma Import (C, Py_Finalize, "Py_Finalize");
       
+   function PyFloat_AsDouble (Obj : PyObject) return Interfaces.C.double;
+   pragma Import (C, PyFloat_AsDouble, "PyFloat_AsDouble");
+   
    function PyFloat_FromDouble (Val : Interfaces.C.double) return PyObject;
    pragma Import (C, PyFloat_FromDouble, "PyFloat_FromDouble");
    
@@ -62,10 +65,14 @@ package Python_API is
                              Item : Interfaces.C.Int);
    pragma Import (C, PyList_SetItem, "PyList_SetItem");  
    
+   function PyLong_AsLong (Obj : PyObject) return Interfaces.C.long;
+   pragma Import (C, PyLong_AsLong, "PyLong_AsLong");
+   
    function PyLong_FromLong (Val : Interfaces.C.long) return PyObject;
    pragma Import (C, PyLong_FromLong, "PyLong_FromLong");
    
-   function PyLong_FromUnsignedLong (Val : Interfaces.C.unsigned_long) return PyObject;
+   function PyLong_FromUnsignedLong (Val : Interfaces.C.unsigned_long)
+                                     return PyObject;
    pragma Import (C, PyLong_FromUnsignedLong, "PyLong_FromUnsignedLong");
    
    function PyObject_GetAttr (Obj, Name : PyObject) return PyObject;
