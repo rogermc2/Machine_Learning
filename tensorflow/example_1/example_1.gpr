@@ -1,0 +1,33 @@
+with "tensorflow";
+
+project Example_1 is
+
+   for Source_Dirs use ("src");
+   for Object_Dir use "obj";
+   for Exec_Dir use ".";
+   for Main use ("example_1.adb");
+   for Languages use ("Ada");
+
+   package Builder is
+      for Default_Switches ("ada") use ("-g");
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnato", "-fstack-check", "-gnata", "-gnat2022");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("ada") use ("-E");
+   end Binder;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-Wl,-rpath,/usr/local/lib", "-L/usr/local/lib", "-ltensorflow");
+   end Linker;
+
+   package Naming is
+      for Spec_Suffix ("c++") use ".h";
+      for Body_Suffix ("c++") use ".cxx";
+   end Naming;
+
+end Example_1;
+
