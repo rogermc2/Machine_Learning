@@ -859,8 +859,6 @@ package body Python is
       B_Tuple  : PyObject;
       C_Tuple  : PyObject;
       D_Tuple  : PyObject;
-      A0_Tuple : PyObject;
-      A00_Tuple : PyObject;
       PyParams : PyObject;
       PyResult : PyObject;
       Result   : aliased int;
@@ -876,18 +874,12 @@ package body Python is
       Result := PyTuple_Size (PyResult);
       Put_Line (Routine_Name & "Tuple size: " & int'Image (Result));
       A_Tuple := PyTuple_GetItem (PyResult, 0);
-      A0_Tuple := PyTuple_GetItem (A_Tuple, 0);
-      A00_Tuple := PyTuple_GetItem (A0_Tuple, 0);
       B_Tuple := PyTuple_GetItem (PyResult, 1);
       C_Tuple := PyTuple_GetItem (PyResult, 2);
       D_Tuple := PyTuple_GetItem (PyResult, 3);
       
       Put_Line (Routine_Name & "A_Tuple size: " &
                   int'Image (PyTuple_Size (A_Tuple)));
-      Put_Line (Routine_Name & "A0_Tuple size: " &
-                  int'Image (PyTuple_Size (A0_Tuple)));
-      Put_Line (Routine_Name & "A00_Tuple size: " &
-                  int'Image (PyTuple_Size (A00_Tuple)));
       Put_Line (Routine_Name & "B_Tuple size: " &
                   int'Image (PyTuple_Size (B_Tuple)));
       Put_Line (Routine_Name & "C_Tuple size: " &
