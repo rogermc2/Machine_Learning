@@ -25,8 +25,8 @@ package Python_API is
    function PyCallable_Check (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyCallable_Check, "PyCallable_Check");
    
-   function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
-   pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
+   function PyTuple_Check (Obj : PyObject) return Interfaces.C.Int;
+   pragma Import (C, PyTuple_Check, "PyTuple_Check");
    
    procedure Py_DecRef (Obj : PyObject);
    pragma Import (C, Py_DecRef, "Py_DecRef");

@@ -850,6 +850,10 @@ package body Python is
       B_Tuple := PyTuple_GetItem (PyResult, 1);
       C_Tuple := PyTuple_GetItem (PyResult, 2);
       D_Tuple := PyTuple_GetItem (PyResult, 3);
+--        Put_Line (Routine_Name & "A_Tuple is tuple: " &
+--                    int'Image (PyTuple_Check (A_Tuple)));
+--        Put_Line (Routine_Name & "A0_Tuple is tuple: " &
+--                    int'Image (PyCheck_Tuple (A0_Tuple)));
       Put_Line (Routine_Name & "A_Tuple size: " &
                   int'Image (PyTuple_Size (A_Tuple)));
       Put_Line (Routine_Name & "A0_Tuple size: " &
