@@ -36,14 +36,6 @@ def load_data(num_train, num_test):
     data1 = to_tuple (data1)
     data2 = to_tuple (data2)
     data3 = to_tuple (data3)
-#    print ("data 0 length", len (data0))
-#    print ("data 1 length", len (data1))
-#    print ("data 2 length", len (data2))
-#    print ("data 3 length", len (data3))
-#    print ("data 0 is tuple", isinstance(data0, tuple))
-#    print ("data0[0] type", type(data0[0]))
-#    print ("data 0[0] is tuple", isinstance(data0[0], tuple))
-#    print ("data 0[0][0] is tuple", isinstance(data0[0][0], tuple))
 
     return data0, data1, data2, data3
 

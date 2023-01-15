@@ -435,12 +435,10 @@ package body Python is
    procedure Call (M : Module; Function_Name : String) is
       Func     : PyObject;
       PyResult : PyObject;
-      Result   : Interfaces.C.long;
    begin
       Func := Get_Symbol (M, Function_Name);
       PyResult := PyObject_CallObject (Func, System.Null_Address);
-      Result := PyInt_AsLong (PyResult);
-      Put_Line ("Python.Call 1 Result:" & Interfaces.C.long'Image (Result));
+      
       Py_DecRef (Func);
       Py_DecRef (PyResult);
 
@@ -869,7 +867,6 @@ package body Python is
       PyResult : PyObject;
       Result   : aliased int;
    begin
-      Put_Line (Routine_Name);
       Py_Func := Get_Symbol (M, Function_Name);
       PyParams := Py_BuildValue (To_C ("ii"), A_Length, C_Length);
 
