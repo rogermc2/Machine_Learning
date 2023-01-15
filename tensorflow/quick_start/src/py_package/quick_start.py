@@ -30,8 +30,8 @@ def preprocess_data(x, y, limit):
 def load_data(num_train, num_test):
     mnist = tf.keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    data0, data2 = preprocess_data(x_train, y_train, num_train)
-    data1, data3 = preprocess_data(x_test, y_test, num_test)
+    data0, data1 = preprocess_data(x_train, y_train, num_train)
+    data2, data3 = preprocess_data(x_test, y_test, num_test)
     data0 = to_tuple (data0)
     data1 = to_tuple (data1)
     data2 = to_tuple (data2)

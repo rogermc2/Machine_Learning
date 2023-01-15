@@ -13,7 +13,7 @@ procedure TF_Quick_Start is
    X_Train        : Real_Float_Matrix (1 .. Train_Size, 1 .. Num_Features);
    Y_Train        : Integer_Matrix (1 .. Train_Size, 1 .. Num_Labels);
    X_Test         : Real_Float_Matrix (1 .. Test_Size, 1 .. Num_Features);
-   Y_Test         : Integer_Matrix (1 .. Train_Size, 1 .. Num_Labels);
+   Y_Test         : Integer_Matrix (1 .. Test_Size, 1 .. Num_Labels);
    TF_Module      : Python.Module;
    TF_Result      : Integer;
 begin
