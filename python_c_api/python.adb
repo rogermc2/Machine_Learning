@@ -838,6 +838,9 @@ package body Python is
          T_Row : PyObject;
          T_Col : PyObject;
       begin
+         Assert (M'Length = integer ( PyTuple_Size (Tuple) ), "PyTuple Size" &
+                   int'Image (PyTuple_Size (Tuple)) & " /= M'Length" &
+                   Integer'Image (M'Length));
          for row in 1 .. PyTuple_Size (Tuple) loop
             T_Row := PyTuple_GetItem (Tuple, row - 1);
             for col in 1 .. PyTuple_Size (T_Row) loop
@@ -886,6 +889,13 @@ package body Python is
                   int'Image (PyTuple_Size (C_Tuple)));
       Put_Line (Routine_Name & "D_Tuple size: " &
                   int'Image (PyTuple_Size (D_Tuple)));
+      Parse_Tuple (A_Tuple, A);
+      Put_Line (Routine_Name & "A parsed ");
+      Parse_Tuple (B_Tuple, B);
+      Put_Line (Routine_Name & "B parsed ");
+      --        Parse_Tuple (C_Tuple, C);
+      --        Parse_Tuple (D_Tuple, D);
+      
       Py_DecRef (PyResult);
       --        Py_DecRef (A_Tuple);
       --        Py_DecRef (B_Tuple);
