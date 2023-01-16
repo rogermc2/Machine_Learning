@@ -120,23 +120,10 @@ package body Network is
 
             for layer in reverse Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line ("backward layer" & Integer'Image (layer));
-               Backward (Network.Layers (layer), Error);
+               Backward (Network.Layers (layer), Error, Learning_Rate);
             end loop;
-            --              Print_List_Dimensions (Routine_Name & "backward Error", Error);
-            --              if sample = 1 then
-            --                 Print_Real_Float_List (Routine_Name & "backward Error", Error);
-            --              end if;
 
          end loop;  --  Sample
-         --           Print_List_Dimensions (Routine_Name & "minibatch Loss", Loss);
-         --           Print_Real_Float_List (Routine_Name & "minibatch Loss", Loss, 1, 6);
-
-         --  update weights and biases
-         for layer in Network.Layers.First_Index ..
-           Network.Layers.Last_Index loop
-            Step (Network.Layers (layer), Learning_Rate);
-         end loop;
 
          --  report mean loss over minibatch
          if Network.Verbose and then
@@ -160,9 +147,7 @@ package body Network is
       for index in Indices'Range loop
          Indices (index) := index;
       end loop;
-      --              Print_Integer_Array (Routine_Name & "Indices", Indices, 1, 50);
       Shuffler.Shuffle (Indices);
-      --              Print_Integer_Array (Routine_Name & "shuffled Indices", Indices, 1, 50);
 
       for row in X_Batch'Range loop
          for col in X_Batch'Range (2) loop

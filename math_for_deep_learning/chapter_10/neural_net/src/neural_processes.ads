@@ -27,7 +27,8 @@ package Neural_Processes is
       end record;
 
    procedure Backward
-     (Layer : in out Layer_Data; Error : in out Real_Float_List);
+     (Layer : in out Layer_Data; Out_Gradient : in out Real_Float_List;
+      Learning_Rate : Float);
    procedure Forward (Layer : in out Layer_Data; Data : in out Real_Float_List);
    function Load_Data (File_Name : String; Num_Columns : Positive)
                        return Real_Float_Matrix;
@@ -36,6 +37,6 @@ package Neural_Processes is
                                return Float;
    function Minus_MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
                                   return Real_Float_Vector;
-   procedure Step (Layer : in out Layer_Data; Eta : Float);
+--     procedure Step (Layer : in out Layer_Data; Eta : Float);
 
 end Neural_Processes;
