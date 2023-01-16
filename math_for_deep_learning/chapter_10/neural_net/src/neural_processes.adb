@@ -3,11 +3,6 @@
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-<<<<<<< Updated upstream
-=======
-with Maths;
-
->>>>>>> Stashed changes
 --  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
@@ -18,15 +13,11 @@ package body Neural_Processes is
    procedure Backward
      (Layer : in out Layer_Data; Error : in out Real_Float_List) is
       use Real_Float_Arrays;
-<<<<<<< Updated upstream
       Routine_Name  : constant String := "Neural_Processes.Backward ";
       Data_T      : constant Real_Float_Matrix :=
                         Transpose (Real_Float_Matrix (Layer.Input_Data));
-=======
---        Routine_Name  : constant String := "Neural_Processes.Backward ";
-      Data_Mat      : constant Real_Float_Matrix :=
-                        Real_Float_Matrix (Layer.Input_Data);
->>>>>>> Stashed changes
+--        Data_Mat      : constant Real_Float_Matrix :=
+--                          Real_Float_Matrix (Layer.Input_Data);
       Error_Mat     : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix (Error);
    begin
