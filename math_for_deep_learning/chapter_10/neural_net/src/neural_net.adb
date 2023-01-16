@@ -26,7 +26,7 @@ procedure Neural_Net is
                       Load_Data ("../../datasets/y_test.csv");
 --     X_Train_Image  : Real_Float_Vector (X_Train'Range (2));
    --     Minibatches    : constant Positive := 40000;
-   Minibatches    : constant Positive := 200;
+   Minibatches    : constant Positive := 40;
    Learning_Rate  : constant Float := 1.0;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
@@ -68,8 +68,11 @@ begin
    Print_Real_Float_List_2D ("Predictions", Predictions, 1, 1);
 
    --  Y_Test values range is the digits 0 .. 9
-   for index in Y_Test'Range loop
+   for index in Y_Test'First .. Y_Test'First + 5 loop
       CM_Col := Arg_Max (Predictions (index)) - 1;
+      Put_Line (Project_Name & "Row, CM_Col, True value:" &
+                  Integer'Image (index) & Integer'Image (CM_Col) &
+                  Integer'Image (Integer (Y_Test (index))));
       Confusion (Integer (Y_Test (index)), CM_Col) :=
         Confusion (Integer (Y_Test (index)), CM_Col) + 1 ;
    end loop;
