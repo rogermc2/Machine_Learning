@@ -26,7 +26,7 @@ procedure Neural_Net is
                       Load_Data ("../../datasets/y_test.csv");
 --     X_Train_Image  : Real_Float_Vector (X_Train'Range (2));
    --     Minibatches    : constant Positive := 40000;
-   Minibatches    : constant Positive := 4;
+   Minibatches    : constant Positive := 200;
    Learning_Rate  : constant Float := 1.0;
    Net            : Network_Data;
    Predictions    : Real_Float_List_2D;  --  out
@@ -39,9 +39,10 @@ begin
    Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
    Print_Matrix_Dimensions (Project_Name & "X_Test", X_Test);
    Put_Line (Project_Name & "Y_Test length:" &  Integer'Image (Y_Test'Length));
+--     Print_Float_Matrix (Project_Name & "X_Train 1", X_Train, 1, 1);
 
 --     for index in X_Train_Image'Range loop
---        X_Train_Image (index) := X_Train (1520, index);
+--        X_Train_Image (index) := X_Train (X_Train'Last, index);
 --     end loop;
 
 --     Python.Initialize;
