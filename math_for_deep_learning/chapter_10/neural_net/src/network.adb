@@ -20,7 +20,7 @@ package body Network is
       return Real_Float_List is
       use Real_Float_Arrays;
       Output_Vector : constant Real_Float_Vector :=
-                        To_Real_Float_Vector (Output_Data);
+        To_Real_Float_Vector (Output_Data);
       Y_Vector      : Real_Float_Vector (Y_Batch'Range (2));
    begin
       for col in Y_Batch'Range (2) loop
@@ -100,15 +100,15 @@ package body Network is
 
          --  forward propagation
          for sample in X_Batch'Range loop
---              Put_Line ("sample" & Integer'Image (sample));
+            --              Put_Line ("sample" & Integer'Image (sample));
             --  Get a sample from X_Batch
             Output_Data := To_Real_Float_List (X_Batch, Sample);
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
---                 Put_Line (Routine_Name &
---                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
---                           & " layer:" & Integer'Image (layer));
+               --                 Put_Line (Routine_Name &
+               --                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
+               --                           & " layer:" & Integer'Image (layer));
                Forward (Network.Layers (layer), Output_Data);
             end loop;
             --              Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, sample, sample);
@@ -123,6 +123,10 @@ package body Network is
                Backward (Network.Layers (layer), Error, Learning_Rate);
             end loop;
 
+            if sample < 4 then
+               Print_Real_Float_List (Routine_Name & "Output_Data row" &
+                                        Integer'Image (sample), Output_Data);
+            end if;
          end loop;  --  Sample
 
          --  report mean loss over minibatch
