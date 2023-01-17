@@ -87,7 +87,7 @@ package body Neural_Processes is
 
       else  --  Activation_Layer
          for row in Data.First_Index .. Data.Last_Index loop
-            Data.Replace_Element (row, Neural_Maths.Sigmoid (In_Data) (row, 1));
+            Data.Replace_Element (row, Neural_Maths.Sigmoid (In_Data (row, 1)));
          end loop;
       end if;
 

@@ -166,7 +166,7 @@ package body Network is
    function Predict
      (Network : in out Network_Data; Input_Data : Real_Float_Matrix)
       return Real_Float_List_2D is
-      --        Routine_Name : constant String := "Network.Predict ";
+      Routine_Name : constant String := "Network.Predict ";
       Output_Data : Real_Float_List;
       Predictions : Real_Float_List_2D;  --  Result
    begin
@@ -181,6 +181,11 @@ package body Network is
            Network.Layers.Last_Index loop
             Forward (Network.Layers (layer), Output_Data);
          end loop;
+         if row < 4 then
+            Print_Real_Float_List (Routine_Name & "Output_Data row" &
+                                     Integer'Image (row), Output_Data);
+            New_Line;
+         end if;
 
          Predictions.Append (Output_Data);
       end loop;
