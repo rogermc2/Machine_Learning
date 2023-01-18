@@ -176,8 +176,8 @@ package body Neural_Processes is
                        Zero_Matrix (Layer.Delta_B'Length,
                                     Layer.Delta_B'Length (2));
          begin
-            Print_Float_Matrix (Routine_Name & "Layer.Delta_W",
-                                Real_Float_Matrix (Layer.Delta_W), 1, 2);
+--              Print_Float_Matrix (Routine_Name & "Layer.Delta_W",
+--                                  Real_Float_Matrix (Layer.Delta_W), 1, 2);
             Layer.Weights :=
               Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
                                 Eta_Av * Real_Float_Matrix (Layer.Delta_W));

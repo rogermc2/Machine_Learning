@@ -308,7 +308,7 @@ package body ML_Arrays_And_Matrices is
       Result : Binary_Array (L'Range);
    begin
       for index in L'Range loop
-            Result (index) := L (index) - R (index);
+         Result (index) := L (index) - R (index);
       end loop;
 
       return Result;
@@ -1383,19 +1383,38 @@ package body ML_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function To_Real_Float_Matrix
-     (List : Real_Float_List; First_Index : Integer := 1)
+     (List        : Real_Float_List; Data_Axis : Positive := 1;
+      First_Index : Integer := 1)
       return Real_Float_Matrix is
    begin
+      Assert (Data_Axis = 1 or Data_Axis = 2,
+              "ML_Arrays_And_Matrices.To_Real_Float_Matrix" &
+                " Invalid Data_Axis" & Integer'Image (Data_Axis) &
+                " should be 1 or 2.");
       if not List.Is_Empty then
-         declare
-            Result   : Real_Float_Matrix
-              (First_Index .. First_Index + Integer (List.Length) - 1, 1 .. 1);
-         begin
-            for col in Result'Range loop
-               Result (col, 1) := List (col);
-            end loop;
-            return Result;
-         end;
+         if Data_Axis = 1 then
+            declare
+               Result : Real_Float_Matrix
+                 (First_Index .. First_Index + Integer (List.Length) - 1, 1 .. 1);
+            begin
+               for row in Result'Range loop
+                  Result (row, 1) := List (row);
+               end loop;
+               return Result;
+            end;
+
+         else
+            declare
+               Result : Real_Float_Matrix
+                 (1 .. 1, First_Index .. First_Index + Integer (List.Length) - 1);
+            begin
+               for col in Result'Range loop
+                  Result (1, col) := List (col);
+               end loop;
+               return Result;
+            end;
+         end if;
+
       else
          declare
             Result : Real_Float_Matrix (1 .. 0, 1 .. 0);

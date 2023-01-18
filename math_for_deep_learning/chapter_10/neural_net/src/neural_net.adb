@@ -45,7 +45,7 @@ begin
    Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
    Print_Matrix_Dimensions (Project_Name & "X_Test", X_Test);
    Put_Line (Project_Name & "Y_Test length:" &  Integer'Image (Y_Test'Length));
---     Print_Float_Matrix (Project_Name & "X_Train 1", X_Train, 1, 1);
+   Print_Float_Matrix (Project_Name & "Y_Train", Y_Train, 1, 3);
 
 --     for index in X_Train_Image'Range loop
 --        X_Train_Image (index) := X_Train (X_Train'Last, index);
@@ -82,13 +82,13 @@ begin
       Confusion (Integer (Y_Test (index)), CM_Col) :=
         Confusion (Integer (Y_Test (index)), CM_Col) + 1 ;
    end loop;
-
-   Print_Integer_Matrix ("Confusion matrix", Confusion);
-   Put_Line ("Confusion diagonal sum:" &
-               Integer'Image (Sum_Diagonal (Confusion)));
-   Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
-   Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
-               Float (Sum (Confusion))));
+--
+--     Print_Integer_Matrix ("Confusion matrix", Confusion);
+--     Put_Line ("Confusion diagonal sum:" &
+--                 Integer'Image (Sum_Diagonal (Confusion)));
+--     Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
+--     Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
+--                 Float (Sum (Confusion))));
 
    Put_Line (Project_Name & "done.");
    New_Line;
