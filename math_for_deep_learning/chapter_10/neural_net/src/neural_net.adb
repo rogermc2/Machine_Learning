@@ -45,7 +45,7 @@ begin
    Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
    Print_Matrix_Dimensions (Project_Name & "X_Test", X_Test);
    Put_Line (Project_Name & "Y_Test length:" &  Integer'Image (Y_Test'Length));
-   Print_Float_Matrix (Project_Name & "Y_Train", Y_Train, 1, 3);
+--     Print_Float_Matrix (Project_Name & "Y_Train", Y_Train, 1, 3);
 
 --     for index in X_Train_Image'Range loop
 --        X_Train_Image (index) := X_Train (X_Train'Last, index);
@@ -68,10 +68,10 @@ begin
 
    --  Build the confusion matrix using the test set predictions
    Predictions := Predict (Net, X_Test);  --  out
-   Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
-             & " x" & Integer'Image (Integer (Predictions (1).Length)));
-   Print_Float_Vector ("Y_Test 3", Y_Test, 3, 3);
-   Print_Real_Float_List_2D ("Predictions 1 .. 3", Predictions, 1, 3);
+--     Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
+--               & " x" & Integer'Image (Integer (Predictions (1).Length)));
+--     Print_Float_Vector ("Y_Test 3", Y_Test, 3, 3);
+--     Print_Real_Float_List_2D ("Predictions 1 .. 3", Predictions, 1, 3);
 
    --  Y_Test values range is the digits 0 .. 9
    for index in Y_Test'First .. Y_Test'First + 5 loop
