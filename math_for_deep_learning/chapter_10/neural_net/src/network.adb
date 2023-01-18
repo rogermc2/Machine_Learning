@@ -129,6 +129,11 @@ package body Network is
             end if;
          end loop;  --  Sample
 
+         for layer in Network.Layers.First_Index ..
+           Network.Layers.Last_Index loop
+               Step (Network.Layers (layer), Learning_Rate);
+         end loop;
+
          --  report mean loss over minibatch
          if Network.Verbose and then
            (Minibatches < 10 or else count mod (Minibatches / 10) = 0) then

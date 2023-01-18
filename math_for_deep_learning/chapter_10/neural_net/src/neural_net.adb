@@ -8,6 +8,12 @@ with Neural_Processes; use Neural_Processes;
 --  with Python; use Python;
 
 with Network; use Network;
+--  1. Feed input data into the neural network.
+--  2. The data flows from layer to layer until the output is reached.
+--  3. Calculate the error which is a scalar.
+--  4. Finally, adjust each parameter (weight or bias) by subtracting
+--     the derivative of the error with respect to the parameter.
+--  5. Iterate through this process.
 
 procedure Neural_Net is
    use Classifier_Utilities;

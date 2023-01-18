@@ -37,6 +37,6 @@ package Neural_Processes is
                                return Float;
    function Minus_MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
                                   return Real_Float_Vector;
---     procedure Step (Layer : in out Layer_Data; Eta : Float);
+   procedure Step (Layer : in out Layer_Data; Eta : Float);
 
 end Neural_Processes;
