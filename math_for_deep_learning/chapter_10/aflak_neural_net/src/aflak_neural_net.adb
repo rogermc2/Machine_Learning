@@ -1,3 +1,4 @@
+--  Based on https://towardsdatascience.com/math-neural-network-from-scratch-in-python-d6da9f29ce65
 
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
