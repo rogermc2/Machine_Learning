@@ -39,6 +39,10 @@ package body Neural_Processes is
             Layer.Bias :=
               Layer_Matrix (Real_Float_Matrix (Layer.Bias) -
                                 Learning_Rate * Out_Grad);
+            Layer.Delta_W :=
+              Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) + Data_T * Out_Grad);
+            Layer.Delta_B := Layer_Matrix (Real_Float_Matrix (Layer.Delta_B) + Out_Grad);
+            Layer.Passes := Layer.Passes + 1;
 
             Out_Gradient.Clear;
             for row in Input_Gradient'Range loop
