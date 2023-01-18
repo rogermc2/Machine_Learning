@@ -16,11 +16,6 @@ package Dense is
             when Dense_Layer =>
                Weights : Layer_Matrix (1 .. Output_Size, 1 .. Input_Size);
                Bias    : Layer_Matrix (1 .. Output_Size, 1 .. 1);
---                 Delta_W : Layer_Matrix (1 .. Input_Size, 1 .. Output_Size) :=
---                             (others => (others => 0.0));
---                 Delta_B : Layer_Matrix (1 .. Output_Size, 1 .. 1) :=
---                             (others =>  (others => 0.0));
---                 Passes  : Natural := 0;
             when Tanh_Layer =>
                null;
          end case;

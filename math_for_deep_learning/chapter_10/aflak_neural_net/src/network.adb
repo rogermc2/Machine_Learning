@@ -72,9 +72,6 @@ package body Network is
          Print_Matrix_Dimensions ("Weights Size", Real_Float_Matrix
                                   (Layer.Weights));
          Put_Line ("Bias Size" & Layer_Range'Image (Layer.Bias'Length));
---           Print_Matrix_Dimensions
---             ("Delta_W Size", Real_Float_Matrix (Layer.Delta_W));
---           Put_Line ("Bias Size" & Layer_Range'Image (Layer.Delta_B'Length));
       end if;
 
    end Print_Layer_Data;
@@ -97,11 +94,6 @@ package body Network is
                  (Network.Layers.Element (index).Weights));
             Put_Line ("Bias Size" & Layer_Range'Image
                       (Network.Layers (index).Bias'Length));
---              Print_Matrix_Dimensions
---                ("Delta_W Size", Real_Float_Matrix
---                   (Network.Layers.Element (index).Delta_W));
---              Put_Line ("Bias Size" & Layer_Range'Image
---                        (Network.Layers.Element (index).Delta_B'Length));
          end if;
       end loop;
 
