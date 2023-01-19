@@ -1,5 +1,5 @@
 
---  with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -80,6 +80,7 @@ package body Network is
       Y_Train       : Real_Float_Matrix; Minibatches : Positive;
       Learning_Rate : Float; Batch_Size : Positive := 64) is
       Routine_Name : constant String := "Network.Fit ";
+      use Real_Float_Arrays;
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
       Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
       Output_Data  : Real_Float_List;
@@ -107,14 +108,20 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               --                 Put_Line (Routine_Name &
-               --                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
-               --                           & " layer:" & Integer'Image (layer));
+               Put_Line (Routine_Name &
+                           Layer_Type'Image (Network.Layers (layer).Layer_Kind)
+                         & " layer:" & Integer'Image (layer));
+               Print_Float_Matrix (Routine_Name & "initial Layer.Input_Data",
+                                   Transpose (Real_Float_Matrix (Network.Layers (layer).Input_Data)), 1, 1, 50, 100);
                Forward (Network.Layers (layer), Output_Data);
+               for row in Network.Layers (layer).Input_Data'Range loop
+                  Assert (Network.Layers (layer).Input_Data (Layer_Range (row), 1)'Valid,
+                          Routine_Name & "Forward generated an invalid Layer.Input_Data " &
+                            Float'Image (Network.Layers (layer).Input_Data (Layer_Range (row), 1)));
+               end loop;
+               Print_Float_Matrix (Routine_Name & "Forward generated Layer.Input_Data",
+                                   Transpose (Real_Float_Matrix (Network.Layers (layer).Input_Data)), 1, 1, 50, 100);
             end loop;
-            --              Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, sample, sample);
-            --              Print_Real_Float_List(Routine_Name & "Output_Data", Output_Data);
-
             --  accumulate error by backward propagate
             --              Error :=
             --                Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Accum_Error);
@@ -134,16 +141,16 @@ package body Network is
                Error :=
                  To_Real_Float_List (Minus_MSE_Derivative (Y_Vector,
                                      To_Real_Float_Vector (Output_Data)));
---                 if sample < 4 then
---                    Print_Real_Float_List (Routine_Name & "Error", Error, 1, 6);
---                 end if;
+               --                 if sample < 4 then
+               --                    Print_Real_Float_List (Routine_Name & "Error", Error, 1, 6);
+               --                 end if;
                for layer in reverse Network.Layers.First_Index ..
                  Network.Layers.Last_Index loop
                   Backward (Network.Layers (layer), Error, Learning_Rate);
                end loop;
---                 if sample < 4 then
---                    Print_Real_Float_List (Routine_Name & "Error", Error, 1, 6);
---                 end if;
+               --                 if sample < 4 then
+               --                    Print_Real_Float_List (Routine_Name & "Error", Error, 1, 6);
+               --                 end if;
             end;
 
             --              if sample < 4 then
