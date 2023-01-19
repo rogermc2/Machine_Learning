@@ -79,7 +79,7 @@ package body Neural_Processes is
    begin
       Put_Line (Routine_Name & "Layer Kind: " &
                   Layer_Type'Image (Layer.Layer_Kind));
-      Print_Float_Matrix (Routine_Name & "Layer.Input_Data",
+      Print_Float_Matrix (Routine_Name & "transposed Layer.Input_Data",
                             Transpose (Real_Float_Matrix (Layer.Input_Data)), 1, 1, 50, 100);
       if Layer.Layer_Kind = Hidden_Layer then
          declare
@@ -95,15 +95,17 @@ package body Neural_Processes is
                        Routine_Name & "Hidden_Layer invalid Layer.Input_Data " &
                          Float'Image (Layer.Input_Data (Layer_Range (row), 1)));
             end loop;
+
             Data.Clear;
             for row in Out_Mat'Range loop
                Data.Append (Out_Mat (row, 1));
             end loop;
+
             for row in Data.First_Index .. Data.Last_Index loop
                Assert (Data.Element (row)'Valid, Routine_Name &
-                         "Hidden_Layer invalid Data " &
-                         Float'Image (Data (row)));
+                         "Hidden_Layer invalid Data " & Float'Image (Data (row)));
             end loop;
+            Print_Real_Float_List (Routine_Name & "output Data", Data, 1, 40);
          end;
 
       else  --  Activation_Layer
