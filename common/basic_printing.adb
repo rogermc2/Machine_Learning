@@ -126,7 +126,7 @@ package body Basic_Printing is
          Last := Integer (aMatrix'Length);
       end if;
 
-      if Col_Finish > 0 and then Finish < aMatrix'Length (2) then
+      if Col_Finish > 0 and then Col_Finish < aMatrix'Length (2) then
          Col_Last := Col_Finish;
       else
          Col_Last := Integer (aMatrix'Length (2));

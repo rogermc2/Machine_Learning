@@ -108,19 +108,22 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line (Routine_Name &
-                           Layer_Type'Image (Network.Layers (layer).Layer_Kind)
-                         & " layer:" & Integer'Image (layer));
-               Print_Float_Matrix (Routine_Name & "initial Layer.Input_Data",
-                                   Transpose (Real_Float_Matrix (Network.Layers (layer).Input_Data)), 1, 1, 50, 100);
+--                 Put_Line (Routine_Name &
+--                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
+--                           & " layer:" & Integer'Image (layer));
+--                 Print_Float_Matrix
+--                   (Routine_Name & "initial Layer.Input_Data",
+--                    Transpose (Real_Float_Matrix
+--                      (Network.Layers (layer).Input_Data)), 1, 1, 50, 100);
                Forward (Network.Layers (layer), Output_Data);
-               for row in Network.Layers (layer).Input_Data'Range loop
-                  Assert (Network.Layers (layer).Input_Data (Layer_Range (row), 1)'Valid,
-                          Routine_Name & "Forward generated an invalid Layer.Input_Data " &
-                            Float'Image (Network.Layers (layer).Input_Data (Layer_Range (row), 1)));
+               for row in Output_Data.First_Index .. Output_Data.Last_Index loop
+                  Assert (Output_Data.Element (row)'Valid, Routine_Name &
+                       "Forward generated Output_Data " &
+                       Float'Image (Output_Data (row)));
                end loop;
-               Print_Float_Matrix (Routine_Name & "Forward generated Layer.Input_Data",
-                                   Transpose (Real_Float_Matrix (Network.Layers (layer).Input_Data)), 1, 1, 50, 100);
+--                 Print_Real_Float_List
+--                   (Routine_Name & "Forward generated Output_Data", Output_Data,
+--                    50, 100);
             end loop;
             --  accumulate error by backward propagate
             --              Error :=

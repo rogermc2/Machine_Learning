@@ -75,21 +75,19 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Data : in out Real_Float_List) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Forward ";
-      --        In_Data      : constant Real_Float_Matrix := To_Real_Float_Matrix (Data);
+      In_Data      : constant Real_Float_Matrix := To_Real_Float_Matrix (Data);
    begin
-      Put_Line (Routine_Name & "Layer Kind: " &
-                  Layer_Type'Image (Layer.Layer_Kind));
-      Print_Float_Matrix (Routine_Name & "transposed Layer.Input_Data",
-                            Transpose (Real_Float_Matrix (Layer.Input_Data)), 1, 1, 50, 100);
+      Layer.Input_Data := Layer_Matrix (In_Data);
+--        Put_Line (Routine_Name & "Layer Kind: " &
+--                    Layer_Type'Image (Layer.Layer_Kind));
+--        Print_Float_Matrix (Routine_Name & "transposed Layer.Input_Data",
+--                              Transpose (Real_Float_Matrix (Layer.Input_Data)), 1, 1, 50, 100);
       if Layer.Layer_Kind = Hidden_Layer then
          declare
-            In_Data : constant Real_Float_Matrix := To_Real_Float_Matrix (Data);
             Out_Mat : constant Real_Float_Matrix :=
               Real_Float_Matrix (Layer.Weights) * In_Data +
               Real_Float_Matrix (Layer.Bias);
          begin
-            --  Save for Active layer use
-            Layer.Input_Data := Layer_Matrix (In_Data);
             for row in Layer.Input_Data'Range loop
                Assert (Layer.Input_Data (Layer_Range (row), 1)'Valid,
                        Routine_Name & "Hidden_Layer invalid Layer.Input_Data " &
@@ -105,7 +103,7 @@ package body Neural_Processes is
                Assert (Data.Element (row)'Valid, Routine_Name &
                          "Hidden_Layer invalid Data " & Float'Image (Data (row)));
             end loop;
-            Print_Real_Float_List (Routine_Name & "output Data", Data, 1, 40);
+--              Print_Real_Float_List (Routine_Name & "output Data", Data, 1, 40);
          end;
 
       else  --  Activation_Layer
@@ -117,7 +115,7 @@ package body Neural_Processes is
                       Float'Image (Layer.Input_Data (Layer_Range (row), 1)));
             Data.Append (Neural_Maths.Sigmoid (Layer.Input_Data (row, 1)));
          end loop;
-         Print_Real_Float_List (Routine_Name & "Data", Data);
+--           Print_Real_Float_List (Routine_Name & "Data", Data);
 
       end if;
 
