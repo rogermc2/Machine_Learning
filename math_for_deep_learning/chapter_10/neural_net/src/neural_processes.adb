@@ -79,13 +79,14 @@ package body Neural_Processes is
    begin
       --        Put_Line (Routine_Name & "Layer Kind: " &
       --                    Layer_Type'Image (Layer.Layer_Kind));
-      Layer.Input_Data := Layer_Matrix (In_Data);
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             Out_Mat : constant Real_Float_Matrix :=
                         Real_Float_Matrix (Layer.Weights) * In_Data +
                         Real_Float_Matrix (Layer.Bias);
          begin
+            --  Save for Active layer use
+            Layer.Input_Data := Layer_Matrix (In_Data);
             Data.Clear;
             for row in Out_Mat'Range loop
                Data.Append (Out_Mat (row, 1));
@@ -93,8 +94,10 @@ package body Neural_Processes is
          end;
 
       else  --  Activation_Layer
-         for row in Data.First_Index .. Data.Last_Index loop
-            Data.Replace_Element (row, Neural_Maths.Sigmoid (In_Data (row, 1)));
+         Data.Clear;
+         for row in Layer.Input_Data'Range loop
+            Data.Append (Neural_Maths.Sigmoid
+                         (Layer.Input_Data (Layer_Range (row), 1)));
          end loop;
       end if;
 
@@ -176,8 +179,8 @@ package body Neural_Processes is
                        Zero_Matrix (Layer.Delta_B'Length,
                                     Layer.Delta_B'Length (2));
          begin
---              Print_Float_Matrix (Routine_Name & "Layer.Delta_W",
---                                  Real_Float_Matrix (Layer.Delta_W), 1, 2);
+            --              Print_Float_Matrix (Routine_Name & "Layer.Delta_W",
+            --                                  Real_Float_Matrix (Layer.Delta_W), 1, 2);
             Layer.Weights :=
               Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
                                 Eta_Av * Real_Float_Matrix (Layer.Delta_W));
