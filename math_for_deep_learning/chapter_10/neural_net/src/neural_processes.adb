@@ -3,7 +3,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -78,10 +78,10 @@ package body Neural_Processes is
       In_Data      : constant Real_Float_Matrix := To_Real_Float_Matrix (Data);
    begin
       Layer.Input_Data := Layer_Matrix (In_Data);
---        Put_Line (Routine_Name & "Layer Kind: " &
---                    Layer_Type'Image (Layer.Layer_Kind));
---        Print_Float_Matrix (Routine_Name & "transposed Layer.Input_Data",
---                              Transpose (Real_Float_Matrix (Layer.Input_Data)), 1, 1, 50, 100);
+      --        Put_Line (Routine_Name & "Layer Kind: " &
+      --                    Layer_Type'Image (Layer.Layer_Kind));
+      --        Print_Float_Matrix (Routine_Name & "transposed Layer.Input_Data",
+      --                              Transpose (Real_Float_Matrix (Layer.Input_Data)), 1, 1, 50, 100);
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             Out_Mat : constant Real_Float_Matrix :=
@@ -103,7 +103,7 @@ package body Neural_Processes is
                Assert (Data.Element (row)'Valid, Routine_Name &
                          "Hidden_Layer invalid Data " & Float'Image (Data (row)));
             end loop;
---              Print_Real_Float_List (Routine_Name & "output Data", Data, 1, 40);
+            --              Print_Real_Float_List (Routine_Name & "output Data", Data, 1, 40);
          end;
 
       else  --  Activation_Layer
@@ -115,13 +115,51 @@ package body Neural_Processes is
                       Float'Image (Layer.Input_Data (Layer_Range (row), 1)));
             Data.Append (Neural_Maths.Sigmoid (Layer.Input_Data (row, 1)));
          end loop;
---           Print_Real_Float_List (Routine_Name & "Data", Data);
+         --           Print_Real_Float_List (Routine_Name & "Data", Data);
 
       end if;
 
    end Forward;
 
    --  --------------------------------------------------------------
+
+   procedure Gradient_Descent_Step (Layer : in out Layer_Data; Eta : Float) is
+      use Real_Float_Arrays;
+      --        Routine_Name : constant String := "Neural_Processes.Gradient_Descent_Step Hidden_Layer ";
+      Eta_Av : Float;
+   begin
+      if Layer.Layer_Kind = Hidden_Layer then
+         Eta_Av := Eta / Float (Layer.Passes);
+         --              Print_Float_Matrix (Routine_Name & "Layer.Delta_W",
+         --                                  Real_Float_Matrix (Layer.Delta_W), 1, 2);
+         Layer.Weights :=
+           Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
+                             Eta_Av * Real_Float_Matrix (Layer.Delta_W));
+
+         Layer.Bias :=
+           Layer_Matrix (Real_Float_Matrix (Layer.Bias) -
+                             Eta_Av * Real_Float_Matrix (Layer.Delta_B));
+
+         --  reset Delta_W and Delta_B for the next minibatch
+         declare
+            --  declare block prevents ambiguous Zero_Matrix operand problems.
+            ZMW : constant Real_Float_Matrix :=
+              Zero_Matrix (Layer.Delta_W'Length,
+                           Layer.Delta_W'Length (2));
+            ZMD : constant Real_Float_Matrix :=
+              Zero_Matrix (Layer.Delta_B'Length,
+                           Layer.Delta_B'Length (2));
+         begin
+            Layer.Delta_W := Layer_Matrix (ZMW);
+            Layer.Delta_B := Layer_Matrix (ZMD);
+         end;  -- declare block
+
+         Layer.Passes := 0;
+      end if;  --  Hidden layer
+
+   end Gradient_Descent_Step;
+
+   --  ------------------------------------------------------------------------
 
    function Load_Data (File_Name : String; Num_Columns : Positive)
                        return Real_Float_Matrix is
@@ -180,39 +218,6 @@ package body Neural_Processes is
       return Y_Pred - Y_True;
 
    end Minus_MSE_Derivative;
-
-   --  --------------------------------------------------------------
-
-   procedure Step (Layer : in out Layer_Data; Eta : Float) is
-      use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Neural_Processes.Step Hidden_Layer ";
-   begin
-      if Layer.Layer_Kind = Hidden_Layer then
-         declare
-            Eta_Av : constant Float := Eta / Float (Layer.Passes);
-            ZMW    : constant Real_Float_Matrix :=
-              Zero_Matrix (Layer.Delta_W'Length,
-                           Layer.Delta_W'Length (2));
-            ZMD    : constant Real_Float_Matrix :=
-              Zero_Matrix (Layer.Delta_B'Length,
-                           Layer.Delta_B'Length (2));
-         begin
-            --              Print_Float_Matrix (Routine_Name & "Layer.Delta_W",
-            --                                  Real_Float_Matrix (Layer.Delta_W), 1, 2);
-            Layer.Weights :=
-              Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
-                                Eta_Av * Real_Float_Matrix (Layer.Delta_W));
-
-            Layer.Bias :=
-              Layer_Matrix (Real_Float_Matrix (Layer.Bias) -
-                                Eta_Av * Real_Float_Matrix (Layer.Delta_B));
-            Layer.Delta_W := Layer_Matrix (ZMW);
-            Layer.Delta_B := Layer_Matrix (ZMD);
-            Layer.Passes := 0;
-         end;  -- declare block
-      end if;  --  Hidden layer
-
-   end Step;
 
    --  --------------------------------------------------------------
 

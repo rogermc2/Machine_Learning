@@ -108,23 +108,23 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
---                 Put_Line (Routine_Name &
---                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
---                           & " layer:" & Integer'Image (layer));
---                 Print_Float_Matrix
---                   (Routine_Name & "initial Layer.Input_Data",
---                    Transpose (Real_Float_Matrix
---                      (Network.Layers (layer).Input_Data)), 1, 1, 50, 100);
+               --                 Put_Line (Routine_Name &
+               --                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
+               --                           & " layer:" & Integer'Image (layer));
+               --                 Print_Float_Matrix
+               --                   (Routine_Name & "initial Layer.Input_Data",
+               --                    Transpose (Real_Float_Matrix
+               --                      (Network.Layers (layer).Input_Data)), 1, 1, 50, 100);
                Forward (Network.Layers (layer), Output_Data);
                for row in Output_Data.First_Index .. Output_Data.Last_Index loop
                   Assert (Output_Data.Element (row)'Valid, Routine_Name &
-                       "Forward generated Output_Data " &
-                       Float'Image (Output_Data (row)));
+                            "Forward generated Output_Data " &
+                            Float'Image (Output_Data (row)));
                end loop;
---                 Print_Real_Float_List
---                   (Routine_Name & "Forward generated Output_Data", Output_Data,
---                    50, 100);
-            end loop;
+               --                 Print_Real_Float_List
+               --                   (Routine_Name & "Forward generated Output_Data", Output_Data,
+               --                    50, 100);
+            end loop;  --  sample
             --  accumulate error by backward propagate
             --              Error :=
             --                Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Accum_Error);
@@ -144,16 +144,18 @@ package body Network is
                Error :=
                  To_Real_Float_List (Minus_MSE_Derivative (Y_Vector,
                                      To_Real_Float_Vector (Output_Data)));
-               --                 if sample < 4 then
-               --                    Print_Real_Float_List (Routine_Name & "Error", Error, 1, 6);
-               --                 end if;
+               if sample < 4 then
+                  Print_Real_Float_List (Routine_Name & "Forward Error", Error);
+               end if;
+
                for layer in reverse Network.Layers.First_Index ..
                  Network.Layers.Last_Index loop
                   Backward (Network.Layers (layer), Error, Learning_Rate);
                end loop;
-               --                 if sample < 4 then
-               --                    Print_Real_Float_List (Routine_Name & "Error", Error, 1, 6);
-               --                 end if;
+               if sample < 4 then
+                  Print_Real_Float_List (Routine_Name & "Level 1 Error", Error, 1, 8);
+                  New_Line;
+               end if;
             end;
 
             --              if sample < 4 then
@@ -164,7 +166,7 @@ package body Network is
 
          for layer in Network.Layers.First_Index ..
            Network.Layers.Last_Index loop
-            Step (Network.Layers (layer), Learning_Rate);
+            Gradient_Descent_Step (Network.Layers (layer), Learning_Rate);
          end loop;
 
          --  report mean loss over minibatch
