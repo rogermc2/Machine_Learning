@@ -1,6 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -1386,9 +1386,10 @@ package body ML_Arrays_And_Matrices is
      (List        : Real_Float_List; Data_Axis : Positive := 1;
       First_Index : Integer := 1)
       return Real_Float_Matrix is
+      Routine_Name : constant String :=
+                       "ML_Arrays_And_Matrices.To_Real_Float_Matrix ";
    begin
-      Assert (Data_Axis = 1 or Data_Axis = 2,
-              "ML_Arrays_And_Matrices.To_Real_Float_Matrix" &
+      Assert (Data_Axis = 1 or Data_Axis = 2, Routine_Name &
                 " Invalid Data_Axis" & Integer'Image (Data_Axis) &
                 " should be 1 or 2.");
       if not List.Is_Empty then
@@ -1406,9 +1407,10 @@ package body ML_Arrays_And_Matrices is
          else
             declare
                Result : Real_Float_Matrix
-                 (1 .. 1, First_Index .. First_Index + Integer (List.Length) - 1);
+                 (1 .. 1,
+                  First_Index .. First_Index + Integer (List.Length) - 1);
             begin
-               for col in Result'Range loop
+               for col in Result'Range (2) loop
                   Result (1, col) := List (col);
                end loop;
                return Result;
@@ -1416,6 +1418,7 @@ package body ML_Arrays_And_Matrices is
          end if;
 
       else
+         Put_Line (Routine_Name & "empty list.");
          declare
             Result : Real_Float_Matrix (1 .. 0, 1 .. 0);
          begin

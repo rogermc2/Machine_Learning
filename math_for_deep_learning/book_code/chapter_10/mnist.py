@@ -31,9 +31,6 @@ net.add(ActivationLayer())
 net.add(FullyConnectedLayer(50, 10))
 net.add(ActivationLayer())
 
-print ("net 0", net.layers[0])
-print ("net 0", net.layers[1])
-
 #  Loss and train
 net.fit(x_train, y_train, minibatches=4, learning_rate=1.0)
 

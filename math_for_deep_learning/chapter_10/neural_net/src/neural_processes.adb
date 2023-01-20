@@ -3,7 +3,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -13,26 +13,26 @@ package body Neural_Processes is
    procedure Backward
      (Layer         : in out Layer_Data; Out_Error : in out Real_Float_List) is
       use Real_Float_Arrays;
-      --        Routine_Name  : constant String := "Neural_Processes.Backward ";
+      Routine_Name  : constant String := "Neural_Processes.Backward ";
       Data_T        : constant Real_Float_Matrix :=
                         Transpose (Real_Float_Matrix (Layer.Input_Data));
       Error_Mat     : constant Real_Float_Matrix :=
-                        To_Real_Float_Matrix (Out_Error);
+                        To_Real_Float_Matrix (Out_Error, 2);
    begin
-      --        Put_Line (Routine_Name & "Layer Kind: " &
-      --                    Layer_Type'Image (Layer.Layer_Kind));
-      --        Print_Matrix_Dimensions (Routine_Name & "Input_Data",
-      --                                 Real_Float_Matrix (Layer.Input_Data));
-      --        Print_Matrix_Dimensions (Routine_Name & "Error_Mat", Error_Mat);
+      Put_Line (Routine_Name & "Layer Kind: " &
+                  Layer_Type'Image (Layer.Layer_Kind));
+      Print_Matrix_Dimensions (Routine_Name & "Input_Data",
+                               Real_Float_Matrix (Layer.Input_Data));
+      Print_Matrix_Dimensions (Routine_Name & "Error_Mat", Error_Mat);
 
       if Layer.Layer_Kind = Hidden_Layer then
          declare
-            Weights_T     :  constant Real_Float_Matrix :=
-                              Transpose (Real_Float_Matrix (Layer.Weights));
-            Input_Error   : constant Real_Float_Matrix := Weights_T * Error_Mat;
+            Weights_T   :  constant Real_Float_Matrix :=
+                            Transpose (Real_Float_Matrix (Layer.Weights));
+            Input_Error : constant Real_Float_Matrix := Weights_T * Error_Mat;
          begin
-            --              Print_Matrix_Dimensions (Routine_Name & "Input_Data",
-            --                                 Real_Float_Matrix (Layer.Input_Data));
+            Print_Matrix_Dimensions (Routine_Name & "Input_Data",
+                                     Real_Float_Matrix (Layer.Input_Data));
             Layer.Delta_W :=
               Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) +
                                 Error_Mat * Data_T);
@@ -41,8 +41,8 @@ package body Neural_Processes is
             Layer.Passes := Layer.Passes + 1;
 
             Out_Error.Clear;
-            for row in Input_Error'Range loop
-               Out_Error.Append (Input_Error (row, 1));
+            for col in Input_Error'Range (2) loop
+               Out_Error.Append (Input_Error (1, col));
             end loop;
          end;
 
@@ -53,8 +53,8 @@ package body Neural_Processes is
                             (Real_Float_Matrix (Layer.Input_Data)), Error_Mat);
          begin
             Out_Error.Clear;
-            for row in Error'Range loop
-               Out_Error.Append (Error (row, 1));
+            for col in Error'Range (2) loop
+               Out_Error.Append (Error (1, col));
             end loop;
          end;
       end if;
@@ -67,28 +67,34 @@ package body Neural_Processes is
      (Layer : in out Layer_Data; Data : in out Real_Float_List) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Processes.Forward ";
-      In_Data      : constant Real_Float_Matrix := To_Real_Float_Matrix (Data);
+      In_Data      : constant Real_Float_Matrix :=
+                       To_Real_Float_Matrix (Data, 2);
    begin
+      Put_Line (Routine_Name & "Data.Length" &
+                  Integer'Image (Integer (Data.Length)));
+      Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
+                               (Real_Float_Matrix (Layer.Input_Data)));
+      Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
       Layer.Input_Data := Layer_Matrix (In_Data);
       --        Put_Line (Routine_Name & "Layer Kind: " &
       --                    Layer_Type'Image (Layer.Layer_Kind));
-      --        Print_Float_Matrix (Routine_Name & "transposed Layer.Input_Data",
-      --                              Transpose (Real_Float_Matrix (Layer.Input_Data)), 1, 1, 50, 100);
       if Layer.Layer_Kind = Hidden_Layer then
+         Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
+                                  (Real_Float_Matrix (Layer.Weights)));
          declare
             Out_Mat : constant Real_Float_Matrix :=
-                        Real_Float_Matrix (Layer.Weights) * In_Data +
+                        In_Data * Real_Float_Matrix (Layer.Weights) +
                         Real_Float_Matrix (Layer.Bias);
          begin
-            for row in Layer.Input_Data'Range loop
-               Assert (Layer.Input_Data (Layer_Range (row), 1)'Valid,
+            for col in Layer.Input_Data'Range (2) loop
+               Assert (Layer.Input_Data (1, Layer_Range (col))'Valid,
                        Routine_Name & "Hidden_Layer invalid Layer.Input_Data " &
-                         Float'Image (Layer.Input_Data (Layer_Range (row), 1)));
+                         Float'Image (Layer.Input_Data (1, Layer_Range (col))));
             end loop;
 
             Data.Clear;
-            for row in Out_Mat'Range loop
-               Data.Append (Out_Mat (row, 1));
+            for col in Out_Mat'Range (2) loop
+               Data.Append (Out_Mat (1, col));
             end loop;
 
             for row in Data.First_Index .. Data.Last_Index loop
@@ -100,12 +106,13 @@ package body Neural_Processes is
 
       else  --  Activation_Layer
          Data.Clear;
-         for row in Layer.Input_Data'Range loop
-            Assert (Layer.Input_Data (Layer_Range (row), 1)'Valid,
-                    Routine_Name & "Activation_Layer invalid Layer.Input_Data row" &
-                      Layer_Range'Image (row) & ":  " &
-                      Float'Image (Layer.Input_Data (Layer_Range (row), 1)));
-            Data.Append (Neural_Maths.Sigmoid (Layer.Input_Data (row, 1)));
+         for col in Layer.Input_Data'Range (2) loop
+            Assert (Layer.Input_Data (1, Layer_Range (col))'Valid,
+                    Routine_Name &
+                      "Activation_Layer invalid Layer.Input_Data column" &
+                      Layer_Range'Image (col) & ":  " &
+                      Float'Image (Layer.Input_Data (1, Layer_Range (col))));
+            Data.Append (Neural_Maths.Sigmoid (Layer.Input_Data (1, col)));
          end loop;
          --           Print_Real_Float_List (Routine_Name & "Data", Data);
 
