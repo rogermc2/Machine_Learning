@@ -100,12 +100,12 @@ package body Network is
          --           Print_Float_Matrix (Routine_Name & "X_Batch", X_Batch, 1, 5, 42, 56);
          --           Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, 1, 5);
 
-         --  forward propagation
          for sample in X_Batch'Range loop
             --              Put_Line ("sample" & Integer'Image (sample));
             --  Get a sample from X_Batch
             Output_Data := To_Real_Float_List (X_Batch, Sample);
 
+         --  forward propagation
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
                Forward (Network.Layers (layer), Output_Data);
@@ -128,10 +128,10 @@ package body Network is
                   Y_Vector (col) := Y_Batch (Sample, col);
                end loop;
                --                 Diagnostic_Error := Diagnostic_Error + Mean_Square_Error (Y_Vector, To_Real_Float_Vector (Output_Data));
---                 if sample < 4 then
---                    Print_Float_Vector (Routine_Name & "Y_Vector", Y_Vector);
---                    Print_Real_Float_List (Routine_Name & "Output_Data", Output_Data);
---                 end if;
+               --                 if sample < 4 then
+               --                    Print_Float_Vector (Routine_Name & "Y_Vector", Y_Vector);
+               --                    Print_Real_Float_List (Routine_Name & "Output_Data", Output_Data);
+               --                 end if;
 
                Error :=
                  To_Real_Float_List (Minus_MSE_Derivative (Y_Vector,
@@ -140,12 +140,14 @@ package body Network is
                   Print_Real_Float_List (Routine_Name & "Forward Error", Error);
                end if;
 
+               --  backtward propagation
                for layer in reverse Network.Layers.First_Index ..
                  Network.Layers.Last_Index loop
-                  Backward (Network.Layers (layer), Error, Learning_Rate);
+                  Backward (Network.Layers (layer), Error);
                end loop;
                if sample < 4 then
-                  Print_Real_Float_List (Routine_Name & "Level 1 Error", Error, 1, 20);
+                  Print_Real_Float_List (Routine_Name & "Level 1 Error",
+                                         Error, 1, 20);
                   New_Line;
                end if;
             end;  --  declare block
@@ -202,10 +204,11 @@ package body Network is
    function Predict
      (Network : in out Network_Data; Input_Data : Real_Float_Matrix)
       return Real_Float_List_2D is
-      --        Routine_Name : constant String := "Network.Predict ";
-      Output_Data : Real_Float_List;
-      Predictions : Real_Float_List_2D;  --  Result
+      Routine_Name : constant String := "Network.Predict ";
+      Output_Data  : Real_Float_List;     --  Feature values
+      Predictions  : Real_Float_List_2D;  --  Result
    begin
+      Print_Matrix_Dimensions (Routine_Name & "Input_Data", Input_Data);
       --  For each sample
       for row in Input_Data'Range loop
          Output_Data.Clear;
@@ -217,11 +220,11 @@ package body Network is
            Network.Layers.Last_Index loop
             Forward (Network.Layers (layer), Output_Data);
          end loop;
-         --           if row < 4 then
-         --              Print_Real_Float_List (Routine_Name & "Output_Data row" &
-         --                                       Integer'Image (row), Output_Data);
-         --              New_Line;
-         --           end if;
+         if row < 4 then
+            Print_Real_Float_List (Routine_Name & "Output_Data row" &
+                                     Integer'Image (row), Output_Data);
+            New_Line;
+         end if;
 
          Predictions.Append (Output_Data);
       end loop;

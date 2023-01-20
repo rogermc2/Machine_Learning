@@ -27,8 +27,7 @@ package Neural_Processes is
       end record;
 
    procedure Backward
-     (Layer : in out Layer_Data; Out_Gradient : in out Real_Float_List;
-      Learning_Rate : Float);
+     (Layer : in out Layer_Data; Out_Error : in out Real_Float_List);
    procedure Forward (Layer : in out Layer_Data; Data : in out Real_Float_List);
    procedure Gradient_Descent_Step (Layer : in out Layer_Data; Eta : Float);
    function Load_Data (File_Name : String; Num_Columns : Positive)
