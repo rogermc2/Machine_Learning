@@ -85,7 +85,7 @@ package body Network is
       Y_Batch      : Real_Float_Matrix (1 .. Batch_Size, Y_Train'Range (2));
       Output_Data  : Real_Float_List;
       Error        : Real_Float_List;
-      --        Err          : Float;
+      --        Diagnostic_Error  : Float  --  err;
    begin
       Put_Line (Routine_Name & "running" & Integer'Image (Minibatches) &
                   " minibatches");
@@ -94,7 +94,7 @@ package body Network is
          if count mod 40 = 0 then
             Put ("*");
          end if;
-         --           Err := 0.0;
+         --           Diagnostic_Error := 0.0;
          --  Select a random minibatch
          Generate_Minibatch (X_Train, Y_Train, X_Batch, Y_Batch);
          --           Print_Float_Matrix (Routine_Name & "X_Batch", X_Batch, 1, 5, 42, 56);
@@ -124,9 +124,9 @@ package body Network is
                --                 Print_Real_Float_List
                --                   (Routine_Name & "Forward generated Output_Data", Output_Data,
                --                    50, 100);
-            end loop;  --  sample
-            --  accumulate error by backward propagate
-            --              Error :=
+            end loop;  --  layer
+            --  accumulate diagnostic backward propagate error
+            --              Diagnostic_Error :=
             --                Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Accum_Error);
             declare
                Y_Vector      : Real_Float_Vector (Y_Batch'Range (2));
@@ -134,11 +134,10 @@ package body Network is
                for col in Y_Batch'Range (2) loop
                   Y_Vector (col) := Y_Batch (Sample, col);
                end loop;
-               --                 Err := Err + Mean_Square_Error (Y_Vector, To_Real_Float_Vector (Output_Data));
+               --                 Diagnostic_Error := Diagnostic_Error + Mean_Square_Error (Y_Vector, To_Real_Float_Vector (Output_Data));
                if sample < 4 then
                   Print_Float_Vector (Routine_Name & "Y_Vector", Y_Vector);
-                  Print_Real_Float_List (Routine_Name & "Output_Data",
-                                         Output_Data);
+                  Print_Real_Float_List (Routine_Name & "Output_Data", Output_Data);
                end if;
 
                Error :=
@@ -152,10 +151,10 @@ package body Network is
                  Network.Layers.Last_Index loop
                   Backward (Network.Layers (layer), Error, Learning_Rate);
                end loop;
-               if sample < 4 then
-                  Print_Real_Float_List (Routine_Name & "Level 1 Error", Error, 1, 8);
-                  New_Line;
-               end if;
+--                 if sample < 4 then
+--                    Print_Real_Float_List (Routine_Name & "Level 1 Error", Error, 1, 8);
+--                    New_Line;
+--                 end if;
             end;
 
             --              if sample < 4 then
@@ -172,7 +171,7 @@ package body Network is
          --  report mean loss over minibatch
          --           if Network.Verbose and then
          --             (Minibatches < 10 or else count mod (Minibatches / 10) = 0) then
-         --              Err := Err / Float (Batch_Size);
+         --              Diagnostic_Error := Diagnostic_Error / Float (Batch_Size);
          --              New_Line;
          --              Put_Line ("Minibatch" & Integer'Image (count) &
          --                          " mean error: " & Float'Image (Err));

@@ -144,11 +144,9 @@ package body Neural_Processes is
          declare
             --  declare block prevents ambiguous Zero_Matrix operand problems.
             ZMW : constant Real_Float_Matrix :=
-              Zero_Matrix (Layer.Delta_W'Length,
-                           Layer.Delta_W'Length (2));
+              Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
             ZMD : constant Real_Float_Matrix :=
-              Zero_Matrix (Layer.Delta_B'Length,
-                           Layer.Delta_B'Length (2));
+              Zero_Matrix (Layer.Delta_B'Length, Layer.Delta_B'Length (2));
          begin
             Layer.Delta_W := Layer_Matrix (ZMW);
             Layer.Delta_B := Layer_Matrix (ZMD);
