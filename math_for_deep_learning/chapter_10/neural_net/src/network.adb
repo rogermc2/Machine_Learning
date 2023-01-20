@@ -108,13 +108,6 @@ package body Network is
 
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               --                 Put_Line (Routine_Name &
-               --                             Layer_Type'Image (Network.Layers (layer).Layer_Kind)
-               --                           & " layer:" & Integer'Image (layer));
-               --                 Print_Float_Matrix
-               --                   (Routine_Name & "initial Layer.Input_Data",
-               --                    Transpose (Real_Float_Matrix
-               --                      (Network.Layers (layer).Input_Data)), 1, 1, 50, 100);
                Forward (Network.Layers (layer), Output_Data);
                for row in Output_Data.First_Index .. Output_Data.Last_Index loop
                   Assert (Output_Data.Element (row)'Valid, Routine_Name &
@@ -135,10 +128,10 @@ package body Network is
                   Y_Vector (col) := Y_Batch (Sample, col);
                end loop;
                --                 Diagnostic_Error := Diagnostic_Error + Mean_Square_Error (Y_Vector, To_Real_Float_Vector (Output_Data));
-               if sample < 4 then
-                  Print_Float_Vector (Routine_Name & "Y_Vector", Y_Vector);
-                  Print_Real_Float_List (Routine_Name & "Output_Data", Output_Data);
-               end if;
+--                 if sample < 4 then
+--                    Print_Float_Vector (Routine_Name & "Y_Vector", Y_Vector);
+--                    Print_Real_Float_List (Routine_Name & "Output_Data", Output_Data);
+--                 end if;
 
                Error :=
                  To_Real_Float_List (Minus_MSE_Derivative (Y_Vector,
@@ -151,11 +144,11 @@ package body Network is
                  Network.Layers.Last_Index loop
                   Backward (Network.Layers (layer), Error, Learning_Rate);
                end loop;
---                 if sample < 4 then
---                    Print_Real_Float_List (Routine_Name & "Level 1 Error", Error, 1, 8);
---                    New_Line;
---                 end if;
-            end;
+               if sample < 4 then
+                  Print_Real_Float_List (Routine_Name & "Level 1 Error", Error, 1, 20);
+                  New_Line;
+               end if;
+            end;  --  declare block
 
             --              if sample < 4 then
             --                 Print_Real_Float_List (Routine_Name & "Output_Data row" &
