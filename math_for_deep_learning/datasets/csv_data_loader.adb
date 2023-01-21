@@ -89,13 +89,14 @@ package body CSV_Data_Loader is
       else
          Put_Line (Routine_Name & "Fetch data");
          declare
+            use Real_Float_Arrays;
             Data_Record  : constant Load_Dataset.Digits_Data_Record :=
                             Neural_Processes.Load_Data_Set
                               (Dataset_Name & ".csv");
-            X            : Real_Float_Matrix :=
-                             To_Real_Float_Matrix (Data_Record.Features);
+            X            : Real_Float_Matrix := To_Real_Float_Matrix
+              (Data_Record.Features) / 255.0;
             Y            : Integer_Array := Data_Record.Target;
-            Num_Features : constant Positive := Positive (X'Length (2));
+            Num_Features : constant Positive := Data_Record.Num_Features;
             Train_X      : Real_Float_Matrix (1 .. Train_Size,
                                               1 .. Num_Features);
             Train_Y      : Integer_Array (1 .. Train_Size);
