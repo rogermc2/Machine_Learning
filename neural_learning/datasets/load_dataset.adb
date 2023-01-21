@@ -77,10 +77,6 @@ package body Load_Dataset is
                end if;
             end loop;
 
-            Put_Line (Routine_Name & "Short_Values.Length:" &
-                      Integer'Image (Integer (Short_Values.Length)));
-            Put_Line (Routine_Name & "Num_Features:" &
-                      Integer'Image (Integer (Num_Features)));
             declare
                Short_Data : Digits_Data_Record
                  (Integer (Short_Values.Length), Num_Features, Num_Classes);

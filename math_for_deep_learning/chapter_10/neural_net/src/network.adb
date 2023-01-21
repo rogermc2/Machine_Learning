@@ -97,8 +97,7 @@ package body Network is
          --           Diagnostic_Error := 0.0;
          --  Select a random minibatch
          Generate_Minibatch (X_Train, Y_Train, X_Batch, Y_Batch);
-         --           Print_Float_Matrix (Routine_Name & "X_Batch", X_Batch, 1, 5, 42, 56);
-         --           Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, 1, 5);
+         Print_Matrix_Dimensions (Routine_Name & "X_Train", X_Train);
 
          for sample in X_Batch'Range loop
 --              Put_Line ("sample" & Integer'Image (sample));

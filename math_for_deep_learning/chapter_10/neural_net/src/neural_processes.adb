@@ -3,7 +3,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -64,6 +64,11 @@ package body Neural_Processes is
       In_Data      : constant Real_Float_Matrix :=
                        To_Real_Float_Matrix (Data, 2);
    begin
+--        Put_Line (Routine_Name & "Data length" &
+--                    Integer'Image (Integer (Data.Length)));
+--        Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
+--        Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
+--                                 Real_Float_Matrix (Layer.Input_Data));
       Layer.Input_Data := Layer_Matrix (In_Data);
       if Layer.Layer_Kind = Hidden_Layer then
          declare

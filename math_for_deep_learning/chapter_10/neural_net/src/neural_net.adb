@@ -75,7 +75,7 @@ begin
    Add_Activation_Layer (Net.Layers, 10);
    Net.Verbose := True;
 
-   Fit (Net, Data.Train_Y, Data.Train_Y, Minibatches, Learning_Rate);
+   Fit (Net, Data.Train_X, Data.Train_Y, Minibatches, Learning_Rate);
 
    --  Build the confusion matrix using the test set predictions
    Predictions := Predict (Net, Data.Test_X);  --  out

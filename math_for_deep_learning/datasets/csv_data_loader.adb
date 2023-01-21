@@ -68,7 +68,7 @@ package body CSV_Data_Loader is
       Routine_Name   : constant String := "CSV_Data_Loader.Get_State ";
       State_File     : constant String := Dataset_Name & ".sta";
       Has_Data       : constant Boolean := Exists (State_File);
-      Num_Features   : Positive;
+      Num_Features   : constant Positive := 196;
       File_ID        : Stream_IO.File_Type;
       aStream        : Stream_Access;
    begin
@@ -76,7 +76,6 @@ package body CSV_Data_Loader is
          Put_Line (Routine_Name & "restoring state");
          Open (File_ID, In_File, State_File);
          aStream := Stream (File_ID);
-         Positive'Read (aStream, Num_Features);
 
          declare
             Data : Base_State (Train_Size, Test_Size, Num_Features);
@@ -92,8 +91,7 @@ package body CSV_Data_Loader is
          declare
             Data_Record  : constant Load_Dataset.Digits_Data_Record :=
                             Neural_Processes.Load_Data_Set
-                              (Dataset_Name & ".csv", Num_Features,
-                               Train_Size + Test_Size);
+                              (Dataset_Name & ".csv");
             X            : Real_Float_Matrix :=
                              To_Real_Float_Matrix (Data_Record.Features);
             Y            : Integer_Array := Data_Record.Target;
