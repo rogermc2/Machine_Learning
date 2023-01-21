@@ -9,7 +9,7 @@ with Neural_Utilities;
 
 package body Load_Dataset is
 
-   --  Each Digits datapoint is an 8x8 marix of a digit image.
+   --  Each Digits datapoint is an 8x8 matrix of a digit image.
    --  =================   ==============
    --  Classes                         10
    --  Samples per class             ~180

@@ -4,6 +4,7 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
+with Load_Dataset;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -19,12 +20,6 @@ package body Neural_Processes is
       Error_Mat     : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix (Out_Error, 2);
    begin
---        Put_Line (Routine_Name & "Layer Kind: " &
---                    Layer_Type'Image (Layer.Layer_Kind));
---        Print_Matrix_Dimensions (Routine_Name & "Input_Data",
---                                 Real_Float_Matrix (Layer.Input_Data));
---        Print_Matrix_Dimensions (Routine_Name & "Error_Mat", Error_Mat);
-
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             Weights_T   :  constant Real_Float_Matrix :=
@@ -70,17 +65,8 @@ package body Neural_Processes is
       In_Data      : constant Real_Float_Matrix :=
                        To_Real_Float_Matrix (Data, 2);
    begin
---        Put_Line (Routine_Name & "Data.Length" &
---                    Integer'Image (Integer (Data.Length)));
---        Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
---                                 (Real_Float_Matrix (Layer.Input_Data)));
---        Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
       Layer.Input_Data := Layer_Matrix (In_Data);
-      --        Put_Line (Routine_Name & "Layer Kind: " &
-      --                    Layer_Type'Image (Layer.Layer_Kind));
       if Layer.Layer_Kind = Hidden_Layer then
---           Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
---                                    (Real_Float_Matrix (Layer.Weights)));
          declare
             Out_Mat : constant Real_Float_Matrix :=
                         In_Data * Real_Float_Matrix (Layer.Weights) +
@@ -101,7 +87,6 @@ package body Neural_Processes is
                Assert (Data.Element (row)'Valid, Routine_Name &
                          "Hidden_Layer invalid Data " & Float'Image (Data (row)));
             end loop;
-            --              Print_Real_Float_List (Routine_Name & "output Data", Data, 1, 40);
          end;
 
       else  --  Activation_Layer
@@ -114,7 +99,6 @@ package body Neural_Processes is
                       Float'Image (Layer.Input_Data (1, Layer_Range (col))));
             Data.Append (Neural_Maths.Sigmoid (Layer.Input_Data (1, col)));
          end loop;
-         --           Print_Real_Float_List (Routine_Name & "Data", Data);
 
       end if;
 
@@ -129,8 +113,6 @@ package body Neural_Processes is
    begin
       if Layer.Layer_Kind = Hidden_Layer then
          Eta_Av := Eta / Float (Layer.Passes);
-         --              Print_Float_Matrix (Routine_Name & "Layer.Delta_W",
-         --                                  Real_Float_Matrix (Layer.Delta_W), 1, 2);
          Layer.Weights :=
            Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
                              Eta_Av * Real_Float_Matrix (Layer.Delta_W));
