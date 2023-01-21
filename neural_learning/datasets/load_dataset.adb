@@ -60,6 +60,10 @@ package body Load_Dataset is
          end if;
 
          if Num_Classes < 10 then
+            Put_Line (Routine_Name & "Num_Classes:" &
+                      Integer'Image (Num_Classes));
+            Put_Line (Routine_Name & "Index_Values Length:" &
+                      Integer'Image (Index_Values'Length));
             for index in Index_Values'Range loop
                List_Row := To_Integer_List (Digit_Values (index));
                Index_Values (index) := List_Row (1) < Num_Classes;
@@ -73,6 +77,10 @@ package body Load_Dataset is
                end if;
             end loop;
 
+            Put_Line (Routine_Name & "Short_Values.Length:" &
+                      Integer'Image (Integer (Short_Values.Length)));
+            Put_Line (Routine_Name & "Num_Features:" &
+                      Integer'Image (Integer (Num_Features)));
             declare
                Short_Data : Digits_Data_Record
                  (Integer (Short_Values.Length), Num_Features, Num_Classes);

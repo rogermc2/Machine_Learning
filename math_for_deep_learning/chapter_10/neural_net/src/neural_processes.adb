@@ -185,7 +185,7 @@ package body Neural_Processes is
                            return Load_Dataset.Digits_Data_Record is
       use Load_Dataset;
       Data : constant Digits_Data_Record :=
-               Load_Digits(File_Name, Num_Classes, Max_Lines);
+               Load_Digits (File_Name, Num_Classes, Max_Lines);
    begin
       return Data;
 

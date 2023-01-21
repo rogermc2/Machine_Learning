@@ -3,7 +3,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
 with Classifier_Utilities;
-with Load_Dataset;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Neural_Processes; use Neural_Processes;
 --  with Python; use Python;
@@ -21,28 +20,14 @@ procedure Neural_Net is
    use Classifier_Utilities;
    use Real_Float_Arrays;
    Project_Name     : constant String := "Neural_Net ";
-   --     Data_Directory   : constant String := "../../datasets/";
-   Data_Directory   : constant String :=
-                        "../../../neural_learning/datasets/";
+   Data_Directory   : constant String := "../../datasets/";
    Num_Feature_Cols : constant Positive := 14 * 14;
-   --     Features         : constant Real_Float_Matrix := Load_Dataset.Load_Features
-   --       (Data_Directory & "mnist_784.csv", Num_Feature_Cols);
-   --     Labels           : constant Real_Float_Matrix :=
-   --                          To_Real_Float_Matrix (Load_Dataset.Load_Labels
-   --       (Data_Directory & "mnist_784.csv"));
-   Train_Data       : constant Load_Dataset.Digits_Data_Record :=
-                        Load_Data_Set (Data_Directory & "mnist_784.csv",
-                                       Num_Feature_Cols, 20000);
-   --     Test_Data        : constant Load_Dataset.Digits_Data_Record :=
-   --                          Load_Data_Set (Data_Directory & "mnist_784.csv",
-   --                                        Num_Feature_Cols, 10000);
-   X_Train          : constant Real_Float_Matrix :=
-                        To_Real_Float_Matrix (Train_Data.Features) / 255.0;
-   X_Test           : constant Real_Float_Matrix :=
-                        To_Real_Float_Matrix (Train_Data.Features) / 255.0;
-   Y_Train          : constant Real_Float_Matrix :=
-                        To_Real_Float_Matrix (Train_Data.Target);
-   Y_Test           : Real_Float_Vector (Train_Data.Target'Range);
+   Train_Size       : constant Positive := 10000;
+   Test_Size        : constant Positive := 1000;
+   Data             : constant CSV_Data_Loader.Base_State :=
+                        CSV_Data_Loader.Get_State
+                          (Data_Directory & "mnist_784", Train_Size, Test_Size);
+
    --     X_Train          : constant Real_Float_Matrix :=
    --                          Load_Data (Data_Directory & "x_train.csv",
    --                                     Num_Feature_Cols) / 255.0;
@@ -65,14 +50,12 @@ procedure Neural_Net is
    --     Py_Module      : Module;
 begin
    Put_Line (Project_Name);
-   for index in Y_Test'Range loop
-      Y_Test (index) := Float (Train_Data.Target (index));
-   end loop;
 
-   Print_Matrix_Dimensions (Project_Name & "X_Train" , X_Train);
-   Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
-   Print_Matrix_Dimensions (Project_Name & "X_Test", X_Test);
-   Put_Line (Project_Name & "Y_Test length:" &  Integer'Image (Y_Test'Length));
+   Print_Matrix_Dimensions (Project_Name & "X_Train" , Data.Train_X);
+   Print_Matrix_Dimensions (Project_Name & "Y_Train", Data.Train_Y);
+   Print_Matrix_Dimensions (Project_Name & "X_Test", Data.Test_X);
+   Put_Line (Project_Name & "Y_Test length:" &
+               Integer'Image (Data.Test_Y'Length));
    --     Print_Float_Matrix (Project_Name & "Y_Train", Y_Train, 1, 3);
 
    --     for index in X_Train_Image'Range loop
@@ -92,23 +75,23 @@ begin
    Add_Activation_Layer (Net.Layers, 10);
    Net.Verbose := True;
 
-   Fit (Net, X_Train, Y_Train, Minibatches, Learning_Rate);
+   Fit (Net, Data.Train_Y, Data.Train_Y, Minibatches, Learning_Rate);
 
    --  Build the confusion matrix using the test set predictions
-   Predictions := Predict (Net, X_Test);  --  out
+   Predictions := Predict (Net, Data.Test_X);  --  out
    --     Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
    --               & " x" & Integer'Image (Integer (Predictions (1).Length)));
    --     Print_Float_Vector ("Y_Test 3", Y_Test, 3, 3);
    Print_Real_Float_List_2D ("Predictions 1 .. 3", Predictions, 1, 3);
 
    --  Y_Test values range is the digits 0 .. 9
-   for index in Y_Test'First .. Y_Test'First + 5 loop
+   for index in Data.Test_Y'First .. Data.Test_Y'First + 5 loop
       CM_Col := Arg_Max (Predictions (index)) - 1;
       Put_Line (Project_Name & "Row, CM_Col, True value:" &
                   Integer'Image (index) & Integer'Image (CM_Col) &
-                  Integer'Image (Integer (Y_Test (index))));
-      Confusion (Integer (Y_Test (index)), CM_Col) :=
-        Confusion (Integer (Y_Test (index)), CM_Col) + 1 ;
+                  Integer'Image (Integer (Data.Test_Y (index))));
+      Confusion (Integer (Data.Test_Y (index)), CM_Col) :=
+        Confusion (Integer (Data.Test_Y (index)), CM_Col) + 1 ;
    end loop;
    --
    --     Print_Integer_Matrix ("Confusion matrix", Confusion);
