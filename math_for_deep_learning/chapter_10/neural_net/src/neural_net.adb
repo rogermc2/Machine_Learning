@@ -28,16 +28,6 @@ procedure Neural_Net is
                         CSV_Data_Loader.Get_State
                           (Data_Directory & "mnist_784", Train_Size, Test_Size);
 
-   --     X_Train          : constant Real_Float_Matrix :=
-   --                          Load_Data (Data_Directory & "x_train.csv",
-   --                                     Num_Feature_Cols) / 255.0;
-   --     X_Test           : constant Real_Float_Matrix :=
-   --                          Load_Data (Data_Directory & "x_test.csv",
-   --                                     Num_Feature_Cols) / 255.0;
-   --     Y_Train          : constant Real_Float_Matrix :=
-   --                          Load_Data (Data_Directory & "y_train.csv", 10);
-   --     Y_Test           : constant Real_Float_Vector :=
-   --                          Load_Data (Data_Directory & "y_test.csv");
    --     X_Train_Image  : Real_Float_Vector (X_Train'Range (2));
    --     Minibatches    : constant Positive := 40000;
    Minibatches      : constant Positive := 4;

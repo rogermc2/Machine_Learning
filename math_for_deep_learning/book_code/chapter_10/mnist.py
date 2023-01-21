@@ -16,6 +16,9 @@ x_train = np.load("../dataset/train_images_small.npy")
 x_test  = np.load("../dataset/test_images_small.npy")
 y_train = np.load("../dataset/train_labels_vector.npy")
 y_test  = np.load("../dataset/test_labels.npy")
+print ("y_train: ", y_train.shape)
+print ("y_test: ", y_test.shape)
+print ("y_train: ", y_train[0])
 
 x_train = x_train.reshape(x_train.shape[0], 1, 14*14)
 x_train /= 255

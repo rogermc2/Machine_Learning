@@ -4,6 +4,7 @@ with Ada.Directories;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Basic_Printing; use Basic_Printing;
 with Data_Splitter;
 with Load_Dataset;
 with Neural_Processes;
@@ -15,47 +16,16 @@ package body CSV_Data_Loader is
 
    --  -------------------------------------------------------------------------
 
---     function Get_State
---       (Dataset               : Load_Dataset.Digits_Data_Record;
---        Train_Size, Test_Size : Positive; Shuffle : Boolean := True)
---        return Base_State is
---        Routine_Name : constant String := "CSV_Data_Loader.Get_State ";
---        Num_Features : constant Positive := Dataset.Num_Features;
---        X            : Real_Float_Matrix :=
---                         To_Real_Float_Matrix (Dataset.Features);
---        Y            : Integer_Matrix := To_Integer_Matrix (Dataset.Target);
---        Train_X      : Real_Float_Matrix (1 .. Train_Size, 1 .. Num_Features);
---        Train_Y      : Integer_Matrix (1 .. Train_Size, 1 .. 1);
---        Test_X       : Real_Float_Matrix (1 .. Test_Size, 1 .. Num_Features);
---        Test_Y       : Integer_Matrix (1 .. Test_Size, 1 .. 1);
---        Data         : Base_State (Train_Size, Test_Size, Num_Features);
---     begin
---        Assert (Y'Length = X'Length, Routine_Name &
---                  "Y length" & Integer'Image (Y'Length) &
---                  " is different to X length" &
---                  Natural'Image (Positive (X'Length)));
---
---        if Shuffle then
---           Put_Line (Routine_Name & "shuffling");
---           Shuffler.Shuffle (X, Y);
---        end if;
---        --        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
---        Put_Line (Routine_Name & "splitting data");
---        Data_Splitter.Train_Test_Split
---          (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
---           Train_X => Train_X, Train_Y => Train_Y,
---           Test_X => Test_X, Test_Y => Test_Y);
---
---        Data.Train_X := Train_X;
---        Data.Train_Y := Train_Y;
---        Data.Test_X := Test_X;
---        for index in Test_Y'Range loop
---           Data.Test_Y (index) := Float (Test_Y (index, 1));
---        end loop;
---
---        return Data;
---
---     end Get_State;
+   function Categorize (Labels : Integer_Array) return Binary_Matrix is
+      Result : Binary_Matrix (Labels'Range, 0 .. 9) :=
+                 (others => (others => 0));
+   begin
+      for row in Labels'Range loop
+         Result (row, Labels (row)) := 1;
+      end loop;
+      return Result;
+
+   end Categorize;
 
    --  -------------------------------------------------------------------------
 
@@ -91,8 +61,8 @@ package body CSV_Data_Loader is
          declare
             use Real_Float_Arrays;
             Data_Record  : constant Load_Dataset.Digits_Data_Record :=
-                            Neural_Processes.Load_Data_Set
-                              (Dataset_Name & ".csv");
+                             Neural_Processes.Load_Data_Set
+                               (Dataset_Name & ".csv");
             X            : Real_Float_Matrix := To_Real_Float_Matrix
               (Data_Record.Features) / 255.0;
             Y            : Integer_Array := Data_Record.Target;
@@ -118,9 +88,10 @@ package body CSV_Data_Loader is
                Train_X => Data.Train_X , Train_Y => Train_Y,
                Test_X => Data.Test_X, Test_Y => Test_Y);
 
-            for row in Train_Y'Range loop
-               Data.Train_Y (row, 1) := Float (Train_Y (row));
-            end loop;
+            Print_Integer_Array (Routine_Name & "Train_Y", Train_Y, 1, 20);
+            Data.Train_Y := Categorize (Train_Y);
+            Print_Binary_Matrix (Routine_Name & "Data.Train_Y", Data.Train_Y,
+                                 1, 5);
 
             for index in Test_Y'Range loop
                Data.Test_Y (index) := Float (Test_Y (index));
