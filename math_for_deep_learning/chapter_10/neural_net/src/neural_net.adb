@@ -20,35 +20,38 @@ procedure Neural_Net is
    use Classifier_Utilities;
    use Real_Float_Arrays;
    Project_Name     : constant String := "Neural_Net ";
---     Data_Directory   : constant String := "../../datasets/";
+   --     Data_Directory   : constant String := "../../datasets/";
    Data_Directory   : constant String :=
                         "../../../neural_learning/datasets/";
    Num_Feature_Cols : constant Positive := 14 * 14;
-   Features         : constant Real_Float_Matrix := Load_Dataset.Load_Features
-     (Data_Directory & "mnist_784.csv", Num_Feature_Cols);
-   Labels           : constant Real_Float_Matrix :=
-                        To_Real_Float_Matrix (Load_Dataset.Load_Labels
-     (Data_Directory & "mnist_784.csv"));
---     Train_Data       : constant Load_Dataset.Digits_Data_Record :=
---                          Load_Data_Set (Data_Directory & "mnist_784.csv",
---                                        Num_Feature_Cols, 20000);
---     Test_Data        : constant Load_Dataset.Digits_Data_Record :=
---                          Load_Data_Set (Data_Directory & "mnist_784.csv",
---                                        Num_Feature_Cols, 10000);
-   X_Train          : constant Real_Float_Matrix := Features / 255.0;
-   X_Test           : constant Real_Float_Matrix := Features / 255.0;
-   Y_Train          : constant Real_Float_Matrix := Labels;
-   Y_Test           : Real_Float_Vector (Labels'Range);
---     X_Train          : constant Real_Float_Matrix :=
---                          Load_Data (Data_Directory & "x_train.csv",
---                                     Num_Feature_Cols) / 255.0;
---     X_Test           : constant Real_Float_Matrix :=
---                          Load_Data (Data_Directory & "x_test.csv",
---                                     Num_Feature_Cols) / 255.0;
---     Y_Train          : constant Real_Float_Matrix :=
---                          Load_Data (Data_Directory & "y_train.csv", 10);
---     Y_Test           : constant Real_Float_Vector :=
---                          Load_Data (Data_Directory & "y_test.csv");
+   --     Features         : constant Real_Float_Matrix := Load_Dataset.Load_Features
+   --       (Data_Directory & "mnist_784.csv", Num_Feature_Cols);
+   --     Labels           : constant Real_Float_Matrix :=
+   --                          To_Real_Float_Matrix (Load_Dataset.Load_Labels
+   --       (Data_Directory & "mnist_784.csv"));
+   Train_Data       : constant Load_Dataset.Digits_Data_Record :=
+                        Load_Data_Set (Data_Directory & "mnist_784.csv",
+                                       Num_Feature_Cols, 20000);
+   --     Test_Data        : constant Load_Dataset.Digits_Data_Record :=
+   --                          Load_Data_Set (Data_Directory & "mnist_784.csv",
+   --                                        Num_Feature_Cols, 10000);
+   X_Train          : constant Real_Float_Matrix :=
+                        To_Real_Float_Matrix (Train_Data.Features) / 255.0;
+   X_Test           : constant Real_Float_Matrix :=
+                        To_Real_Float_Matrix (Train_Data.Features) / 255.0;
+   Y_Train          : constant Real_Float_Matrix :=
+                        To_Real_Float_Matrix (Train_Data.Target);
+   Y_Test           : Real_Float_Vector (Train_Data.Target'Range);
+   --     X_Train          : constant Real_Float_Matrix :=
+   --                          Load_Data (Data_Directory & "x_train.csv",
+   --                                     Num_Feature_Cols) / 255.0;
+   --     X_Test           : constant Real_Float_Matrix :=
+   --                          Load_Data (Data_Directory & "x_test.csv",
+   --                                     Num_Feature_Cols) / 255.0;
+   --     Y_Train          : constant Real_Float_Matrix :=
+   --                          Load_Data (Data_Directory & "y_train.csv", 10);
+   --     Y_Test           : constant Real_Float_Vector :=
+   --                          Load_Data (Data_Directory & "y_test.csv");
    --     X_Train_Image  : Real_Float_Vector (X_Train'Range (2));
    --     Minibatches    : constant Positive := 40000;
    Minibatches      : constant Positive := 4;
@@ -62,8 +65,9 @@ procedure Neural_Net is
 begin
    Put_Line (Project_Name);
    for index in Y_Test'Range loop
-      Y_Test (index) := Labels (index, 1);
+      Y_Test (index) := Float (Train_Data.Target (index));
    end loop;
+
    Print_Matrix_Dimensions (Project_Name & "X_Train" , X_Train);
    Print_Matrix_Dimensions (Project_Name & "Y_Train", Y_Train);
    Print_Matrix_Dimensions (Project_Name & "X_Test", X_Test);
