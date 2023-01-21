@@ -21,7 +21,6 @@ procedure Neural_Net is
    use Real_Float_Arrays;
    Project_Name     : constant String := "Neural_Net ";
    Data_Directory   : constant String := "../../datasets/";
-   Num_Feature_Cols : constant Positive := 14 * 14;
    Train_Size       : constant Positive := 10000;
    Test_Size        : constant Positive := 1000;
    Data             : constant CSV_Data_Loader.Base_State :=
@@ -57,7 +56,7 @@ begin
    --     Python.Call (Py_Module, "show_image", X_Train_Image);
    --     Python.Finalize;
 
-   Add_Fully_Connected_Layer (Net.Layers, Layer_Range (Num_Feature_Cols), 100);
+   Add_Fully_Connected_Layer (Net.Layers, Layer_Range (Data.Num_Features), 100);
    Add_Activation_Layer (Net.Layers, 100);
    Add_Fully_Connected_Layer (Net.Layers, 100, 50);
    Add_Activation_Layer (Net.Layers, 50);

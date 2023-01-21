@@ -66,7 +66,6 @@ package body CSV_Data_Loader is
             X            : Real_Float_Matrix := To_Real_Float_Matrix
               (Data_Record.Features) / 255.0;
             Y            : Integer_Array := Data_Record.Target;
-            Num_Features : constant Positive := Data_Record.Num_Features;
             Train_Y      : Integer_Array (1 .. Train_Size);
             Test_Y       : Integer_Array (1 .. Test_Size);
             Data         : Base_State (Train_Size, Test_Size, Num_Features);
@@ -85,7 +84,8 @@ package body CSV_Data_Loader is
             Put_Line (Routine_Name & "splitting data");
             Data_Splitter.Train_Test_Split
               (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
-               Train_X => Data.Train_X , Train_Y => Train_Y,
+               Train_X => Data.Train_X , Train_Y => Train_Y
+,
                Test_X => Data.Test_X, Test_Y => Test_Y);
 
             Print_Integer_Array (Routine_Name & "Train_Y", Train_Y, 1, 20);
