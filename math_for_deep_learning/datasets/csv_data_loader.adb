@@ -97,14 +97,8 @@ package body CSV_Data_Loader is
               (Data_Record.Features) / 255.0;
             Y            : Integer_Array := Data_Record.Target;
             Num_Features : constant Positive := Data_Record.Num_Features;
-            Train_X      : Real_Float_Matrix (1 .. Train_Size,
-                                              1 .. Num_Features);
             Train_Y      : Integer_Array (1 .. Train_Size);
-            Train_Y2     : Real_Float_Matrix (1 .. Train_Size, 1 .. 1);
-            Test_X       : Real_Float_Matrix (1 .. Test_Size,
-                                              1 .. Num_Features);
             Test_Y       : Integer_Array (1 .. Test_Size);
-            Test_Y2      : Integer_Matrix (1 .. Test_Size, 1 .. 1);
             Data         : Base_State (Train_Size, Test_Size, Num_Features);
          begin
             Put_Line (Routine_Name & "csv loaded");
@@ -121,22 +115,15 @@ package body CSV_Data_Loader is
             Put_Line (Routine_Name & "splitting data");
             Data_Splitter.Train_Test_Split
               (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
-               Train_X => Train_X, Train_Y => Train_Y,
-               Test_X => Test_X, Test_Y => Test_Y);
+               Train_X => Data.Train_X , Train_Y => Train_Y,
+               Test_X => Data.Test_X, Test_Y => Test_Y);
 
-            for row in Train_Y2'First .. Train_Y2'Last loop
-               Train_Y2 (row, 1) := Float (Train_Y (row));
+            for row in Train_Y'Range loop
+               Data.Train_Y (row, 1) := Float (Train_Y (row));
             end loop;
 
-            for row in Test_Y2'First .. Test_Y2'Last loop
-               Test_Y2 (row, 1) := Test_Y (row);
-            end loop;
-
-            Data.Train_X := Train_X;
-            Data.Train_Y := Train_Y2;
-            Data.Test_X := Test_X;
-            for index in Test_Y2'Range loop
-               Data.Test_Y (index) := Float (Test_Y2 (index, 1));
+            for index in Test_Y'Range loop
+               Data.Test_Y (index) := Float (Test_Y (index));
             end loop;
 
             Save_State (Dataset_Name, Data);
@@ -160,7 +147,6 @@ package body CSV_Data_Loader is
       aStream := Stream (File_ID);
       Base_State'Write (aStream, State);
       Close (File_ID);
---        pragma Unreferenced (File_ID);
 
    end Save_State;
 
