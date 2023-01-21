@@ -1383,6 +1383,40 @@ package body ML_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function To_Real_Float_Matrix
+     (IA : Integer_Array; Data_Axis : Positive := 1)
+      return Real_Float_Matrix is
+      Routine_Name : constant String :=
+                       "ML_Arrays_And_Matrices.To_Real_Float_Matrix Integer_Array ";
+   begin
+      Assert (Data_Axis = 1 or Data_Axis = 2, Routine_Name &
+                " Invalid Data_Axis" & Integer'Image (Data_Axis) &
+                " should be 1 or 2.");
+      if Data_Axis = 1 then
+         declare
+            Result : Real_Float_Matrix (IA'Range, 1 .. 1);
+         begin
+            for row in IA'Range loop
+               Result (row, 1) := Float (IA (row));
+            end loop;
+            return Result;
+         end;
+
+      else
+         declare
+            Result : Real_Float_Matrix (1 .. 1, IA'Range);
+         begin
+            for col in IA'Range loop
+               Result (1, col) := Float (IA (col));
+            end loop;
+            return Result;
+         end;
+      end if;
+
+   end To_Real_Float_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   function To_Real_Float_Matrix
      (List        : Real_Float_List; Data_Axis : Positive := 1;
       First_Index : Integer := 1)
       return Real_Float_Matrix is

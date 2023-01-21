@@ -3,6 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
 with Classifier_Utilities;
+with Load_Dataset;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Neural_Processes; use Neural_Processes;
 --  with Python; use Python;
@@ -19,18 +20,34 @@ procedure Neural_Net is
    use Classifier_Utilities;
    use Real_Float_Arrays;
    Project_Name     : constant String := "Neural_Net ";
-   Data_Directory   : constant String := "../../datasets/";
+--     Data_Directory   : constant String := "../../datasets/";
+   Data_Directory   : constant String :=
+                        "/Ada_Projects/machine_learning/neural_learning/datasets";
    Num_Feature_Cols : constant Positive := 14 * 14;
+   Train_Data       : constant Load_Dataset.Digits_Data_Record :=
+                        Load_Data_Set (Data_Directory & "mnist_784.csv",
+                                      Num_Feature_Cols, 20000);
+   Test_Data        : constant Load_Dataset.Digits_Data_Record :=
+                        Load_Data_Set (Data_Directory & "mnist_784.csv",
+                                      Num_Feature_Cols, 10000);
    X_Train          : constant Real_Float_Matrix :=
-                        Load_Data (Data_Directory & "x_train.csv",
-                                   Num_Feature_Cols) / 255.0;
+                        To_Real_Float_Matrix (Train_Data.Features) / 255.0;
    X_Test           : constant Real_Float_Matrix :=
-                        Load_Data (Data_Directory & "x_test.csv",
-                                   Num_Feature_Cols) / 255.0;
+                        To_Real_Float_Matrix (Test_Data.Features) / 255.0;
    Y_Train          : constant Real_Float_Matrix :=
-                        Load_Data (Data_Directory & "y_train.csv", 10);
+                        To_Real_Float_Matrix (Train_Data.Target);
    Y_Test           : constant Real_Float_Vector :=
-                        Load_Data (Data_Directory & "y_test.csv");
+                        To_Real_Float_Vector (Test_Data.Target);
+--     X_Train          : constant Real_Float_Matrix :=
+--                          Load_Data (Data_Directory & "x_train.csv",
+--                                     Num_Feature_Cols) / 255.0;
+--     X_Test           : constant Real_Float_Matrix :=
+--                          Load_Data (Data_Directory & "x_test.csv",
+--                                     Num_Feature_Cols) / 255.0;
+--     Y_Train          : constant Real_Float_Matrix :=
+--                          Load_Data (Data_Directory & "y_train.csv", 10);
+--     Y_Test           : constant Real_Float_Vector :=
+--                          Load_Data (Data_Directory & "y_test.csv");
    --     X_Train_Image  : Real_Float_Vector (X_Train'Range (2));
    --     Minibatches    : constant Positive := 40000;
    Minibatches      : constant Positive := 4;

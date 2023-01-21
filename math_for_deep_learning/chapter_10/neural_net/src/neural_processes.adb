@@ -4,7 +4,6 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
-with Load_Dataset;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -178,6 +177,19 @@ package body Neural_Processes is
       return Data;
 
    end Load_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
+                           Max_Lines : Positive := 20000)
+                           return Load_Dataset.Digits_Data_Record is
+      use Load_Dataset;
+      Data : constant Digits_Data_Record :=
+               Load_Digits(File_Name, Num_Classes, Max_Lines);
+   begin
+      return Data;
+
+   end Load_Data_Set;
 
    --  -------------------------------------------------------------------------
 

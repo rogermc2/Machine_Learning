@@ -259,9 +259,11 @@ package ML_Arrays_And_Matrices is
    function To_Real_Float_Matrix (List : NL_Types.Float_List_2D)
                                    return Real_Float_Matrix;
    function To_Real_Float_Matrix
-     (List        : Real_Float_List; Data_Axis : Positive := 1;
-      First_Index : Integer := 1)
+     (IA : Integer_Array; Data_Axis : Positive := 1)
       return Real_Float_Matrix;
+   function To_Real_Float_Matrix
+     (List        : Real_Float_List; Data_Axis : Positive := 1;
+      First_Index : Integer := 1) return Real_Float_Matrix;
    function To_Real_Float_Matrix (List : Real_Float_List_2D)
                                    return Real_Float_Matrix;
    function To_Real_Float_Matrix (BM : Boolean_Matrix)

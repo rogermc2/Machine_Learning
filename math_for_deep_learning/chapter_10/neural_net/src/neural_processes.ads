@@ -1,4 +1,5 @@
 
+with Load_Dataset;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Neural_Processes is
@@ -33,6 +34,9 @@ package Neural_Processes is
    function Load_Data (File_Name : String; Num_Columns : Positive)
                        return Real_Float_Matrix;
    function Load_Data (File_Name : String) return Real_Float_Vector;
+   function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
+                           Max_Lines : Positive := 20000)
+                           return Load_Dataset.Digits_Data_Record;
    function Mean_Square_Error (Y_True,Y_Pred : Real_Float_Vector)
                                return Float;
    function Minus_MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
