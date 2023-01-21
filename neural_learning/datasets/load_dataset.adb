@@ -113,6 +113,7 @@ package body Load_Dataset is
       Features  : ML_Arrays_And_Matrices.Real_Float_Matrix
         (1 .. Positive (CSV_Data.Length) - 1, 1 .. Num_Features);
    begin
+    Put_Line ("Loading " & File_Name & " Features");
       --  First row of CSV_Data is header of feature names
       for row in Features'Range loop
          List_Row := CSV_Data (row + 1);
@@ -188,6 +189,7 @@ package body Load_Dataset is
       Labels     : Integer_Matrix (1 .. Positive (CSV_Data.Length) - 1,
                                    1 .. Num_Outputs);
    begin
+    Put_Line ("Loading " & File_Name & " Labels");
       --  First row is header of label names
       for row in Labels'Range loop
          Data_Row := CSV_Data.Element (row + 1);
