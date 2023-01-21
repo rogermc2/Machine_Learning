@@ -3,7 +3,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Maths;
 with Neural_Utilities;
@@ -13,29 +13,29 @@ package body Neural_Processes is
    procedure Backward
      (Layer         : in out Layer_Data; Out_Error : in out Real_Float_List) is
       use Real_Float_Arrays;
-      Routine_Name  : constant String := "Neural_Processes.Backward ";
+--        Routine_Name  : constant String := "Neural_Processes.Backward ";
       Data_T        : constant Real_Float_Matrix :=
                         Transpose (Real_Float_Matrix (Layer.Input_Data));
       Error_Mat     : constant Real_Float_Matrix :=
                         To_Real_Float_Matrix (Out_Error, 2);
    begin
-      Put_Line (Routine_Name & "Layer Kind: " &
-                  Layer_Type'Image (Layer.Layer_Kind));
-      Print_Matrix_Dimensions (Routine_Name & "Input_Data",
-                               Real_Float_Matrix (Layer.Input_Data));
-      Print_Matrix_Dimensions (Routine_Name & "Error_Mat", Error_Mat);
+--        Put_Line (Routine_Name & "Layer Kind: " &
+--                    Layer_Type'Image (Layer.Layer_Kind));
+--        Print_Matrix_Dimensions (Routine_Name & "Input_Data",
+--                                 Real_Float_Matrix (Layer.Input_Data));
+--        Print_Matrix_Dimensions (Routine_Name & "Error_Mat", Error_Mat);
 
       if Layer.Layer_Kind = Hidden_Layer then
          declare
             Weights_T   :  constant Real_Float_Matrix :=
                             Transpose (Real_Float_Matrix (Layer.Weights));
-            Input_Error : constant Real_Float_Matrix := Weights_T * Error_Mat;
+            Input_Error : constant Real_Float_Matrix := Error_Mat * Weights_T;
          begin
-            Print_Matrix_Dimensions (Routine_Name & "Input_Data",
-                                     Real_Float_Matrix (Layer.Input_Data));
+--              Print_Matrix_Dimensions (Routine_Name & "Input_Data",
+--                                       Real_Float_Matrix (Layer.Input_Data));
             Layer.Delta_W :=
               Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) +
-                                Error_Mat * Data_T);
+                                Data_T * Error_Mat);
             Layer.Delta_B :=
               Layer_Matrix (Real_Float_Matrix (Layer.Delta_B) + Error_Mat);
             Layer.Passes := Layer.Passes + 1;
@@ -70,17 +70,17 @@ package body Neural_Processes is
       In_Data      : constant Real_Float_Matrix :=
                        To_Real_Float_Matrix (Data, 2);
    begin
-      Put_Line (Routine_Name & "Data.Length" &
-                  Integer'Image (Integer (Data.Length)));
-      Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
-                               (Real_Float_Matrix (Layer.Input_Data)));
-      Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
+--        Put_Line (Routine_Name & "Data.Length" &
+--                    Integer'Image (Integer (Data.Length)));
+--        Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
+--                                 (Real_Float_Matrix (Layer.Input_Data)));
+--        Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
       Layer.Input_Data := Layer_Matrix (In_Data);
       --        Put_Line (Routine_Name & "Layer Kind: " &
       --                    Layer_Type'Image (Layer.Layer_Kind));
       if Layer.Layer_Kind = Hidden_Layer then
-         Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
-                                  (Real_Float_Matrix (Layer.Weights)));
+--           Print_Matrix_Dimensions (Routine_Name & "Layer.Weights",
+--                                    (Real_Float_Matrix (Layer.Weights)));
          declare
             Out_Mat : constant Real_Float_Matrix :=
                         In_Data * Real_Float_Matrix (Layer.Weights) +

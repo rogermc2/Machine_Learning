@@ -101,16 +101,16 @@ package body Network is
          --           Print_Float_Matrix (Routine_Name & "Y_Batch", Y_Batch, 1, 5);
 
          for sample in X_Batch'Range loop
-            Put_Line ("sample" & Integer'Image (sample));
+--              Put_Line ("sample" & Integer'Image (sample));
             --  Get a sample from X_Batch
             Output_Data := To_Real_Float_List (X_Batch, Sample);
 
          --  forward propagation
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
-               Put_Line (Routine_Name & "layer: " & Integer'Image (layer));
-               Put_Line (Routine_Name & "Output_Data.Length" &
-                        Integer'Image (Integer (Output_Data.Length)));
+--                 Put_Line (Routine_Name & "layer: " & Integer'Image (layer));
+--                 Put_Line (Routine_Name & "Output_Data.Length" &
+--                          Integer'Image (Integer (Output_Data.Length)));
                Forward (Network.Layers (layer), Output_Data);
                for row in Output_Data.First_Index .. Output_Data.Last_Index loop
                   Assert (Output_Data.Element (row)'Valid, Routine_Name &
