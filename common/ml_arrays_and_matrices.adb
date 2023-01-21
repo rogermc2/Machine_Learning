@@ -410,19 +410,6 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function "-" (L : Real_Float_Vector) return Real_Float_Vector is
-      Result : Real_Float_Vector (L'Range);
-   begin
-      for index in L'Range loop
-         Result (index) := -L (index);
-      end loop;
-
-      return Result;
-
-   end "-";
-
-   --  ------------------------------------------------------------------------
-
    function "-" (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
       Result : Real_Float_Vector (R'Range);
    begin

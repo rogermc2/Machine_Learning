@@ -290,7 +290,8 @@ package body Base_Neural is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Base_Neural.Softmax ";
       --  Max returns a vector with the maximum value of each row of a matrix
-      Tmp          : Real_Float_Matrix := Activation - Max (Activation);
+      Max_Act      : constant Real_Float_Vector := Max (Activation);
+      Tmp          : Real_Float_Matrix := Activation - Max_Act;
       Sum_Tmp      : Real_Float_Vector (Activation'Range);
    begin
       Tmp := ML_Arrays_And_Matrices.Exp (Tmp);
