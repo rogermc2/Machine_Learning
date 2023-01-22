@@ -1,0 +1,28 @@
+project Quick_Start is
+
+   type Operating_System_Type is
+      ("high_sierra", "ventura");
+   Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
+   for Source_Dirs use ("src", "../../common", "../../tree_learning/decision_tree_classifier/support", "../../tree_learning/decision_tree_classifier/src", "../../tree_learning/utils", "../../python_c_api", "../../common");
+   for Object_Dir use "obj";
+   for Main use ("tf_quick_start.adb");
+   for Exec_Dir use ".";
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnat12", "-gnatw.Tkmru", "-gnatyclux");
+   end Compiler;
+
+   package Linker is
+
+      case Operating_System is
+
+         when "high_sierra" =>
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.9/3.9.16/Frameworks/Python.framework/Versions/3.9/lib", "-lpython3.9");
+
+         when "ventura" =>
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.9/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
+      end case;
+   end Linker;
+
+end Quick_Start;
+

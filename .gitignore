@@ -1,7 +1,11 @@
 *.adb1
 *.ads1
 *.orig
-*.pdf
+*.oml
+*.sta
+*.ada
+*.arff
+*.clang-format
 *.rtf
 *.csv
 *.o
@@ -30,3 +34,4 @@ sklearn
 access token.txt
 *sublime-workspace
 *sublime-project
+*.code-workspace

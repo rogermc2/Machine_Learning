@@ -2,7 +2,7 @@
 
 with Ada.Containers.Indefinite_Vectors;
 
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Stochastic_Optimizers is
 

@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Utilities;
+with TL_Utilities;
 
 --  Steps for making decision tree:
 --  1. Get list of rows (dataset) to be taken into consideration for making
@@ -126,7 +126,7 @@ package body Builder is
          Leaf.Decision_Branch := False;
          Leaf.Prediction := Rows.First_Element;
          Leaf.Rows := Rows;
-         Leaf.Prediction_List := Utilities.Predictions (Leaf);
+         Leaf.Prediction_List := TL_Utilities.Predictions (Leaf);
          --           Utilities.Print_Rows ("Prediction", Rows);
          --           New_Line;
          theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
@@ -142,17 +142,17 @@ package body Builder is
          True_Split_Rows  : Rows_Vector;
          False_Split_Rows : Rows_Vector;
       begin
---           Utilities.Print_Rows (Routine_Name & " Rows", Rows);
+--           TL_Utilities.Print_Rows (Routine_Name & " Rows", Rows);
          if Best_Split.Gain = 0.0 then
-            Utilities.Print_Question
+            TL_Utilities.Print_Question
               (Routine_Name & " prediction", Best_Split.Question);
             Put_Line (Routine_Name & " prediction Gini" &
                         Float'Image (Best_Split.Gini));
             New_Line;
             Add_Prediction_Node (Parent_Cursor, Rows);
          elsif Max_Leaves = 0 or else Num_Leaves < Max_Leaves then
-            Utilities.Print_Question (Routine_Name & " Best split",
-                                      Best_Split.Question);
+            TL_Utilities.Print_Question (Routine_Name & " Best split",
+                                         Best_Split.Question);
             Add_Decision_Node (Parent_Cursor, Best_Split);
             True_Split_Rows := Best_Split.True_Rows;
             False_Split_Rows := Best_Split.False_Rows;
@@ -168,7 +168,7 @@ package body Builder is
       end Add_Branch;
 
    begin
-      Utilities.Check_Rows (Rows);
+      TL_Utilities.Check_Rows (Rows);
       Add_Branch (Rows, theTree.Root);
       return theTree;
 
@@ -316,7 +316,7 @@ package body Builder is
          aRow := Test_Data.Element (index);
          Put_Line
            ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
-              Utilities.Prediction_String (Classify (Top, aRow)));
+              TL_Utilities.Prediction_String (Classify (Top, aRow)));
       end loop;
       New_Line;
 
@@ -353,7 +353,7 @@ package body Builder is
       for col in 1 .. Num_Features loop
          Feature_Name := Feature_Name_Type (Header_Data.Features (col));
          Feature_Data_Type :=
-           Utilities.Get_Data_Type (Header_Data.Features (col));
+           TL_Utilities.Get_Data_Type (Header_Data.Features (col));
 
          for row in
            Rows.First_Index .. Rows.Last_Index loop Feature_Value := Rows.Element (row).Features (col);
@@ -507,11 +507,12 @@ package body Builder is
 
       if Found then
          Example_Feature := Example_Data.Features (Feat_Index);
-         if Utilities.Get_Data_Type (Example_Feature) = Val_Type then
+         if TL_Utilities.Get_Data_Type (Example_Feature) = Val_Type then
             case Val_Type is
                when Integer_Type =>
                   declare
-                     Question_Value : constant Integer := Question.Integer_Value;
+                     Question_Value : constant Integer :=
+                                        Question.Integer_Value;
                   begin
                      Matches := Integer'Value (To_String (Example_Feature)) >=
                        Question_Value;
@@ -668,7 +669,7 @@ package body Builder is
    --  --------------------------------------------------------------------------
 
    function To_Label (UB_String : Raw_Label) return Value_Record is
-      use Utilities;
+      use TL_Utilities;
       Value : constant String := To_String (UB_String);
       Label : Value_Record;
    begin
@@ -708,7 +709,7 @@ package body Builder is
    --  --------------------------------------------------------------------------
 
    function To_Question (Q : Raw_Question) return Question_Data is
-      use Utilities;
+      use TL_Utilities;
       Value  : constant String := To_String (Q.Feature_Value);
       Q_Data : Question_Data;
    begin

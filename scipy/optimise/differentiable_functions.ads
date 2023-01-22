@@ -2,7 +2,7 @@
 
 with Opt_Constraints;
 with Multilayer_Perceptron;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Num_Diff; use Num_Diff;
 
 package Differentiable_Functions is

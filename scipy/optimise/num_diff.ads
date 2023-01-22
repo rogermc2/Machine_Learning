@@ -1,8 +1,7 @@
 --  Based on scipy/optimize/_numdiff.py
 
 with Opt_Constraints;
---  with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Num_Diff is
 

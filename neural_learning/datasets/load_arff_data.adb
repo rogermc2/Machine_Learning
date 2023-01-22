@@ -10,7 +10,7 @@ with Ada.Text_IO.Unbounded_IO;
 with GNAT.Regpat;
 
 with Maths;
-with Utilities;
+with Neural_Utilities;
 
 with Dataset_Utilities;
 with ML_Types;
@@ -382,8 +382,7 @@ package body Load_ARFF_Data is
 
                Nominal_Text :=
                  To_Unbounded_String (Slice (aLine, Pos_1, Pos_2 - 1));
-               --                 Put_Line (Routine_Name & "Nominal_Text: " & Nominal_Text);
-               Nominal_ML_Type := Utilities.Get_Data_Type (Nominal_Text);
+               Nominal_ML_Type := Neural_Utilities.Get_Data_Type (Nominal_Text);
                case Nominal_ML_Type is
                when ML_Types.Integer_Type =>
                   Nominal_Kind := Nominal_Integer;

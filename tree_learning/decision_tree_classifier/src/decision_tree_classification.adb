@@ -10,7 +10,7 @@ with Classifier_Utilities;
 with Estimator;
 with Node_Splitter;
 --  with Printing;
-with Utilities;
+with Neural_Utilities;
 
 package body Decision_Tree_Classification is
 
@@ -53,14 +53,16 @@ package body Decision_Tree_Classification is
       Random_State             : Integer := 0) is
       use Base_Decision_Tree;
    begin
-      if Utilities.Is_Float (To_Unbounded_String (Min_Split_Samples)) then
+      if Neural_Utilities.Is_Float
+        (To_Unbounded_String (Min_Split_Samples)) then
          declare
             Min_Split : Split_Value_Record (Split_Float);
          begin
             Min_Split.Float_Value := Float'Value (Min_Split_Samples);
             aClassifier.Parameters.Min_Samples_Split := Min_Split;
          end;
-      elsif Utilities.Is_Integer
+
+      elsif Neural_Utilities.Is_Integer
         (To_Unbounded_String (Min_Split_Samples)) then
          declare
             Min_Split : Base_Decision_Tree.Split_Value_Record

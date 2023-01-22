@@ -6,6 +6,10 @@ package Python_API is
    
    subtype PyObject is System.Address;
    
+   function PyArg_ParseTuple (Obj : PyObject; Format : Interfaces.C.char_array)
+                              return Interfaces.C.Int;
+   pragma Import (C, PyArg_ParseTuple, "PyArg_ParseTuple");
+   
    function PyArray_SimpleNewFromData (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyArray_SimpleNewFromData, "PyArray_SimpleNewFromData");
 
@@ -21,8 +25,8 @@ package Python_API is
    function PyCallable_Check (Obj : PyObject) return Interfaces.C.Int;
    pragma Import (C, PyCallable_Check, "PyCallable_Check");
    
-   function PyCheck_Tuple (Obj : PyObject) return Interfaces.C.Int;
-   pragma Import (C, PyCheck_Tuple, "PyTuple_Check");
+   function PyTuple_Check (Obj : PyObject) return Interfaces.C.Int;
+   pragma Import (C, PyTuple_Check, "PyTuple_Check");
    
    procedure Py_DecRef (Obj : PyObject);
    pragma Import (C, Py_DecRef, "Py_DecRef");
@@ -42,6 +46,9 @@ package Python_API is
    procedure Py_Finalize;
    pragma Import (C, Py_Finalize, "Py_Finalize");
       
+   function PyFloat_AsDouble (Obj : PyObject) return Interfaces.C.double;
+   pragma Import (C, PyFloat_AsDouble, "PyFloat_AsDouble");
+   
    function PyFloat_FromDouble (Val : Interfaces.C.double) return PyObject;
    pragma Import (C, PyFloat_FromDouble, "PyFloat_FromDouble");
    
@@ -58,8 +65,15 @@ package Python_API is
                              Item : Interfaces.C.Int);
    pragma Import (C, PyList_SetItem, "PyList_SetItem");  
    
+   function PyLong_AsLong (Obj : PyObject) return Interfaces.C.long;
+   pragma Import (C, PyLong_AsLong, "PyLong_AsLong");
+   
    function PyLong_FromLong (Val : Interfaces.C.long) return PyObject;
    pragma Import (C, PyLong_FromLong, "PyLong_FromLong");
+   
+   function PyLong_FromUnsignedLong (Val : Interfaces.C.unsigned_long)
+                                     return PyObject;
+   pragma Import (C, PyLong_FromUnsignedLong, "PyLong_FromUnsignedLong");
    
    function PyObject_GetAttr (Obj, Name : PyObject) return PyObject;
    pragma Import (C, PyObject_GetAttr, "PyObject_GetAttr");  
@@ -87,8 +101,9 @@ package Python_API is
    --                                   return PyObject;
    --     pragma Import (C, PyObject_VectorCall, "PyObject_Vectorcall");
    
-   function PyParse_Tuple (Args : PyObject; Index : Interfaces.C.char_array; Obj : PyObject)
-                           return Interfaces.C.int;  --  returns Boolean
+   function PyParse_Tuple
+     (Args : PyObject; Index : Interfaces.C.char_array; Obj : PyObject)
+      return Interfaces.C.int;  --  returns Boolean
    pragma Import (C, PyParse_Tuple, "PyArg_ParseTuple");
      
    function PyRun_SimpleString (Command : Interfaces.C.char_array)
@@ -104,6 +119,10 @@ package Python_API is
    
    procedure PySys_SetPath (Path : Interfaces.C.char_array);
    pragma Import (C, PySys_SetPath, "PySys_SetPath");
+   
+   function PyTuple_GetItem (Tuple : PyObject; Pos : Interfaces.C.int)
+                             return PyObject;
+   pragma Import (C, PyTuple_GetItem, "PyTuple_GetItem");
    
    function PyTuple_New (Length : Interfaces.C.int) return PyObject;
    pragma Import (C, PyTuple_New, "PyTuple_New");

@@ -2,7 +2,7 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Lbfgsb_F_Interface is
 

@@ -1,0 +1,176 @@
+
+with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Text_IO; use Ada.Text_IO;
+
+--  with Basic_Printing; use Basic_Printing;
+with Neural_Maths;
+
+package body Neural_Processes is
+
+   procedure Backward
+     (Layer         : in out Layer_Data; Out_Error : in out Real_Float_List) is
+      use Real_Float_Arrays;
+--        Routine_Name  : constant String := "Neural_Processes.Backward ";
+      Data_T        : constant Real_Float_Matrix :=
+                        Transpose (Real_Float_Matrix (Layer.Input_Data));
+      Error_Mat     : constant Real_Float_Matrix :=
+                        To_Real_Float_Matrix (Out_Error, 2);
+   begin
+      if Layer.Layer_Kind = Hidden_Layer then
+         declare
+            Weights_T   :  constant Real_Float_Matrix :=
+                            Transpose (Real_Float_Matrix (Layer.Weights));
+            Input_Error : constant Real_Float_Matrix := Error_Mat * Weights_T;
+         begin
+--              Print_Matrix_Dimensions (Routine_Name & "Input_Data",
+--                                       Real_Float_Matrix (Layer.Input_Data));
+            Layer.Delta_W :=
+              Layer_Matrix (Real_Float_Matrix (Layer.Delta_W) +
+                                Data_T * Error_Mat);
+            Layer.Delta_B :=
+              Layer_Matrix (Real_Float_Matrix (Layer.Delta_B) + Error_Mat);
+            Layer.Passes := Layer.Passes + 1;
+
+            Out_Error.Clear;
+            for col in Input_Error'Range (2) loop
+               Out_Error.Append (Input_Error (1, col));
+            end loop;
+         end;
+
+      else  --  Activation layer
+         declare
+            Error : constant Real_Float_Matrix
+              := H_Product (Neural_Maths.Sigmoid_Deriv
+                            (Real_Float_Matrix (Layer.Input_Data)), Error_Mat);
+         begin
+            Out_Error.Clear;
+            for col in Error'Range (2) loop
+               Out_Error.Append (Error (1, col));
+            end loop;
+         end;
+      end if;
+
+   end Backward;
+
+   --  --------------------------------------------------------------
+
+   procedure Forward
+     (Layer : in out Layer_Data; Data : in out Real_Float_List) is
+      use Real_Float_Arrays;
+      Routine_Name : constant String := "Neural_Processes.Forward ";
+      In_Data      : constant Real_Float_Matrix :=
+                       To_Real_Float_Matrix (Data, 2);
+   begin
+--        Put_Line (Routine_Name & "Data length" &
+--                    Integer'Image (Integer (Data.Length)));
+--        Print_Matrix_Dimensions (Routine_Name & "In_Data", In_Data);
+--        Print_Matrix_Dimensions (Routine_Name & "Layer.Input_Data",
+--                                 Real_Float_Matrix (Layer.Input_Data));
+      Layer.Input_Data := Layer_Matrix (In_Data);
+      if Layer.Layer_Kind = Hidden_Layer then
+         declare
+            Out_Mat : constant Real_Float_Matrix :=
+                        In_Data * Real_Float_Matrix (Layer.Weights) +
+                        Real_Float_Matrix (Layer.Bias);
+         begin
+            for col in Layer.Input_Data'Range (2) loop
+               Assert (Layer.Input_Data (1, Layer_Range (col))'Valid,
+                       Routine_Name & "Hidden_Layer invalid Layer.Input_Data " &
+                         Float'Image (Layer.Input_Data (1, Layer_Range (col))));
+            end loop;
+
+            Data.Clear;
+            for col in Out_Mat'Range (2) loop
+               Data.Append (Out_Mat (1, col));
+            end loop;
+
+            for row in Data.First_Index .. Data.Last_Index loop
+               Assert (Data.Element (row)'Valid, Routine_Name &
+                         "Hidden_Layer invalid Data " & Float'Image (Data (row)));
+            end loop;
+         end;
+
+      else  --  Activation_Layer
+         Data.Clear;
+         for col in Layer.Input_Data'Range (2) loop
+            Assert (Layer.Input_Data (1, Layer_Range (col))'Valid,
+                    Routine_Name &
+                      "Activation_Layer invalid Layer.Input_Data column" &
+                      Layer_Range'Image (col) & ":  " &
+                      Float'Image (Layer.Input_Data (1, Layer_Range (col))));
+            Data.Append (Neural_Maths.Sigmoid (Layer.Input_Data (1, col)));
+         end loop;
+
+      end if;
+
+   end Forward;
+
+   --  --------------------------------------------------------------
+
+   procedure Gradient_Descent_Step (Layer : in out Layer_Data; Eta : Float) is
+      use Real_Float_Arrays;
+      --        Routine_Name : constant String := "Neural_Processes.Gradient_Descent_Step Hidden_Layer ";
+      Eta_Av : Float;
+   begin
+      if Layer.Layer_Kind = Hidden_Layer then
+         Eta_Av := Eta / Float (Layer.Passes);
+         Layer.Weights :=
+           Layer_Matrix (Real_Float_Matrix (Layer.Weights) -
+                             Eta_Av * Real_Float_Matrix (Layer.Delta_W));
+
+         Layer.Bias :=
+           Layer_Matrix (Real_Float_Matrix (Layer.Bias) -
+                             Eta_Av * Real_Float_Matrix (Layer.Delta_B));
+
+         --  reset Delta_W and Delta_B for the next minibatch
+         declare
+            --  declare block prevents ambiguous Zero_Matrix operand problems.
+            ZMW : constant Real_Float_Matrix :=
+                    Zero_Matrix (Layer.Delta_W'Length, Layer.Delta_W'Length (2));
+            ZMD : constant Real_Float_Matrix :=
+                    Zero_Matrix (Layer.Delta_B'Length, Layer.Delta_B'Length (2));
+         begin
+            Layer.Delta_W := Layer_Matrix (ZMW);
+            Layer.Delta_B := Layer_Matrix (ZMD);
+         end;  -- declare block
+
+         Layer.Passes := 0;
+      end if;  --  Hidden layer
+
+   end Gradient_Descent_Step;
+
+   --  ------------------------------------------------------------------------
+
+   function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
+                           Max_Lines : Positive := 20000)
+                           return Load_Dataset.Digits_Data_Record is
+      use Load_Dataset;
+      Data : constant Digits_Data_Record :=
+               Load_Digits (File_Name, Num_Classes, Max_Lines);
+   begin
+      return Data;
+
+   end Load_Data_Set;
+
+   --  -------------------------------------------------------------------------
+
+   function Mean_Square_Error (Y_True, Y_Pred : Real_Float_Vector) return Float is
+      use Real_Float_Arrays;
+   begin
+      return 0.5 * Neural_Maths.Mean ((Y_True - Y_Pred) ** 2);
+
+   end Mean_Square_Error;
+
+   --  ------------------------------------------------------------------------
+
+   function Minus_MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
+                                  return Real_Float_Vector is
+      use Real_Float_Arrays;
+   begin
+      return Y_Pred - Y_True;
+
+   end Minus_MSE_Derivative;
+
+   --  --------------------------------------------------------------
+
+end Neural_Processes;

@@ -6,7 +6,7 @@ with Criterion;
 with Base_Decision_Tree;
 with Encode_Utils;
 with ML_Types;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with NL_Types;
 with Node_Splitter;
 with Tree;

@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
 --  with Printing;
-with Utilities;
+with Neural_Utilities;
 
 package body Classifier_Utilities is
 
@@ -19,11 +19,29 @@ package body Classifier_Utilities is
                             return ML_Types.Multi_Output_Data_Record;
 
    --  ------------------------------------------------------------------------
+   --  Arg_Max returns the index of the first maximum value.
+   function Arg_Max (Values : Binary_Array) return Integer is
+      Max_Value  : Natural := 0;
+      Max_Index  : Integer := Values'First;
+      Value      : Natural;
+   begin
+      for index in Values'Range loop
+         Value := Values (index);
+         if Value > Max_Value then
+            Max_Index := index;
+            Max_Value := Value;
+         end if;
+      end loop;
 
-   --  Arg_Max returns the index of the true values along an axis.
-   function Arg_Max (Values : Boolean_Array) return Positive is
+      return Max_Index;
+
+   end Arg_Max;
+
+   --  -------------------------------------------------------------------------
+   --  Arg_Max returns the index of the first true value.
+   function Arg_Max (Values : Boolean_Array) return Integer is
       Max_Value  : Boolean := False;
-      Max_Index  : Positive := 1;
+      Max_Index  : Integer := Values'First;
       Value      : Boolean;
    begin
       for index in Values'Range loop
@@ -60,6 +78,25 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the indices of the maximum values along an axis.
    function Arg_Max (Values : NL_Types.Float_List) return Positive is
+      Max_Value  : Float := Float'Safe_First;
+      Max_Index  : Positive := 1;
+      Value      : Float;
+   begin
+      for index in Values.First_Index .. Values.Last_Index loop
+         Value := Values.Element (index);
+         if Value > Max_Value then
+            Max_Index := index;
+            Max_Value := Value;
+         end if;
+      end loop;
+
+      return Max_Index;
+
+   end Arg_Max;
+
+   --  ------------------------------------------------------------------------
+
+   function Arg_Max (Values : Real_Float_List) return Positive is
       Max_Value  : Float := Float'Safe_First;
       Max_Index  : Positive := 1;
       Value      : Float;
@@ -316,18 +353,24 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
+   function Load_Data (File_Name : String; Num_Outputs : Positive := 1;
+                       Max_Lines : Positive := 20000)
                        return ML_Types.Multi_Output_Data_Record is
---        Routine_Name : constant String := "Classifier_Utilities.Load_Data ";
+      Routine_Name : constant String := "Classifier_Utilities.Load_Data ";
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
       Output_Data  : ML_Types.Multi_Output_Data_Record;
    begin
+      Put_Line (Routine_Name & "loading " & File_Name);
       Open (Data_File, In_File, File_Name);
-      Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
+      Raw_CSV_Data := Neural_Utilities.Load_Raw_CSV_Data (Data_File, Max_Lines);
       Close (Data_File);
 
+      Put_Line (Routine_Name & "splitting " & File_Name);
+
       Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
+      Put_Line (Routine_Name & File_Name & " split");
+
       return Output_Data;
 
    end Load_Data;
@@ -717,7 +760,7 @@ package body Classifier_Utilities is
                   aRow (f_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
                Feature_Types (Positive (f_index)) :=
-                 Utilities.Get_Data_Type (aRow (Positive (f_index)));
+                 Neural_Utilities.Get_Data_Type (aRow (Positive (f_index)));
             end;
          end loop;
 
@@ -731,7 +774,7 @@ package body Classifier_Utilities is
                   aRow (Num_Features + l_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
                Label_Types (Positive (l_index)) :=
-                 Utilities.Get_Data_Type (aRow (Positive (Num_Features + l_index)));
+                 Neural_Utilities.Get_Data_Type (aRow (Positive (Num_Features + l_index)));
             end;
          end loop;
 
@@ -1004,7 +1047,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
+   function To_Integer_Value_List (A : ML_Arrays_And_Matrices.Integer_Array)
                                    return ML_Types.Value_Data_List is
       use ML_Types;
       Data   : Value_Record (Integer_Type);
@@ -1020,7 +1063,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_Value_List_2D (A : NL_Arrays_And_Matrices.Integer_Array)
+   function To_Integer_Value_List_2D (A : ML_Arrays_And_Matrices.Integer_Array)
                                       return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Data       : Value_Record (Integer_Type);
@@ -1053,7 +1096,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
+   function To_Multi_Value_List (A : ML_Arrays_And_Matrices.Multi_Value_Array)
                                  return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Value    : Value_Record (Integer_Type);
@@ -1074,7 +1117,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Natural_List (A : NL_Arrays_And_Matrices.Natural_Array)
+   function To_Natural_List (A : Natural_Array)
                              return NL_Types.Natural_List is
       A_List : NL_Types.Natural_List;
    begin
@@ -1111,9 +1154,9 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
+   function To_Natural_Value_List (A : Natural_Array)
                                    return ML_Types.Value_Data_Lists_2D is
-      Int_Array : NL_Arrays_And_Matrices.Integer_Array (1 .. A'Length);
+      Int_Array : Integer_Array (1 .. A'Length);
    begin
       for index in A'First .. A'Last loop
          Int_Array (index) := A (index);

@@ -2,7 +2,7 @@
 
 with ML_Types;
 with NL_Types;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Multiclass_Utils is
    type Y_Type is (Y_Unknown, Y_Continuous, Y_Continuous_Multioutput, Y_Binary,

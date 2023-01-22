@@ -4,7 +4,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Utilities;
+with Neural_Utilities;
 --  with Printing;
 
 package body Data_Splitter is
@@ -53,7 +53,7 @@ package body Data_Splitter is
 
       --  L1716
       for index in 1 .. Self.Num_Splits loop
-         Utilities.Permute (Perms);
+         Neural_Utilities.Permute (Perms);
          for test_index in 1 .. Num_Test loop
             Test_Indices (test_index) := Perms (test_index);
          end loop;
