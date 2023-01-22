@@ -6,19 +6,20 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 with Load_Dataset;
-with Neural_Processes;
 with Shuffler;
 
 package body CSV_Data_Loader is
 
+   function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
+                           Max_Lines : Positive := 20000)
+                           return Load_Dataset.Digits_Data_Record;
    procedure Save_State (Dataset_Name : String; State : Base_Split_State;
                          Num_Features : Positive);
-
    procedure Train_Test_Split
-     (X           : Real_Float_Matrix; Y : Integer_Array;
-      Train_Size  : Natural; Test_Size  : Natural;
-      Train_X     : out Real_Float_Matrix; Train_Y : out Integer_Array;
-      Test_X      : out Real_Float_Matrix; Test_Y : out Integer_Array);
+     (X          : Real_Float_Matrix; Y : Integer_Array;
+      Train_Size : Natural; Test_Size  : Natural;
+      Train_X    : out Real_Float_Matrix; Train_Y : out Integer_Array;
+      Test_X     : out Real_Float_Matrix; Test_Y : out Integer_Array);
 
    --  -------------------------------------------------------------------------
 
@@ -71,8 +72,7 @@ package body CSV_Data_Loader is
          declare
             use Real_Float_Arrays;
             Data_Record  : constant Load_Dataset.Digits_Data_Record :=
-                             Neural_Processes.Load_Data_Set
-                               (Dataset_Name & ".csv");
+                             Load_Data_Set (Dataset_Name & ".csv");
             X            : Real_Float_Matrix := To_Real_Float_Matrix
               (Data_Record.Features) / 255.0;
             Y            : Integer_Array := Data_Record.Target;
@@ -138,6 +138,19 @@ package body CSV_Data_Loader is
       end case;
 
    end Get_Split_State;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
+                           Max_Lines : Positive := 20000)
+                           return Load_Dataset.Digits_Data_Record is
+      use Load_Dataset;
+      Data : constant Digits_Data_Record :=
+               Load_Digits (File_Name, Num_Classes, Max_Lines);
+   begin
+      return Data;
+
+   end Load_Data_Set;
 
    --  -------------------------------------------------------------------------
 
