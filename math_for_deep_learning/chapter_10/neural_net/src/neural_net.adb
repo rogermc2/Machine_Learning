@@ -30,8 +30,8 @@ procedure Neural_Net is
                                          Reload => False);
 
 --     X_Train_Image    : Real_Float_Vector (Data.Train_X'Range (2));
-   --     Minibatches    : constant Positive := 40000;
-   Minibatches      : constant Positive := 100;
+   Minibatches    : constant Positive := 40000;
+--     Minibatches      : constant Positive := 4000;
    Learning_Rate    : constant Float := 1.0;
    Net              : Network_Data;
    Predictions      : Real_Float_List_2D;  --  out
@@ -48,15 +48,9 @@ begin
    Put_Line (Project_Name & "Y_Test length:" &
                Integer'Image (Data.Test_Y'Length));
 
-   Put_Line (Project_Name & "Data.Num_Features:" &
-               Integer'Image (Data.Num_Features));
 --     for index in X_Train_Image'Range loop
---        X_Train_Image (index) := Data.Train_X (Data.Train_X'Last, index);
+--        X_Train_Image (index) := Data.Train_X (2, index);
 --     end loop;
---     Put_Line (Project_Name & "X_Train_Image length:" &
---                 Integer'Image (X_Train_Image'Length));
---     Print_Float_Matrix (Project_Name & "Data.Train_X", Data.Train_X, 2, 2);
---     Print_Float_Vector (Project_Name & "X_Train_Image", X_Train_Image);
 
 --     Python.Initialize;
 --     Py_Module := Import_File ("neural_net");
@@ -75,14 +69,10 @@ begin
 
    --  Build the confusion matrix using the test set predictions
    Predictions := Predict (Net, Data.Test_X);  --  out
-   --     Print_Real_Float_List_2D ("Predictions 1 .. 3", Predictions, 1, 3);
 
    --  Y_Test values range is the digits 0 .. 9
-   for index in Data.Test_Y'First .. Data.Test_Y'First + 5 loop
+   for index in Data.Test_Y'Range loop
       CM_Col := Arg_Max (Predictions (index)) - 1;
-      Put_Line (Project_Name & "Row, CM_Col, True value:" &
-                  Integer'Image (index) & Integer'Image (CM_Col) &
-                  Integer'Image (Integer (Data.Test_Y (index))));
       Confusion (Integer (Data.Test_Y (index)), CM_Col) :=
         Confusion (Integer (Data.Test_Y (index)), CM_Col) + 1 ;
    end loop;
