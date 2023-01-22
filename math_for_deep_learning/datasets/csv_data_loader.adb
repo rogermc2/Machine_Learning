@@ -34,14 +34,15 @@ package body CSV_Data_Loader is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Split_State
+   function Get_Digits_Split_State
      (Dataset_Name : String; Train_Size, Test_Size : Positive;
       Shuffle      : Boolean := True; Reload : Boolean := False)
       return Base_Split_State is
       use Ada.Directories;
       use Ada.Streams;
       use Stream_IO;
-      Routine_Name   : constant String := "CSV_Data_Loader.Get_Split_State ";
+      Routine_Name   : constant String :=
+                         "CSV_Data_Loader.Get_Digits_Split_State ";
       State_File     : constant String := Dataset_Name & ".sta";
       Has_Data       : constant Boolean := Exists (State_File);
       Num_Features   : constant Positive := 784;
@@ -107,6 +108,32 @@ package body CSV_Data_Loader is
             return Data;
          end;
       end if;
+
+   end Get_Digits_Split_State;
+
+   --  -------------------------------------------------------------------------
+
+   function Get_Split_State
+     (Dataset_Name : String; Data_Type : Data_Kind;
+      Train_Size   : Positive; Test_Size : Positive;
+      Shuffle      : Boolean := True; Reload : Boolean := False)
+      return Base_Split_State is
+      Routine_Name   : constant String := "CSV_Data_Loader.Get_Split_State ";
+       Dummy_Data : Base_Split_State (Train_Size, Test_Size, 1);
+   begin
+      case Data_Type is
+         when Diabetes_Data =>
+            Put_Line (Routine_Name &
+                        "Diabetes data processing not implemented");
+            return Dummy_Data;
+         when Digits_Data =>
+            return Get_Digits_Split_State (Dataset_Name, Train_Size, Test_Size,
+                                           Shuffle, Reload);
+         when Iris_Data =>
+            Put_Line (Routine_Name &
+                        "Iris data processing not implemented");
+            return Dummy_Data;
+      end case;
 
    end Get_Split_State;
 

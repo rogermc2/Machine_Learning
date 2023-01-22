@@ -18,15 +18,16 @@ with Network; use Network;
 
 procedure Neural_Net is
    use Classifier_Utilities;
+   use CSV_Data_Loader;
    use Real_Float_Arrays;
    Project_Name     : constant String := "Neural_Net ";
    Data_Directory   : constant String := "../../datasets/";
    Train_Size       : constant Positive := 10000;
    Test_Size        : constant Positive := 1000;
-   Data             : constant CSV_Data_Loader.Base_Split_State :=
-                        CSV_Data_Loader.Get_Split_State
-                          (Data_Directory & "mnist_784", Train_Size,
-                           Test_Size, Reload => True);
+   Data             : constant Base_Split_State :=
+                        Get_Split_State (Data_Directory & "mnist_784",
+                                         Digits_Data, Train_Size, Test_Size,
+                                         Reload => True);
 
    X_Train_Image    : Real_Float_Vector (Data.Train_X'Range (2));
    --     Minibatches    : constant Positive := 40000;
