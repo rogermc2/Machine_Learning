@@ -23,14 +23,14 @@ procedure Neural_Net is
    Data_Directory   : constant String := "../../datasets/";
    Train_Size       : constant Positive := 10000;
    Test_Size        : constant Positive := 1000;
-   Data             : constant CSV_Data_Loader.Base_State :=
-                        CSV_Data_Loader.Get_State
+   Data             : constant CSV_Data_Loader.Base_Split_State :=
+                        CSV_Data_Loader.Get_Split_State
                           (Data_Directory & "mnist_784", Train_Size,
                            Test_Size, Reload => True);
 
    X_Train_Image    : Real_Float_Vector (Data.Train_X'Range (2));
    --     Minibatches    : constant Positive := 40000;
-   Minibatches      : constant Positive := 4000;
+   Minibatches      : constant Positive := 100;
    Learning_Rate    : constant Float := 1.0;
    Net              : Network_Data;
    Predictions      : Real_Float_List_2D;  --  out

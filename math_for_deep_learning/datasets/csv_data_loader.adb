@@ -11,7 +11,7 @@ with Shuffler;
 
 package body CSV_Data_Loader is
 
-   procedure Save_State (Dataset_Name : String; State : Base_State);
+   procedure Save_State (Dataset_Name : String; State : Base_Split_State);
 
    procedure Train_Test_Split
      (X           : Real_Float_Matrix; Y : Integer_Array;
@@ -34,14 +34,14 @@ package body CSV_Data_Loader is
 
    --  -------------------------------------------------------------------------
 
-   function Get_State
+   function Get_Split_State
      (Dataset_Name : String; Train_Size, Test_Size : Positive;
       Shuffle      : Boolean := True; Reload : Boolean := False)
-      return Base_State is
+      return Base_Split_State is
       use Ada.Directories;
       use Ada.Streams;
       use Stream_IO;
-      Routine_Name   : constant String := "CSV_Data_Loader.Get_State ";
+      Routine_Name   : constant String := "CSV_Data_Loader.Get_Split_State ";
       State_File     : constant String := Dataset_Name & ".sta";
       Has_Data       : constant Boolean := Exists (State_File);
       Num_Features   : constant Positive := 784;
@@ -54,9 +54,9 @@ package body CSV_Data_Loader is
          aStream := Stream (File_ID);
 
          declare
-            Data : Base_State (Train_Size, Test_Size, Num_Features);
+            Data : Base_Split_State (Train_Size, Test_Size, Num_Features);
          begin
-            Base_State'Read (aStream, Data);
+            Base_Split_State'Read (aStream, Data);
             Close (File_ID);
             Put_Line (Routine_Name & "state restored");
             return Data;
@@ -74,7 +74,8 @@ package body CSV_Data_Loader is
             Y            : Integer_Array := Data_Record.Target;
             Train_Y      : Integer_Array (1 .. Train_Size);
             Test_Y       : Integer_Array (1 .. Test_Size);
-            Data         : Base_State (Train_Size, Test_Size, Num_Features);
+            Data         : Base_Split_State (Train_Size, Test_Size,
+                                             Num_Features);
          begin
             Put_Line (Routine_Name & "csv loaded");
             Print_Matrix_Dimensions (Routine_Name & "X" , X);
@@ -107,11 +108,11 @@ package body CSV_Data_Loader is
          end;
       end if;
 
-   end Get_State;
+   end Get_Split_State;
 
    --  -------------------------------------------------------------------------
 
-   procedure Save_State (Dataset_Name : String; State : Base_State) is
+   procedure Save_State (Dataset_Name : String; State : Base_Split_State) is
       use Ada.Streams;
       use Stream_IO;
       --        Routine_Name : constant String := "CSV_Data_Loader.Save_State ";
@@ -121,7 +122,7 @@ package body CSV_Data_Loader is
    begin
       Create (File_ID, Out_File, State_File);
       aStream := Stream (File_ID);
-      Base_State'Write (aStream, State);
+      Base_Split_State'Write (aStream, State);
       Close (File_ID);
 
    end Save_State;
