@@ -27,11 +27,11 @@ procedure Neural_Net is
    Data             : constant Base_Split_State :=
                         Get_Split_State (Data_Directory & "mnist_784",
                                          Digits_Data, Train_Size, Test_Size,
-                                         Reload => True);
+                                         Categorized => True, Reload => True);
 
 --     X_Train_Image    : Real_Float_Vector (Data.Train_X'Range (2));
 --     Minibatches    : constant Positive := 40000;
-   Minibatches      : constant Positive := 4000;
+   Minibatches      : constant Positive := 40;
    Learning_Rate    : constant Float := 1.0;
    Net              : Network_Data;
    Predictions      : Real_Float_List_2D;  --  out
@@ -43,10 +43,10 @@ begin
    Put_Line (Project_Name);
 
    Print_Matrix_Dimensions (Project_Name & "X_Train" , Data.Train_X);
-   Print_Matrix_Dimensions (Project_Name & "Y_Train", Data.Train_Y);
+   Print_Matrix_Dimensions (Project_Name & "Y_Train", Data.Cat_Train_Y);
    Print_Matrix_Dimensions (Project_Name & "X_Test", Data.Test_X);
    Put_Line (Project_Name & "Y_Test length:" &
-               Integer'Image (Data.Test_Y'Length));
+               Integer'Image (Data.Cat_Test_Y'Length));
 
 --     for index in X_Train_Image'Range loop
 --        X_Train_Image (index) := Data.Train_X (2, index);
@@ -65,16 +65,16 @@ begin
    Add_Activation_Layer (Net.Layers, 10);
    Net.Verbose := True;
 
-   Fit (Net, Data.Train_X, Data.Train_Y, Minibatches, Learning_Rate);
+   Fit (Net, Data.Train_X, Data.Cat_Train_Y, Minibatches, Learning_Rate);
 
    --  Build the confusion matrix using the test set predictions
    Predictions := Predict (Net, Data.Test_X);  --  out
 
    --  Y_Test values range is the digits 0 .. 9
-   for index in Data.Test_Y'Range loop
+   for index in Data.Cat_Test_Y'Range loop
       CM_Col := Arg_Max (Predictions (index)) - 1;
-      Confusion (Integer (Data.Test_Y (index)), CM_Col) :=
-        Confusion (Integer (Data.Test_Y (index)), CM_Col) + 1 ;
+      Confusion (Integer (Data.Cat_Test_Y (index)), CM_Col) :=
+        Confusion (Integer (Data.Cat_Test_Y (index)), CM_Col) + 1 ;
    end loop;
 
    Print_Integer_Matrix ("Confusion matrix", Confusion);
