@@ -24,8 +24,8 @@ procedure Neural_Net is
    Train_Size       : constant Positive := 10000;
    Test_Size        : constant Positive := 1000;
    Data             : constant CSV_Data_Loader.Base_State :=
-                        CSV_Data_Loader.Get_State
-                          (Data_Directory & "mnist_784", Train_Size, Test_Size);
+     CSV_Data_Loader.Get_State
+       (Data_Directory & "mnist_784", Train_Size, Test_Size);
 
    --     X_Train_Image  : Real_Float_Vector (X_Train'Range (2));
    --     Minibatches    : constant Positive := 40000;
@@ -34,7 +34,7 @@ procedure Neural_Net is
    Net              : Network_Data;
    Predictions      : Real_Float_List_2D;  --  out
    Confusion        : Integer_Matrix (0 .. 9, 0 .. 9) :=
-                        (others => (others => 0));
+     (others => (others => 0));
    CM_Col           : Natural;
    --     Py_Module      : Module;
 begin
@@ -68,9 +68,6 @@ begin
 
    --  Build the confusion matrix using the test set predictions
    Predictions := Predict (Net, Data.Test_X);  --  out
-   --     Put_Line ("Predictions size:" & Integer'Image (Integer (Predictions.Length))
-   --               & " x" & Integer'Image (Integer (Predictions (1).Length)));
-   --     Print_Float_Vector ("Y_Test 3", Y_Test, 3, 3);
    Print_Real_Float_List_2D ("Predictions 1 .. 3", Predictions, 1, 3);
 
    --  Y_Test values range is the digits 0 .. 9
@@ -82,13 +79,13 @@ begin
       Confusion (Integer (Data.Test_Y (index)), CM_Col) :=
         Confusion (Integer (Data.Test_Y (index)), CM_Col) + 1 ;
    end loop;
-   --
-   --     Print_Integer_Matrix ("Confusion matrix", Confusion);
-   --     Put_Line ("Confusion diagonal sum:" &
-   --                 Integer'Image (Sum_Diagonal (Confusion)));
-   --     Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
-   --     Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
-   --                 Float (Sum (Confusion))));
+
+   Print_Integer_Matrix ("Confusion matrix", Confusion);
+   Put_Line ("Confusion diagonal sum:" &
+               Integer'Image (Sum_Diagonal (Confusion)));
+   Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
+   Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
+               Float (Sum (Confusion))));
 
    Put_Line (Project_Name & "done.");
    New_Line;

@@ -15,24 +15,24 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
-   --     function Accumulate_MS_Error
-   --       (Sample      : Positive; Y_Batch : Real_Float_Matrix;
-   --        Output_Data : Real_Float_List; Error : in out Float)
-   --        return Real_Float_List is
-   --        use Real_Float_Arrays;
-   --        Output_Vector : constant Real_Float_Vector :=
-   --          To_Real_Float_Vector (Output_Data);
-   --        Y_Vector      : Real_Float_Vector (Y_Batch'Range (2));
-   --     begin
-   --        for col in Y_Batch'Range (2) loop
-   --           Y_Vector (col) := Y_Batch (Sample, col);
-   --        end loop;
-   --        Error := Error + Mean_Square_Error (Y_Vector, Output_Vector);
-   --
-   --        return To_Real_Float_List
-   --          (Minus_MSE_Derivative (Y_Vector, Output_Vector));
-   --
-   --     end Accumulate_MS_Error;
+      function Accumulate_MS_Error
+        (Sample      : Positive; Y_Batch : Binary_Matrix;
+         Output_Data : Real_Float_List; Error : in out Float)
+         return Real_Float_List is
+         use Real_Float_Arrays;
+         Output_Vector : constant Real_Float_Vector :=
+           To_Real_Float_Vector (Output_Data);
+         Y_Vector      : Real_Float_Vector (Y_Batch'Range (2));
+      begin
+         for col in Y_Batch'Range (2) loop
+            Y_Vector (col) := Float (Y_Batch (Sample, col));
+         end loop;
+         Error := Error + Mean_Square_Error (Y_Vector, Output_Vector);
+
+         return To_Real_Float_List
+           (Minus_MSE_Derivative (Y_Vector, Output_Vector));
+
+      end Accumulate_MS_Error;
 
    --  -------------------------------------------------------------------------
 
@@ -82,88 +82,61 @@ package body Network is
       Learning_Rate : Float; Batch_Size : Positive := 64) is
       Routine_Name : constant String := "Network.Fit ";
       use Real_Float_Arrays;
-      X_Batch      : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
-      Y_Batch      : Binary_Matrix (1 .. Batch_Size, Y_Train'Range (2));
-      Output_Data  : Real_Float_List;
-      Error        : Real_Float_List;
-      --        Diagnostic_Error  : Float  --  err;
+      X_Batch          : Real_Float_Matrix (1 .. Batch_Size, X_Train'Range (2));
+      Y_Batch          : Binary_Matrix (1 .. Batch_Size, Y_Train'Range (2));
+      Output_Data      : Real_Float_List;
+      Error            : Real_Float_List;
+      Diagnostic_Error : Float;  --  err;
    begin
       Put_Line (Routine_Name & "running" & Integer'Image (Minibatches) &
                   " minibatches");
       for count in 1 .. Minibatches loop
---           Put_Line ("Minibatch" & Integer'Image (count));
          if count mod 40 = 0 then
             Put ("*");
          end if;
-         --           Diagnostic_Error := 0.0;
+         Diagnostic_Error := 0.0;
          --  Select a random minibatch
          Generate_Minibatch (X_Train, Y_Train, X_Batch, Y_Batch);
---           Print_Matrix_Dimensions (Routine_Name & "X_Train", X_Train);
 
          for sample in X_Batch'Range loop
-            --              Put_Line ("sample" & Integer'Image (sample));
             --  Get a sample from X_Batch
             Output_Data := To_Real_Float_List (X_Batch, Sample);
 
             --  forward propagation
             for layer in Network.Layers.First_Index ..
               Network.Layers.Last_Index loop
---                 Put_Line (Routine_Name & "layer: " & Integer'Image (layer));
-               --                 Put_Line (Routine_Name & "Output_Data.Length" &
-               --                          Integer'Image (Integer (Output_Data.Length)));
                Forward (Network.Layers (layer), Output_Data);
                for row in Output_Data.First_Index .. Output_Data.Last_Index loop
                   Assert (Output_Data.Element (row)'Valid, Routine_Name &
                             "Forward generated Output_Data " &
                             Float'Image (Output_Data (row)));
                end loop;
-               --                 Print_Real_Float_List
-               --                   (Routine_Name & "Forward generated Output_Data", Output_Data,
-               --                    50, 100);
             end loop;  --  layer
+
             --  accumulate diagnostic backward propagate error
-            --              Diagnostic_Error :=
-            --                Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Accum_Error);
+--              Diagnostic_Error :=
+--                Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Diagnostic_Error);
             declare
                Y_Vector : Real_Float_Vector (Y_Batch'Range (2));
             begin
                for col in Y_Vector'Range loop
                   Y_Vector (col) := Float (Y_Batch (Sample, col));
                end loop;
-               --                 Diagnostic_Error := Diagnostic_Error + Mean_Square_Error (Y_Vector, To_Real_Float_Vector (Output_Data));
---                 if sample < 4 then
---                    Print_Binary_Matrix (Routine_Name & "Y_Train sample", Y_Train,
---                                         Sample, Sample);
---                    Print_Binary_Matrix (Routine_Name & "Y_Batch sample", Y_Batch,
---                                         Sample, Sample);
---                    Print_Float_Vector (Routine_Name & "Y_Vector", Y_Vector);
---                    Print_Real_Float_List (Routine_Name & "Output_Data",
---                                           Output_Data);
---                 end if;
+               Diagnostic_Error :=
+                 Diagnostic_Error + Mean_Square_Error
+                   (Y_Vector, To_Real_Float_Vector (Output_Data));
 
                Error :=
                  To_Real_Float_List (Minus_MSE_Derivative (Y_Vector,
                                      To_Real_Float_Vector (Output_Data)));
---                 if sample < 4 then
---                    Print_Real_Float_List (Routine_Name & "Forward Error", Error);
---                 end if;
 
                --  backtward propagation
                for layer in reverse Network.Layers.First_Index ..
                  Network.Layers.Last_Index loop
                   Backward (Network.Layers (layer), Error);
                end loop;
---                 if sample < 4 then
---                    Print_Real_Float_List (Routine_Name & "Level 1 Error",
---                                           Error, 1, 20);
---                    New_Line;
---                 end if;
             end;  --  declare block
 
-            --              if sample < 4 then
-            --                 Print_Real_Float_List (Routine_Name & "Output_Data row" &
-            --                                          Integer'Image (sample), Output_Data);
-            --              end if;
          end loop;  --  Sample
 
          for layer in Network.Layers.First_Index ..
@@ -172,13 +145,13 @@ package body Network is
          end loop;
 
          --  report mean loss over minibatch
-         --           if Network.Verbose and then
-         --             (Minibatches < 10 or else count mod (Minibatches / 10) = 0) then
-         --              Diagnostic_Error := Diagnostic_Error / Float (Batch_Size);
-         --              New_Line;
-         --              Put_Line ("Minibatch" & Integer'Image (count) &
-         --                          " mean error: " & Float'Image (Err));
-         --           end if;
+         if Network.Verbose and then
+           (Minibatches < 10 or else count mod (Minibatches / 10) = 0) then
+            Diagnostic_Error := Diagnostic_Error / Float (Batch_Size);
+            New_Line;
+            Put_Line ("Minibatch" & Integer'Image (count) &
+                        " mean error: " & Float'Image (Diagnostic_Error));
+         end if;
       end loop;  --  Minibatches
       New_Line;
 
@@ -212,7 +185,7 @@ package body Network is
 
    function Predict
      (Network : in out Network_Data; Input_Data : Real_Float_Matrix)
-      return Real_Float_List_2D is
+         return Real_Float_List_2D is
       Routine_Name : constant String := "Network.Predict ";
       Output_Data  : Real_Float_List;     --  Feature values
       Predictions  : Real_Float_List_2D;  --  Result
