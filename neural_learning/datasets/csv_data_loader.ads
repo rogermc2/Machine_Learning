@@ -6,11 +6,11 @@ package CSV_Data_Loader is
    type Data_Kind is (Digits_Data, Iris_Data, Diabetes_Data);
 
    type Base_Split_State (Num_Train, Num_Test, Num_Features : Positive;
-                          Categorized : Boolean)
+                          Y_Categorized : Boolean)
    is record
       Train_X : Real_Float_Matrix (1 .. Num_Train, 1 .. Num_Features);
       Test_X  : Real_Float_Matrix (1 .. Num_Test, 1 .. Num_Features);
-      case Categorized is
+      case Y_Categorized is
          when True =>
             Cat_Train_Y : Binary_Matrix (1 .. Num_Train, 1 .. 10);
             Cat_Test_Y  : Real_Float_Vector (1 .. Num_Test);
@@ -21,9 +21,9 @@ package CSV_Data_Loader is
    end record;
 
    function Get_Split_State
-     (Dataset_Name : String; Data_Type : Data_Kind;
-      Train_Size   : Positive; Test_Size : Positive;
-      Categorized  : Boolean := True; Shuffle : Boolean := True;
+     (Dataset_Name  : String; Data_Type : Data_Kind;
+      Train_Size    : Positive; Test_Size : Positive;
+      Y_Categorized : Boolean := True; Shuffle : Boolean := True;
       Reload : Boolean := False)
       return Base_Split_State;
 

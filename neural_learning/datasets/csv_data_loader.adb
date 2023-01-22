@@ -37,8 +37,8 @@ package body CSV_Data_Loader is
    --  -------------------------------------------------------------------------
 
    function Get_Digits_Split_State
-     (Dataset_Name : String; Train_Size, Test_Size : Positive;
-      Categorized  : Boolean := True; Shuffle : Boolean := True;
+     (Dataset_Name  : String; Train_Size, Test_Size : Positive;
+      Y_Categorized : Boolean := True; Shuffle : Boolean := True;
       Reload : Boolean := False)
       return Base_Split_State is
       use Ada.Directories;
@@ -100,7 +100,7 @@ package body CSV_Data_Loader is
 ,
                Test_X => Data.Test_X, Test_Y => Test_Y);
 
-            if Categorized then
+            if Y_Categorized then
                Data.Cat_Train_Y := Categorize (Train_Y);
             else
                Data.Train_Y := To_Integer_Matrix (Train_Y);
@@ -122,7 +122,7 @@ package body CSV_Data_Loader is
    function Get_Split_State
      (Dataset_Name : String; Data_Type : Data_Kind;
       Train_Size   : Positive; Test_Size : Positive;
-      Categorized  : Boolean := True; Shuffle : Boolean := True;
+      Y_Categorized  : Boolean := True; Shuffle : Boolean := True;
       Reload : Boolean := False)
       return Base_Split_State is
       Routine_Name   : constant String := "CSV_Data_Loader.Get_Split_State ";
@@ -135,7 +135,7 @@ package body CSV_Data_Loader is
             return Dummy_Data;
          when Digits_Data =>
             return Get_Digits_Split_State (Dataset_Name, Train_Size, Test_Size,
-                                           Categorized, Shuffle, Reload);
+                                           Y_Categorized, Shuffle, Reload);
          when Iris_Data =>
             Put_Line (Routine_Name &
                         "Iris data processing not implemented");
