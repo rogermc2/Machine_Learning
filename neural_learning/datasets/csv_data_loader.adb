@@ -102,13 +102,13 @@ package body CSV_Data_Loader is
 
             if Y_Categorized then
                Data.Cat_Train_Y := Categorize (Train_Y);
+               for index in Test_Y'Range loop
+                  Data.Cat_Test_Y (index) := Float (Test_Y (index));
+               end loop;
             else
                Data.Train_Y := To_Integer_Matrix (Train_Y);
+               Data.Test_Y := To_Integer_Matrix (Test_Y);
             end if;
-
-            for index in Test_Y'Range loop
-               Data.Cat_Test_Y (index) := Float (Test_Y (index));
-            end loop;
 
             Save_State (Dataset_Name, Data, Num_Features);
             return Data;

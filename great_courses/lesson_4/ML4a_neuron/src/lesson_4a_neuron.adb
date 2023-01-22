@@ -24,15 +24,15 @@ procedure Lesson_4A_Neuron is
    Train_X       : constant Real_Float_Matrix := Data.Train_X;
    Train_Y       : constant Integer_Matrix := Data.Train_Y;
    Test_X        : constant Real_Float_Matrix := Data.Test_X;
-   Test_Y        : Integer_Matrix (1 .. Test_Size, 1 .. 1);
+   Test_Y        : constant Integer_Matrix := Data.Test_Y;
    Layer_Sizes   : ML_Types.Integer_List;
    Sample_Weight : Real_Float_Vector (1 .. 0);
    MLP           : Multilayer_Perceptron.MLP_Classifier;
 begin
    Put_Line (Program_Name & "no hidden layers");
-   for row in Test_Y'Range loop
-      Test_Y (row, 1) := Integer (Data.Cat_Test_Y (row));
-   end loop;
+--     for row in Test_Y'Range loop
+--        Test_Y (row, 1) := Integer (Data.Cat_Test_Y (row));
+--     end loop;
 
    Print_Matrix_Dimensions ("Train X", Train_X);
    Print_Matrix_Dimensions ("Train Y", Train_Y);
