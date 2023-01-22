@@ -31,9 +31,6 @@ package Neural_Processes is
      (Layer : in out Layer_Data; Out_Error : in out Real_Float_List);
    procedure Forward (Layer : in out Layer_Data; Data : in out Real_Float_List);
    procedure Gradient_Descent_Step (Layer : in out Layer_Data; Eta : Float);
-   function Load_Data (File_Name : String; Num_Columns : Positive)
-                       return Real_Float_Matrix;
-   function Load_Data (File_Name : String) return Real_Float_Vector;
    function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
                            Max_Lines : Positive := 20000)
                            return Load_Dataset.Digits_Data_Record;

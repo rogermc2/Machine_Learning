@@ -1,12 +1,9 @@
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
-with ML_Types;
 with Neural_Maths;
-with Neural_Utilities;
 
 package body Neural_Processes is
 
@@ -143,47 +140,6 @@ package body Neural_Processes is
    end Gradient_Descent_Step;
 
    --  ------------------------------------------------------------------------
-
-   function Load_Data (File_Name : String; Num_Columns : Positive)
-                       return Real_Float_Matrix is
-      use Ada.Strings.Unbounded;
-      CSV_Data  : constant ML_Types.Raw_Data_Vector :=
-                    Neural_Utilities.Load_Raw_CSV_Data (File_Name);
-      List_Row  : ML_Types.Unbounded_List;
-      Data      : ML_Arrays_And_Matrices.Real_Float_Matrix
-        (1 .. Positive (CSV_Data.Length), 1 .. Num_Columns);
-   begin
-      Put_Line ("Loading " & File_Name);
-      for row in Data'Range loop
-         List_Row := CSV_Data (row);
-         for col in Data'Range( 2) loop
-            Data (row, col) := Float'Value (To_String (List_Row (col)));
-         end loop;
-      end loop;
-
-      return Data;
-
-   end Load_Data;
-
-   --  -------------------------------------------------------------------------
-
-   function Load_Data (File_Name : String) return Real_Float_Vector is
-      use  Ada.Strings.Unbounded;
-      CSV_Data : constant ML_Types.Unbounded_List :=
-                   Neural_Utilities.Load_CSV_Data (File_Name);
-      Data     : ML_Arrays_And_Matrices.Real_Float_Vector
-        (1 .. Positive (CSV_Data.Length));
-   begin
-      Put_Line ("Loading " & File_Name);
-      for index in CSV_Data.First_Index .. CSV_Data.Last_Index loop
-         Data (index) := Float'Value (To_String (CSV_Data (index)));
-      end loop;
-
-      return Data;
-
-   end Load_Data;
-
-   --  -------------------------------------------------------------------------
 
    function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
                            Max_Lines : Positive := 20000)

@@ -29,7 +29,7 @@ procedure Neural_Net is
 
    --     X_Train_Image  : Real_Float_Vector (X_Train'Range (2));
    --     Minibatches    : constant Positive := 40000;
-   Minibatches      : constant Positive := 4;
+   Minibatches      : constant Positive := 4000;
    Learning_Rate    : constant Float := 1.0;
    Net              : Network_Data;
    Predictions      : Real_Float_List_2D;  --  out

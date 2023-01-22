@@ -91,14 +91,14 @@ package body Network is
       Put_Line (Routine_Name & "running" & Integer'Image (Minibatches) &
                   " minibatches");
       for count in 1 .. Minibatches loop
-         Put_Line ("Minibatch" & Integer'Image (count));
+--           Put_Line ("Minibatch" & Integer'Image (count));
          if count mod 40 = 0 then
             Put ("*");
          end if;
          --           Diagnostic_Error := 0.0;
          --  Select a random minibatch
          Generate_Minibatch (X_Train, Y_Train, X_Batch, Y_Batch);
-         Print_Matrix_Dimensions (Routine_Name & "X_Train", X_Train);
+--           Print_Matrix_Dimensions (Routine_Name & "X_Train", X_Train);
 
          for sample in X_Batch'Range loop
             --              Put_Line ("sample" & Integer'Image (sample));
@@ -131,33 +131,33 @@ package body Network is
                   Y_Vector (col) := Float (Y_Batch (Sample, col));
                end loop;
                --                 Diagnostic_Error := Diagnostic_Error + Mean_Square_Error (Y_Vector, To_Real_Float_Vector (Output_Data));
-               if sample < 4 then
-                  Print_Binary_Matrix (Routine_Name & "Y_Train sample", Y_Train,
-                                       Sample, Sample);
-                  Print_Binary_Matrix (Routine_Name & "Y_Batch sample", Y_Batch,
-                                       Sample, Sample);
-                  Print_Float_Vector (Routine_Name & "Y_Vector", Y_Vector);
-                  Print_Real_Float_List (Routine_Name & "Output_Data",
-                                         Output_Data);
-               end if;
+--                 if sample < 4 then
+--                    Print_Binary_Matrix (Routine_Name & "Y_Train sample", Y_Train,
+--                                         Sample, Sample);
+--                    Print_Binary_Matrix (Routine_Name & "Y_Batch sample", Y_Batch,
+--                                         Sample, Sample);
+--                    Print_Float_Vector (Routine_Name & "Y_Vector", Y_Vector);
+--                    Print_Real_Float_List (Routine_Name & "Output_Data",
+--                                           Output_Data);
+--                 end if;
 
                Error :=
                  To_Real_Float_List (Minus_MSE_Derivative (Y_Vector,
                                      To_Real_Float_Vector (Output_Data)));
-               if sample < 4 then
-                  Print_Real_Float_List (Routine_Name & "Forward Error", Error);
-               end if;
+--                 if sample < 4 then
+--                    Print_Real_Float_List (Routine_Name & "Forward Error", Error);
+--                 end if;
 
                --  backtward propagation
                for layer in reverse Network.Layers.First_Index ..
                  Network.Layers.Last_Index loop
                   Backward (Network.Layers (layer), Error);
                end loop;
-               if sample < 4 then
-                  Print_Real_Float_List (Routine_Name & "Level 1 Error",
-                                         Error, 1, 20);
-                  New_Line;
-               end if;
+--                 if sample < 4 then
+--                    Print_Real_Float_List (Routine_Name & "Level 1 Error",
+--                                           Error, 1, 20);
+--                    New_Line;
+--                 end if;
             end;  --  declare block
 
             --              if sample < 4 then
