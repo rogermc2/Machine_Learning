@@ -6,7 +6,7 @@ with Classifier_Utilities;
 with CSV_Data_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Neural_Processes; use Neural_Processes;
-with Python; use Python;
+--  with Python; use Python;
 
 with Network; use Network;
 --  1. Feed input data into the neural network.
@@ -27,9 +27,9 @@ procedure Neural_Net is
    Data             : constant Base_Split_State :=
                         Get_Split_State (Data_Directory & "mnist_784",
                                          Digits_Data, Train_Size, Test_Size,
-                                         Reload => True);
+                                         Reload => False);
 
-   X_Train_Image    : Real_Float_Vector (Data.Train_X'Range (2));
+--     X_Train_Image    : Real_Float_Vector (Data.Train_X'Range (2));
    --     Minibatches    : constant Positive := 40000;
    Minibatches      : constant Positive := 100;
    Learning_Rate    : constant Float := 1.0;
@@ -38,7 +38,7 @@ procedure Neural_Net is
    Confusion        : Integer_Matrix (0 .. 9, 0 .. 9) :=
                         (others => (others => 0));
    CM_Col           : Natural;
-   Py_Module        : Module;
+--     Py_Module        : Module;
 begin
    Put_Line (Project_Name);
 
@@ -50,18 +50,18 @@ begin
 
    Put_Line (Project_Name & "Data.Num_Features:" &
                Integer'Image (Data.Num_Features));
-   for index in X_Train_Image'Range loop
-      X_Train_Image (index) := Data.Train_X (Data.Train_X'Last, index);
-   end loop;
-   Put_Line (Project_Name & "X_Train_Image length:" &
-               Integer'Image (X_Train_Image'Length));
+--     for index in X_Train_Image'Range loop
+--        X_Train_Image (index) := Data.Train_X (Data.Train_X'Last, index);
+--     end loop;
+--     Put_Line (Project_Name & "X_Train_Image length:" &
+--                 Integer'Image (X_Train_Image'Length));
 --     Print_Float_Matrix (Project_Name & "Data.Train_X", Data.Train_X, 2, 2);
 --     Print_Float_Vector (Project_Name & "X_Train_Image", X_Train_Image);
 
-   Python.Initialize;
-   Py_Module := Import_File ("neural_net");
-   Python.Call (Py_Module, "show_image", X_Train_Image);
-   Python.Finalize;
+--     Python.Initialize;
+--     Py_Module := Import_File ("neural_net");
+--     Python.Call (Py_Module, "show_image", X_Train_Image);
+--     Python.Finalize;
 
    Add_Fully_Connected_Layer (Net.Layers, Layer_Range (Data.Num_Features), 100);
    Add_Activation_Layer (Net.Layers, 100);
