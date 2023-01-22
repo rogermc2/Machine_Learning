@@ -100,7 +100,11 @@ package body CSV_Data_Loader is
 ,
                Test_X => Data.Test_X, Test_Y => Test_Y);
 
-            Data.Cat_Train_Y := Categorize (Train_Y);
+            if Categorized then
+               Data.Cat_Train_Y := Categorize (Train_Y);
+            else
+               Data.Train_Y := To_Integer_Matrix (Train_Y);
+            end if;
 
             for index in Test_Y'Range loop
                Data.Cat_Test_Y (index) := Float (Test_Y (index));
@@ -131,7 +135,7 @@ package body CSV_Data_Loader is
             return Dummy_Data;
          when Digits_Data =>
             return Get_Digits_Split_State (Dataset_Name, Train_Size, Test_Size,
-                                           Shuffle, Reload);
+                                           Categorized, Shuffle, Reload);
          when Iris_Data =>
             Put_Line (Routine_Name &
                         "Iris data processing not implemented");
