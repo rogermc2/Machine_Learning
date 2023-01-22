@@ -78,13 +78,8 @@ begin
    end loop;
 
    Print_Integer_Matrix ("Confusion matrix", Confusion);
-   Put_Line ("Confusion diagonal sum:" &
-               Integer'Image (Sum_Diagonal (Confusion)));
-   Put_Line ("Confusion sum:" & Integer'Image (Sum (Confusion)));
    Put_Line ("Accuracy: " & Float'Image (Float (Sum_Diagonal (Confusion)) /
                Float (Sum (Confusion))));
-
-   Put_Line (Project_Name & "done.");
    New_Line;
 
 end Neural_Net;

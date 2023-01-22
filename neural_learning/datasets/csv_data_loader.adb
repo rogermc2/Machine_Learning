@@ -4,7 +4,7 @@ with Ada.Directories;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Load_Dataset;
 with Neural_Processes;
 with Shuffler;
@@ -83,8 +83,6 @@ package body CSV_Data_Loader is
          begin
             Put_Line (Routine_Name & "csv loaded");
             Num_Features := X'Length (2);
-            Print_Matrix_Dimensions (Routine_Name & "X" , X);
-            New_Line;
             Assert (Y'Length = X'Length, Routine_Name &
                       "Y length" & Integer'Image (Y'Length) &
                       " is different to X length" &
