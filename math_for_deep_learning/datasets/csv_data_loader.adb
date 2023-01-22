@@ -146,8 +146,6 @@ package body CSV_Data_Loader is
          end loop;
          Train_Y (row) := Y (row);
       end loop;
-     Print_Float_Matrix (Routine_Name & "X 1", X, 1, 1);
---       Print_Float_Matrix (Routine_Name & "Train_X 1", Train_X, 1, 1);
 
       for row in 1 .. Test_Size loop
          for col in X'Range (2) loop
