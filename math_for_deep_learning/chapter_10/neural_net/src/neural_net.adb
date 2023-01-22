@@ -26,11 +26,11 @@ procedure Neural_Net is
    Data             : constant CSV_Data_Loader.Base_State :=
                         CSV_Data_Loader.Get_State
                           (Data_Directory & "mnist_784", Train_Size,
-                           Test_Size);
+                           Test_Size, Reload => True);
 
    X_Train_Image    : Real_Float_Vector (Data.Train_X'Range (2));
    --     Minibatches    : constant Positive := 40000;
-   Minibatches      : constant Positive := 4;
+   Minibatches      : constant Positive := 4000;
    Learning_Rate    : constant Float := 1.0;
    Net              : Network_Data;
    Predictions      : Real_Float_List_2D;  --  out
