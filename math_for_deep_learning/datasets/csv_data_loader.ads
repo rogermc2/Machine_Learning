@@ -12,6 +12,7 @@ package CSV_Data_Loader is
 
    function Get_State
      (Dataset_Name : String; Train_Size, Test_Size : Positive;
-      Shuffle      : Boolean := True) return Base_State;
+      Shuffle      : Boolean := True; Reload : Boolean := False)
+      return Base_State;
 
 end CSV_Data_Loader;

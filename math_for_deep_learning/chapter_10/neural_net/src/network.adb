@@ -15,27 +15,6 @@ package body Network is
 
    --  -------------------------------------------------------------------------
 
-      function Accumulate_MS_Error
-        (Sample      : Positive; Y_Batch : Binary_Matrix;
-         Output_Data : Real_Float_List; Error : in out Float)
-         return Real_Float_List is
-         use Real_Float_Arrays;
-         Output_Vector : constant Real_Float_Vector :=
-           To_Real_Float_Vector (Output_Data);
-         Y_Vector      : Real_Float_Vector (Y_Batch'Range (2));
-      begin
-         for col in Y_Batch'Range (2) loop
-            Y_Vector (col) := Float (Y_Batch (Sample, col));
-         end loop;
-         Error := Error + Mean_Square_Error (Y_Vector, Output_Vector);
-
-         return To_Real_Float_List
-           (Minus_MSE_Derivative (Y_Vector, Output_Vector));
-
-      end Accumulate_MS_Error;
-
-   --  -------------------------------------------------------------------------
-
    procedure Add_Activation_Layer (Network : in out Network_List) is
       Layer : Layer_Data (Activation_Layer, 0, 0);
    begin
@@ -114,8 +93,6 @@ package body Network is
             end loop;  --  layer
 
             --  accumulate diagnostic backward propagate error
---              Diagnostic_Error :=
---                Accumulate_MS_Error (Sample, Y_Batch, Output_Data, Diagnostic_Error);
             declare
                Y_Vector : Real_Float_Vector (Y_Batch'Range (2));
             begin

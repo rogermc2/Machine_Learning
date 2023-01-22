@@ -61,8 +61,6 @@ class FullyConnectedLayer:
         self.bias = np.random.rand(1, output_size) - 0.5
 
     def forward(self, input_data):
-        print ("input_data", input_data.shape)
-        print ("self.weights", self.weights.shape)
         self.input = input_data
         return np.dot(self.input, self.weights) + self.bias
 
