@@ -59,7 +59,8 @@ package body CSV_Data_Loader is
          Positive'Read (aStream, Num_Features);
 
          declare
-            Data : Base_Split_State (Train_Size, Test_Size, Num_Features, True);
+            Data : Base_Split_State (Train_Size, Test_Size, Num_Features,
+                                     Y_Categorized);
          begin
             Base_Split_State'Read (aStream, Data);
             Close (File_ID);
@@ -79,7 +80,7 @@ package body CSV_Data_Loader is
             Train_Y      : Integer_Array (1 .. Train_Size);
             Test_Y       : Integer_Array (1 .. Test_Size);
             Data         : Base_Split_State (Train_Size, Test_Size,
-                                             X'Length (2), True);
+                                             X'Length (2), Y_Categorized);
          begin
             Put_Line (Routine_Name & "csv loaded");
             Num_Features := X'Length (2);
