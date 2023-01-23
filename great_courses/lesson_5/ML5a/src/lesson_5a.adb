@@ -6,7 +6,7 @@ with Maths;
 
 with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with Python; use Python;
+--  with Python; use Python;
 
 with ML; use ML;
 with Support_5A; use Support_5A;
@@ -45,7 +45,7 @@ begin
       All_Data              : constant Integer_Matrix :=
                                 Set_All_Data (Yes_List, No_List);
       Labels                : Integer_Array (All_Data'Range);
-      Py_Module             : Module;
+--        Py_Module             : Module;
       Seen_List             : Integer3_List;
       Colour                : Integer3_Array;
       Weights               : Real_Float_Vector (1 .. 4);
@@ -59,9 +59,9 @@ begin
       end loop;
 
       Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
-      Python.Initialize;
-      Py_Module := Import_File ("lesson_5a");
-      Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
+--        Python.Initialize;
+--        Py_Module := Import_File ("lesson_5a");
+--        Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
 --        Python.Call (Py_Module, "show_bitmap", Image_Data);
 --        Python.Call (Py_Module, "show_bitmap", Green_Data);
 --        Python.Call (Py_Module, "show_bitmap", Fore_Data);
@@ -90,7 +90,7 @@ begin
       Weights := (0.786,  0.175, -0.558, -0.437);
       Fit (Weights, All_Data, Labels);
 
-      Python.Finalize;
+--        Python.Finalize;
       Put_Line (Project_Name & "done");
 
    end;
