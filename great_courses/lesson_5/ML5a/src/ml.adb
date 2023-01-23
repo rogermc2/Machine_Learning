@@ -36,17 +36,23 @@ package body ML is
       Delta_Weights   : Real_Float_Vector (Weights'Range);
       New_Weights     : Real_Float_Vector (Weights'Range);
       Current_Loss    : Float;
+      Count           : Natural := 0;
       Done            : Boolean := False;  --  Stop near a local minimum
    begin
       Assert (Weights'Length = All_Data'Length (2), Routine_Name &
                 "Invalid Weights length");
+      Put_Line (Routine_Name);
+
       while not Done loop
+         Count := Count + 1;
          if Maths.Random_Float < 0.01 then
-            Put_Line ("***************");
+--           if Count mod 100 = 0 then
+            Put_Line ("**** Iteration " & Integer'Image (Count) & " ****");
             Put_Line ("Learning Rate: " & Float'Image (Learn_Rate));
             Print_Float_Vector ("Weights", Weights);
             Put_Line ("Loss: " &
                         Float'Image (Loss (Weights, All_Data, Labels)));
+            Put_Line ("*************");
             New_Line;
          end if;
 
@@ -108,6 +114,8 @@ package body ML is
          Done := Learn_Rate * Max (abs (Delta_Weights)) < 0.0001;
 
       end loop;
+      Put_Line (Routine_Name & Integer'Image (Count) & " iterations completed");
+      New_Line;
 
    end Fit;
 
