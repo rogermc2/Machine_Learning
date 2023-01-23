@@ -8,11 +8,8 @@ with Basic_Printing; use Basic_Printing;
 
 package body ML is
 
-   --     function Mult_2 (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    function Mult_3 (L, M, R : Real_Float_Vector) return Real_Float_Vector;
    function Sigmoid (H : Real_Float_Vector) return Real_Float_Vector;
-   function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
-                               return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -20,7 +17,7 @@ package body ML is
                   Labels  : Integer_Array) is
       use Real_Float_Arrays;
       Routine_Name    : constant String := "ML.Fit ";
-      F_Data          : constant Real_Float_Matrix :=
+      F_All_Data      : constant Real_Float_Matrix :=
                           To_Real_Float_Matrix (All_Data);
       F_Labels        : constant Real_Float_Vector :=
                           To_Real_Float_Vector (Labels);
@@ -53,21 +50,17 @@ package body ML is
             Put_Line ("Learning Rate: " & Float'Image (Learn_Rate) &
                         "  Loss: " & Float'Image (Loss (Weights, All_Data, Labels)));
             Print_Float_Vector ("Weights", Weights);
-            Put_Line ("**********************");
+--              Put_Line ("**********************");
             New_Line;
          end if;
 
-         --  Compute the gradient of the loss function
-         --  Current solution
-         Y := F_Data * Weights;  --  h
-         --  transform the current solution to range 0 .. 1.0 using the
-         --  sigmoid function Y = 1.0 / (1.0 + exp (-Y1))
+         Y := F_All_Data * Weights;  --  h
+         --  transform Y to the range 0 .. 1.0 using the sigmoid function
          Y_Sig := Sigmoid (Y);
-         --  d/dY1 (Y) = exp (-Y) / (1.0 + exp (-Y))^2
-         --              = exp (-Y) * 1.0 / (1.0 + exp (-Y))^2
-         --              =  exp (-Y) * Y^2
+
          --  F_Labels are the expected solutions, 0 or 1
          Errors := F_Labels - Y_Sig;
+         --  Compute the gradient of the loss function
          --  delta_w is the change in the weights suggested by the gradient
          --  Delta_Weight_i = error_i * derivative of the sigmoid *  activation_i
          --                   derivative of the sigmoid = exp(-h) * y**2
@@ -78,18 +71,15 @@ package body ML is
          --  add.reduce appears to do matrix multiplication of
          --  (error * sigmoid gradient) and alldat
 
-         --  Gradient = d/dY (Y(Y)) = exp (-Y) * Y_Sig(Y)^2
          Y_Sig_Sq := Y_Sig ** 2;
-         Errors_x_Grad :=
-           Vec_To_1xN_Matrix (Mult_3 (Errors, Exp (-Y), Y_Sig_Sq));
-         Delta_Matrix := Errors_x_Grad * F_Data;
+         Errors_x_Grad := To_Real_Float_Matrix (Mult_3 (Errors, Exp (-Y), Y_Sig_Sq), 2);
+         Delta_Matrix := Errors_x_Grad * F_All_Data;
          --           Print_Float_Matrix ("Delta_Matrix", Delta_Matrix);
-         Learn_Rate := 2.0 * Learn_Rate;
-         Delta_Weights := Learn_Rate * Sum_Each_Column (Delta_Matrix);
+         Delta_Weights := Sum_Each_Column (Delta_Matrix);
          --           Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
-         --  Get new weights by taking a step of size alpha and updating
          Current_Loss := Loss (Weights, All_Data, Labels);
+         Learn_Rate := 2.0 * Learn_Rate;
 
          New_Weights := Weights + Learn_Rate * Delta_Weights;
          --           Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
@@ -110,8 +100,8 @@ package body ML is
             Descend := not Done and
               Loss (New_Weights, All_Data, Labels) >= Current_Loss;
          end loop;
-         Put_Line ("*******" & Integer'Image (Step) &
-                     " gradient steps completed");
+--           Put_Line ("*******" & Integer'Image (Step) &
+--                       " gradient steps completed");
 
          if not Done then
             Weights := New_Weights;
@@ -136,12 +126,9 @@ package body ML is
       --        Routine_Name : constant String := "ML.Loss ";
       H      : constant Real_Float_Vector := Dot (All_Data, Weights);
       --  transform using the sigmoid function
-      Exp_H  : constant Real_Float_Vector := Exp (-H);
-      Y      : constant Real_Float_Vector := 1.0 / (1.0 + Exp_H);
+      Y      : constant Real_Float_Vector := 1.0 / (1.0 + Exp (-H));
       Errors : Real_Float_Vector (Labels'Range);
    begin
-      --        Print_Float_Vector (Routine_Name & "H", H);
-      --        Put_Line (Routine_Name & "Max (Exp_H): " & Float'Image (Max (Exp_H)));
       --  take the difference between the labels and the output of the
       --  sigmoid squared, then sum over all instances to get the
       --  total loss.
@@ -150,24 +137,6 @@ package body ML is
       return Sum (Errors);
 
    end Loss;
-
-   --  -------------------------------------------------------------------------
-
-   --     function Mult_2 (L, R : Real_Float_Matrix) return Real_Float_Matrix is
-   --        Routine_Name : constant String := "ML.Mult_2 ";
-   --        Result       : Real_Float_Matrix (R'Range, R'Range (2));
-   --     begin
-   --        Assert (L'Length = R'Length, Routine_Name &
-   --                  "vectors have different lengths.");
-   --        for row in R'Range loop
-   --           for col in R'Range (2) loop
-   --              Result (row, col) := L (row, 1) * R (row, col);
-   --           end loop;
-   --        end loop;
-   --
-   --        return Result;
-   --
-   --     end Mult_2;
 
    --  -------------------------------------------------------------------------
 
@@ -194,21 +163,6 @@ package body ML is
       return 1.0 / (1.0 + Exp (-H));
 
    end Sigmoid;
-
-   --  -------------------------------------------------------------------------
-
-   function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
-                               return Real_Float_Matrix is
-      --        Routine_Name : constant String := "ML.Vec_To_Nx1_Matrix ";
-      Result : Real_Float_Matrix ( 1 .. 1, Vec'Range);
-   begin
-      for index in Vec'Range loop
-         Result (1, index) := Vec (index);
-      end loop;
-
-      return Result;
-
-   end Vec_To_1xN_Matrix;
 
    --  -------------------------------------------------------------------------
 
