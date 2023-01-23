@@ -25,18 +25,18 @@ package body ML is
       F_Labels        : constant Real_Float_Vector :=
                           To_Real_Float_Vector (Labels);
       Learn_Rate      : Float := 0.1;
-      --  Y1 = h = np.matmul(alldat,w) dot product
+      --  Y = h = np.matmul(alldat,w) dot product
       --  Y1i = w1xi1 + w2x21 + ... wnxn1 + w_offset
-      Y1              : Real_Float_Vector (All_Data'Range);
-      Y2              : Real_Float_Vector (All_Data'Range);
       Y               : Real_Float_Vector (All_Data'Range);
+      Y_Sig           : Real_Float_Vector (All_Data'Range);
+      Y_Sig_Sq        : Real_Float_Vector (All_Data'Range);
       Errors          : Real_Float_Vector (All_Data'Range);
       Errors_x_Grad   : Real_Float_Matrix ( 1 .. 1, All_Data'Range);
       Delta_Matrix    : Real_Float_Matrix (1 .. 1, All_Data'Range (2));
       Delta_Weights   : Real_Float_Vector (Weights'Range);
       New_Weights     : Real_Float_Vector (Weights'Range);
       Current_Loss    : Float;
-      Count           : Natural := 0;
+      Iteration       : Natural := 0;
       Step            : Natural;
       Descend         : Boolean;
       Done            : Boolean := False;  --  Stop near a local minimum
@@ -46,29 +46,28 @@ package body ML is
       Put_Line (Routine_Name);
 
       while not Done loop
-         Count := Count + 1;
+         Iteration := Iteration + 1;
          if Maths.Random_Float < 0.01 then
             --           if Count mod 100 = 0 then
-            Put_Line ("**** Iteration " & Integer'Image (Count) & " ****");
-            Put_Line ("Learning Rate: " & Float'Image (Learn_Rate));
+            Put_Line ("**** Iteration " & Integer'Image (Iteration) & " ****");
+            Put_Line ("Learning Rate: " & Float'Image (Learn_Rate) &
+                        "  Loss: " & Float'Image (Loss (Weights, All_Data, Labels)));
             Print_Float_Vector ("Weights", Weights);
-            Put_Line ("Loss: " &
-                        Float'Image (Loss (Weights, All_Data, Labels)));
-            Put_Line ("*************");
+            Put_Line ("**********************");
             New_Line;
          end if;
 
          --  Compute the gradient of the loss function
          --  Current solution
-         Y1 :=  F_Data * Weights;  --  h
+         Y := F_Data * Weights;  --  h
          --  transform the current solution to range 0 .. 1.0 using the
          --  sigmoid function Y = 1.0 / (1.0 + exp (-Y1))
-         Y := Sigmoid (Y1);
-         --  d/dY1 (Y) = exp (-Y1) / (1.0 + exp (-Y1))^2
-         --              = exp (-Y1) * 1.0 / (1.0 + exp (-Y1))^2
-         --              =  exp (-Y1) * Y^2
+         Y_Sig := Sigmoid (Y);
+         --  d/dY1 (Y) = exp (-Y) / (1.0 + exp (-Y))^2
+         --              = exp (-Y) * 1.0 / (1.0 + exp (-Y))^2
+         --              =  exp (-Y) * Y^2
          --  F_Labels are the expected solutions, 0 or 1
-         Errors := F_Labels - Y;
+         Errors := F_Labels - Y_Sig;
          --  delta_w is the change in the weights suggested by the gradient
          --  Delta_Weight_i = error_i * derivative of the sigmoid *  activation_i
          --                   derivative of the sigmoid = exp(-h) * y**2
@@ -79,24 +78,25 @@ package body ML is
          --  add.reduce appears to do matrix multiplication of
          --  (error * sigmoid gradient) and alldat
 
-         --  Gradient = d/dY1 (Y(Y1)) = exp (-Y1) * Y(Y1)^2
-         Y2 := Y ** 2;
-         Errors_x_Grad := Vec_To_1xN_Matrix (Mult_3 (Errors, Exp (-Y1), Y2));
+         --  Gradient = d/dY (Y(Y)) = exp (-Y) * Y_Sig(Y)^2
+         Y_Sig_Sq := Y_Sig ** 2;
+         Errors_x_Grad :=
+           Vec_To_1xN_Matrix (Mult_3 (Errors, Exp (-Y), Y_Sig_Sq));
          Delta_Matrix := Errors_x_Grad * F_Data;
-         Print_Float_Matrix ("Delta_Matrix", Delta_Matrix);
+         --           Print_Float_Matrix ("Delta_Matrix", Delta_Matrix);
          Learn_Rate := 2.0 * Learn_Rate;
          Delta_Weights := Learn_Rate * Sum_Each_Column (Delta_Matrix);
-         Print_Float_Vector ("Delta_Weights", Delta_Weights);
+         --           Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
          --  Get new weights by taking a step of size alpha and updating
          Current_Loss := Loss (Weights, All_Data, Labels);
 
-         New_Weights := Weights + Delta_Weights;
-         Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
-         Put_Line ("Current_Loss: " & Float'Image (Current_Loss));
-         Print_Float_Vector ("New_Weights", New_Weights);
-         Put_Line ("Next Loss: " &
-                     Float'Image (Loss (New_Weights, All_Data, Labels)));
+         New_Weights := Weights + Learn_Rate * Delta_Weights;
+         --           Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
+         --           Put_Line ("Current_Loss: " & Float'Image (Current_Loss));
+         --           Print_Float_Vector ("New_Weights", New_Weights);
+         --           Put_Line ("Next Loss: " &
+         --                       Float'Image (Loss (New_Weights, All_Data, Labels)));
 
          Step := 0;
          Descend := True;
@@ -104,24 +104,26 @@ package body ML is
             Step := Step + 1;
             Learn_Rate := Learn_Rate / 2.0;
             Done := Learn_Rate * Max (abs (Delta_Weights)) < 0.0001;
-            if Done then
-               Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
-               Print_Float_Vector ("Delta_Weights", Delta_Weights);
-            else
+            if not Done then
                New_Weights := Weights + Learn_Rate * Delta_Weights;
-               if not done then
-                  Weights := New_Weights;
-               end if;
             end if;
             Descend := not Done and
               Loss (New_Weights, All_Data, Labels) >= Current_Loss;
          end loop;
          Put_Line ("*******" & Integer'Image (Step) &
                      " gradient steps completed");
-         Done := Learn_Rate * Max (abs (Delta_Weights)) < 0.0001;
+
+         if not Done then
+            Weights := New_Weights;
+         end if;
       end loop;
-      Put_Line (Routine_Name & Integer'Image (Count) &
-                  " overall iterations completed");
+
+      New_Line;
+      Put_Line ("Total iterations:" & Integer'Image (Iteration));
+      Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
+      Print_Float_Vector ("Delta_Weights", Delta_Weights);
+      Put_Line ("Final loss:" & Float'Image (Loss (Weights, All_Data, Labels)));
+      Put_Line (Routine_Name & "finished");
       New_Line;
 
    end Fit;
