@@ -8,7 +8,7 @@ with Basic_Printing; use Basic_Printing;
 
 package body ML is
 
---     function Mult_2 (L, R : Real_Float_Matrix) return Real_Float_Matrix;
+   --     function Mult_2 (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    function Mult_3 (L, M, R : Real_Float_Vector) return Real_Float_Vector;
    function Sigmoid (H : Real_Float_Vector) return Real_Float_Vector;
    function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
@@ -16,36 +16,37 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
-   procedure Fit (Weights : in out Real_Float_Vector; Data : Integer_Matrix;
+   procedure Fit (Weights : in out Real_Float_Vector; All_Data : Integer_Matrix;
                   Labels  : Integer_Array) is
       use Real_Float_Arrays;
       Routine_Name    : constant String := "ML.Fit ";
       F_Data          : constant Real_Float_Matrix :=
-        To_Real_Float_Matrix (Data);
+                          To_Real_Float_Matrix (All_Data);
       F_Labels        : constant Real_Float_Vector :=
-        To_Real_Float_Vector (Labels);
+                          To_Real_Float_Vector (Labels);
       Learn_Rate      : Float := 0.1;
       --  Y1 = h = np.matmul(alldat,w) dot product
       --  Y1i = w1xi1 + w2x21 + ... wnxn1 + w_offset
-      Y1              : Real_Float_Vector (Data'Range);
-      Y2              : Real_Float_Vector (Data'Range);
-      Y               : Real_Float_Vector (Data'Range);
-      Errors          : Real_Float_Vector (Data'Range);
-      Errors_x_Grad   : Real_Float_Matrix ( 1 .. 1, Data'Range);
-      Delta_Matrix    : Real_Float_Matrix (1 .. 1, Data'Range (2));
+      Y1              : Real_Float_Vector (All_Data'Range);
+      Y2              : Real_Float_Vector (All_Data'Range);
+      Y               : Real_Float_Vector (All_Data'Range);
+      Errors          : Real_Float_Vector (All_Data'Range);
+      Errors_x_Grad   : Real_Float_Matrix ( 1 .. 1, All_Data'Range);
+      Delta_Matrix    : Real_Float_Matrix (1 .. 1, All_Data'Range (2));
       Delta_Weights   : Real_Float_Vector (Weights'Range);
       New_Weights     : Real_Float_Vector (Weights'Range);
       Current_Loss    : Float;
       Done            : Boolean := False;  --  Stop near a local minimum
    begin
-      Assert (Weights'Length = Data'Length (2), Routine_Name &
+      Assert (Weights'Length = All_Data'Length (2), Routine_Name &
                 "Invalid Weights length");
       while not Done loop
          if Maths.Random_Float < 0.01 then
             Put_Line ("***************");
             Put_Line ("Learning Rate: " & Float'Image (Learn_Rate));
             Print_Float_Vector ("Weights", Weights);
-            Put_Line ("Loss: " & Float'Image (Loss (Weights, Data, Labels)));
+            Put_Line ("Loss: " &
+                        Float'Image (Loss (Weights, All_Data, Labels)));
             New_Line;
          end if;
 
@@ -61,16 +62,16 @@ package body ML is
          --  d/dY1 (Y(Y1)) = exp (-Y1)  * Y(Y1)^2
          --  F_Labels are the expected solutions, 0 or 1
          Errors := F_Labels - Y;
---  delta_w is the change in the weights suggested by the gradient
---  Delta_Weight_i = error_i * derivative of the sigmoid *
---                   activation_i
---                   derivative of the sigmoid = exp(-h) * y**2
---                   activation_i = alldat_i
---  Delta_Weight = np.add.reduce
---  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
---  np.exp(-h)*y**2 is the derivative (gradient) of the sigmoid function
---  add.reduce appears to do matrix multiplication of
---  (error * sigmoid gradient) and alldat
+         --  delta_w is the change in the weights suggested by the gradient
+         --  Delta_Weight_i = error_i * derivative of the sigmoid *
+         --                   activation_i
+         --                   derivative of the sigmoid = exp(-h) * y**2
+         --                   activation_i = alldat_i
+         --  Delta_Weight = np.add.reduce
+         --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
+         --  np.exp(-h)*y**2 is the derivative (gradient) of the sigmoid function
+         --  add.reduce appears to do matrix multiplication of
+         --  (error * sigmoid gradient) and alldat
 
          --  Gradient = d/dY1 (Y(Y1)) = exp (-Y1) * Y(Y1)^2
          Y2 := Y ** 2;
@@ -82,15 +83,15 @@ package body ML is
          Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
          --  Get new weights by taking a step of size alpha and updating
-         Current_Loss := Loss (Weights, Data, Labels);
+         Current_Loss := Loss (Weights, All_Data, Labels);
          New_Weights := Weights + Delta_Weights;
          Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
          Put_Line ("Current_Loss: " & Float'Image (Current_Loss));
          Print_Float_Vector ("New_Weights", New_Weights);
          Put_Line ("Next Loss: " &
-                     Float'Image (Loss (New_Weights, Data, Labels)));
+                     Float'Image (Loss (New_Weights, All_Data, Labels)));
 
-         while Loss (New_Weights, Data, Labels) >= Current_Loss and
+         while Loss (New_Weights, All_Data, Labels) >= Current_Loss and
            not Done loop
             Learn_Rate := Learn_Rate / 2.0;
             Done := Learn_Rate * Max (abs (Delta_Weights)) < 0.0001;
@@ -112,11 +113,11 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
-   function Loss (Weights : Real_Float_Vector; Data : Integer_Matrix;
+   function Loss (Weights : Real_Float_Vector; All_Data : Integer_Matrix;
                   Labels  : Integer_Array) return Float is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "ML.Loss ";
-      H      : constant Real_Float_Vector := Dot (Data, Weights);
+      H      : constant Real_Float_Vector := Dot (All_Data, Weights);
       --  transform using the sigmoid function
       Exp_H  : constant Real_Float_Vector := Exp (-H);
       Y      : constant Real_Float_Vector := 1.0 / (1.0 + Exp_H);
@@ -135,21 +136,21 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
---     function Mult_2 (L, R : Real_Float_Matrix) return Real_Float_Matrix is
---        Routine_Name : constant String := "ML.Mult_2 ";
---        Result       : Real_Float_Matrix (R'Range, R'Range (2));
---     begin
---        Assert (L'Length = R'Length, Routine_Name &
---                  "vectors have different lengths.");
---        for row in R'Range loop
---           for col in R'Range (2) loop
---              Result (row, col) := L (row, 1) * R (row, col);
---           end loop;
---        end loop;
---
---        return Result;
---
---     end Mult_2;
+   --     function Mult_2 (L, R : Real_Float_Matrix) return Real_Float_Matrix is
+   --        Routine_Name : constant String := "ML.Mult_2 ";
+   --        Result       : Real_Float_Matrix (R'Range, R'Range (2));
+   --     begin
+   --        Assert (L'Length = R'Length, Routine_Name &
+   --                  "vectors have different lengths.");
+   --        for row in R'Range loop
+   --           for col in R'Range (2) loop
+   --              Result (row, col) := L (row, 1) * R (row, col);
+   --           end loop;
+   --        end loop;
+   --
+   --        return Result;
+   --
+   --     end Mult_2;
 
    --  -------------------------------------------------------------------------
 
@@ -181,7 +182,7 @@ package body ML is
 
    function Vec_To_1xN_Matrix (Vec : Real_Float_Vector)
                                return Real_Float_Matrix is
---        Routine_Name : constant String := "ML.Vec_To_Nx1_Matrix ";
+      --        Routine_Name : constant String := "ML.Vec_To_Nx1_Matrix ";
       Result : Real_Float_Matrix ( 1 .. 1, Vec'Range);
    begin
       for index in Vec'Range loop
