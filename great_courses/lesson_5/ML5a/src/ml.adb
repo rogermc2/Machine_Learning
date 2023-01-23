@@ -37,6 +37,7 @@ package body ML is
       New_Weights     : Real_Float_Vector (Weights'Range);
       Current_Loss    : Float;
       Count           : Natural := 0;
+      Loss_Iteration  : Natural := 0;
       Done            : Boolean := False;  --  Stop near a local minimum
    begin
       Assert (Weights'Length = All_Data'Length (2), Routine_Name &
@@ -56,9 +57,10 @@ package body ML is
             New_Line;
          end if;
 
-         --  Current pre-sigmoid solution
+         --  Compute the gradient of the loss function
+         --  Current solution
          Y1 :=  F_Data * Weights;  --  h
-         --  transform current solution to range 0 .. 1.0 using the
+         --  transform the current solution to range 0 .. 1.0 using the
          --  sigmoid function S(x) = 1.0 / (1.0 + exp (-x))
          --  Y := 1.0 / (1.0 + Exp_Y1);
          Y := Sigmoid (Y1);
@@ -69,8 +71,7 @@ package body ML is
          --  F_Labels are the expected solutions, 0 or 1
          Errors := F_Labels - Y;
          --  delta_w is the change in the weights suggested by the gradient
-         --  Delta_Weight_i = error_i * derivative of the sigmoid *
-         --                   activation_i
+         --  Delta_Weight_i = error_i * derivative of the sigmoid *  activation_i
          --                   derivative of the sigmoid = exp(-h) * y**2
          --                   activation_i = alldat_i
          --  Delta_Weight = np.add.reduce
@@ -90,6 +91,7 @@ package body ML is
 
          --  Get new weights by taking a step of size alpha and updating
          Current_Loss := Loss (Weights, All_Data, Labels);
+
          New_Weights := Weights + Delta_Weights;
          Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
          Put_Line ("Current_Loss: " & Float'Image (Current_Loss));
@@ -97,8 +99,10 @@ package body ML is
          Put_Line ("Next Loss: " &
                      Float'Image (Loss (New_Weights, All_Data, Labels)));
 
+         Loss_Iteration := 0;
          while Loss (New_Weights, All_Data, Labels) >= Current_Loss and
            not Done loop
+            Loss_Iteration := Loss_Iteration + 1;
             Learn_Rate := Learn_Rate / 2.0;
             Done := Learn_Rate * Max (abs (Delta_Weights)) < 0.0001;
             if Done then
@@ -111,10 +115,10 @@ package body ML is
                end if;
             end if;
          end loop;
+         Put_Line ("*******" & Integer'Image (Loss_Iteration) & " loss iterations completed");
          Done := Learn_Rate * Max (abs (Delta_Weights)) < 0.0001;
-
       end loop;
-      Put_Line (Routine_Name & Integer'Image (Count) & " iterations completed");
+      Put_Line (Routine_Name & Integer'Image (Count) & " overall iterations completed");
       New_Line;
 
    end Fit;
