@@ -92,6 +92,7 @@ begin
    --  The weights will be updated by gradient descent.
    Weights := (0.786,  0.175, -0.558, -0.437);
    Fit (Weights, All_Data, Labels);
+   Print_Float_Vector ("Fitted weights", Weights);
 
    Put_Line (Project_Name & "done");
 
