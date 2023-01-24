@@ -23,13 +23,15 @@ procedure Lesson_5A is
    Image_Data      : constant Unsigned_8_Array_3D :=
                        Get_Picture (Image_File_Name);
    Green_Data      : constant Unsigned_8_Array_3D :=
-                       Get_Part (Image_Data, Image_Data'First,
-                                 Image_Data'Last,
+                       Get_Part (Image_Data, Image_Data'First, Image_Data'Last,
                                  Image_Data'First (2),
                                  Image_Data'First (2) + 360);
    Fore_Data       : constant Unsigned_8_Array_3D :=
                        Get_Part (Image_Data, 30, Image_Data'Last,
                                  547, 620);
+   Flat_Data       : constant Unsigned_8_Array_3D :=
+                       Get_Part (Image_Data, Image_Data'First, Image_Data'Last,
+                                 Image_Data'First (2), Image_Data'Last);
    Yes_Length      : constant Positive := Green_Data'Length *
                        Green_Data'Length (2);
    No_Length       : constant Positive := Fore_Data'Length *
