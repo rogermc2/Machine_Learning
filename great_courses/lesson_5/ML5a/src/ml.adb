@@ -17,6 +17,7 @@ package body ML is
 
    procedure Fit (Weights : in out Real_Float_Vector; All_Data : Integer_Matrix;
                   Labels  : Integer_Array) is
+      --  All_Data is a n x 4 matrix of pixel r, g, b + offset
       use Real_Float_Arrays;
       Routine_Name    : constant String := "ML.Fit ";
       F_All_Data      : constant Real_Float_Matrix :=
@@ -25,7 +26,7 @@ package body ML is
                           To_Real_Float_Vector (Labels);
       Learn_Rate      : Float := 0.1;
       --  Y = h = np.matmul(alldat,w) dot product
-      --  Y1i = w1xi1 + w2x21 + ... wnxn1 + w_offset
+      --  Y = w1 r + w2 g + w3 b + offset
       Y               : Real_Float_Vector (All_Data'Range);
       Y_Sig           : Real_Float_Vector (All_Data'Range);
       Y_Sig_Sq        : Real_Float_Vector (All_Data'Range);
@@ -57,7 +58,7 @@ package body ML is
          Errors_x_Grad := Mult_3 (Errors, Exp (-Y), Y_Sig_Sq);
          Delta_Matrix := Row_Multiply (Errors_x_Grad, F_All_Data);
          Delta_Weights := Sum_Each_Column (Delta_Matrix);
-         --           Print_Float_Vector ("Delta_Weights", Delta_Weights);
+--           Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
          Current_Loss := Loss (Weights, All_Data, Labels);
          Learn_Rate := 2.0 * Learn_Rate;
@@ -69,6 +70,8 @@ package body ML is
             Put_Line ("Learning Rate: " & Float'Image (Learn_Rate) &
                         "  Loss: " & Float'Image (Current_Loss));
             Print_Float_Vector ("Weights", Weights);
+            Print_Float_Matrix ("Delta_Matrix", Delta_Matrix, 1, 10);
+            Print_Float_Vector ("Delta_Weights", Delta_Weights, 1, 10);
             New_Line;
          end if;
 
@@ -91,8 +94,9 @@ package body ML is
 
       New_Line;
       Put_Line ("Total iterations:" & Integer'Image (Iteration));
-      Put_Line ("FinaL Learn Rate: " & Float'Image (Learn_Rate) & "Final loss:"
-                & Float'Image (Loss (Weights, All_Data, Labels)));
+      Put_Line ("FinaL Learn Rate: " & Float'Image (Learn_Rate) &
+                  "  Final loss:" &
+                Float'Image (Loss (Weights, All_Data, Labels)));
       Put_Line (Routine_Name & "finished");
       New_Line;
 

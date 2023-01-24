@@ -1181,15 +1181,15 @@ package body ML_Arrays_And_Matrices is
 
    function Sum_Each_Column (Data : Real_Float_Matrix)
                              return Real_Float_Vector is
-      Val    : Float;
+      Sum    : Float;
       Result : Real_Float_Vector (Data'Range (2));
    begin
       for col in Data'Range (2) loop
-         Val := 0.0;
+         Sum := 0.0;
          for row in Data'Range loop
-            Val := Val + Data (row, Col);
+            Sum := Sum + Data (row, Col);
          end loop;
-         Result (col) := Val;
+         Result (col) := Sum;
       end loop;
 
       return Result;
