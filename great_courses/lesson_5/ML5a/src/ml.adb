@@ -9,6 +9,8 @@ with Basic_Printing; use Basic_Printing;
 package body ML is
 
    function Mult_3 (L, M, R : Real_Float_Vector) return Real_Float_Vector;
+   function Row_Multiply (L : Real_Float_Vector; R : Real_Float_Matrix)
+                          return Real_Float_Matrix;
    function Sigmoid (H : Real_Float_Vector) return Real_Float_Vector;
 
    --  -------------------------------------------------------------------------
@@ -28,13 +30,12 @@ package body ML is
       Y_Sig           : Real_Float_Vector (All_Data'Range);
       Y_Sig_Sq        : Real_Float_Vector (All_Data'Range);
       Errors          : Real_Float_Vector (All_Data'Range);
-      Errors_x_Grad   : Real_Float_Matrix ( 1 .. 1, All_Data'Range);
-      Delta_Matrix    : Real_Float_Matrix (1 .. 1, All_Data'Range (2));
+      Errors_x_Grad   : Real_Float_Vector (All_Data'Range);
+      Delta_Matrix    : Real_Float_Matrix (All_Data'Range, All_Data'Range (2));
       Delta_Weights   : Real_Float_Vector (Weights'Range);
       New_Weights     : Real_Float_Vector (Weights'Range);
-      Current_Loss    : Float;
+      Current_Loss    : Float := Float'Safe_Last;
       Iteration       : Natural := 0;
-      Step            : Natural;
       Descend         : Boolean;
       Done            : Boolean := False;  --  Stop near a local minimum
    begin
@@ -44,15 +45,6 @@ package body ML is
 
       while not Done loop
          Iteration := Iteration + 1;
-         if Maths.Random_Float < 0.01 then
-            --           if Count mod 100 = 0 then
-            Put_Line ("**** Iteration " & Integer'Image (Iteration) & " ****");
-            Put_Line ("Learning Rate: " & Float'Image (Learn_Rate) &
-                        "  Loss: " & Float'Image (Loss (Weights, All_Data, Labels)));
-            Print_Float_Vector ("Weights", Weights);
---              Put_Line ("**********************");
-            New_Line;
-         end if;
 
          Y := F_All_Data * Weights;  --  h
          --  transform Y to the range 0 .. 1.0 using the sigmoid function
@@ -60,21 +52,10 @@ package body ML is
 
          --  F_Labels are the expected solutions, 0 or 1
          Errors := F_Labels - Y_Sig;
-         --  Compute the gradient of the loss function
-         --  delta_w is the change in the weights suggested by the gradient
-         --  Delta_Weight_i = error_i * derivative of the sigmoid *  activation_i
-         --                   derivative of the sigmoid = exp(-h) * y**2
-         --                   activation_i = alldat_i
-         --  Delta_Weight = np.add.reduce
-         --  (np.reshape((labs-y) * np.exp(-h)*y**2,(len(y),1)) * alldat)
-         --  np.exp(-h)*y**2 is the derivative (gradient) of the sigmoid function
-         --  add.reduce appears to do matrix multiplication of
-         --  (error * sigmoid gradient) and alldat
 
          Y_Sig_Sq := Y_Sig ** 2;
-         Errors_x_Grad := To_Real_Float_Matrix (Mult_3 (Errors, Exp (-Y), Y_Sig_Sq), 2);
-         Delta_Matrix := Errors_x_Grad * F_All_Data;
-         --           Print_Float_Matrix ("Delta_Matrix", Delta_Matrix);
+         Errors_x_Grad := Mult_3 (Errors, Exp (-Y), Y_Sig_Sq);
+         Delta_Matrix := Row_Multiply (Errors_x_Grad, F_All_Data);
          Delta_Weights := Sum_Each_Column (Delta_Matrix);
          --           Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
@@ -82,16 +63,17 @@ package body ML is
          Learn_Rate := 2.0 * Learn_Rate;
 
          New_Weights := Weights + Learn_Rate * Delta_Weights;
-         --           Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
-         --           Put_Line ("Current_Loss: " & Float'Image (Current_Loss));
-         --           Print_Float_Vector ("New_Weights", New_Weights);
-         --           Put_Line ("Next Loss: " &
-         --                       Float'Image (Loss (New_Weights, All_Data, Labels)));
 
-         Step := 0;
+         if Maths.Random_Float < 0.01 then
+            Put_Line ("**** Iteration " & Integer'Image (Iteration) & " ****");
+            Put_Line ("Learning Rate: " & Float'Image (Learn_Rate) &
+                        "  Loss: " & Float'Image (Current_Loss));
+            Print_Float_Vector ("Weights", Weights);
+            New_Line;
+         end if;
+
          Descend := True;
          while Descend loop
-            Step := Step + 1;
             Learn_Rate := Learn_Rate / 2.0;
             Done := Learn_Rate * Max (abs (Delta_Weights)) < 0.0001;
             if not Done then
@@ -100,19 +82,17 @@ package body ML is
             Descend := not Done and
               Loss (New_Weights, All_Data, Labels) >= Current_Loss;
          end loop;
---           Put_Line ("*******" & Integer'Image (Step) &
---                       " gradient steps completed");
 
          if not Done then
             Weights := New_Weights;
          end if;
+
       end loop;
 
       New_Line;
       Put_Line ("Total iterations:" & Integer'Image (Iteration));
-      Put_Line ("Learn_Rate: " & Float'Image (Learn_Rate));
-      Print_Float_Vector ("Delta_Weights", Delta_Weights);
-      Put_Line ("Final loss:" & Float'Image (Loss (Weights, All_Data, Labels)));
+      Put_Line ("FinaL Learn Rate: " & Float'Image (Learn_Rate) & "Final loss:"
+                & Float'Image (Loss (Weights, All_Data, Labels)));
       Put_Line (Routine_Name & "finished");
       New_Line;
 
@@ -153,6 +133,25 @@ package body ML is
       return Result;
 
    end Mult_3;
+
+   --  -------------------------------------------------------------------------
+
+   function Row_Multiply (L : Real_Float_Vector; R : Real_Float_Matrix)
+                          return Real_Float_Matrix is
+      Routine_Name : constant String := "ML.Row_Multiply ";
+      Result       : Real_Float_Matrix (R'Range, R'Range (2));
+   begin
+      Assert (L'Length = R'Length, Routine_Name &
+                "vectors have different lengths.");
+      for row in R'Range loop
+         for col in R'Range (2) loop
+            Result (row, col) := L (row) * R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Row_Multiply;
 
    --  -------------------------------------------------------------------------
 
