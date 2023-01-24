@@ -57,6 +57,7 @@ package body ML is
          Y_Sig_Sq := Y_Sig ** 2;
          Errors_x_Grad := Mult_3 (Errors, Exp (-Y), Y_Sig_Sq);
          Delta_Matrix := Row_Multiply (Errors_x_Grad, F_All_Data);
+         --  Sum_Each_Column is equiva;lent to numpy add.reduce
          Delta_Weights := Sum_Each_Column (Delta_Matrix);
 --           Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
@@ -70,8 +71,8 @@ package body ML is
             Put_Line ("Learning Rate: " & Float'Image (Learn_Rate) &
                         "  Loss: " & Float'Image (Current_Loss));
             Print_Float_Vector ("Weights", Weights);
-            Print_Float_Matrix ("Delta_Matrix", Delta_Matrix, 1, 10);
-            Print_Float_Vector ("Delta_Weights", Delta_Weights, 1, 10);
+            Print_Float_Matrix ("Delta_Matrix", Delta_Matrix, 1, 4);
+            Print_Float_Vector ("Delta_Weights", Delta_Weights);
             New_Line;
          end if;
 
