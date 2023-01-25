@@ -65,15 +65,17 @@ package body Support_5A is
    function Set_All_Data (Yes_List, No_List : Integer_Matrix)
                           return Integer_Matrix is
       All_Data              : constant Integer_Matrix := Yes_List & No_List;
-      All_Data_With_Offset  :  Integer_Matrix (All_Data'Range ,
+      All_Data_With_Offset  : Integer_Matrix (All_Data'Range,
                                                1 .. All_Data'Length (2) + 1);
    begin
       for row in All_Data_With_Offset'Range loop
          for col in All_Data_With_Offset'Range (2) loop
             if col <= All_Data'Length (2) then
                All_Data_With_Offset (row, col) := All_Data (row, col);
-            else
+            elsif row <= Yes_List'Length then
                All_Data_With_Offset (row, col) := 1;
+            else
+               All_Data_With_Offset (row, col) := 0;
             end if;
          end loop;
       end loop;

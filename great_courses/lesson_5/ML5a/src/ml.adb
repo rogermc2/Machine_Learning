@@ -25,7 +25,6 @@ package body ML is
       F_Labels        : constant Real_Float_Vector :=
                           To_Real_Float_Vector (Labels);
       Learn_Rate      : Float := 0.1;
-      --  Y = h = np.matmul(alldat,w) dot product
       --  Y = w1 r + w2 g + w3 b + offset
       Y               : Real_Float_Vector (All_Data'Range);
       Y_Sig           : Real_Float_Vector (All_Data'Range);
@@ -57,9 +56,8 @@ package body ML is
          Y_Sig_Sq := Y_Sig ** 2;
          Errors_x_Grad := Mult_3 (Errors, Exp (-Y), Y_Sig_Sq);
          Delta_Matrix := Row_Multiply (Errors_x_Grad, F_All_Data);
-         --  Sum_Each_Column is equiva;lent to numpy add.reduce
+         --  Sum_Each_Column is equivalent to numpy add.reduce
          Delta_Weights := Sum_Each_Column (Delta_Matrix);
---           Print_Float_Vector ("Delta_Weights", Delta_Weights);
 
          Current_Loss := Loss (Weights, All_Data, Labels);
          Learn_Rate := 2.0 * Learn_Rate;
@@ -71,8 +69,6 @@ package body ML is
             Put_Line ("Learning Rate: " & Float'Image (Learn_Rate) &
                         "  Loss: " & Float'Image (Current_Loss));
             Print_Float_Vector ("Weights", Weights);
-            Print_Float_Matrix ("Delta_Matrix", Delta_Matrix, 1, 4);
-            Print_Float_Vector ("Delta_Weights", Delta_Weights);
             New_Line;
          end if;
 
@@ -98,7 +94,6 @@ package body ML is
       Put_Line ("FinaL Learn Rate: " & Float'Image (Learn_Rate) &
                   "  Final loss:" &
                 Float'Image (Loss (Weights, All_Data, Labels)));
-      Put_Line (Routine_Name & "finished");
       New_Line;
 
    end Fit;
@@ -115,9 +110,6 @@ package body ML is
       Y      : constant Real_Float_Vector := 1.0 / (1.0 + Exp (-H));
       Errors : Real_Float_Vector (Labels'Range);
    begin
-      --  take the difference between the labels and the output of the
-      --  sigmoid squared, then sum over all instances to get the
-      --  total loss.
       Errors := (To_Real_Float_Vector (Labels) - Y) ** 2;
 
       return Sum (Errors);

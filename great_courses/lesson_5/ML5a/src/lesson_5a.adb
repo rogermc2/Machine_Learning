@@ -49,7 +49,7 @@ procedure Lesson_5A is
    Labels                : Integer_Array (All_Data'Range);
    Py_Module             : Module;
    Seen_List             : Integer3_List;
-   Colour                : Integer3_Array;
+   Pixel_Colour          : Integer3_Array;
    Weights               : Real_Float_Vector (1 .. 4);
 begin
    for index in Labels'Range loop
@@ -67,18 +67,21 @@ begin
    Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
    Python.Initialize;
    Py_Module := Import_File ("lesson_5a");
-   Python.Call (Py_Module, "show_bitmap", Image_Data);
-   Python.Call (Py_Module, "show_bitmap", Green_Data);
-   Python.Call (Py_Module, "show_bitmap", Fore_Data);
+--     Python.Call (Py_Module, "show_bitmap", Image_Data);
+--     Python.Call (Py_Module, "show_bitmap", Green_Data);
+--     Python.Call (Py_Module, "show_bitmap", Fore_Data);
 
    for index in Yes_List'Range loop
-      for col in Colour'Range loop
-         Colour (col) := Yes_List (index, col);
+      for col in Pixel_Colour'Range loop
+         Pixel_Colour (col) := Yes_List (index, col);
       end loop;
-      if not Seen_List.Contains (Colour) then
-         Seen_List.Append (Colour);
+
+      if not Seen_List.Contains (Pixel_Colour) then
+         Seen_List.Append (Pixel_Colour);
       end if;
    end loop;
+   Put_Line (Project_Name & "Seen_List length:" &
+               Integer'Image (Integer (Seen_List.Length)));
 
    Put_Line (Project_Name & "Loss vs weights examples:");
    for count in 1 .. 10 loop
@@ -90,9 +93,9 @@ begin
    end loop;
    New_Line;
 
-   --  Train the model by using a fit function to fit the model to the data.
-   --  The weights will be updated by gradient descent.
-   Weights := (0.786,  0.175, -0.558, -0.437);
+   --  Train the model.
+   --  Result very dependent on initial weights
+   Weights := (-2.0, 0.0, 0.093, -0.713);
    Fit (Weights, All_Data, Labels);
    Print_Float_Vector ("Fitted weights", Weights);
 
@@ -101,6 +104,6 @@ begin
                   Weights));
    Python.Finalize;
 
-   Put_Line (Project_Name & "done");
+   Put_Line (Project_Name & "finished.");
 
 end Lesson_5A;
