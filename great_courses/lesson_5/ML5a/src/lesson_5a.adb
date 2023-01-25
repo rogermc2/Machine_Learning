@@ -62,10 +62,10 @@ begin
          Labels (index) := 0;
       end if;
    end loop;
-   Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
-   Print_Matrix_Dimensions (Project_Name & "No_List", No_List);
-   Print_Matrix_Dimensions (Project_Name & "All_Data", All_Data);
-   Put_Line (Project_Name & "Labels length:" & Integer'Image (Labels'Length));
+--     Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
+--     Print_Matrix_Dimensions (Project_Name & "No_List", No_List);
+--     Print_Matrix_Dimensions (Project_Name & "All_Data", All_Data);
+--     Put_Line (Project_Name & "Labels length:" & Integer'Image (Labels'Length));
 
    Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
    Python.Initialize;
@@ -83,8 +83,8 @@ begin
          Seen_List.Append (Pixel_Colour);
       end if;
    end loop;
-   Put_Line (Project_Name & "Seen_List length:" &
-               Integer'Image (Integer (Seen_List.Length)));
+--     Put_Line (Project_Name & "Seen_List length:" &
+--                 Integer'Image (Integer (Seen_List.Length)));
 
    --     Put_Line (Project_Name & "Loss vs weights examples:");
    --     for count in 1 .. 10 loop
@@ -107,7 +107,7 @@ begin
                   Weights));
    Python.Finalize;
 
-   --     Display_Forest (Forest_File_Name);
+   Display_Forest (Forest_Image_Data);
 
    Put_Line (Project_Name & "finished.");
 

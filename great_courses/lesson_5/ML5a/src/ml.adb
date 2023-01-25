@@ -5,7 +5,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Basic_Printing; use Basic_Printing;
-with Support_5A;
 
 package body ML is
 
@@ -16,10 +15,7 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
-   procedure Display_Forest (Image_File_Name : String) is
-      use Support_5A;
-      Image_Data : constant Unsigned_8_Array_3D :=
-                     Get_Picture (Image_File_Name);
+   procedure Display_Forest (Image_Data : Unsigned_8_Array_3D) is
    begin
       null;
    end Display_Forest;
