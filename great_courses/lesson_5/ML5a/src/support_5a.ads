@@ -3,7 +3,7 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Support_5A is
 
-   function Get_Part
+   function Get_Pixels
      (Image : Unsigned_8_Array_3D; First_Row, Last_Row : Positive;
        First_Column, Last_Column : Positive) return Unsigned_8_Array_3D;
    function Get_Picture (File_Name : String) return Unsigned_8_Array_3D;

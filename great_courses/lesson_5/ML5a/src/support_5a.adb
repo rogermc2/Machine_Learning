@@ -5,11 +5,11 @@ with PNG_To_BMP; use PNG_To_BMP;
 
 package body Support_5A is
 
-   function Get_Part
+   function Get_Pixels
      (Image                     : Unsigned_8_Array_3D;
       First_Row, Last_Row       : Positive;
       First_Column, Last_Column : Positive) return Unsigned_8_Array_3D is
-      Routine_Name : constant String := "Support_5A.Get_Part ";
+      Routine_Name : constant String := "Support_5A.Get_Pixels ";
       Part         : Unsigned_8_Array_3D
         (1 .. Last_Row - First_Row + 1, 1 .. Last_Column - First_Column + 1,
          Image'Range (3));
@@ -31,7 +31,7 @@ package body Support_5A is
 
       return Part;
 
-   end Get_Part;
+   end Get_Pixels;
 
    --  -------------------------------------------------------------------------
 
