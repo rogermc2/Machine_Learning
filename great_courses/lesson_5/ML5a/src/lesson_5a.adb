@@ -24,11 +24,12 @@ procedure Lesson_5A is
    Image_Data            : constant Unsigned_8_Array_3D :=
                              Get_Picture (Image_File_Name);
    Green_Data            : constant Unsigned_8_Array_3D :=
-                             Get_Pixels (Image_Data, Image_Data'First, Image_Data'Last,
-                                         Image_Data'First (2), Image_Data'First (2) + 360);
+                             Get_Pixels (Image_Data, Image_Data'First,
+                                         Image_Data'Last, Image_Data'First (2),
+                                         Image_Data'First (2) + 359);
    Fore_Data             : constant Unsigned_8_Array_3D :=
-                             Get_Pixels (Image_Data, 30, Image_Data'Last,
-                                         547, 620);
+                             Get_Pixels (Image_Data, 31, Image_Data'Last,
+                                         547, 619);
    Flat_Data             : constant Integer_Matrix :=
                              To_2D (Get_Pixels (Image_Data, Image_Data'First,
                                     Image_Data'Last, Image_Data'First (2),
@@ -58,13 +59,16 @@ begin
          Labels (index) := 0;
       end if;
    end loop;
+   Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
+   Print_Matrix_Dimensions (Project_Name & "No_List", No_List);
+   Print_Matrix_Dimensions (Project_Name & "All_Data", All_Data);
 
    Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
-      Python.Initialize;
-      Py_Module := Import_File ("lesson_5a");
-   --     Python.Call (Py_Module, "show_bitmap", Image_Data);
-   --     Python.Call (Py_Module, "show_bitmap", Green_Data);
-   --     Python.Call (Py_Module, "show_bitmap", Fore_Data);
+   Python.Initialize;
+   Py_Module := Import_File ("lesson_5a");
+   Python.Call (Py_Module, "show_bitmap", Image_Data);
+   Python.Call (Py_Module, "show_bitmap", Green_Data);
+   Python.Call (Py_Module, "show_bitmap", Fore_Data);
 
    for index in Yes_List'Range loop
       for col in Colour'Range loop

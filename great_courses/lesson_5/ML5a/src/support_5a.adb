@@ -45,7 +45,8 @@ package body Support_5A is
       Initial : constant Unsigned_8_Array_3D :=
                   Unsigned_8_Array_3D (Process (File_Name));
       Clipped : Unsigned_8_Array_3D
-        (1 .. Initial'Length - 14, Initial'Range (2), Initial'Range (3));
+        (1 .. Initial'Length - 15, 1 .. Initial'Length (2) - 1,
+         Initial'Range (3));
    begin
       for row in Clipped'Range loop
          for col in Clipped'Range (2) loop
