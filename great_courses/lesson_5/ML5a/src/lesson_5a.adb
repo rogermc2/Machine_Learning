@@ -19,41 +19,41 @@ procedure Lesson_5A is
      Ada.Containers.Vectors (Positive, Integer3_Array);
    subtype Integer3_List is Integer3_Package.Vector;
 
-   Project_Name          : constant String := "Lesson_5A ";
-   Green_File_Name       : constant String := "../greenML.png";
-   Forest_File_Name      : constant String := "../forest.jpg";
-   Image_Data            : constant Unsigned_8_Array_3D :=
-                             Get_Picture (Green_File_Name);
-   --     Forest_Image_Data      : constant Unsigned_8_Array_3D :=
-   --                            Get_Picture (Forest_File_Name);
-   Green_Data            : constant Unsigned_8_Array_3D :=
-                             Get_Pixels (Image_Data, Image_Data'First,
-                                         Image_Data'Last, Image_Data'First (2),
-                                         Image_Data'First (2) + 359);
-   Fore_Data             : constant Unsigned_8_Array_3D :=
-                             Get_Pixels (Image_Data, 31, Image_Data'Last,
-                                         547, 619);
-   Flat_Data             : constant Integer_Matrix :=
-                             To_2D (Get_Pixels (Image_Data, Image_Data'First,
-                                    Image_Data'Last, Image_Data'First (2),
-                                    Image_Data'Last (2), 4));
-   Yes_Length            : constant Positive := Green_Data'Length *
-                             Green_Data'Length (2);
-   No_Length             : constant Positive := Fore_Data'Length *
-                             Fore_Data'Length (2);
-   Yes_List              : constant Integer_Matrix (1 .. Yes_Length,
-                                                    Green_Data'Range (3)) :=
-                             To_2D (Green_Data);
-   No_List               : constant Integer_Matrix (1 .. No_Length,
-                                                    Fore_Data'Range (3)) :=
-                             To_2D (Fore_Data);
-   All_Data              : constant Integer_Matrix :=
-                             Set_All_Data (Yes_List, No_List);
-   Labels                : Integer_Array (All_Data'Range);
-   Py_Module             : Module;
-   Seen_List             : Integer3_List;
-   Pixel_Colour          : Integer3_Array;
-   Weights               : Real_Float_Vector (1 .. 4);
+   Project_Name           : constant String := "Lesson_5A ";
+   Green_File_Name        : constant String := "../greenML.png";
+   Forest_File_Name       : constant String := "../forest.jpg";
+   Image_Data             : constant Unsigned_8_Array_3D :=
+                              Get_Picture (Green_File_Name);
+   Forest_Image_Data      : constant Unsigned_8_Array_3D :=
+                              Get_Picture (Forest_File_Name);
+   Green_Data             : constant Unsigned_8_Array_3D :=
+                              Get_Pixels (Image_Data, Image_Data'First,
+                                          Image_Data'Last, Image_Data'First (2),
+                                          Image_Data'First (2) + 359);
+   Fore_Data              : constant Unsigned_8_Array_3D :=
+                              Get_Pixels (Image_Data, 31, Image_Data'Last,
+                                          547, 619);
+   Flat_Data              : constant Integer_Matrix :=
+                              To_2D (Get_Pixels (Image_Data, Image_Data'First,
+                                     Image_Data'Last, Image_Data'First (2),
+                                     Image_Data'Last (2), 4));
+   Yes_Length             : constant Positive := Green_Data'Length *
+                              Green_Data'Length (2);
+   No_Length              : constant Positive := Fore_Data'Length *
+                              Fore_Data'Length (2);
+   Yes_List               : constant Integer_Matrix (1 .. Yes_Length,
+                                                     Green_Data'Range (3)) :=
+                              To_2D (Green_Data);
+   No_List                : constant Integer_Matrix (1 .. No_Length,
+                                                     Fore_Data'Range (3)) :=
+                              To_2D (Fore_Data);
+   All_Data               : constant Integer_Matrix :=
+                              Set_All_Data (Yes_List, No_List);
+   Labels                 : Integer_Array (All_Data'Range);
+   Py_Module              : Module;
+   Seen_List              : Integer3_List;
+   Pixel_Colour           : Integer3_Array;
+   Weights                : Real_Float_Vector (1 .. 4);
 begin
    for index in Labels'Range loop
       if index <= Yes_Length then
@@ -107,7 +107,7 @@ begin
                   Weights));
    Python.Finalize;
 
-   Display_Forest (Forest_File_Name);
+   --     Display_Forest (Forest_File_Name);
 
    Put_Line (Project_Name & "finished.");
 
