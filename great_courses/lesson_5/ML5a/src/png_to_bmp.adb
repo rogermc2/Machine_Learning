@@ -32,8 +32,8 @@ package body PNG_To_BMP is
       subtype U16 is Unsigned_16;
       image_width        : constant Positive := GID.Pixel_width (image);
       padded_line_size_x : constant Positive :=
-                             4 * Integer (Float'Ceiling (Float (image_width) *
-                                            3.0 / 4.0));
+        4 * Integer (Float'Ceiling (Float (image_width) *
+                       3.0 / 4.0));
       idx                : Natural;  --  (in bytes)
 
       --  ----------------------------------------------------------------------
@@ -98,6 +98,8 @@ package body PNG_To_BMP is
    function Process (Image_File_Name : String) return Image_Array is
       Routine_Name    : constant String := "PNG_To_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
+      File_Kind       : constant String :=
+        File_Name_Upper (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
       in_file_id      : Ada.Streams.Stream_IO.File_Type;
       image_desc      : GID.Image_descriptor;
       Width           : Positive;
@@ -113,8 +115,9 @@ package body PNG_To_BMP is
         (image_desc, Stream (in_file_id).all,
          try_tga =>
            Image_File_Name'Length >= 4 and then
-         File_Name_Upper
-           (File_Name_Upper'Last - 3 .. File_Name_Upper'Last) = ".TGA");
+         File_Kind = ".TGA");
+      --           File_Name_Upper
+      --             (File_Name_Upper'Last - 3 .. File_Name_Upper'Last) = ".TGA");
       Width := GID.Pixel_width (image_desc);
       Height := GID.Pixel_height (image_desc);
 
