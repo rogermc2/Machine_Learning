@@ -105,6 +105,8 @@ begin
    Python.Call (Py_Module, "show_bitmap",
                 To_Picture (Flat_Data, Image_Data'Length, Image_Data'Length (2),
                   Weights));
+
+   Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
    Python.Finalize;
 
    Display_Forest (Forest_Image_Data);
