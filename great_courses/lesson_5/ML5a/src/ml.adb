@@ -109,7 +109,8 @@ package body ML is
                   Labels  : Integer_Array) return Float is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "ML.Loss ";
-      H      : constant Real_Float_Vector := Dot (All_Data, Weights);
+      H      : constant Real_Float_Vector :=
+                 To_Real_Float_Matrix (All_Data) * Weights;
       --  transform using the sigmoid function
       Y      : constant Real_Float_Vector := 1.0 / (1.0 + Exp (-H));
       Errors : Real_Float_Vector (Labels'Range);

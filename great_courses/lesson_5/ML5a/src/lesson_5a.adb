@@ -62,6 +62,7 @@ begin
    Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
    Print_Matrix_Dimensions (Project_Name & "No_List", No_List);
    Print_Matrix_Dimensions (Project_Name & "All_Data", All_Data);
+   Put_Line (Project_Name & "Labels length:" & Integer'Image (Labels'Length));
 
    Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
    Python.Initialize;
