@@ -12,42 +12,44 @@ with ML; use ML;
 with Support_5A; use Support_5A;
 
 procedure Lesson_5A is
+   use Real_Float_Arrays;
    type Integer3_Array is array (Integer range 1 .. 3) of Integer;
 
    package Integer3_Package is new
      Ada.Containers.Vectors (Positive, Integer3_Array);
    subtype Integer3_List is Integer3_Package.Vector;
 
-   Project_Name    : constant String := "Lesson_5A ";
-   Image_File_Name : constant String := "../greenML.png";
-   Image_Data      : constant Unsigned_8_Array_3D :=
-     Get_Picture (Image_File_Name);
-   Green_Data      : constant Unsigned_8_Array_3D :=
-     Get_Pixels (Image_Data, Image_Data'First, Image_Data'Last,
-                 Image_Data'First (2), Image_Data'First (2) + 360);
-   Fore_Data       : constant Unsigned_8_Array_3D :=
-     Get_Pixels (Image_Data, 30, Image_Data'Last,
-                 547, 620);
-   Flat_Data       : constant Unsigned_8_Array_3D :=
-     Get_Pixels (Image_Data, Image_Data'First, Image_Data'Last,
-                 Image_Data'First (2), Image_Data'Last (2));
-   Yes_Length      : constant Positive := Green_Data'Length *
-     Green_Data'Length (2);
-   No_Length       : constant Positive := Fore_Data'Length *
-     Fore_Data'Length (2);
-   Yes_List        : constant Integer_Matrix (1 .. Yes_Length,
-                                              Green_Data'Range (3)) :=
-     To_2D (Green_Data);
-   No_List         : constant Integer_Matrix (1 .. No_Length,
-                                              Fore_Data'Range (3)) :=
-     To_2D (Fore_Data);
-   All_Data        : constant Integer_Matrix :=
-     Set_All_Data (Yes_List, No_List);
-   Labels           : Integer_Array (All_Data'Range);
-   --     Py_Module        : Module;
-   Seen_List        : Integer3_List;
-   Colour           : Integer3_Array;
-   Weights          : Real_Float_Vector (1 .. 4);
+   Project_Name          : constant String := "Lesson_5A ";
+   Image_File_Name       : constant String := "../greenML.png";
+   Image_Data            : constant Unsigned_8_Array_3D :=
+                             Get_Picture (Image_File_Name);
+   Green_Data            : constant Unsigned_8_Array_3D :=
+                             Get_Pixels (Image_Data, Image_Data'First, Image_Data'Last,
+                                         Image_Data'First (2), Image_Data'First (2) + 360);
+   Fore_Data             : constant Unsigned_8_Array_3D :=
+                             Get_Pixels (Image_Data, 30, Image_Data'Last,
+                                         547, 620);
+   Flat_Data             : constant Integer_Matrix :=
+                             To_2D (Get_Pixels (Image_Data, Image_Data'First, Image_Data'Last,
+                                    Image_Data'First (2), Image_Data'Last (2), 4));
+   Yes_Length            : constant Positive := Green_Data'Length *
+                             Green_Data'Length (2);
+   No_Length             : constant Positive := Fore_Data'Length *
+                             Fore_Data'Length (2);
+   Yes_List              : constant Integer_Matrix (1 .. Yes_Length,
+                                                    Green_Data'Range (3)) :=
+                             To_2D (Green_Data);
+   No_List               : constant Integer_Matrix (1 .. No_Length,
+                                                    Fore_Data'Range (3)) :=
+                             To_2D (Fore_Data);
+   All_Data              : constant Integer_Matrix :=
+                             Set_All_Data (Yes_List, No_List);
+   Labels                : Integer_Array (All_Data'Range);
+   Out_Data              : Boolean_Array (Flat_Data'Range);
+   --     Py_Module       : Module;
+   Seen_List             : Integer3_List;
+   Colour                : Integer3_Array;
+   Weights               : Real_Float_Vector (1 .. 4);
 begin
    for index in Labels'Range loop
       if index <= Yes_Length then
@@ -92,8 +94,11 @@ begin
    --  Train the model by using a fit function to fit the model to the data.
    --  The weights will be updated by gradient descent.
    Weights := (0.786,  0.175, -0.558, -0.437);
+   Out_Data := To_Boolean (To_Real_Float_Matrix (Flat_Data) * Weights);
    Fit (Weights, All_Data, Labels);
    Print_Float_Vector ("Fitted weights", Weights);
+
+   Out_Data := To_Boolean (To_Real_Float_Matrix (Flat_Data) * Weights);
 
    Put_Line (Project_Name & "done");
 

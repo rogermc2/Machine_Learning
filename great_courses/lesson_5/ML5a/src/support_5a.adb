@@ -8,11 +8,12 @@ package body Support_5A is
    function Get_Pixels
      (Image                     : Unsigned_8_Array_3D;
       First_Row, Last_Row       : Positive;
-      First_Column, Last_Column : Positive) return Unsigned_8_Array_3D is
+      First_Column, Last_Column : Positive; D3 : Positive := 3)
+      return Unsigned_8_Array_3D is
       Routine_Name : constant String := "Support_5A.Get_Pixels ";
       Part         : Unsigned_8_Array_3D
         (1 .. Last_Row - First_Row + 1, 1 .. Last_Column - First_Column + 1,
-         Image'Range (3));
+         1 .. D3);
       Part_Row     : Natural := 0;
       Part_Col     : Natural;
    begin
@@ -26,6 +27,9 @@ package body Support_5A is
             for pix in Image'Range (3) loop
                Part (Part_Row, Part_Col, pix) := Image (row, col, pix);
             end loop;
+            if D3 = 4 then
+               Part (Part_Row, Part_Col, 4) := 1;
+            end if;
          end loop;
       end loop;
 
@@ -92,6 +96,19 @@ package body Support_5A is
       return M2;
 
    end To_2D;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Boolean (From : Real_Float_Vector) return Boolean_Array is
+      Bool : Boolean_Array (From'Range);
+   begin
+      for index in From'Range loop
+         Bool (index) := From (index) > 0.0;
+      end loop;
+
+      return Bool;
+
+   end To_Boolean;
 
    --  -------------------------------------------------------------------------
 
