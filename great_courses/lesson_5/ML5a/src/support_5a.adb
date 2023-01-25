@@ -1,5 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with PNG_To_BMP; use PNG_To_BMP;
 
@@ -59,33 +60,6 @@ package body Support_5A is
 
    --  -------------------------------------------------------------------------
 
-   function To_Picture (Flat_Data : Integer_Matrix; Width : Positive;
-                       Weights : Real_Float_Vector)
-                        return Unsigned_8_Array_3D is
-      use Real_Float_Arrays;
-      Out_Data : constant Boolean_Array :=
-                    To_Boolean (To_Real_Float_Matrix (Flat_Data) * Weights);
-      Result   : Unsigned_8_Array_3D
-        (1 .. Out_Data'Length, 1 .. Width, 1 .. 3);
-   begin
-      for row in Result'Range loop
-         for col in Result'Range (2) loop
-            for pix in Result'Range (3) loop
-               if Out_Data (row) then
-                  Result (row, col, pix) := 1;
-               else
-                  Result (row, col, pix) := 0;
-               end if;
-            end loop;
-         end loop;
-      end loop;
-
-      return Result;
-
-   end To_Picture;
-
-   --  -------------------------------------------------------------------------
-
    function Set_All_Data (Yes_List, No_List : Integer_Matrix)
                           return Integer_Matrix is
       All_Data              : constant Integer_Matrix := Yes_List & No_List;
@@ -136,6 +110,38 @@ package body Support_5A is
       return Bool;
 
    end To_Boolean;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Picture (Flat_Data : Integer_Matrix; Width : Positive;
+                        Weights   : Real_Float_Vector)
+                        return Unsigned_8_Array_3D is
+      use Real_Float_Arrays;
+      Routine_Name : constant String := "Support_5A.To_Picture ";
+      Out_Data     : constant Boolean_Array :=
+                       To_Boolean (To_Real_Float_Matrix (Flat_Data) * Weights);
+      Result       : Unsigned_8_Array_3D
+        (1 .. Out_Data'Length, 1 .. Width, 1 .. 3);
+   begin
+      Put_Line (Routine_Name & "Result Width" &
+                  Integer'Image (Result'Length (2)));
+      for row in Result'Range loop
+         for col in Result'Range (2) loop
+            for pix in Result'Range (3) loop
+               if Out_Data (row) then
+                  Result (row, col, pix) := 1;
+               else
+                  Result (row, col, pix) := 0;
+               end if;
+            end loop;
+         end loop;
+      end loop;
+
+      Put_Line (Routine_Name & "Result Length" &
+                  Integer'Image (Result'Length));
+      return Result;
+
+   end To_Picture;
 
    --  -------------------------------------------------------------------------
 
