@@ -6,7 +6,7 @@ with Maths;
 
 with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
---  with Python; use Python;
+with Python; use Python;
 
 with ML; use ML;
 with Support_5A; use Support_5A;
@@ -45,8 +45,7 @@ procedure Lesson_5A is
    All_Data              : constant Integer_Matrix :=
                              Set_All_Data (Yes_List, No_List);
    Labels                : Integer_Array (All_Data'Range);
-   Out_Data              : Boolean_Array (Flat_Data'Range);
-   --     Py_Module       : Module;
+   Py_Module             : Module;
    Seen_List             : Integer3_List;
    Colour                : Integer3_Array;
    Weights               : Real_Float_Vector (1 .. 4);
@@ -60,14 +59,11 @@ begin
    end loop;
 
    Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
-   --     Python.Initialize;
-   --     Py_Module := Import_File ("lesson_5a");
-   --     Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
+      Python.Initialize;
+      Py_Module := Import_File ("lesson_5a");
    --     Python.Call (Py_Module, "show_bitmap", Image_Data);
    --     Python.Call (Py_Module, "show_bitmap", Green_Data);
    --     Python.Call (Py_Module, "show_bitmap", Fore_Data);
-
-   --     Python.Finalize;
 
    for index in Yes_List'Range loop
       for col in Colour'Range loop
@@ -94,11 +90,12 @@ begin
    --  Train the model by using a fit function to fit the model to the data.
    --  The weights will be updated by gradient descent.
    Weights := (0.786,  0.175, -0.558, -0.437);
-   Out_Data := To_Boolean (To_Real_Float_Matrix (Flat_Data) * Weights);
    Fit (Weights, All_Data, Labels);
    Print_Float_Vector ("Fitted weights", Weights);
 
-   Out_Data := To_Boolean (To_Real_Float_Matrix (Flat_Data) * Weights);
+   Python.Call (Py_Module, "show_bitmap",
+                To_Picture (Flat_Data, Image_Data'Length (2), Weights));
+   Python.Finalize;
 
    Put_Line (Project_Name & "done");
 

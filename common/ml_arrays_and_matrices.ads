@@ -46,7 +46,8 @@ package ML_Arrays_And_Matrices is
      Integer;
 
    type Unsigned_8_Array_3D is array (Integer range <>, Integer range <>,
-                                      Integer range <>) of Interfaces.Unsigned_8;
+                                      Integer range <>) of
+     Interfaces.Unsigned_8;
 
    package Integer_Array_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Integer_Array);
