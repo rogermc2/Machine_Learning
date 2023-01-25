@@ -5,6 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Basic_Printing; use Basic_Printing;
+with Support_5A;
 
 package body ML is
 
@@ -15,8 +16,18 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
+   procedure Display_Forest (Image_File_Name : String) is
+      use Support_5A;
+      Image_Data : constant Unsigned_8_Array_3D :=
+                     Get_Picture (Image_File_Name);
+   begin
+      null;
+   end Display_Forest;
+
+   --  -------------------------------------------------------------------------
+
    procedure Fit (Weights : in out Real_Float_Vector; All_Data : Integer_Matrix;
-                  Labels  : Integer_Array) is
+                  Labels  : Integer_Array; Verbose : Boolean := False) is
       --  All_Data is a n x 4 matrix of pixel r, g, b + offset
       use Real_Float_Arrays;
       Routine_Name    : constant String := "ML.Fit ";
@@ -41,7 +52,7 @@ package body ML is
    begin
       Assert (Weights'Length = All_Data'Length (2), Routine_Name &
                 "Invalid Weights length");
-      Put_Line (Routine_Name);
+      Put_Line ("Fitting data.");
 
       while not Done loop
          Iteration := Iteration + 1;
@@ -65,11 +76,16 @@ package body ML is
          New_Weights := Weights + Learn_Rate * Delta_Weights;
 
          if Maths.Random_Float < 0.01 then
-            Put_Line ("**** Iteration " & Integer'Image (Iteration) & " ****");
-            Put_Line ("Learning Rate: " & Float'Image (Learn_Rate) &
-                        "  Loss: " & Float'Image (Current_Loss));
-            Print_Float_Vector ("Weights", Weights);
-            New_Line;
+            if Verbose then
+               Put_Line ("**** Iteration " & Integer'Image (Iteration) &
+                           " ****");
+               Put_Line ("Learning Rate: " & Float'Image (Learn_Rate) &
+                           "  Loss: " & Float'Image (Current_Loss));
+               Print_Float_Vector ("Weights", Weights);
+               New_Line;
+            else
+               Put ("*");
+            end if;
          end if;
 
          Descend := True;
@@ -93,7 +109,7 @@ package body ML is
       Put_Line ("Total iterations:" & Integer'Image (Iteration));
       Put_Line ("FinaL Learn Rate: " & Float'Image (Learn_Rate) &
                   "  Final loss:" &
-                Float'Image (Loss (Weights, All_Data, Labels)));
+                  Float'Image (Loss (Weights, All_Data, Labels)));
       New_Line;
 
    end Fit;

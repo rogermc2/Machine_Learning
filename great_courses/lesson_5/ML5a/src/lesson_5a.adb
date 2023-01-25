@@ -2,7 +2,7 @@
 with Ada.Containers.Vectors;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
+--  with Maths;
 
 with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
@@ -20,9 +20,12 @@ procedure Lesson_5A is
    subtype Integer3_List is Integer3_Package.Vector;
 
    Project_Name          : constant String := "Lesson_5A ";
-   Image_File_Name       : constant String := "../greenML.png";
+   Green_File_Name       : constant String := "../greenML.png";
+   Forest_File_Name      : constant String := "../forest.jpg";
    Image_Data            : constant Unsigned_8_Array_3D :=
-                             Get_Picture (Image_File_Name);
+                             Get_Picture (Green_File_Name);
+   --     Forest_Image_Data      : constant Unsigned_8_Array_3D :=
+   --                            Get_Picture (Forest_File_Name);
    Green_Data            : constant Unsigned_8_Array_3D :=
                              Get_Pixels (Image_Data, Image_Data'First,
                                          Image_Data'Last, Image_Data'First (2),
@@ -67,9 +70,9 @@ begin
    Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
    Python.Initialize;
    Py_Module := Import_File ("lesson_5a");
---     Python.Call (Py_Module, "show_bitmap", Image_Data);
---     Python.Call (Py_Module, "show_bitmap", Green_Data);
---     Python.Call (Py_Module, "show_bitmap", Fore_Data);
+   --     Python.Call (Py_Module, "show_bitmap", Image_Data);
+   --     Python.Call (Py_Module, "show_bitmap", Green_Data);
+   --     Python.Call (Py_Module, "show_bitmap", Fore_Data);
 
    for index in Yes_List'Range loop
       for col in Pixel_Colour'Range loop
@@ -83,15 +86,15 @@ begin
    Put_Line (Project_Name & "Seen_List length:" &
                Integer'Image (Integer (Seen_List.Length)));
 
-   Put_Line (Project_Name & "Loss vs weights examples:");
-   for count in 1 .. 10 loop
-      for index in Weights'Range loop
-         Weights (index) := Maths.Random_Float;
-      end loop;
-      Put ("Loss: " & Float'Image (Loss (Weights, All_Data, Labels)));
-      Print_Float_Vector_As_Line ("Weights", Weights);
-   end loop;
-   New_Line;
+   --     Put_Line (Project_Name & "Loss vs weights examples:");
+   --     for count in 1 .. 10 loop
+   --        for index in Weights'Range loop
+   --           Weights (index) := Maths.Random_Float;
+   --        end loop;
+   --        Put ("Loss: " & Float'Image (Loss (Weights, All_Data, Labels)));
+   --        Print_Float_Vector_As_Line ("Weights", Weights);
+   --     end loop;
+   --     New_Line;
 
    --  Train the model.
    --  Result very dependent on initial weights
@@ -103,6 +106,8 @@ begin
                 To_Picture (Flat_Data, Image_Data'Length, Image_Data'Length (2),
                   Weights));
    Python.Finalize;
+
+   Display_Forest (Forest_File_Name);
 
    Put_Line (Project_Name & "finished.");
 

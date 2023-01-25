@@ -105,9 +105,9 @@ package body PNG_To_BMP is
       next_frame      : Ada.Calendar.Day_Duration := 0.0;
       Buffer_Index    : Natural := 0;
    begin
+      Put_Line (Routine_Name & "processing " & Image_File_Name);
       --  Load the image in its original format
       Open (in_file_id, In_File, Image_File_Name);
-      Put_Line (Routine_Name & "processing " & Image_File_Name);
 
       GID.Load_image_header
         (image_desc, Stream (in_file_id).all,
