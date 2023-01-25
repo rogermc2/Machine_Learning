@@ -30,8 +30,9 @@ procedure Lesson_5A is
                              Get_Pixels (Image_Data, 30, Image_Data'Last,
                                          547, 620);
    Flat_Data             : constant Integer_Matrix :=
-                             To_2D (Get_Pixels (Image_Data, Image_Data'First, Image_Data'Last,
-                                    Image_Data'First (2), Image_Data'Last (2), 4));
+                             To_2D (Get_Pixels (Image_Data, Image_Data'First,
+                                    Image_Data'Last, Image_Data'First (2),
+                                    Image_Data'Last (2), 4));
    Yes_Length            : constant Positive := Green_Data'Length *
                              Green_Data'Length (2);
    No_Length             : constant Positive := Fore_Data'Length *
@@ -73,9 +74,6 @@ begin
          Seen_List.Append (Colour);
       end if;
    end loop;
-   Put_Line (Project_Name & "Seen_List length" &
-               Integer'Image (Integer (Seen_List.Length)));
-   New_Line;
 
    Put_Line (Project_Name & "Loss vs weights examples:");
    for count in 1 .. 10 loop
@@ -94,7 +92,8 @@ begin
    Print_Float_Vector ("Fitted weights", Weights);
 
    Python.Call (Py_Module, "show_bitmap",
-                To_Picture (Flat_Data, Image_Data'Length (2), Weights));
+                To_Picture (Flat_Data, Image_Data'Length, Image_Data'Length (2),
+                  Weights));
    Python.Finalize;
 
    Put_Line (Project_Name & "done");

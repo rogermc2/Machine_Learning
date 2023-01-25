@@ -12,8 +12,8 @@ package Support_5A is
                           return Integer_Matrix;
    function To_2D (From : Unsigned_8_Array_3D) return Integer_Matrix;
    function To_Boolean (From : Real_Float_Vector) return Boolean_Array;
-   function To_Picture (Flat_Data : Integer_Matrix; Width : Positive;
-                        Weights   : Real_Float_Vector)
+   function To_Picture (Flat_Data : Integer_Matrix;
+                        Height, Width : Positive; Weights : Real_Float_Vector)
                         return Unsigned_8_Array_3D;
 
 end Support_5A;
