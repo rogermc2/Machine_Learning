@@ -20,7 +20,7 @@ package body ML is
    procedure Composite (Mask, Foreground : Unsigned_8_Array_3D;
                         Background       : in out Unsigned_8_Array_3D) is
       use Interfaces;
-      Routine_Name : constant String := "ML.Composite";
+      Routine_Name : constant String := "ML.Composite ";
       Shift        : constant Positive := 157;
       FG_Index     : Integer;
    begin

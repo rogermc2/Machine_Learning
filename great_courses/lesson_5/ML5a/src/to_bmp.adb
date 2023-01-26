@@ -14,7 +14,7 @@ with Ada.Unchecked_Deallocation;
 
 with ML_Arrays_And_Matrices;
 
-package body PNG_To_BMP is
+package body To_BMP is
    use Interfaces;
 
    type p_Byte_Array is access ML_Arrays_And_Matrices.Byte_Array;
@@ -98,7 +98,7 @@ package body PNG_To_BMP is
    --  -------------------------------------------------------------------------
 
    function Process (Image_File_Name : String) return Image_Array is
-      Routine_Name    : constant String := "PNG_To_BMP.Process ";
+      Routine_Name    : constant String := "To_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
       File_Kind       : constant String :=
                           File_Name_Upper (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
@@ -132,21 +132,44 @@ package body PNG_To_BMP is
 
       declare
          Image_Data : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
+         Col_Rot    : Natural;
       begin
-         for row in reverse Image_Data'Range loop
-            for col in Image_Data'Range (2) loop
-               for pix in Image_Data'Range (3) loop
-                  Buffer_Index := Buffer_Index + 1;
-                  if pix = 1 then
-                     Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
-                  elsif pix = 2 then
-                     Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
-                  else
-                     Image_Data (row, col, pix) := img_buf (Buffer_Index);
-                  end if;
+         if File_Kind = ".PNG" then
+            for row in reverse Image_Data'Range loop
+               for col in Image_Data'Range (2) loop
+                  for pix in Image_Data'Range (3) loop
+                     Buffer_Index := Buffer_Index + 1;
+                     if pix = 1 then
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
+                     elsif pix = 2 then
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
+                     else
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index);
+                     end if;
+                  end loop;
                end loop;
             end loop;
-         end loop;
+
+         elsif File_Kind = ".JPG" then
+            for row in reverse Image_Data'Range loop
+               for col in Image_Data'Range (2) loop
+                  Col_Rot :=
+                    (col + Height - row) mod Width + 1;
+                  for pix in Image_Data'Range (3) loop
+                     Buffer_Index := Buffer_Index + 1;
+                     if pix = 1 then
+                        Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index + 1);
+                     elsif pix = 2 then
+                        Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index - 1);
+                     else
+                        Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index);
+                     end if;
+                  end loop;
+               end loop;
+            end loop;
+         else
+            Put_Line (Routine_Name & "unsupported image format " & File_Kind);
+         end if;
 
          return Image_Data;
       end;  --  declare block
@@ -170,4 +193,4 @@ package body PNG_To_BMP is
 
    --  -------------------------------------------------------------------------
 
-end PNG_To_BMP;
+end To_BMP;

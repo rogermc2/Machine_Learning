@@ -4,8 +4,7 @@ with Ada.Characters.Handling;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
-with JPEG_To_BMP;
-with PNG_To_BMP;
+with To_BMP;
 
 package body Support_5A is
 
@@ -53,7 +52,7 @@ package body Support_5A is
       if File_Kind = ".PNG" then
          declare
             Initial : constant Unsigned_8_Array_3D :=
-                        Unsigned_8_Array_3D (PNG_To_BMP.Process (File_Name));
+                        Unsigned_8_Array_3D (To_BMP.Process (File_Name));
             Clipped : Unsigned_8_Array_3D
               (1 .. Initial'Length - 15, 1 .. Initial'Length (2) - 1,
                Initial'Range (3));
@@ -70,7 +69,8 @@ package body Support_5A is
          end;
 
       elsif File_Kind = ".JPG" then
-         return Unsigned_8_Array_3D (JPEG_To_BMP.Process (File_Name));
+         return Unsigned_8_Array_3D (To_BMP.Process (File_Name));
+
       else
          Put_Line (Routine_Name & "unsupported image format " & File_Kind);
          declare
