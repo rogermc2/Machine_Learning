@@ -22,7 +22,7 @@ package body PNG_To_BMP is
 
    type p_Byte_Array is access ML_Arrays_And_Matrices.Byte_Array;
 
-   img_buf                : p_Byte_Array := null;
+   img_buf : p_Byte_Array := null;
 
    procedure Dispose is new Ada.Unchecked_Deallocation
      (ML_Arrays_And_Matrices.Byte_Array, p_Byte_Array);
@@ -37,8 +37,8 @@ package body PNG_To_BMP is
       subtype U16 is Unsigned_16;
       image_width        : constant Positive := GID.Pixel_width (image);
       padded_line_size_x : constant Positive :=
-                             4 * Integer (Float'Ceiling (Float (image_width) *
-                                            3.0 / 4.0));
+        4 * Integer (Float'Ceiling (Float (image_width) *
+                       3.0 / 4.0));
       idx                : Natural;  --  (in bytes)
 
       --  ----------------------------------------------------------------------
@@ -57,21 +57,22 @@ package body PNG_To_BMP is
          use Maths.Float_Math_Functions;
          use ML_Arrays_And_Matrices;
          use Real_Float_Arrays;
-         R45     : constant Float := Cos (0.25 * Pi);
-         R45_Mat : constant Real_Float_Matrix (1 .. 2, 1 .. 2) :=
-                     ((R45, -R45), (R45, R45));
-         XY      : Real_Float_Vector (1 .. 2) :=
-                     (Float (x) - 640.0, Float (y) - 427.0);
+         Width     : constant Float := 1280.0;
+         Height    : constant Float := 854.0;
+         Point_1   : constant Real_Float_Vector (1 .. 2) := (Width / 2.0, Height / 2.0);
+         Point_2   : constant Real_Float_Vector (1 .. 2) := (Float (x), Float (y));
+         R45       : constant Float := Cos (0.25 * Pi);
+         R45_Mat   : constant Real_Float_Matrix (1 .. 2, 1 .. 2) :=
+           ((R45, -R45), (R45, R45));
+         XY        : constant Real_Float_Vector (1 .. 2) :=
+           R45_Mat * (Point_2 - Point_1) + Point_1;
       begin
-         Put_Line ("Set_XY R45: " & Float'Image (R45));
          Put_Line ("Set_XY: " & Integer'Image (x) & Integer'Image (y));
          Put_Line ("Set_XY: " & Float'Image (XY (1)) & Float'Image (XY (2)));
-         XY := R45_Mat * XY;
-         XY (1) := XY (1) +  640.0 ;
-         XY (2) := XY (1) +  427.0;
-         Put_Line ("Set_XY rotated: " & Float'Image (XY (1)) & Float'Image (XY (2)));
-         idx := 3 * Natural (XY (1)) +
-           padded_line_size_x * Natural (XY (2));
+         Put_Line ("Set_XY rotated: " & Float'Image (XY (1)) &
+                     Float'Image (XY (2)));
+         idx := 3 * Natural (XY (1)) + padded_line_size_x * Natural (XY (2));
+
       end Set_X_Y_R45;
 
       --  ----------------------------------------------------------------------
@@ -122,15 +123,16 @@ package body PNG_To_BMP is
 
    begin  --  Load_raw_image
       Dispose (buffer);
+      --  GID.Unchanged | GID.Rotation_180 =>
       buffer := new ML_Arrays_And_Matrices.Byte_Array
         (0 .. padded_line_size_x * GID.Pixel_height (image) - 1);
-      if Image_Format = "PNG" then
-         BMP24_Load (image, next_frame);
-      elsif Image_Format = "JPEG" then
-         BMP24_Load_R45 (image, next_frame);
-      else
-         raise Unsupported_Image_Format;
-      end if;
+      --        if Image_Format = "PNG" then
+      BMP24_Load (image, next_frame);
+      --        elsif Image_Format = "JPEG" then
+      --           BMP24_Load_R45 (image, next_frame);
+      --        else
+      --           raise Unsupported_Image_Format;
+      --        end if;
 
    end Load_raw_image;
 
@@ -140,7 +142,7 @@ package body PNG_To_BMP is
       Routine_Name    : constant String := "PNG_To_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
       File_Kind       : constant String :=
-                          File_Name_Upper (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
+        File_Name_Upper (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
       in_file_id      : Ada.Streams.Stream_IO.File_Type;
       image_desc      : GID.Image_descriptor;
       Image_Format    : Unbounded_String;
@@ -178,6 +180,7 @@ package body PNG_To_BMP is
       declare
          Image_Data : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
       begin
+         if Image_Format = "PNG" then
             for row in reverse Image_Data'Range loop
                for col in Image_Data'Range (2) loop
                   for pix in Image_Data'Range (3) loop
@@ -192,6 +195,24 @@ package body PNG_To_BMP is
                   end loop;
                end loop;
             end loop;
+
+         elsif Image_Format = "JPEG" then
+            for row in reverse Image_Data'Range loop
+               for col in reverse Image_Data'Range (2) loop
+                  for pix in Image_Data'Range (3) loop
+                     Buffer_Index := Buffer_Index + 1;
+                     if pix = 1 then
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
+                     elsif pix = 2 then
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
+                     else
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index);
+                     end if;
+                  end loop;
+               end loop;
+            end loop;
+
+         end if;
 
          return Image_Data;
       end;  --  declare block
