@@ -2,6 +2,7 @@
 --  Derived from gid/test/To_BMP
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GID;
 
@@ -32,8 +33,8 @@ package body PNG_To_BMP is
       subtype U16 is Unsigned_16;
       image_width        : constant Positive := GID.Pixel_width (image);
       padded_line_size_x : constant Positive :=
-        4 * Integer (Float'Ceiling (Float (image_width) *
-                       3.0 / 4.0));
+                             4 * Integer (Float'Ceiling (Float (image_width) *
+                                            3.0 / 4.0));
       idx                : Natural;  --  (in bytes)
 
       --  ----------------------------------------------------------------------
@@ -99,11 +100,13 @@ package body PNG_To_BMP is
       Routine_Name    : constant String := "PNG_To_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
       File_Kind       : constant String :=
-        File_Name_Upper (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
+                          File_Name_Upper (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
       in_file_id      : Ada.Streams.Stream_IO.File_Type;
       image_desc      : GID.Image_descriptor;
+      Image_Format    : Unbounded_String;
       Width           : Positive;
       Height          : Positive;
+      Orientation     : Unbounded_String;
       next_frame      : Ada.Calendar.Day_Duration := 0.0;
       Buffer_Index    : Natural := 0;
    begin
@@ -116,38 +119,72 @@ package body PNG_To_BMP is
          try_tga =>
            Image_File_Name'Length >= 4 and then
          File_Kind = ".TGA");
-      --           File_Name_Upper
-      --             (File_Name_Upper'Last - 3 .. File_Name_Upper'Last) = ".TGA");
-      Width := GID.Pixel_width (image_desc);
-      Height := GID.Pixel_height (image_desc);
+      Image_Format := To_Unbounded_String (GID.Image_format_type'Image
+                                           (GID.Format (image_desc)));
+      Put_Line (Routine_Name & "image format: " & To_String (Image_Format));
+      Orientation := To_Unbounded_String
+        (GID.Orientation'Image (GID.Display_orientation (image_desc)));
+      Put_Line (Routine_Name & "orientation: " & To_String (Orientation));
 
       Load_raw_image (image_desc, img_buf, next_frame);
-      Assert (next_frame = 0.0, "");
+      Close (in_file_id);
+
+      Assert (next_frame = 0.0, Routine_Name & "animation is not supported ");
+      Width := GID.Pixel_width (image_desc);
+      Height := GID.Pixel_height (image_desc);
 
       declare
          Image_Data : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
       begin
-         for row in reverse Image_Data'Range loop
-            for col in Image_Data'Range (2) loop
-               for pix in Image_Data'Range (3) loop
-                  Buffer_Index := Buffer_Index + 1;
-                  if pix = 1 then
-                     Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
-                  elsif pix = 2 then
-                     Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
-                  else
-                     Image_Data (row, col, pix) := img_buf (Buffer_Index);
-                  end if;
+         if Image_Format = "PNG" then
+            for row in reverse Image_Data'Range loop
+               for col in Image_Data'Range (2) loop
+                  for pix in Image_Data'Range (3) loop
+                     Buffer_Index := Buffer_Index + 1;
+                     if pix = 1 then
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
+                     elsif pix = 2 then
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
+                     else
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index);
+                     end if;
+                  end loop;
                end loop;
             end loop;
-         end loop;
-         Close (in_file_id);
+
+         elsif Image_Format = "JPEG" then
+            for row in reverse Image_Data'Range loop
+               for col in Image_Data'Range (2) loop
+                  for pix in Image_Data'Range (3) loop
+                     Buffer_Index := Buffer_Index + 1;
+                     if pix = 1 then
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
+                     elsif pix = 2 then
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
+                     else
+                        Image_Data (row, col, pix) := img_buf (Buffer_Index);
+                     end if;
+                  end loop;
+               end loop;
+            end loop;
+
+         else
+            raise Unsupported_Image_Format;
+         end if;
+
          return Image_Data;
       end;  --  declare block
 
    exception
       when GID.unknown_image_format =>
          Put_Line (Routine_Name & "image format is unknown!");
+         if Is_Open (in_file_id) then
+            Close (in_file_id);
+         end if;
+         raise;
+
+      when Unsupported_Image_Format =>
+         Put_Line (Routine_Name & "image format is not supported");
          if Is_Open (in_file_id) then
             Close (in_file_id);
          end if;

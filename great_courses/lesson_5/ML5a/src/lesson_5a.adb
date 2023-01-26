@@ -99,12 +99,12 @@ begin
    --  Train the model.
    --  Result very dependent on initial weights
    Weights := (-2.0, 0.0, 0.093, -0.713);
-   Fit (Weights, All_Data, Labels);
-   Print_Float_Vector ("Fitted weights", Weights);
-
-   Python.Call (Py_Module, "show_bitmap",
-                To_Picture (Flat_Data, Image_Data'Length, Image_Data'Length (2),
-                  Weights));
+--     Fit (Weights, All_Data, Labels);
+--     Print_Float_Vector ("Fitted weights", Weights);
+--
+--     Python.Call (Py_Module, "show_bitmap",
+--                  To_Picture (Flat_Data, Image_Data'Length, Image_Data'Length (2),
+--                    Weights));
 
    Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
    Python.Finalize;
