@@ -1,9 +1,11 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Characters.Handling;
+with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
-with PNG_To_BMP; use PNG_To_BMP;
+with JPEG_To_BMP;
+with PNG_To_BMP;
 
 package body Support_5A is
 
@@ -42,31 +44,52 @@ package body Support_5A is
    --  -------------------------------------------------------------------------
 
    function Get_Picture (File_Name : String) return Unsigned_8_Array_3D is
-      Initial : constant Unsigned_8_Array_3D :=
-                  Unsigned_8_Array_3D (Process (File_Name));
-      Clipped : Unsigned_8_Array_3D
-        (1 .. Initial'Length - 15, 1 .. Initial'Length (2) - 1,
-         Initial'Range (3));
+      use Ada.Characters.Handling;
+      Routine_Name    : constant String := "Support_5A.Get_Pixels ";
+      File_Name_Upper : constant String := To_Upper (File_Name);
+      File_Kind       : constant String :=
+                          File_Name_Upper (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
    begin
-      for row in Clipped'Range loop
-         for col in Clipped'Range (2) loop
-            for pix in Clipped'Range (3) loop
-               Clipped (row, col, pix) := Initial (row, col, pix);
+      if File_Kind = ".PNG" then
+         declare
+            Initial : constant Unsigned_8_Array_3D :=
+                        Unsigned_8_Array_3D (PNG_To_BMP.Process (File_Name));
+            Clipped : Unsigned_8_Array_3D
+              (1 .. Initial'Length - 15, 1 .. Initial'Length (2) - 1,
+               Initial'Range (3));
+         begin
+            for row in Clipped'Range loop
+               for col in Clipped'Range (2) loop
+                  for pix in Clipped'Range (3) loop
+                     Clipped (row, col, pix) := Initial (row, col, pix);
+                  end loop;
+               end loop;
             end loop;
-         end loop;
-      end loop;
 
-      return Clipped;
+            return Clipped;
+         end;
+
+      elsif File_Kind = ".JPG" then
+         return Unsigned_8_Array_3D (JPEG_To_BMP.Process (File_Name));
+      else
+         Put_Line (Routine_Name & "unsupported image format " & File_Kind);
+         declare
+            Dummy : constant Unsigned_8_Array_3D (1 .. 1, 1 .. 1, 1 .. 1) :=
+                      (1 => (1 => (1 => 0)));
+         begin
+            return Dummy;
+         end;
+      end if;
 
    end Get_Picture;
 
    --  -------------------------------------------------------------------------
 
    function Set_All_Data (Yes_List, No_List : Integer_Matrix)
-                          return Integer_Matrix is
+                       return Integer_Matrix is
       All_Data              : constant Integer_Matrix := Yes_List & No_List;
       All_Data_With_Offset  : Integer_Matrix (All_Data'Range,
-                                               1 .. All_Data'Length (2) + 1);
+                                              1 .. All_Data'Length (2) + 1);
    begin
       for row in All_Data_With_Offset'Range loop
          for col in All_Data_With_Offset'Range (2) loop
@@ -117,11 +140,11 @@ package body Support_5A is
 
    --  -------------------------------------------------------------------------
 
-   function To_Picture (Flat_Data : Integer_Matrix;
+   function To_Picture (Flat_Data     : Integer_Matrix;
                         Height, Width : Positive; Weights : Real_Float_Vector)
-                        return Unsigned_8_Array_3D is
+                     return Unsigned_8_Array_3D is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Support_5A.To_Picture ";
+      --        Routine_Name : constant String := "Support_5A.To_Picture ";
       Out_Data     : constant Boolean_Array :=
                        To_Boolean (To_Real_Float_Matrix (Flat_Data) * Weights);
       Result       : Unsigned_8_Array_3D (1 .. Height, 1 .. Width, 1 .. 3);
