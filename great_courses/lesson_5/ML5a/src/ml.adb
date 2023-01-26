@@ -22,15 +22,16 @@ package body ML is
       use Interfaces;
       Routine_Name : constant String := "ML.Composite";
       Shift        : constant Positive := 157;
-      FGI          : Integer;
+      FG_Index     : Integer;
    begin
       Print_Matrix_Dimensions (Routine_Name & "Mask", Mask);
+
       for row in Background'First .. Foreground'First + Shift loop
          for col in Background'First (2) .. Foreground'Last (2) loop
-            FGI := row - Shift;
-            if FGI > 0 and then Mask (row, col, 1) /= 0 then
+            FG_Index := row - Shift;
+            if FG_Index > 0 and then Mask (row, col, 1) /= 0 then
                for pix in Background'Range (3) loop
-                  Background (row, col, pix) := Foreground (FGI, col, pix);
+                  Background (row, col, pix) := Foreground (FG_Index, col, pix);
                end loop;
             end if;
          end loop;
