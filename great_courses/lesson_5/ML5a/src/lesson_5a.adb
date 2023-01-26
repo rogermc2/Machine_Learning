@@ -12,7 +12,7 @@ with ML; use ML;
 with Support_5A; use Support_5A;
 
 procedure Lesson_5A is
---     use Real_Float_Arrays;
+   --     use Real_Float_Arrays;
    type Integer3_Array is array (Integer range 1 .. 3) of Integer;
 
    package Integer3_Package is new
@@ -24,7 +24,7 @@ procedure Lesson_5A is
    Forest_File_Name       : constant String := "../forest.jpg";
    Image_Data             : constant Unsigned_8_Array_3D :=
                               Get_Picture (Green_File_Name);
-   Forest_Image_Data      : constant Unsigned_8_Array_3D :=
+   Forest_Image_Data      : Unsigned_8_Array_3D :=
                               Get_Picture (Forest_File_Name);
    Green_Data             : constant Unsigned_8_Array_3D :=
                               Get_Pixels (Image_Data, Image_Data'First,
@@ -62,15 +62,15 @@ begin
          Labels (index) := 0;
       end if;
    end loop;
---     Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
---     Print_Matrix_Dimensions (Project_Name & "No_List", No_List);
---     Print_Matrix_Dimensions (Project_Name & "All_Data", All_Data);
---     Put_Line (Project_Name & "Labels length:" & Integer'Image (Labels'Length));
+   --     Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
+   --     Print_Matrix_Dimensions (Project_Name & "No_List", No_List);
+   --     Print_Matrix_Dimensions (Project_Name & "All_Data", All_Data);
+   --     Put_Line (Project_Name & "Labels length:" & Integer'Image (Labels'Length));
 
    Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
    Python.Initialize;
    Py_Module := Import_File ("lesson_5a");
---     Python.Call (Py_Module, "show_bitmap", Image_Data);
+   --     Python.Call (Py_Module, "show_bitmap", Image_Data);
    --     Python.Call (Py_Module, "show_bitmap", Green_Data);
    --     Python.Call (Py_Module, "show_bitmap", Fore_Data);
 
@@ -83,8 +83,8 @@ begin
          Seen_List.Append (Pixel_Colour);
       end if;
    end loop;
---     Put_Line (Project_Name & "Seen_List length:" &
---                 Integer'Image (Integer (Seen_List.Length)));
+   --     Put_Line (Project_Name & "Seen_List length:" &
+   --                 Integer'Image (Integer (Seen_List.Length)));
 
    --     Put_Line (Project_Name & "Loss vs weights examples:");
    --     for count in 1 .. 10 loop
@@ -102,15 +102,17 @@ begin
    Fit (Weights, All_Data, Labels);
    Print_Float_Vector ("Fitted weights", Weights);
 
-   Python.Call (Py_Module, "show_bitmap",
-                To_Picture (Flat_Data, Image_Data'Length, Image_Data'Length (2),
-                  Weights));
+   declare
+      New_Array : constant Unsigned_8_Array_3D :=
+                    To_Picture (Flat_Data, Image_Data'Length,
+                                Image_Data'Length (2), Weights);
+   begin
+      Python.Call (Py_Module, "show_bitmap", New_Array);
+      Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
+      Composite (New_Array, Image_Data, Forest_Image_Data);
+   end;
 
-   Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
    Python.Finalize;
-
-   Display_Forest (Forest_Image_Data);
-
    Put_Line (Project_Name & "finished.");
 
 end Lesson_5A;

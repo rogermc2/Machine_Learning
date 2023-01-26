@@ -1,4 +1,6 @@
 
+with Interfaces;
+
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -15,10 +17,26 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
-   procedure Display_Forest (Image_Data : Unsigned_8_Array_3D) is
+   procedure Composite (Mask, Foreground : Unsigned_8_Array_3D;
+                        Background       : in out Unsigned_8_Array_3D) is
+      use Interfaces;
+      Routine_Name : constant String := "ML.Composite";
+      Shift        : constant Positive := 157;
+      FGI          : Integer;
    begin
-      null;
-   end Display_Forest;
+      Print_Matrix_Dimensions (Routine_Name & "Mask", Mask);
+      for row in Background'First .. Foreground'First + Shift loop
+         for col in Background'First (2) .. Foreground'Last (2) loop
+            FGI := row - Shift;
+            if FGI > 0 and then Mask (row, col, 1) /= 0 then
+               for pix in Background'Range (3) loop
+                  Background (row, col, pix) := Foreground (FGI, col, pix);
+               end loop;
+            end if;
+         end loop;
+      end loop;
+
+   end Composite;
 
    --  -------------------------------------------------------------------------
 
