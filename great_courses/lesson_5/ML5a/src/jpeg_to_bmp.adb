@@ -17,7 +17,7 @@ with Ada.Unchecked_Deallocation;
 
 with ML_Arrays_And_Matrices;
 
-package body PNG_To_BMP is
+package body JPEG_To_BMP is
    use Interfaces;
 
    type p_Byte_Array is access ML_Arrays_And_Matrices.Byte_Array;
@@ -217,4 +217,4 @@ package body PNG_To_BMP is
 
    --  -------------------------------------------------------------------------
 
-end PNG_To_BMP;
+end JPEG_To_BMP;
