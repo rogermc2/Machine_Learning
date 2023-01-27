@@ -15,11 +15,12 @@ procedure Lesson_6A is
 --     type Integer3_Array is array (Integer range 1 .. 3) of Integer;
 
    Project_Name           : constant String := "Lesson_6A ";
-   Vocab_File_Name        : constant String := "../data/vocab.txt";
+   Vocab_File_Name        : constant String := "../../data/vocab.txt";
    Train_File_Name        : constant String := "../data/spam-train.csv";
    Test_File_Name         : constant String := "../data/spam-test.csv";
    Py_Module              : Module;
-   Word_Dict              : Vocablary_Dictionary_Map;
+   Word_Dict              : constant Vocablary_Dictionary_Map :=
+     Read_Vocabulary (Vocab_File_Name);
 --     Weights                : Real_Float_Vector (1 .. 4);
 begin
 

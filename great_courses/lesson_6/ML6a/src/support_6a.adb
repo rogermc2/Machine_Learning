@@ -42,7 +42,7 @@ package body Support_6A is
 
    function Read_Vocabulary (File_Name : String)
                              return Vocablary_Dictionary_Map is
-      --        Routine_Name : constant String := "Support_6A.Read_Vocab ";
+--        Routine_Name : constant String := "Support_6A.Read_Vocab ";
       File_ID         : File_Type;
       Lexicon_Size    : Natural := 0;
       Word_Dictionary : Vocablary_Dictionary_Map;
@@ -51,7 +51,8 @@ package body Support_6A is
       Lexicon_Size := 1;
 
       Open (File_ID, In_File, File_Name);
-      while not End_Of_File loop
+
+      while not End_Of_File (File_ID) loop
          declare
             aLine : constant String := Get_Line (File_ID);
             Count : constant Positive := Integer'Value (aLine (1 .. 4));
@@ -61,7 +62,8 @@ package body Support_6A is
             if Count > 1 then
                Word_Dictionary.Insert (Token, Lexicon_Size);
                Lexicon_Size := Lexicon_Size + 1;
-            end if ;
+            end if;
+--              Put_Line (Routine_Name & aLine);
          end;
       end loop;
       Close (File_ID);
