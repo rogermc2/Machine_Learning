@@ -28,8 +28,8 @@ package body ML is
    begin
       Print_Matrix_Dimensions (Routine_Name & "Mask", Mask);
 
-      for row in Result'First .. Result'First + Shift loop
-         for col in Result'First (2) .. Result'Last (2) loop
+      for row in Background'First .. Foreground'First + Shift loop
+         for col in Background'First (2) .. Foreground'Last (2) loop
             FG_Index := row - Shift;
             if FG_Index > 0 and then Mask (row, col, 1) /= 0 then
                for pix in Background'Range (3) loop
