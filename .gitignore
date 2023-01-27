@@ -13,6 +13,7 @@
 *obj*
 *.a
 *.ali
+*.dib
 *.dot
 *.json
 *.stderr

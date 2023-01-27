@@ -46,7 +46,8 @@ package ML_Arrays_And_Matrices is
      Integer;
 
    type Unsigned_8_Array_3D is array (Integer range <>, Integer range <>,
-                                      Integer range <>) of Interfaces.Unsigned_8;
+                                      Integer range <>) of
+     Interfaces.Unsigned_8;
 
    package Integer_Array_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Integer_Array);
@@ -262,6 +263,9 @@ package ML_Arrays_And_Matrices is
       return Real_Float_Matrix;
    function To_Real_Float_Matrix
      (List        : Real_Float_List; Data_Axis : Positive := 1;
+      First_Index : Integer := 1) return Real_Float_Matrix;
+   function To_Real_Float_Matrix
+     (Vec         : Real_Float_Vector; Data_Axis : Positive := 1;
       First_Index : Integer := 1) return Real_Float_Matrix;
    function To_Real_Float_Matrix (List : Real_Float_List_2D)
                                    return Real_Float_Matrix;

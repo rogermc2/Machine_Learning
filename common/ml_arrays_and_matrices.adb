@@ -1181,15 +1181,15 @@ package body ML_Arrays_And_Matrices is
 
    function Sum_Each_Column (Data : Real_Float_Matrix)
                              return Real_Float_Vector is
-      Val    : Float;
+      Sum    : Float;
       Result : Real_Float_Vector (Data'Range (2));
    begin
       for col in Data'Range (2) loop
-         Val := 0.0;
+         Sum := 0.0;
          for row in Data'Range loop
-            Val := Val + Data (row, Col);
+            Sum := Sum + Data (row, Col);
          end loop;
-         Result (col) := Val;
+         Result (col) := Sum;
       end loop;
 
       return Result;
@@ -1446,6 +1446,42 @@ package body ML_Arrays_And_Matrices is
             return Result;
          end;
       end if;
+
+   end To_Real_Float_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   function To_Real_Float_Matrix
+     (Vec         : Real_Float_Vector; Data_Axis : Positive := 1;
+      First_Index : Integer := 1) return Real_Float_Matrix is
+      Routine_Name : constant String :=
+                       "ML_Arrays_And_Matrices.To_Real_Float_Matrix Real_Float_Vector ";
+   begin
+      Assert (Data_Axis = 1 or Data_Axis = 2, Routine_Name &
+                " Invalid Data_Axis" & Integer'Image (Data_Axis) &
+                " should be 1 or 2.");
+         if Data_Axis = 1 then
+            declare
+               Result : Real_Float_Matrix
+                 (First_Index .. First_Index + Vec'Length - 1, 1 .. 1);
+            begin
+               for row in Result'Range loop
+                  Result (row, 1) := Vec (row);
+               end loop;
+               return Result;
+            end;
+
+         else
+            declare
+               Result : Real_Float_Matrix
+                 (1 .. 1, First_Index .. First_Index + Vec'Length - 1);
+            begin
+               for col in Result'Range (2) loop
+                  Result (1, col) := Vec (col);
+               end loop;
+               return Result;
+            end;
+         end if;
 
    end To_Real_Float_Matrix;
 

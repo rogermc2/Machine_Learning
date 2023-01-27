@@ -141,19 +141,6 @@ package body Neural_Processes is
 
    --  ------------------------------------------------------------------------
 
-   function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
-                           Max_Lines : Positive := 20000)
-                           return Load_Dataset.Digits_Data_Record is
-      use Load_Dataset;
-      Data : constant Digits_Data_Record :=
-               Load_Digits (File_Name, Num_Classes, Max_Lines);
-   begin
-      return Data;
-
-   end Load_Data_Set;
-
-   --  -------------------------------------------------------------------------
-
    function Mean_Square_Error (Y_True, Y_Pred : Real_Float_Vector) return Float is
       use Real_Float_Arrays;
    begin
