@@ -28,10 +28,12 @@ package body ML is
    begin
       Print_Matrix_Dimensions (Routine_Name & "Mask", Mask);
 
-      for row in Background'First .. Foreground'First + Shift loop
-         for col in Background'First (2) .. Foreground'Last (2) loop
+      for row in 1 .. Integer'Min (Background'Length, Foreground'Length + Shift)
+      loop
+         for col in 1 .. Integer'Min (Background'Length (2), Foreground'Length (2))
+         loop
             FG_Index := row - Shift;
-            if FG_Index > 0 and then Mask (row, col, 1) /= 0 then
+            if FG_Index > 0 and then Mask (FG_Index, col, 1) /= 0 then
                for pix in Background'Range (3) loop
                   Result (row, col, pix) := Foreground (FG_Index, col, pix);
                end loop;

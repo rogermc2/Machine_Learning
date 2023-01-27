@@ -107,7 +107,7 @@ begin
                     To_Picture (Flat_Data, Image_Data'Length,
                                 Image_Data'Length (2), Weights);
    begin
-      Python.Call (Py_Module, "show_bitmap", New_Array);
+--        Python.Call (Py_Module, "show_bitmap", New_Array);
       Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
       Python.Call (Py_Module, "show_bitmap",
                    Ml.Composite (New_Array, Image_Data, Forest_Image_Data));
