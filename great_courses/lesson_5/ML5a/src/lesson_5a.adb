@@ -2,8 +2,6 @@
 with Ada.Containers.Vectors;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Maths;
-
 with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
@@ -12,7 +10,6 @@ with ML; use ML;
 with Support_5A; use Support_5A;
 
 procedure Lesson_5A is
-   --     use Real_Float_Arrays;
    type Integer3_Array is array (Integer range 1 .. 3) of Integer;
 
    package Integer3_Package is new
@@ -62,10 +59,6 @@ begin
          Labels (index) := 0;
       end if;
    end loop;
-   --     Print_Matrix_Dimensions (Project_Name & "Yes_List", Yes_List);
-   --     Print_Matrix_Dimensions (Project_Name & "No_List", No_List);
-   --     Print_Matrix_Dimensions (Project_Name & "All_Data", All_Data);
-   --     Put_Line (Project_Name & "Labels length:" & Integer'Image (Labels'Length));
 
    Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
    Python.Initialize;
@@ -83,8 +76,6 @@ begin
          Seen_List.Append (Pixel_Colour);
       end if;
    end loop;
-   --     Put_Line (Project_Name & "Seen_List length:" &
-   --                 Integer'Image (Integer (Seen_List.Length)));
 
    --     Put_Line (Project_Name & "Loss vs weights examples:");
    --     for count in 1 .. 10 loop
@@ -97,7 +88,7 @@ begin
    --     New_Line;
 
    --  Train the model.
-   --  Result very dependent on initial weights
+   --  Result is very dependent on the initial weights
    Weights := (-2.0, 0.0, 0.093, -0.713);
    Fit (Weights, All_Data, Labels);
    Print_Float_Vector ("Fitted weights", Weights);
@@ -108,7 +99,7 @@ begin
                                 Image_Data'Length (2), Weights);
    begin
 --        Python.Call (Py_Module, "show_bitmap", New_Array);
-      Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
+--        Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
       Python.Call (Py_Module, "show_bitmap",
                    Ml.Composite (New_Array, Image_Data, Forest_Image_Data));
    end;

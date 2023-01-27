@@ -23,19 +23,21 @@ package body ML is
       use Interfaces;
       Routine_Name : constant String := "ML.Composite ";
       Shift        : constant Positive := 157;
-      FG_Index     : Integer;
+      Last_Row     : constant Positive :=
+                       Integer'Min (Background'Length, Foreground'Length + Shift);
+      Last_Col     : constant Positive :=
+                      Integer'Min (Background'Length (2), Foreground'Length (2));
+      FG_Row       : Integer;
       Result       : Unsigned_8_Array_3D := Background;
    begin
       Print_Matrix_Dimensions (Routine_Name & "Mask", Mask);
 
-      for row in 1 .. Integer'Min (Background'Length, Foreground'Length + Shift)
-      loop
-         for col in 1 .. Integer'Min (Background'Length (2), Foreground'Length (2))
-         loop
-            FG_Index := row - Shift;
-            if FG_Index > 0 and then Mask (FG_Index, col, 1) /= 0 then
+      for row in 1 .. Last_Row loop
+         for col in 1 .. Last_Col loop
+            FG_Row := row - Shift;
+            if FG_Row > 0 and then Mask (FG_Row, col, 1) = 0 then
                for pix in Background'Range (3) loop
-                  Result (row, col, pix) := Foreground (FG_Index, col, pix);
+                  Result (row, col, pix) := Foreground (FG_Row, col, pix);
                end loop;
             end if;
          end loop;

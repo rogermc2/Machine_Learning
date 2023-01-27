@@ -3,7 +3,6 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Handling;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
 with To_BMP;
 
 package body Support_5A is
