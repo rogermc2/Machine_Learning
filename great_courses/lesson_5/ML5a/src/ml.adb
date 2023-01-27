@@ -17,25 +17,29 @@ package body ML is
 
    --  -------------------------------------------------------------------------
 
-   procedure Composite (Mask, Foreground : Unsigned_8_Array_3D;
-                        Background       : in out Unsigned_8_Array_3D) is
+   function Composite
+     (Mask, Foreground : Unsigned_8_Array_3D; Background : Unsigned_8_Array_3D)
+      return Unsigned_8_Array_3D is
       use Interfaces;
       Routine_Name : constant String := "ML.Composite ";
       Shift        : constant Positive := 157;
       FG_Index     : Integer;
+      Result       : Unsigned_8_Array_3D := Background;
    begin
       Print_Matrix_Dimensions (Routine_Name & "Mask", Mask);
 
-      for row in Background'First .. Foreground'First + Shift loop
-         for col in Background'First (2) .. Foreground'Last (2) loop
+      for row in Result'First .. Result'First + Shift loop
+         for col in Result'First (2) .. Result'Last (2) loop
             FG_Index := row - Shift;
             if FG_Index > 0 and then Mask (row, col, 1) /= 0 then
                for pix in Background'Range (3) loop
-                  Background (row, col, pix) := Foreground (FG_Index, col, pix);
+                  Result (row, col, pix) := Foreground (FG_Index, col, pix);
                end loop;
             end if;
          end loop;
       end loop;
+
+      return Result;
 
    end Composite;
 

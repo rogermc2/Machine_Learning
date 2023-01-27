@@ -24,7 +24,7 @@ procedure Lesson_5A is
    Forest_File_Name       : constant String := "../forest.jpg";
    Image_Data             : constant Unsigned_8_Array_3D :=
                               Get_Picture (Green_File_Name);
-   Forest_Image_Data      : Unsigned_8_Array_3D :=
+   Forest_Image_Data      : constant Unsigned_8_Array_3D :=
                               Get_Picture (Forest_File_Name);
    Green_Data             : constant Unsigned_8_Array_3D :=
                               Get_Pixels (Image_Data, Image_Data'First,
@@ -109,10 +109,12 @@ begin
    begin
       Python.Call (Py_Module, "show_bitmap", New_Array);
       Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
-      Composite (New_Array, Image_Data, Forest_Image_Data);
+      Python.Call (Py_Module, "show_bitmap",
+                   Ml.Composite (New_Array, Image_Data, Forest_Image_Data));
    end;
 
    Python.Finalize;
+
    Put_Line (Project_Name & "finished.");
 
 end Lesson_5A;
