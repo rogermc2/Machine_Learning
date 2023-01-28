@@ -32,8 +32,7 @@ begin
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
    Python.Call (Classifier, "classify", Train_Data.Features,
-                Train_Data.Labels, Test_Data.Features);
---     Python.Call (Classifier, "predict", Test_Data.Features);
+                Train_Data.Labels, Test_Data.Features, Test_Data.Labels);
 
    --  Train the model.
 

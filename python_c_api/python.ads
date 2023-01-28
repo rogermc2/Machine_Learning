@@ -85,6 +85,11 @@ package Python is
                    A : ML_Arrays_And_Matrices.Integer_Array_List;
                    B : ML_Arrays_And_Matrices.Integer_Array_List;
                    C : ML_Arrays_And_Matrices.Integer_Array_List);
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Integer_Array_List;
+                   B : ML_Arrays_And_Matrices.Integer_Array_List;
+                   C : ML_Arrays_And_Matrices.Integer_Array_List;
+                   D : ML_Arrays_And_Matrices.Integer_Array_List);
    
 private
 
