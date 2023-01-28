@@ -12,7 +12,7 @@ with Support_6A; use Support_6A;
 
 procedure Lesson_6A is
 
---     type Integer3_Array is array (Integer range 1 .. 3) of Integer;
+   --     type Integer3_Array is array (Integer range 1 .. 3) of Integer;
 
    Project_Name           : constant String := "Lesson_6A ";
    Vocab_File_Name        : constant String := "../../data/vocab.txt";
@@ -25,14 +25,16 @@ procedure Lesson_6A is
                               Get_Data (Train_File_Name, Word_Dict);
    Test_Data              : constant Data_Record :=
                               Get_Data (Test_File_Name, Word_Dict);
---     Y_Hat                  : Integer_Array_List;
---     Weights                : Real_Float_Vector (1 .. 4);
+   Accuracy               : Float;
+   --     Weights                : Real_Float_Vector (1 .. 4);
 begin
 
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
-   Python.Call (Classifier, "classify", Train_Data.Features,
-                Train_Data.Labels, Test_Data.Features, Test_Data.Labels);
+   Accuracy := Python.Call
+     (Classifier, "classify", Train_Data.Features, Train_Data.Labels,
+      Test_Data.Features, Test_Data.Labels);
+   Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
 
    --  Train the model.
 
