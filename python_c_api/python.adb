@@ -182,6 +182,11 @@ package body Python is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array_List)
                       return PyObject is
       use Interfaces.C;
+      use ML_Arrays_And_Matrices;
+      
+      function Py_BuildValue (Format : char_array; T1 : int) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+      
       Routine_Name : constant String := "Python.To_Tuple Integer_Array_List ";
       Tuple        : PyObject;
       Py_Index     : int := -1;
@@ -189,7 +194,21 @@ package body Python is
       Tuple := PyTuple_New (int (Data.Length));
       for row in Data.First_Index .. Data.Last_Index loop
          Py_Index := Py_Index + 1;
-         PyTuple_SetItem (Tuple, Py_Index, To_Tuple (Data (row)));
+         declare
+            Row_Data     : constant Integer_Array := Data (row);
+            PyParams     : PyObject;
+            Row_Tuple    : PyObject;
+            Py_Row_Index : int := -1;
+         begin
+            Row_Tuple := PyTuple_New (int (Row_Data'Length));
+            for index in Row_Data'Range loop
+               Py_Row_Index := Py_Row_Index + 1;
+               PyParams := Py_BuildValue (To_C ("(i)"), int (Row_Data (index)));
+               PyTuple_SetItem (Row_Tuple, Py_Row_Index, PyParams); 
+               Py_DecRef (PyParams);
+            end loop;
+            PyTuple_SetItem (Tuple, Py_Index, To_Tuple (Row_Data));
+         end;
       end loop;
 
       return Tuple;
@@ -1224,8 +1243,8 @@ package body Python is
          PyErr_Print;
       end if;
 
---        Result := PyInt_AsLong (PyResult);
---        Put_Line (Routine_Name & " Result: " & Interfaces.C.long'Image (Result));
+      --        Result := PyInt_AsLong (PyResult);
+      --        Put_Line (Routine_Name & " Result: " & Interfaces.C.long'Image (Result));
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
