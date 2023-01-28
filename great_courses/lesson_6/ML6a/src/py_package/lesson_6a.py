@@ -1,10 +1,23 @@
-import numpy as np
-import matplotlib.pyplot as plt
+from sklearn import tree
 
-def show_bitmap(bitmap, Row_Size):
-    listmap = list (bitmap[0])
-    bm_array = np.asarray(bitmap[0])
-    num_rows = int (len(bm_array) / Row_Size)
-    bm_array = bm_array.reshape(num_rows, Row_Size, 3)
-    plt.imshow(bm_array)
-    plt.show()
+import matplotlib
+from matplotlib import pyplot
+
+def classify (dat, labels):
+    
+    clf = tree.DecisionTreeClassifier(max_leaf_nodes=6)
+    clf = clf.fit(dat, labels)
+    
+#    correct = 0
+#    for i in range(len(dat)):
+#        if clf.predict([dat[i]]) == labels[i]:
+#            correct = correct + 1
+#    percent_correct = 100.0 * correct / len (dat)
+#    print("Percentage correct: ", percent_correct)
+#    
+#    tree.plot_tree (clf, feature_names=feat_names, filled=True,
+#                    rounded=True, fontsize=8)
+#                    pyplot.show()
+#                    print()
+#                    return percent_correct
+

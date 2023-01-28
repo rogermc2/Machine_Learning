@@ -20,7 +20,7 @@ package body Support_6A is
       Data            : Data_Record;
    begin
       Open (File_ID, In_File, File_Name);
-      while not End_Of_File loop
+      while not End_Of_File (File_ID) loop
          declare
             aLine : constant String := Get_Line (File_ID);
             Label : constant Integer_Array (1 .. 1) :=
@@ -44,11 +44,10 @@ package body Support_6A is
                              return Vocablary_Dictionary_Map is
 --        Routine_Name : constant String := "Support_6A.Read_Vocab ";
       File_ID         : File_Type;
-      Lexicon_Size    : Natural := 0;
+      Lexicon_Size    : Positive := 1;
       Word_Dictionary : Vocablary_Dictionary_Map;
    begin
       Word_Dictionary.Insert (Unknown, Lexicon_Size);
-      Lexicon_Size := 1;
 
       Open (File_ID, In_File, File_Name);
 

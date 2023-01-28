@@ -179,6 +179,30 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array_List)
+                      return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Integer_Array_List ";
+      Tuple        : PyObject;
+      Py_Index     : int := -1;
+   begin
+      Tuple := PyTuple_New (int (Data.Length));
+      for row in Data.First_Index .. Data.Last_Index loop
+         Py_Index := Py_Index + 1;
+         PyTuple_SetItem (Tuple, Py_Index, To_Tuple (Data (row)));
+      end loop;
+
+      return Tuple;
+
+   exception
+      when E : others =>
+         raise Interpreter_Error with Routine_Name & "error" &
+           Exception_Message (E);
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject is
       use Interfaces.C;
@@ -1109,7 +1133,7 @@ package body Python is
       end if;
 
       Result := PyInt_AsLong (PyResult);
-      Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
+      Put_Line (Routine_Name & "Result: " & Interfaces.C.long'Image (Result));
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
@@ -1154,7 +1178,7 @@ package body Python is
       end if;
 
       Result := PyInt_AsLong (PyResult);
-      Put_Line ("Python.Call 2 Result: " & Interfaces.C.long'Image (Result));
+      Put_Line (Routine_Name & "Result: " & Interfaces.C.long'Image (Result));
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
@@ -1207,6 +1231,49 @@ package body Python is
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Integer_Array_List;
+                   B : ML_Arrays_And_Matrices.Integer_Array_List) is
+      use System;
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1, T2  : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call 2 * Integer_Array_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+      Result       : aliased Interfaces.C.long;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Assert (B_Tuple /= Null_Address, Routine_Name &
+                "Labels_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Result := PyInt_AsLong (PyResult);
+      Put_Line (Routine_Name & " Result: " & Interfaces.C.long'Image (Result));
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 

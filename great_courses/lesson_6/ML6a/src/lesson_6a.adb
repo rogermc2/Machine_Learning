@@ -16,17 +16,22 @@ procedure Lesson_6A is
 
    Project_Name           : constant String := "Lesson_6A ";
    Vocab_File_Name        : constant String := "../../data/vocab.txt";
-   Train_File_Name        : constant String := "../data/spam-train.csv";
-   Test_File_Name         : constant String := "../data/spam-test.csv";
-   Py_Module              : Module;
+   Train_File_Name        : constant String := "../../data/spam-train.csv";
+   Test_File_Name         : constant String := "../../data/spam-test.csv";
+   Classifier             : Module;
    Word_Dict              : constant Vocablary_Dictionary_Map :=
-     Read_Vocabulary (Vocab_File_Name);
+                              Read_Vocabulary (Vocab_File_Name);
+   Train_Data             : constant Data_Record :=
+                              Get_Data (Train_File_Name, Word_Dict);
+   Test_Data              : constant Data_Record :=
+                              Get_Data (Test_File_Name, Word_Dict);
 --     Weights                : Real_Float_Vector (1 .. 4);
 begin
 
    Python.Initialize;
-   Py_Module := Import_File ("lesson_6a");
-   --     Python.Call (Py_Module, "show_bitmap", Image_Data);
+   Classifier := Import_File ("lesson_6a");
+   Python.Call (Classifier, "classify", Train_Data.Features,
+                Train_Data.Labels);
 
    --  Train the model.
 
