@@ -2,7 +2,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
-with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+--  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
 
 --  with Maths;
@@ -25,15 +25,15 @@ procedure Lesson_6A is
                               Get_Data (Train_File_Name, Word_Dict);
    Test_Data              : constant Data_Record :=
                               Get_Data (Test_File_Name, Word_Dict);
-   Y_Hat                  : Integer_Array_List;
+--     Y_Hat                  : Integer_Array_List;
 --     Weights                : Real_Float_Vector (1 .. 4);
 begin
 
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
    Python.Call (Classifier, "classify", Train_Data.Features,
-                Train_Data.Labels);
-   Y_Hat := Python.Call (Classifier, "predict", Test_Data.Features);
+                Train_Data.Labels, Test_Data.Features);
+--     Python.Call (Classifier, "predict", Test_Data.Features);
 
    --  Train the model.
 

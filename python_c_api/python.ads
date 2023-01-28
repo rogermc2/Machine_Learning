@@ -76,12 +76,15 @@ package Python is
    procedure Call (M : Module; Function_Name : String;
                    A : NL_Types.Boolean_List_2D; B : NL_Types.Boolean_List;
                    C : NL_Types.Boolean_List_2D; D : ML_Types.Unbounded_List);
-   function Call (M : Module; Function_Name : String;
-                  A : ML_Arrays_And_Matrices.Integer_Array_List)
-                  return ML_Arrays_And_Matrices.Integer_Array_List;
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Integer_Array_List);
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Array_List;
                    B : ML_Arrays_And_Matrices.Integer_Array_List);
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Integer_Array_List;
+                   B : ML_Arrays_And_Matrices.Integer_Array_List;
+                   C : ML_Arrays_And_Matrices.Integer_Array_List);
    
 private
 

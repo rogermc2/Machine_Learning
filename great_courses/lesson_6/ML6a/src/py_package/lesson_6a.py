@@ -3,13 +3,13 @@ from sklearn import tree
 import matplotlib
 from matplotlib import pyplot
 
-def classify (dat, labels):
+def classify (dat, labels, test_data):
     
     clf = tree.DecisionTreeClassifier(max_leaf_nodes=6)
     clf = clf.fit(dat, labels)
 
-def predict (test_data):
-    return clf.predict (test_data)
+#def predict (test_data):
+    clf.predict (test_data)
 
 #    correct = 0
 #    for i in range(len(dat)):
