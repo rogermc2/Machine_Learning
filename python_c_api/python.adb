@@ -496,18 +496,16 @@ package body Python is
 
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer is
+      use Interfaces.C;
 
-      function Py_BuildValue (Format : Interfaces.C.char_array;
-                              A      : Interfaces.C.int) return PyObject;
+      function Py_BuildValue (Format : char_array; A : int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       PyParams : PyObject;
       PyResult : PyObject;
-      Result   : aliased Interfaces.C.long;
+      Result   : aliased long;
    begin
-      PyParams := Py_BuildValue (Interfaces.C.To_C ("(i)"),
-                                 Interfaces.C.int (A));
+      PyParams := Py_BuildValue (To_C ("(i)"), int (A));
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
       
@@ -790,46 +788,6 @@ package body Python is
       Py_DecRef (PyResult);
 
    end Call;
-
-   --  -------------------------------------------------------------------------
-
-   --     procedure Call (M    : Module; Function_Name : String;
-   --                     A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
-   --                     B    : ML_Arrays_And_Matrices.Integer_Matrix;
-   --                     C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
-   --                     D    : ML_Arrays_And_Matrices.Integer_Matrix) is
-   --        --        Routine_Name : constant String := "Python.Call ABCD ";
-   --  
-   --        function Py_BuildValue (Format          : Interfaces.C.char_array;
-   --                                T1, T2, T3, T4  : PyObject) return PyObject;
-   --        pragma Import (C, Py_BuildValue, "Py_BuildValue");
-   --  
-   --        Py_Func  : PyObject;
-   --        A_Tuple  : constant PyObject := To_Tuple (A);
-   --        B_Tuple  : constant PyObject := To_Tuple (B);
-   --        C_Tuple  : constant PyObject := To_Tuple (C);
-   --        D_Tuple  : constant PyObject := To_Tuple (D);
-   --        PyParams : PyObject;
-   --        PyResult : PyObject;
-   --        Result   : aliased Interfaces.C.long;
-   --     begin
-   --        Py_Func := Get_Symbol (M, Function_Name);
-   --        PyParams :=
-   --          Py_BuildValue (Interfaces.C.To_C ("OOOO"),
-   --                         A_Tuple, B_Tuple, C_Tuple, D_Tuple);
-   --        Py_DecRef (A_Tuple);
-   --        Py_DecRef (B_Tuple);
-   --        Py_DecRef (C_Tuple);
-   --        Py_DecRef (D_Tuple);
-   --  
-   --        PyResult := Call_Object (Py_Func, PyParams);
-   --        Py_DecRef (Py_Func);
-   --        Py_DecRef (PyParams);
-   --  
-   --        Result := PyInt_AsLong (PyResult);     
-   --        Py_DecRef (PyResult);
-   --  
-   --     end Call;
 
    --  -------------------------------------------------------------------------
 
@@ -1233,6 +1191,48 @@ package body Python is
       Py_DecRef (C_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Call (M : Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Integer_Array_List)
+                  return ML_Arrays_And_Matrices.Integer_Array_List is
+      use System;
+      use ML_Arrays_And_Matrices;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call 2 * Integer_Array_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+      Result       : aliased Integer_Array_List;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+--        Result := PyInt_AsLong (PyResult);
+--        Put_Line (Routine_Name & " Result: " & Interfaces.C.long'Image (Result));
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+      
+      return Result;
 
    end Call;
 
