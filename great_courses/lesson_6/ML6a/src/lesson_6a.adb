@@ -30,7 +30,8 @@ begin
    CLF := Python_CLF.Call (Classifier, "init_classifer", Max_Leaf_Nodes);
    --  Train the model.
    Python_CLF.Call (Classifier, "fit", CLF, Train_Data.Features,
-                    Train_Data.Labels, Test_Data.Features, Test_Data.Labels);
+                    Train_Data.Labels);
+--     Python_CLF.Call (Classifier, "predict",  Test_Data.Features);
    --     Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
 
    Python.Finalize;

@@ -38,7 +38,7 @@ package body Python_CLF is
    -- --------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject; A   : Integer_Array_List) return Float is
+                  CLF : PyObject; A : Integer_Array_List) return Float is
       use Python;
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
@@ -71,6 +71,44 @@ package body Python_CLF is
       Py_DecRef (Py_Result);
 
       return Float (Result);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M   : Python.Module; Function_Name : String;
+                   CLF : in out PyObject;
+                   A   : ML_Arrays_And_Matrices.Integer_Array_List;
+                   B   : ML_Arrays_And_Matrices.Integer_Array_List) is
+      use Python;
+
+      function Py_BuildValue (Format             : Interfaces.C.char_array;
+                              T1, T2, T3 : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call 4 * Integer_Array_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      CLF := Call_Object (PyFunc, PyParams);
+      if CLF = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
 
    end Call;
 

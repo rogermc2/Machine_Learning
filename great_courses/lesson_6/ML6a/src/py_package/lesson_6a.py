@@ -6,7 +6,7 @@ from matplotlib import pyplot
 def init_classifer(max_leaves):
     return tree.DecisionTreeClassifier(max_leaf_nodes=max_leaves)
 
-def fit (clf, dat, labels, testdat, testlabs):
+def fit (clf, dat, labels):
 #    clf = tree.DecisionTreeClassifier(max_leaf_nodes=6)
 #    clf = clf.fit(dat, labels)
     return clf.fit(dat, labels)
