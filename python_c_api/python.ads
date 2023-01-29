@@ -8,17 +8,20 @@ with Python_API;
 
 package Python is
 
+   type Module is new System.Address;
+   
    Interpreter_Error : exception;
    
-   type Module is private;
-
    procedure Initialize (Program_Name : String := "");
    procedure Finalize;
     
    procedure Execute_String (Script : String);
-
    function Import_File (File_Name : String) return Module;
+   function Call_Object (PyFunc, PyParams : Python_API.PyObject)
+                         return Python_API.PyObject;
    procedure Close_Module (M : Module);
+   function Get_Symbol (M : in Module; Function_Name : in String)
+                        return Python_API.PyObject;
    
    --  Overloads for "all" needed combinations of parameters and return types:
    
@@ -93,9 +96,5 @@ package Python is
                   D : ML_Arrays_And_Matrices.Integer_Array_List)
                   return Float;
    function Run_String (Script : String) return Python_API.PyObject;
-   
-private
-
-   type Module is new System.Address;
 
 end Python;
