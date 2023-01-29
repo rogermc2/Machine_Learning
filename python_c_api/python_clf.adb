@@ -91,8 +91,7 @@ package body Python_CLF is
 
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject;
-                   A   : ML_Arrays_And_Matrices.Integer_Array_List;
-                   B   : ML_Arrays_And_Matrices.Integer_Array_List) is
+                   A   : Integer_Array_List; B : ML_Types.Integer_List) is
       use Python;
 
       function Py_BuildValue (Format             : Interfaces.C.char_array;

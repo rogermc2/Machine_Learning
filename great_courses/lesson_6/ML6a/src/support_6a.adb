@@ -3,7 +3,6 @@
 --  with Ada.Characters.Handling;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with ML_Types;
 with Neural_Utilities;
 
 package body Support_6A is
@@ -23,8 +22,7 @@ package body Support_6A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant String := Get_Line (File_ID);
-            Label : constant Integer_Array (1 .. 1) :=
-                      (1 => Integer'Value (aLine (1 .. 1)));
+            Label : constant Integer := Integer'Value (aLine (1 .. 1));
             Token : constant Integer_Array :=
                       Tokenize (aLine (3 .. aLine'Last), Dictionary);
          begin

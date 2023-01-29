@@ -3,6 +3,7 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_Types;
 
 package Support_6A is
 
@@ -12,7 +13,7 @@ package Support_6A is
 
    type Data_Record is record
       Features : Integer_Array_List;
-      Labels   : Integer_Array_List;
+      Labels   : ML_Types.Integer_List;
    end record;
 
    function Get_Data (File_Name : String; Dictionary : Vocablary_Dictionary_Map)

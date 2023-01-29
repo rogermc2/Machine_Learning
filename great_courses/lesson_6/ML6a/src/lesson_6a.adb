@@ -1,8 +1,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
-with Classifier_Utilities;
+--  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
 with Python_API;
@@ -31,10 +30,13 @@ procedure Lesson_6A is
       Correct     : Natural := 0;
       Accuracy    : Float;
    begin
-      Print_Integer_Array (Project_Name & "Prediction: ", Predictions, 1, 30);
+--        Put_Line (Project_Name & "Predictions lenght: " &
+--                 Integer'Image (Predictions'Length));
+--        Put_Line (Project_Name & "Test_Data.Labels lenght: " &
+--                 Integer'Image (Integer (Test_Data.Labels.Length)));
+--        Print_Integer_Array (Project_Name & "Prediction: ", Predictions, 1, 30);
       for index in Predictions'Range loop
-         if Predictions (index) =
-           Classifier_Utilities.Arg_Max (Test_Data.Labels (index)) - 1 then
+         if Predictions (index) = Test_Data.Labels (index) then
             Correct := Correct + 1;
          end if;
       end loop;

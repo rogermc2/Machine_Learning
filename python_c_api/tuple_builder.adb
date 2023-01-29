@@ -75,6 +75,25 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : ML_Types.Integer_List) return PyObject is
+      use Interfaces.C;
+--        Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
+      Tuple        : constant PyObject := PyTuple_New (int (Data.Length));
+      Long_Value   : long;
+      Py_Index     : int := -1;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         Py_Index := Py_Index + 1;
+         Long_Value := long (Data.Element (index));
+         PyTuple_SetItem (Tuple, Py_Index, PyLong_FromLong (Long_Value));
+      end loop;
+
+      return Tuple;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject is
       use Interfaces.C;
