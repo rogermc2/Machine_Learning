@@ -1,7 +1,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
 with Python_API;
@@ -32,10 +32,12 @@ begin
    Python_CLF.Call (Classifier, "fit", CLF, Train_Data.Features,
                     Train_Data.Labels);
    declare
-      Prediction : Integer_Array := Python_CLF.Call
+      Predictions : constant Integer_Array := Python_CLF.Call
         (Classifier, "predict", CLF, Test_Data.Features);
    begin
-      null;
+      Put_Line (Project_Name & "Predictions length: " &
+                  Integer'Image (Predictions'Length));
+      Print_Integer_Array (Project_Name & "Prediction: ", Predictions);
       --     Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
    end;
 
