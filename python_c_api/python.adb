@@ -1342,11 +1342,11 @@ package body Python is
    --  -------------------------------------------------------------------------
 
    function Call (M : Module; Function_Name : String;
-                  A : ML_Arrays_And_Matrices.Integer_Array_List;
-                  B : ML_Arrays_And_Matrices.Integer_Array_List;
-                  C : ML_Arrays_And_Matrices.Integer_Array_List;
-                  D : ML_Arrays_And_Matrices.Integer_Array_List)
-                  return Float is
+                   A : ML_Arrays_And_Matrices.Integer_Array_List;
+                   B : ML_Arrays_And_Matrices.Integer_Array_List;
+                   C : ML_Arrays_And_Matrices.Integer_Array_List;
+                   D : ML_Arrays_And_Matrices.Integer_Array_List)
+   return float is
       use System;
       function Py_BuildValue (Format         : Interfaces.C.char_array;
                               T1, T2, T3, T4 : PyObject)  return PyObject;
@@ -1379,8 +1379,8 @@ package body Python is
       end if;
 
       Result := PyFloat_AsDouble (PyResult);
---        Put_Line (Routine_Name & " Result: " &
---                    Interfaces.C.double'Image (Result));
+      Put_Line (Routine_Name & " Result: " &
+                  Interfaces.C.double'Image (Result));
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
@@ -1393,6 +1393,21 @@ package body Python is
       return Float (Result);
 
    end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Run_String (Script : String) return PyObject is
+      use System;
+      Obj : PyObject;
+   begin
+      Obj := PyRun_String (Interfaces.C.To_C (Script));
+      if Obj = Null_Address then
+         Put_Line ("Python.Run_String caused a Python exception!");
+      end if;
+      
+      return Obj;
+
+   end Run_String;
 
    --  -------------------------------------------------------------------------
 

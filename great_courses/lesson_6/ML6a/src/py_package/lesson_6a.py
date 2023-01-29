@@ -3,6 +3,9 @@ from sklearn import tree
 import matplotlib
 from matplotlib import pyplot
 
+def init_classifer(max_leaves):
+    return tree.DecisionTreeClassifier(max_leaf_nodes=max_leaves)
+
 def classify (dat, labels, testdat, testlabs):
     
     clf = tree.DecisionTreeClassifier(max_leaf_nodes=6)

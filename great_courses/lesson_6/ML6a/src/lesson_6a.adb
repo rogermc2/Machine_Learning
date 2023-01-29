@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use Basic_Printing;
 --  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
+--  with Python_API;
 
 --  with Maths;
 
@@ -25,12 +26,14 @@ procedure Lesson_6A is
                               Get_Data (Train_File_Name, Word_Dict);
    Test_Data              : constant Data_Record :=
                               Get_Data (Test_File_Name, Word_Dict);
+--     Max_Leaf_Nodes         : constant Positive := 6;
    Accuracy               : Float;
-   --     Weights                : Real_Float_Vector (1 .. 4);
+--     CLF                    : Python_API.PyObject;
 begin
 
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
+--     CLF := Python.Call (Classifier, "init_classifer", Max_Leaf_Nodes);
    Accuracy := Python.Call
      (Classifier, "classify", Train_Data.Features, Train_Data.Labels,
       Test_Data.Features, Test_Data.Labels);

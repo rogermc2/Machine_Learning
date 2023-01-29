@@ -110,6 +110,10 @@ package Python_API is
                                 return Interfaces.C.int;
    pragma Import (C, PyRun_SimpleString, "PyRun_SimpleString");
    
+   function PyRun_String (Command : Interfaces.C.char_array)
+                                return PyObject;
+   pragma Import (C, PyRun_String, "PyRun_String");
+
    procedure Py_SetProgramName (Name : Interfaces.C.char_array);
    pragma Import (C, Py_SetProgramName, "Py_SetProgramName");
     

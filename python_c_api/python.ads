@@ -4,6 +4,7 @@ with System;
 with ML_Types;
 with NL_Types;
 with ML_Arrays_And_Matrices;
+with Python_API;
 
 package Python is
 
@@ -91,6 +92,7 @@ package Python is
                   C : ML_Arrays_And_Matrices.Integer_Array_List;
                   D : ML_Arrays_And_Matrices.Integer_Array_List)
                   return Float;
+   function Run_String (Script : String) return Python_API.PyObject;
    
 private
 
