@@ -38,7 +38,9 @@ package body Python_CLF is
    -- --------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject; A : Integer_Array_List) return Float is
+                  CLF : PyObject; A : Integer_Array_List)
+                  return Integer_Array is
+      use Interfaces.C;
       use Python;
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
@@ -50,7 +52,6 @@ package body Python_CLF is
       A_Tuple      : constant PyObject := To_Tuple (A);
       PyParams     : PyObject;
       Py_Result    : PyObject;
-      Result       : aliased Interfaces.C.double;
    begin
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
 
@@ -63,14 +64,25 @@ package body Python_CLF is
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
       end if;
-      Result := PyFloat_AsDouble (Py_Result);
 
-      Py_DecRef (PyFunc);
-      Py_DecRef (A_Tuple);
-      Py_DecRef (PyParams);
-      Py_DecRef (Py_Result);
+      declare
+         Tuple_Size : constant int := PyTuple_Size (Py_Result);
+         Tuple_Item : PyObject;
+         Result     : Integer_Array (1 .. Integer (Tuple_Size));
+      begin
+         for index in 0 .. Tuple_Size - 1 loop
+            Tuple_Item := PyTuple_GetItem (Py_Result, index);
+            Result (Integer (index) + 1) :=
+              Integer (PyLong_AsLong (Tuple_Item));
+         end loop;
+         --        Result := PyParse_Tuple (Py_Result);
 
-      return Float (Result);
+         Py_DecRef (PyFunc);
+         Py_DecRef (A_Tuple);
+         Py_DecRef (PyParams);
+         Py_DecRef (Py_Result);
+         return Result;
+      end;
 
    end Call;
 
@@ -83,7 +95,7 @@ package body Python_CLF is
       use Python;
 
       function Py_BuildValue (Format             : Interfaces.C.char_array;
-                              T1, T2, T3 : PyObject)  return PyObject;
+                              T1, T2, T3         : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String := "Python_CLF.Call 4 * Integer_Array_List ";
