@@ -37,6 +37,45 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject; A   : Integer_Array_List) return Float is
+      use Python;
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1, T2 : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call 4 * Integer_Array_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      Py_Result    : PyObject;
+      Result       : aliased Interfaces.C.double;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      Py_Result := Call_Object (PyFunc, PyParams);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+      Result := PyFloat_AsDouble (Py_Result);
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (Py_Result);
+
+      return Float (Result);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject;
                    A   : ML_Arrays_And_Matrices.Integer_Array_List;

@@ -22,18 +22,16 @@ procedure Lesson_6A is
    Test_Data              : constant Data_Record :=
                               Get_Data (Test_File_Name, Word_Dict);
    Max_Leaf_Nodes         : constant Positive := 6;
-   Accuracy               : Float;
+   --     Accuracy               : Float;
    CLF                    : Python_API.PyObject;
 begin
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
    CLF := Python_CLF.Call (Classifier, "init_classifer", Max_Leaf_Nodes);
-   Accuracy := Python.Call
-     (Classifier, "classify", Train_Data.Features, Train_Data.Labels,
-      Test_Data.Features, Test_Data.Labels);
-   Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
-
    --  Train the model.
+   Python_CLF.Call (Classifier, "fit", CLF, Train_Data.Features,
+                    Train_Data.Labels, Test_Data.Features, Test_Data.Labels);
+   --     Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
 
    Python.Finalize;
 
