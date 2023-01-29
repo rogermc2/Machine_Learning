@@ -50,6 +50,7 @@ procedure Lesson_6A is
    end Do_Predictions;
 
 begin
+--     Print_Unbound_List (Project_Name & "Words", Words);
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
    CLF := Python_CLF.Call (Classifier, "init_classifer", Max_Leaf_Nodes);

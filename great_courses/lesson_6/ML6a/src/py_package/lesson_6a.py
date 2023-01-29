@@ -13,7 +13,7 @@ def predict (clf, testdat):
     return tuple (clf.predict (testdat))
 
 def show_tree (clf, feat_names):
-    tree.plot_tree (clf, feature_names=feat_names, filled=True,
+    tree.plot_tree (clf, feature_names=list(feat_names), filled=True,
                     rounded=True, fontsize=8)
     pyplot.show()
 
