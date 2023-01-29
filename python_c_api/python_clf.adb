@@ -47,7 +47,7 @@ package body Python_CLF is
                               T1, T2 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      Routine_Name : constant String := "Python_CLF.Call 4 * Integer_Array_List ";
+      Routine_Name : constant String := "Python_CLF.Call Integer_Array_List ";
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
       PyParams     : PyObject;
@@ -70,6 +70,7 @@ package body Python_CLF is
          Tuple_Item : PyObject;
          Result     : Integer_Array (1 .. Integer (Tuple_Size));
       begin
+         Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
          for index in 0 .. Tuple_Size - 1 loop
             Tuple_Item := PyTuple_GetItem (Py_Result, index);
             Result (Integer (index) + 1) :=

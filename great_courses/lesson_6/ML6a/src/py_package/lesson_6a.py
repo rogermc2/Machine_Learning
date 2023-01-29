@@ -12,8 +12,9 @@ def fit (clf, dat, labels):
     return clf.fit(dat, labels)
 
 def predict (clf, testdat):
-    return clf.predict (testdat)
-#    yhat = clf.predict (testdat)
+    yhat = clf.predict (testdat)
+    print ("yhat: ", yhat)
+    return yhat
 
 #    return sum([yhat[i] == testlabs[i] for i in range(len(testdat))])/len(testdat)
 
