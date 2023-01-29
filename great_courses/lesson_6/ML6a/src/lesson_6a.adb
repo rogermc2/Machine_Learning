@@ -3,6 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_Types;
 with Python; use Python;
 with Python_API;
 with Python_CLF;
@@ -17,6 +18,8 @@ procedure Lesson_6A is
    Classifier             : Module;
    Word_Dict              : constant Vocablary_Dictionary_Map :=
                               Read_Vocabulary (Vocab_File_Name);
+   Words                  : constant ML_Types.Unbounded_List :=
+                              Word_List (Word_Dict);
    Train_Data             : constant Data_Record :=
                               Get_Data (Train_File_Name, Word_Dict);
    Test_Data              : constant Data_Record :=
@@ -54,6 +57,7 @@ begin
    Python_CLF.Call (Classifier, "fit", CLF, Train_Data.Features,
                     Train_Data.Labels);
    Do_Predictions;
+   Python_CLF.Call (Classifier, "show_tree", CLF, Words);
 
    Python.Finalize;
 

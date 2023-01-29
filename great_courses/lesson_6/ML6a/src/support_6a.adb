@@ -105,4 +105,22 @@ package body Support_6A is
 
    --  -------------------------------------------------------------------------
 
+   function Word_List  (Dictionary : Vocablary_Dictionary_Map)
+                        return ML_Types.Unbounded_List is
+      use ML_Types;
+      use Vocablary_Dictionary_Package;
+      Curs  : Cursor := Dictionary.First;
+      Words : Unbounded_List;
+   begin
+      while Has_Element (Curs) loop
+         Words.Append (Key (Curs));
+         Next (Curs);
+      end loop;
+
+      return Words;
+
+   end Word_List;
+
+   --  -------------------------------------------------------------------------
+
 end Support_6A;

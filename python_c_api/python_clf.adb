@@ -126,4 +126,37 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
+   procedure Call (M : Python.Module; Function_Name : String;
+                   CLF : in out PyObject; A : ML_Types.Unbounded_List) is
+      use Python;
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1, T2  : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call Unbounded_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      CLF := Call_Object (PyFunc, PyParams);
+      if CLF = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
 end Python_CLF;

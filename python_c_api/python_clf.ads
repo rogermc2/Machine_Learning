@@ -18,5 +18,7 @@ package Python_CLF is
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject; A : Integer_Array_List;
                    B   : ML_Types.Integer_List);
+   procedure Call (M : Python.Module; Function_Name : String;
+                   CLF : in out PyObject; A : ML_Types.Unbounded_List);
    
 end Python_CLF;
