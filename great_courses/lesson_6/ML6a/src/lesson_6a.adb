@@ -2,6 +2,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
+with Classifier_Utilities;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
 with Python_API;
@@ -22,17 +23,25 @@ procedure Lesson_6A is
    Test_Data              : constant Data_Record :=
                               Get_Data (Test_File_Name, Word_Dict);
    Max_Leaf_Nodes         : constant Positive := 6;
-   --     Accuracy               : Float;
    CLF                    : Python_API.PyObject;
 
    procedure Do_Predictions is
       Predictions : constant Integer_Array := Python_CLF.Call
         (Classifier, "predict", CLF, Test_Data.Features);
+      Correct     : Natural := 0;
+      Accuracy    : Float;
    begin
-      Put_Line (Project_Name & "Predictions length: " &
-                  Integer'Image (Predictions'Length));
-      Print_Integer_Array (Project_Name & "Prediction: ", Predictions, 1, 20);
-      --     Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
+      Print_Integer_Array (Project_Name & "Prediction: ", Predictions, 1, 30);
+      for index in Predictions'Range loop
+         if Predictions (index) =
+           Classifier_Utilities.Arg_Max (Test_Data.Labels (index)) - 1 then
+            Correct := Correct + 1;
+         end if;
+      end loop;
+
+      Accuracy := Float (Correct) / Float (Predictions'Length);
+      Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
+
    end Do_Predictions;
 
 begin
