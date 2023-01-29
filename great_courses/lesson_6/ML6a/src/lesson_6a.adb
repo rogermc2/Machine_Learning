@@ -24,6 +24,17 @@ procedure Lesson_6A is
    Max_Leaf_Nodes         : constant Positive := 6;
    --     Accuracy               : Float;
    CLF                    : Python_API.PyObject;
+
+   procedure Do_Predictions is
+      Predictions : constant Integer_Array := Python_CLF.Call
+        (Classifier, "predict", CLF, Test_Data.Features);
+   begin
+      Put_Line (Project_Name & "Predictions length: " &
+                  Integer'Image (Predictions'Length));
+      Print_Integer_Array (Project_Name & "Prediction: ", Predictions, 1, 20);
+      --     Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
+   end Do_Predictions;
+
 begin
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
@@ -31,15 +42,7 @@ begin
    --  Train the model.
    Python_CLF.Call (Classifier, "fit", CLF, Train_Data.Features,
                     Train_Data.Labels);
-   declare
-      Predictions : constant Integer_Array := Python_CLF.Call
-        (Classifier, "predict", CLF, Test_Data.Features);
-   begin
-      Put_Line (Project_Name & "Predictions length: " &
-                  Integer'Image (Predictions'Length));
-      Print_Integer_Array (Project_Name & "Prediction: ", Predictions);
-      --     Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
-   end;
+   Do_Predictions;
 
    Python.Finalize;
 

@@ -7,14 +7,10 @@ def init_classifer(max_leaves):
     return tree.DecisionTreeClassifier(max_leaf_nodes=max_leaves)
 
 def fit (clf, dat, labels):
-#    clf = tree.DecisionTreeClassifier(max_leaf_nodes=6)
-#    clf = clf.fit(dat, labels)
     return clf.fit(dat, labels)
 
 def predict (clf, testdat):
-    yhat = clf.predict (testdat)
-    print ("yhat: ", yhat)
-    return yhat
+    return tuple (clf.predict (testdat))
 
 #    return sum([yhat[i] == testlabs[i] for i in range(len(testdat))])/len(testdat)
 

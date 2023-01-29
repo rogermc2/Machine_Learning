@@ -70,7 +70,7 @@ package body Python_CLF is
          Tuple_Item : PyObject;
          Result     : Integer_Array (1 .. Integer (Tuple_Size));
       begin
-         Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
+--           Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
          for index in 0 .. Tuple_Size - 1 loop
             Tuple_Item := PyTuple_GetItem (Py_Result, index);
             Result (Integer (index) + 1) :=
