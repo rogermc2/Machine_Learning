@@ -268,9 +268,9 @@ package body Basic_Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_Array_List
-      (Name  : String; aList : Integer_Array_List;
-       List_Start : Positive := 1; List_Finish : Natural := 0;
-       Start : Positive := 1; Finish : Natural := 0) is
+     (Name  : String; aList : Integer_Array_List;
+      List_Start : Positive := 1; List_Finish : Natural := 0;
+      Start : Positive := 1; Finish : Natural := 0) is
       List_Last  : Positive;
    begin
       Put_Line (Name);
@@ -282,7 +282,7 @@ package body Basic_Printing is
 
       for index in List_Start .. List_Last loop
          Print_Integer_Array ("" & Integer'Image (index),
-                             aList (index), Start, Finish);
+                              aList (index), Start, Finish);
       end loop;
 
    end Print_Integer_Array_List;
@@ -302,7 +302,7 @@ package body Basic_Printing is
       end if;
 
       Put_Line (Name & ": ");
-         for Index in Start .. Last loop
+      for Index in Start .. Last loop
          Put (Integer'Image (aList (Index)) & "  ");
          Count := Count + 1;
          if Count > 10 then
@@ -548,6 +548,40 @@ package body Basic_Printing is
       New_Line;
 
    end Print_Unbound_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Unbound_Map (Name : String; aMap : ML_Types.Unbound_Map;
+                                Start : Natural := 0; Finish : Natural := 0) is
+      use ML_Types.Unbound_Map_Package;
+      Curs  : Cursor := aMap.First;
+      aKey  : Unbounded_String;
+      Last  : Natural;
+      Count : Natural := 0;
+   begin
+      if Integer (aMap.Length) > 0 then
+         if Finish > 0 and Finish <= Natural (aMap.Length) then
+            Last := Finish;
+         else
+            Last := Integer (aMap.Length);
+         end if;
+
+         while Has_Element (Curs) and Count <= Start loop
+            Count := Count + 1;
+            Next (Curs);
+         end loop;
+
+         Put_Line (Name & ": ");
+         while Has_Element (Curs) and Count < Last loop
+            Count := Count + 1;
+            aKey := Key (Curs);
+            Put_Line (To_String (aKey) & ":  '" &
+                        Integer'Image (Element (Curs)) & "'");
+            Next (Curs);
+         end loop;
+      end if;
+
+   end Print_Unbound_Map;
 
    --  ------------------------------------------------------------------------
 

@@ -289,4 +289,8 @@ package ML_Types is
      (Unbounded_String);
    subtype Strings_List is Strings_Package.List;
 
+   package Unbound_Map_Package is new
+     Ada.Containers.Ordered_Maps (Unbounded_String, Natural);
+   subtype Unbound_Map is Unbound_Map_Package.Map;
+
 end ML_Types;

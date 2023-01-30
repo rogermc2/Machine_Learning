@@ -17,7 +17,7 @@ procedure Lesson_6A is
    Train_File_Name        : constant String := "../../data/spam-train.csv";
    Test_File_Name         : constant String := "../../data/spam-test.csv";
    Classifier             : Module;
-   Word_Dict              : constant Vocablary_Dictionary_Map :=
+   Word_Dict              : constant ML_Types.Unbound_Map :=
      Read_Vocabulary (Vocab_File_Name);
    Words                  : constant ML_Types.Unbounded_List :=
      Word_List (Word_Dict);
@@ -51,10 +51,11 @@ procedure Lesson_6A is
    end Do_Predictions;
 
 begin
-   Print_Integer_Array_List (Project_Name & "Train_Data Features",
-                             Train_Data.Features, 1, 1, 1, 10);
-   Print_Integer_List (Project_Name & "Train_Data Labels", Train_Data.Labels,
-                        1, 10);
+   Print_Unbound_Map (Project_Name & "Word_Dict", Word_Dict, 1, 6);
+--     Print_Integer_Array_List (Project_Name & "Train_Data Features",
+--                               Train_Data.Features, 1, 1, 1, 10);
+--     Print_Integer_List (Project_Name & "Train_Data Labels", Train_Data.Labels,
+--                          1, 10);
 --     Print_Unbound_List (Project_Name & "Words", Words);
    Put_Line (Project_Name & "Words 1 '" & To_String (Words (1)) & "'");
    Put_Line (Project_Name & "Words 2 '" & To_String (Words (2)) & "'");
