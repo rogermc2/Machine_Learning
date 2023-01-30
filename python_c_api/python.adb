@@ -321,7 +321,7 @@ package body Python is
       Result   : aliased Interfaces.C.long;
    begin
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("(OOO)"), A_Tuple, B_Tuple, C_Tuple);
+        Py_BuildValue (Interfaces.C.To_C ("OOO"), A_Tuple, B_Tuple, C_Tuple);
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
 

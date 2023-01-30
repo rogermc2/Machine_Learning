@@ -1,7 +1,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python; use Python;
@@ -50,7 +50,7 @@ procedure Lesson_6A is
    end Do_Predictions;
 
 begin
---     Print_Unbound_List (Project_Name & "Words", Words);
+   Print_Unbound_List (Project_Name & "Words", Words);
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
    CLF := Python_CLF.Call (Classifier, "init_classifer", Max_Leaf_Nodes);

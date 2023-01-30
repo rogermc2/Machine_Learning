@@ -15,7 +15,8 @@ def classify (dat, lab, feat_names):
             correct = correct + 1
     percent_correct = 100.0 * correct / len (data)
     print("Percentage correct: ", percent_correct)
-
+    
+    print (feat_names)
     tree.plot_tree (clf, feature_names=feat_names, filled=True,
                     rounded=True, fontsize=8)
     pyplot.show()
