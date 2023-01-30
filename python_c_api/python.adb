@@ -22,9 +22,9 @@ package body Python is
       if Program_Name /= "" then
          declare
             C_Name           : constant Interfaces.C.char_array :=
-                                 To_C (Program_Name);
+              To_C (Program_Name);
             Program_Name_Ptr : constant access Interfaces.C.char_array :=
-                                 new char_array'(C_Name);
+              new char_array'(C_Name);
          begin
             Py_SetProgramName (Program_Name_Ptr.all);
          end;
@@ -68,7 +68,7 @@ package body Python is
       use type System.Address;
       Routine_Name : constant String := "Python.Import_File ";
       PyFileName   : constant PyObject :=
-                       PyString_FromString (Interfaces.C.To_C (File_Name));
+        PyString_FromString (Interfaces.C.To_C (File_Name));
    begin
       Execute_String ("cwd = os.getcwd()");
       Execute_String ("os.path.join (cwd, '/src/py_package')");
@@ -108,8 +108,8 @@ package body Python is
       --  PyObject_GetAttrString retrieves the attribute named Function_Name
       --  from the object PyModule.
       F            : constant PyObject :=
-                       PyObject_GetAttrString
-                         (PyModule, Interfaces.C.To_C (Function_Name));
+        PyObject_GetAttrString
+          (PyModule, Interfaces.C.To_C (Function_Name));
    begin
       if F = System.Null_Address then
          Put_Line (Routine_Name & "Python error message:");
@@ -311,6 +311,7 @@ package body Python is
                               T1, T2, T3  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
+--        Routine_Name : constant String := "Python.Call ABC 2 int + UBL ";
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple  : constant PyObject := To_Tuple (A);
       B_Tuple  : constant PyObject := To_Tuple (B);
@@ -320,7 +321,7 @@ package body Python is
       Result   : aliased Interfaces.C.long;
    begin
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("OOO"), A_Tuple, B_Tuple, C_Tuple);
+        Py_BuildValue (Interfaces.C.To_C ("(OOO)"), A_Tuple, B_Tuple, C_Tuple);
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
 
@@ -404,7 +405,7 @@ package body Python is
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple  : constant PyObject := To_Tuple (A);
       PyParams : constant PyObject := 
-                   Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
@@ -432,7 +433,7 @@ package body Python is
       A_Tuple  : constant PyObject := To_Tuple (A);
       B_Tuple  : constant PyObject := To_Tuple (B);
       PyParams : constant PyObject := 
-                   Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
       PyResult : PyObject;
       Result   : aliased Interfaces.C.long;
    begin
@@ -1021,11 +1022,11 @@ package body Python is
    --  -------------------------------------------------------------------------
 
    function Call (M : Module; Function_Name : String;
-                   A : ML_Arrays_And_Matrices.Integer_Array_List;
-                   B : ML_Arrays_And_Matrices.Integer_Array_List;
-                   C : ML_Arrays_And_Matrices.Integer_Array_List;
-                   D : ML_Arrays_And_Matrices.Integer_Array_List)
-   return float is
+                  A : ML_Arrays_And_Matrices.Integer_Array_List;
+                  B : ML_Arrays_And_Matrices.Integer_Array_List;
+                  C : ML_Arrays_And_Matrices.Integer_Array_List;
+                  D : ML_Arrays_And_Matrices.Integer_Array_List)
+                  return float is
       use System;
       function Py_BuildValue (Format         : Interfaces.C.char_array;
                               T1, T2, T3, T4 : PyObject)  return PyObject;
