@@ -14,25 +14,30 @@ package Basic_Printing is
                                Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
                                 Start : Positive := 1; Finish : Natural := 0);
-   procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
-                                 Start : Positive := 1; Finish : Natural := 0;
+   procedure Print_Float_Matrix (Name       : String; aMatrix : Real_Float_Matrix;
+                                 Start      : Positive := 1; Finish : Natural := 0;
                                  Col_Start  : Positive := 1;
                                  Col_Finish : Natural := 0);
    procedure Print_Float_Matrix_List
-      (Name  : String; aList : Real_Matrix_List;
-       Start : Positive := 1; Finish : Natural := 0);
-   procedure Print_Float_Vector (Name : String; Vec : Real_Float_Vector;
+     (Name  : String; aList : Real_Matrix_List;
+      Start : Positive := 1; Finish : Natural := 0);
+   procedure Print_Float_Vector (Name  : String; Vec : Real_Float_Vector;
                                  Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Vector_As_Line
-     (Name : String; Vec : Real_Float_Vector;  Start : Positive := 1;
+     (Name   : String; Vec : Real_Float_Vector;  Start : Positive := 1;
       Finish : Natural := 0);
    procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
                                   Start : Positive := 1; Finish : Natural := 0);
-   procedure Print_Integer_List (Name  : String;
-                                 aList : ML_Types.Integer_List);
+   procedure Print_Integer_Array_List
+     (Name       : String; aList : Integer_Array_List;
+      List_Start : Positive := 1; List_Finish : Natural := 0;
+      Start      : Positive := 1; Finish : Natural := 0);
+   procedure Print_Integer_List
+     (Name  : String; aList : ML_Types.Integer_List;
+      Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Integer_Map (Name : String;
                                 aMap : ML_Types.Integer_Label_Map);
-   procedure Print_Integer_Matrix (Name : String; aMatrix : Integer_Matrix;
+   procedure Print_Integer_Matrix (Name  : String; aMatrix : Integer_Matrix;
                                    Start : Natural := 0; Finish : Integer := 0);
    procedure Print_List_Dimensions (Name : String; aList : Real_Float_List);
    procedure Print_List_Dimensions (Name  : String;
@@ -52,7 +57,7 @@ package Basic_Printing is
      (Name  : String; aList : Real_Float_List_2D;
       Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Unbound_Array (Name : String;
-                                   UB   : Unbounded_String_Array);
+                                  UB   : Unbounded_String_Array);
    procedure Print_Unbound_List (Name : String; UB : ML_Types.Unbounded_List);
    procedure Print_Unbound_Matrix (Name : String;
                                    UB   : Unbounded_String_Matrix);

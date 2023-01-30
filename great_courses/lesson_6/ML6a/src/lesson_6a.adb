@@ -51,6 +51,10 @@ procedure Lesson_6A is
    end Do_Predictions;
 
 begin
+   Print_Integer_Array_List (Project_Name & "Train_Data Features",
+                             Train_Data.Features, 1, 1, 1, 10);
+   Print_Integer_List (Project_Name & "Train_Data Labels", Train_Data.Labels,
+                        1, 10);
 --     Print_Unbound_List (Project_Name & "Words", Words);
    Put_Line (Project_Name & "Words 1 '" & To_String (Words (1)) & "'");
    Put_Line (Project_Name & "Words 2 '" & To_String (Words (2)) & "'");
@@ -60,8 +64,8 @@ begin
    --  Train the model.
    Python_CLF.Call (Classifier, "fit", CLF, Train_Data.Features,
                     Train_Data.Labels);
-   Do_Predictions;
-   Python_CLF.Call (Classifier, "show_tree", CLF, Words);
+--     Do_Predictions;
+--     Python_CLF.Call (Classifier, "show_tree", CLF, Words);
 
    Python.Finalize;
 
