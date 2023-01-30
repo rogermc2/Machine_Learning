@@ -119,7 +119,7 @@ package body Support_6A is
          declare
             aWord : constant String := To_String (Key (Curs));
          begin
-            if aWord'Length > 1 and aWord /= "" and aWord /= " " then
+--              if aWord'Length > 1 and aWord /= "" and aWord /= " " then
 --                 if Count < 6 then
 --                    Put_Line (Routine_Name & "aWord length: " & Integer'Image (Count) &
 --                               ", " & Integer'Image (aWord'Length));
@@ -127,7 +127,7 @@ package body Support_6A is
 --                               ", '" & aWord & "'");
 --                 end if;
                Words.Append (To_Unbounded_String (aWord));
-            end if;
+--              end if;
          end;
          Next (Curs);
       end loop;
