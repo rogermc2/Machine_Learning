@@ -24,7 +24,7 @@ package body Support_6A is
             aLine : constant String := Get_Line (File_ID);
             Label : constant Integer := Integer'Value (aLine (1 .. 1));
             Token : constant Integer_Array :=
-                      Tokenize (aLine (3 .. aLine'Last), Dictionary);
+              Tokenize (aLine (3 .. aLine'Last), Dictionary);
          begin
             Data.Labels.Append (Label);
             Data.Features.Append (Token);
@@ -40,7 +40,7 @@ package body Support_6A is
 
    function Read_Vocabulary (File_Name : String)
                              return Vocablary_Dictionary_Map is
---        Routine_Name : constant String := "Support_6A.Read_Vocab ";
+      --        Routine_Name : constant String := "Support_6A.Read_Vocab ";
       File_ID         : File_Type;
       Lexicon_Size    : Positive := 1;
       Word_Dictionary : Vocablary_Dictionary_Map;
@@ -54,13 +54,13 @@ package body Support_6A is
             aLine : constant String := Get_Line (File_ID);
             Count : constant Positive := Integer'Value (aLine (1 .. 4));
             Token : constant Unbounded_String :=
-                      To_Unbounded_String (aLine (6 .. aLine'Last));
+              To_Unbounded_String (aLine (6 .. aLine'Last));
          begin
             if Count > 1 then
                Word_Dictionary.Insert (Token, Lexicon_Size);
                Lexicon_Size := Lexicon_Size + 1;
             end if;
---              Put_Line (Routine_Name & aLine);
+            --              Put_Line (Routine_Name & aLine);
          end;
       end loop;
       Close (File_ID);
@@ -77,18 +77,18 @@ package body Support_6A is
                       return Integer_Array is
       use Neural_Utilities;
       use ML_Types.String_Package;
---        Routine_Name : constant String := "Support_6A.Tokenize ";
+      --        Routine_Name : constant String := "Support_6A.Tokenize ";
       Words        : ML_Types.String_List;
       Word         : Unbounded_String;
-      Word_Curor   : Cursor;
+      Word_Cursor  : Cursor;
       Index        : Positive;
       Vec          : Integer_Array (1 .. Dictionary (Lex_Size)) :=
-                       (others => 0);
+        (others => 0);
    begin
       Words := Split_String_On_Spaces (Data);
-      Word_Curor := Words.First;
-      while Has_Element (Word_Curor) loop
-         Word := Element (Word_Curor);
+      Word_Cursor := Words.First;
+      while Has_Element (Word_Cursor) loop
+         Word := Element (Word_Cursor);
          if Dictionary.Contains (Word) then
             Index := Dictionary.Element (Word);
             Vec (Index) := Vec (Index) + 1;
@@ -96,7 +96,7 @@ package body Support_6A is
             Index := Dictionary.Element (Unknown);
             Vec (Index) := Vec (Index) + 1;
          end if;
-         Next  (Word_Curor);
+         Next  (Word_Cursor);
       end loop;
 
       return Vec;
@@ -109,11 +109,26 @@ package body Support_6A is
                         return ML_Types.Unbounded_List is
       use ML_Types;
       use Vocablary_Dictionary_Package;
+--        Routine_Name : constant String := "Support_6A.Word_List ";
       Curs  : Cursor := Dictionary.First;
       Words : Unbounded_List;
+--        Count : Natural := 0;
    begin
       while Has_Element (Curs) loop
-         Words.Append (Key (Curs));
+--           Count := Count + 1;
+         declare
+            aWord : constant String := To_String (Key (Curs));
+         begin
+            if aWord'Length > 1 and aWord /= "" and aWord /= " " then
+--                 if Count < 6 then
+--                    Put_Line (Routine_Name & "aWord length: " & Integer'Image (Count) &
+--                               ", " & Integer'Image (aWord'Length));
+--                    Put_Line (Routine_Name & "aWord: " & Integer'Image (Count) &
+--                               ", '" & aWord & "'");
+--                 end if;
+               Words.Append (To_Unbounded_String (aWord));
+            end if;
+         end;
          Next (Curs);
       end loop;
 

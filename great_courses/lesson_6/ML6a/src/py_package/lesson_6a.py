@@ -13,11 +13,8 @@ def predict (clf, testdat):
     return tuple (clf.predict (testdat))
 
 def show_tree (clf, feat_names):
-#    names = ' '.join(feat_names)
-#    names = list(feat_names[1:])
-#    print (feat_names)
-    print ("names length", len(feat_names))
-    tree.plot_tree (clf, feature_names=feat_names, filled=True,
-                    rounded=True, fontsize=8)
+    print ("names: ", feat_names[0:10])
+    tree.plot_tree (clf, feature_names=feat_names, filled=True, fontsize=8)
+#    tree.plot_tree (clf, filled=True, rounded=True, fontsize=8)
     pyplot.show()
 
