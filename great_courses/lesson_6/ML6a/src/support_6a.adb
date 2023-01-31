@@ -7,8 +7,9 @@ with Neural_Utilities;
 
 package body Support_6A is
 
-   Unknown  : constant String := "@unk";
    Lex_Size : constant String := "@size";
+   Unknown  : constant String := "@unk";
+   Num      : Natural := 0;
 
    --  -------------------------------------------------------------------------
 
@@ -44,7 +45,7 @@ package body Support_6A is
       Lexicon_Size    : Positive := 1;  --  Token
       Word_Dictionary : ML_Types.String_Map;
    begin
-      Word_Dictionary.Insert (Unknown, Lexicon_Size);
+      Word_Dictionary.Include (Unknown, Lexicon_Size);
 
       Open (File_ID, In_File, File_Name);
 
@@ -61,9 +62,10 @@ package body Support_6A is
             --              Put_Line (Routine_Name & aLine);
          end;
       end loop;
+
       Close (File_ID);
 
-      Word_Dictionary.Insert (Lex_Size, Lexicon_Size);
+      Word_Dictionary.Include (Lex_Size, Lexicon_Size);
 
       return Word_Dictionary;
 
@@ -82,6 +84,7 @@ package body Support_6A is
       Vec          : Integer_Array (1 .. Dictionary (Lex_Size)) :=
                        (others => 0);
    begin
+--        Put_Line (Routine_Name & "Data: '" & Data);
       Words := Split_String_On_Spaces (Data);
       Word_Cursor := Words.First;
       while Has_Element (Word_Cursor) loop
@@ -93,7 +96,11 @@ package body Support_6A is
                Index := Dictionary.Element (Word);
                Vec (Index) := Vec (Index) + 1;
             else
---                 Put_Line (Routine_Name & "unknown word: '" & Word & "'");
+               Num := Num + 1;
+               if Num < 8 then
+                  Put_Line (Routine_Name & "unknown word: '" & Word & "', " &
+                              "length: " & Integer'Image (Word'Length));
+               end if;
                Index := Dictionary.Element (Unknown);
                Vec (Index) := Vec (Index) + 1;
             end if;
