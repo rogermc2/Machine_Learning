@@ -551,11 +551,10 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Unbound_Map (Name : String; aMap : ML_Types.Unbound_Map;
+   procedure Print_String_Map (Name : String; aMap : ML_Types.String_Map;
                                 Start : Natural := 0; Finish : Natural := 0) is
-      use ML_Types.Unbound_Map_Package;
+      use ML_Types.String_Map_Package;
       Curs  : Cursor := aMap.First;
-      aKey  : Unbounded_String;
       Last  : Natural;
       Count : Natural := 0;
    begin
@@ -574,14 +573,16 @@ package body Basic_Printing is
          Put_Line (Name & ": ");
          while Has_Element (Curs) and Count < Last loop
             Count := Count + 1;
-            aKey := Key (Curs);
-            Put_Line (To_String (aKey) & ":  '" &
-                        Integer'Image (Element (Curs)) & "'");
+            declare
+               aKey : constant String := Key (Curs);
+            begin
+               Put_Line (aKey & ": " & Integer'Image (Element (Curs)));
+            end;
             Next (Curs);
          end loop;
       end if;
 
-   end Print_Unbound_Map;
+   end Print_String_Map;
 
    --  ------------------------------------------------------------------------
 

@@ -60,7 +60,7 @@ package Basic_Printing is
                                   UB   : Unbounded_String_Array);
    procedure Print_Unbound_List (Name : String; UB : ML_Types.Unbounded_List);
 
-   procedure Print_Unbound_Map (Name : String; aMap : ML_Types.Unbound_Map;
+   procedure Print_String_Map (Name : String; aMap : ML_Types.String_Map;
                                 Start : Natural := 0; Finish : Natural := 0);
    procedure Print_Unbound_Matrix (Name : String;
                                    UB   : Unbounded_String_Matrix);

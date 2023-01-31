@@ -7,12 +7,12 @@ with Neural_Utilities;
 
 package body Support_6A is
 
-   Unknown  : constant Unbounded_String := To_Unbounded_String ("@unk");
-   Lex_Size : constant Unbounded_String := To_Unbounded_String ("@size");
+   Unknown  : constant String := "@unk";
+   Lex_Size : constant String := "@size";
 
    --  -------------------------------------------------------------------------
 
-   function Get_Data (File_Name : String; Dictionary : ML_Types.Unbound_Map)
+   function Get_Data (File_Name : String; Dictionary : ML_Types.String_Map)
                       return Data_Record is
       --        Routine_Name : constant String := "Support_6A.Get_Data ";
       File_ID         : File_Type;
@@ -24,7 +24,7 @@ package body Support_6A is
             aLine : constant String := Get_Line (File_ID);
             Label : constant Integer := Integer'Value (aLine (1 .. 1));
             Token : constant Integer_Array :=
-              Tokenize (aLine (3 .. aLine'Last), Dictionary);
+                      Tokenize (aLine (3 .. aLine'Last), Dictionary);
          begin
             Data.Labels.Append (Label);
             Data.Features.Append (Token);
@@ -38,11 +38,11 @@ package body Support_6A is
 
    --  -------------------------------------------------------------------------
 
-   function Read_Vocabulary (File_Name : String) return ML_Types.Unbound_Map is
+   function Read_Vocabulary (File_Name : String) return ML_Types.String_Map is
       --        Routine_Name : constant String := "Support_6A.Read_Vocab ";
       File_ID         : File_Type;
-      Lexicon_Size    : Positive := 1;
-      Word_Dictionary : ML_Types.Unbound_Map;
+      Lexicon_Size    : Positive := 1;  --  Token
+      Word_Dictionary : ML_Types.String_Map;
    begin
       Word_Dictionary.Insert (Unknown, Lexicon_Size);
 
@@ -52,11 +52,10 @@ package body Support_6A is
          declare
             aLine : constant String := Get_Line (File_ID);
             Count : constant Positive := Integer'Value (aLine (1 .. 4));
-            Token : constant Unbounded_String :=
-              To_Unbounded_String (aLine (6 .. aLine'Last));
+            Token : constant String := aLine (6 .. aLine'Last);
          begin
             if Count > 1 then
-               Word_Dictionary.Insert (Token, Lexicon_Size);
+               Word_Dictionary.Include (Token, Lexicon_Size);
                Lexicon_Size := Lexicon_Size + 1;
             end if;
             --              Put_Line (Routine_Name & aLine);
@@ -72,31 +71,33 @@ package body Support_6A is
 
    --  -------------------------------------------------------------------------
 
-   function Tokenize (Data : String; Dictionary : ML_Types.Unbound_Map)
+   function Tokenize (Data : String; Dictionary : ML_Types.String_Map)
                       return Integer_Array is
       use Neural_Utilities;
       use ML_Types.String_Package;
---        Routine_Name : constant String := "Support_6A.Tokenize ";
+      Routine_Name : constant String := "Support_6A.Tokenize ";
       Words        : ML_Types.String_List;
-      Word         : Unbounded_String;
       Word_Cursor  : Cursor;
       Index        : Positive;
       Vec          : Integer_Array (1 .. Dictionary (Lex_Size)) :=
-        (others => 0);
+                       (others => 0);
    begin
       Words := Split_String_On_Spaces (Data);
       Word_Cursor := Words.First;
       while Has_Element (Word_Cursor) loop
-         Word := Element (Word_Cursor);
-         Word := To_Unbounded_String (Slice (Word, 2, Length (Word)));
-         if Dictionary.Contains (Word) then
-            Index := Dictionary.Element (Word);
-            Vec (Index) := Vec (Index) + 1;
-         else
---              Put_Line (Routine_Name & "Unknown word: '" & To_String (Word) & "'");
-            Index := Dictionary.Element (Unknown);
-            Vec (Index) := Vec (Index) + 1;
-         end if;
+         declare
+            Word : constant String := To_String (Element (Word_Cursor));
+         begin
+            if Dictionary.Contains (Word) then
+               Put_Line (Routine_Name & "known word: '" & Word & "'");
+               Index := Dictionary.Element (Word);
+               Vec (Index) := Vec (Index) + 1;
+            else
+               Put_Line (Routine_Name & "unknown word: '" & Word & "'");
+               Index := Dictionary.Element (Unknown);
+               Vec (Index) := Vec (Index) + 1;
+            end if;
+         end;
          Next  (Word_Cursor);
       end loop;
 
@@ -106,29 +107,29 @@ package body Support_6A is
 
    --  -------------------------------------------------------------------------
 
-   function Word_List  (Dictionary : ML_Types.Unbound_Map)
+   function Word_List  (Dictionary : ML_Types.String_Map)
                         return ML_Types.Unbounded_List is
       use ML_Types;
-      use ML_Types.Unbound_Map_Package;
---        Routine_Name : constant String := "Support_6A.Word_List ";
+      use ML_Types.String_Map_Package;
+      --        Routine_Name : constant String := "Support_6A.Word_List ";
       Curs  : Cursor := Dictionary.First;
       Words : Unbounded_List;
---        Count : Natural := 0;
+      --        Count : Natural := 0;
    begin
       while Has_Element (Curs) loop
---           Count := Count + 1;
+         --           Count := Count + 1;
          declare
-            aWord : constant String := To_String (Key (Curs));
+            aWord : constant String := Key (Curs);
          begin
---              if aWord'Length > 1 and aWord /= "" and aWord /= " " then
---                 if Count < 6 then
---                    Put_Line (Routine_Name & "aWord length: " & Integer'Image (Count) &
---                               ", " & Integer'Image (aWord'Length));
---                    Put_Line (Routine_Name & "aWord: " & Integer'Image (Count) &
---                               ", '" & aWord & "'");
---                 end if;
-               Words.Append (To_Unbounded_String (aWord));
---              end if;
+            --              if aWord'Length > 1 and aWord /= "" and aWord /= " " then
+            --                 if Count < 6 then
+            --                    Put_Line (Routine_Name & "aWord length: " & Integer'Image (Count) &
+            --                               ", " & Integer'Image (aWord'Length));
+            --                    Put_Line (Routine_Name & "aWord: " & Integer'Image (Count) &
+            --                               ", '" & aWord & "'");
+            --                 end if;
+            Words.Append (To_Unbounded_String (aWord));
+            --              end if;
          end;
          Next (Curs);
       end loop;

@@ -2,6 +2,7 @@
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Multiway_Trees;
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
@@ -289,8 +290,8 @@ package ML_Types is
      (Unbounded_String);
    subtype Strings_List is Strings_Package.List;
 
-   package Unbound_Map_Package is new
-     Ada.Containers.Ordered_Maps (Unbounded_String, Natural);
-   subtype Unbound_Map is Unbound_Map_Package.Map;
+   package String_Map_Package is new
+     Ada.Containers.Indefinite_Ordered_Maps (String, Natural);
+   subtype String_Map is String_Map_Package.Map;
 
 end ML_Types;
