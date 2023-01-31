@@ -1,5 +1,5 @@
 
---  with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Characters.Handling;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -7,15 +7,16 @@ with Neural_Utilities;
 
 package body Support_6A is
 
-   Lex_Size : constant String := "@size";
-   Unknown  : constant String := "@unk";
-   Num      : Natural := 0;
+   Lex_Size    : constant String := "@size";
+   Unknown     : constant String := "@unk";
+   Num_Known   : Natural := 0;
+   Num_Unknown : Natural := 0;
 
    --  -------------------------------------------------------------------------
 
    function Get_Data (File_Name : String; Dictionary : ML_Types.String_Map)
                       return Data_Record is
-      --        Routine_Name : constant String := "Support_6A.Get_Data ";
+      Routine_Name : constant String := "Support_6A.Get_Data ";
       File_ID         : File_Type;
       Data            : Data_Record;
    begin
@@ -25,13 +26,19 @@ package body Support_6A is
             aLine : constant String := Get_Line (File_ID);
             Label : constant Integer := Integer'Value (aLine (1 .. 1));
             Token : constant Integer_Array :=
-                      Tokenize (aLine (3 .. aLine'Last), Dictionary);
+              Tokenize (aLine (3 .. aLine'Last), Dictionary);
          begin
             Data.Labels.Append (Label);
             Data.Features.Append (Token);
          end;
       end loop;
+
       Close (File_ID);
+
+      Put_Line (Routine_Name & "Number of known words: " &
+                  Integer'Image (Num_Known));
+      Put_Line (Routine_Name & "Number of unknown words: " &
+                  Integer'Image (Num_Unknown));
 
       return Data;
 
@@ -40,7 +47,7 @@ package body Support_6A is
    --  -------------------------------------------------------------------------
 
    function Read_Vocabulary (File_Name : String) return ML_Types.String_Map is
-      --        Routine_Name : constant String := "Support_6A.Read_Vocab ";
+      Routine_Name : constant String := "Support_6A.Read_Vocabulary ";
       File_ID         : File_Type;
       Lexicon_Size    : Positive := 1;  --  Token
       Word_Dictionary : ML_Types.String_Map;
@@ -53,19 +60,25 @@ package body Support_6A is
          declare
             aLine : constant String := Get_Line (File_ID);
             Count : constant Positive := Integer'Value (aLine (1 .. 4));
-            Token : constant String := aLine (6 .. aLine'Last);
+            Token : constant String (1 .. aLine'Length - 6) :=
+              aLine (aLine'First + 5 .. aLine'Last - 1);
          begin
             if Count > 1 then
                Word_Dictionary.Include (Token, Lexicon_Size);
                Lexicon_Size := Lexicon_Size + 1;
+               Assert (Word_Dictionary.Contains (Token), Routine_Name &
+                         "Word_Dictionary entry failed: '" & Token & "', " &
+                         "length: " & Integer'Image (Token'Length));
             end if;
-            --              Put_Line (Routine_Name & aLine);
+
          end;
       end loop;
 
       Close (File_ID);
 
       Word_Dictionary.Include (Lex_Size, Lexicon_Size);
+      Put_Line (Routine_Name & "Word_Dictionary loaded");
+      New_Line;
 
       return Word_Dictionary;
 
@@ -82,9 +95,9 @@ package body Support_6A is
       Word_Cursor  : Cursor;
       Index        : Positive;
       Vec          : Integer_Array (1 .. Dictionary (Lex_Size)) :=
-                       (others => 0);
+        (others => 0);
    begin
---        Put_Line (Routine_Name & "Data: '" & Data);
+      --        Put_Line (Routine_Name & "Data: '" & Data);
       Words := Split_String_On_Spaces (Data);
       Word_Cursor := Words.First;
       while Has_Element (Word_Cursor) loop
@@ -92,12 +105,16 @@ package body Support_6A is
             Word : constant String := To_String (Element (Word_Cursor));
          begin
             if Dictionary.Contains (Word) then
-               Put_Line (Routine_Name & "known word: '" & Word & "'");
+               Num_Known := Num_Known + 1;
+               if Num_Known < 5 then
+                  Put_Line (Routine_Name & "known word: '" & Word & "', " &
+                              "length: " & Integer'Image (Word'Length));
+               end if;
                Index := Dictionary.Element (Word);
                Vec (Index) := Vec (Index) + 1;
             else
-               Num := Num + 1;
-               if Num < 8 then
+               Num_Unknown := Num_Unknown + 1;
+               if Num_Unknown < 5  then
                   Put_Line (Routine_Name & "unknown word: '" & Word & "', " &
                               "length: " & Integer'Image (Word'Length));
                end if;
