@@ -18,8 +18,8 @@ procedure Lesson_6A is
    Classifier             : Module;
    Word_Dict              : constant ML_Types.String_Map :=
      Read_Vocabulary (Vocab_File_Name);
---     Words                  : constant ML_Types.Indef_String_List :=
---       Word_List (Word_Dict);
+   Words                  : constant ML_Types.Indef_String_List :=
+     Word_List (Word_Dict);
    Train_Data             : constant Data_Record :=
      Get_Data (Train_File_Name, Word_Dict);
    Test_Data              : constant Data_Record :=
@@ -57,7 +57,7 @@ begin
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
    Run_Tree;
---     Python_CLF.Call (Classifier, "show_tree", CLF, Words);
+   Python_CLF.Call (Classifier, "show_tree", CLF, Words);
    Python_API.Py_DecRef (CLF);
 
 --     for leaves in 1 .. 15 loop
