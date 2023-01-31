@@ -24,7 +24,6 @@ procedure Lesson_6A is
      Get_Data (Train_File_Name, Word_Dict);
    Test_Data              : constant Data_Record :=
      Get_Data (Test_File_Name, Word_Dict);
-   Max_Leaf_Nodes         : constant Positive := 6;
    CLF                    : Python_API.PyObject;
 
    procedure Do_Predictions is
@@ -40,23 +39,31 @@ procedure Lesson_6A is
       end loop;
 
       Accuracy := Float (Correct) / Float (Predictions'Length);
-      Put_Line (Project_Name & "Accuracy: " & Float'Image (Accuracy));
+      Put_Line ("Accuracy: " & Float'Image (Accuracy));
 
    end Do_Predictions;
 
+   procedure Run (Max_Leaf_Nodes : Positive := 6) is
+   begin
+      CLF := Python_CLF.Call (Classifier, "init_classifer", Max_Leaf_Nodes);
+      --  Train the model.
+      Python_CLF.Call (Classifier, "fit", CLF, Train_Data.Features,
+                       Train_Data.Labels);
+      Put ("Leaves:" & Integer'Image (Max_Leaf_Nodes) & " ");
+      Do_Predictions;
+   end Run;
+
 begin
---     Print_Integer_Array_List (Project_Name & "Train_Data Features",
---                               Train_Data.Features, 1, 1, 1, 10);
---     Print_Integer_List (Project_Name & "Train_Data Labels", Train_Data.Labels,
---                          1, 10);
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
-   CLF := Python_CLF.Call (Classifier, "init_classifer", Max_Leaf_Nodes);
-   --  Train the model.
-   Python_CLF.Call (Classifier, "fit", CLF, Train_Data.Features,
-                    Train_Data.Labels);
-   Do_Predictions;
+   Run;
    Python_CLF.Call (Classifier, "show_tree", CLF, Words);
+   Python_API.Py_DecRef (CLF);
+
+   for leaves in 1 .. 15 loop
+      Run (2 * leaves);
+      Python_API.Py_DecRef (CLF);
+   end loop;
 
    Python.Finalize;
 

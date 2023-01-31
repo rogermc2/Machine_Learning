@@ -16,7 +16,7 @@ package body Support_6A is
 
    function Get_Data (File_Name : String; Dictionary : ML_Types.String_Map)
                       return Data_Record is
-      Routine_Name : constant String := "Support_6A.Get_Data ";
+--        Routine_Name : constant String := "Support_6A.Get_Data ";
       File_ID         : File_Type;
       Data            : Data_Record;
    begin
@@ -35,10 +35,10 @@ package body Support_6A is
 
       Close (File_ID);
 
-      Put_Line (Routine_Name & "Number of words occurring more than once: " &
-                  Integer'Image (Num_Known));
-      Put_Line (Routine_Name & "Number of words occurring only once: " &
-                  Integer'Image (Num_Unknown));
+--        Put_Line (Routine_Name & "Number of words occurring more than once: " &
+--                    Integer'Image (Num_Known));
+--        Put_Line (Routine_Name & "Number of words occurring only once: " &
+--                    Integer'Image (Num_Unknown));
 
       return Data;
 
