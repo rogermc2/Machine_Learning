@@ -1,5 +1,5 @@
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+--  with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
@@ -19,8 +19,8 @@ procedure Lesson_6A is
    Classifier             : Module;
    Word_Dict              : constant ML_Types.String_Map :=
      Read_Vocabulary (Vocab_File_Name);
-   Words                  : constant ML_Types.Unbounded_List :=
-     Word_List (Word_Dict);
+--     Words                  : constant ML_Types.Indef_String_List :=
+--       Word_List (Word_Dict);
    Train_Data             : constant Data_Record :=
      Get_Data (Train_File_Name, Word_Dict);
 --     Test_Data              : constant Data_Record :=
@@ -51,14 +51,14 @@ procedure Lesson_6A is
 --     end Do_Predictions;
 
 begin
-   Print_String_Map (Project_Name & "Word_Dict", Word_Dict, 780,800);
+   Print_String_Map (Project_Name & "Word_Dict", Word_Dict, 784,788);
 --     Print_Integer_Array_List (Project_Name & "Train_Data Features",
 --                               Train_Data.Features, 1, 1, 1, 10);
 --     Print_Integer_List (Project_Name & "Train_Data Labels", Train_Data.Labels,
 --                          1, 10);
 --     Print_Unbound_List (Project_Name & "Words", Words);
-   Put_Line (Project_Name & "Words 1 '" & To_String (Words (1)) & "'");
-   Put_Line (Project_Name & "Words 2 '" & To_String (Words (2)) & "'");
+--     Put_Line (Project_Name & "Words 787 '" & Words (787) & "'");
+--     Put_Line (Project_Name & "Words 789 '" & Words (789) & "'");
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
    CLF := Python_CLF.Call (Classifier, "init_classifer", Max_Leaf_Nodes);

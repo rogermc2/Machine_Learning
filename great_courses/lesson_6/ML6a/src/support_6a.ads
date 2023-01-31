@@ -17,6 +17,6 @@ package Support_6A is
    function Tokenize (Data : String; Dictionary : ML_Types.String_Map)
                       return Integer_Array;
    function Word_List  (Dictionary : ML_Types.String_Map)
-                        return ML_Types.Unbounded_List;
+                        return ML_Types.Indef_String_List;
 
 end Support_6A;

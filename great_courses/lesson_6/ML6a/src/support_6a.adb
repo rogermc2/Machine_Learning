@@ -93,7 +93,7 @@ package body Support_6A is
                Index := Dictionary.Element (Word);
                Vec (Index) := Vec (Index) + 1;
             else
-               Put_Line (Routine_Name & "unknown word: '" & Word & "'");
+--                 Put_Line (Routine_Name & "unknown word: '" & Word & "'");
                Index := Dictionary.Element (Unknown);
                Vec (Index) := Vec (Index) + 1;
             end if;
@@ -108,12 +108,12 @@ package body Support_6A is
    --  -------------------------------------------------------------------------
 
    function Word_List  (Dictionary : ML_Types.String_Map)
-                        return ML_Types.Unbounded_List is
+                        return ML_Types.Indef_String_List is
       use ML_Types;
       use ML_Types.String_Map_Package;
       --        Routine_Name : constant String := "Support_6A.Word_List ";
       Curs  : Cursor := Dictionary.First;
-      Words : Unbounded_List;
+      Words : Indef_String_List;
       --        Count : Natural := 0;
    begin
       while Has_Element (Curs) loop
@@ -128,7 +128,7 @@ package body Support_6A is
             --                    Put_Line (Routine_Name & "aWord: " & Integer'Image (Count) &
             --                               ", '" & aWord & "'");
             --                 end if;
-            Words.Append (To_Unbounded_String (aWord));
+            Words.Append (aWord);
             --              end if;
          end;
          Next (Curs);
