@@ -43,7 +43,7 @@ procedure Lesson_6A is
 
    end Do_Predictions;
 
-   procedure Run (Max_Leaf_Nodes : Positive := 6) is
+   procedure Run_Tree (Max_Leaf_Nodes : Positive := 6) is
    begin
       CLF := Python_CLF.Call (Classifier, "init_classifer", Max_Leaf_Nodes);
       --  Train the model.
@@ -51,19 +51,22 @@ procedure Lesson_6A is
                        Train_Data.Labels);
       Put ("Leaves:" & Integer'Image (Max_Leaf_Nodes) & " ");
       Do_Predictions;
-   end Run;
+   end Run_Tree;
 
 begin
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
-   Run;
-   Python_CLF.Call (Classifier, "show_tree", CLF, Words);
+   Run_Tree;
+--     Python_CLF.Call (Classifier, "show_tree", CLF, Words);
    Python_API.Py_DecRef (CLF);
 
-   for leaves in 1 .. 15 loop
-      Run (2 * leaves);
-      Python_API.Py_DecRef (CLF);
-   end loop;
+--     for leaves in 1 .. 15 loop
+--        Run (2 * leaves);
+--        Python_API.Py_DecRef (CLF);
+--     end loop;
+
+   CLF := Python_CLF.Call (Classifier, "multinomial_fit",
+                           Train_Data.Features, Train_Data.Labels);
 
    Python.Finalize;
 

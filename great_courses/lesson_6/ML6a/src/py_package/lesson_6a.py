@@ -1,4 +1,6 @@
 from sklearn import tree
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import confusion_matrix
 
 import matplotlib
 from matplotlib import pyplot
@@ -8,6 +10,9 @@ def init_classifer(max_leaves):
 
 def fit (clf, dat, labels):
     return clf.fit(dat, labels)
+
+def multinomial_fit (dat, labels):
+    return MultinomialNB().fit(dat, labels)
 
 def predict (clf, testdat):
     return tuple (clf.predict (testdat))
