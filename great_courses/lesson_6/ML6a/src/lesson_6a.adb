@@ -18,8 +18,8 @@ procedure Lesson_6A is
    Classifier             : Module;
    Word_Dict              : constant ML_Types.String_Map :=
      Read_Vocabulary (Vocab_File_Name);
-   Words                  : constant ML_Types.Indef_String_List :=
-     Word_List (Word_Dict);
+--     Words                  : constant ML_Types.Indef_String_List :=
+--       Word_List (Word_Dict);
    Train_Data             : constant Data_Record :=
      Get_Data (Train_File_Name, Word_Dict);
    Test_Data              : constant Data_Record :=
@@ -67,6 +67,8 @@ begin
 
    CLF := Python_CLF.Call (Classifier, "multinomial_fit",
                            Train_Data.Features, Train_Data.Labels);
+   Put_Line ("Naive Bayes predictions:");
+   Do_Predictions;
 
    Python.Finalize;
 
