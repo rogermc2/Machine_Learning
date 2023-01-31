@@ -129,11 +129,9 @@ package body Support_6A is
       Words : Indef_String_List;
    begin
       while Has_Element (Curs) loop
---           declare
---              aWord : constant String := Key (Curs);
---           begin
+         if Curs /= Dictionary.Last then
             Words.Append (Key (Curs));
---           end;
+         end if;
          Next (Curs);
       end loop;
 
