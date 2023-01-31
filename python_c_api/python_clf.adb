@@ -127,7 +127,7 @@ package body Python_CLF is
    --  -------------------------------------------------------------------------
 
    procedure Call (M : Python.Module; Function_Name : String;
-                   CLF : in out PyObject; A : ML_Types.Unbounded_List) is
+                   CLF : in out PyObject; A : ML_Types.Indef_String_List) is
       use Python;
 
       function Py_BuildValue (Format : Interfaces.C.char_array;

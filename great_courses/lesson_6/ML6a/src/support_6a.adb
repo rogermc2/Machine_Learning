@@ -35,9 +35,9 @@ package body Support_6A is
 
       Close (File_ID);
 
-      Put_Line (Routine_Name & "Number of known words: " &
+      Put_Line (Routine_Name & "Number of words occurring more than once: " &
                   Integer'Image (Num_Known));
-      Put_Line (Routine_Name & "Number of unknown words: " &
+      Put_Line (Routine_Name & "Number of words occurring only once: " &
                   Integer'Image (Num_Unknown));
 
       return Data;
@@ -70,14 +70,12 @@ package body Support_6A is
                          "Word_Dictionary entry failed: '" & Token & "', " &
                          "length: " & Integer'Image (Token'Length));
             end if;
-
          end;
       end loop;
 
       Close (File_ID);
 
       Word_Dictionary.Include (Lex_Size, Lexicon_Size);
-      Put_Line (Routine_Name & "Word_Dictionary loaded");
       New_Line;
 
       return Word_Dictionary;
@@ -90,14 +88,13 @@ package body Support_6A is
                       return Integer_Array is
       use Neural_Utilities;
       use ML_Types.String_Package;
-      Routine_Name : constant String := "Support_6A.Tokenize ";
+--        Routine_Name : constant String := "Support_6A.Tokenize ";
       Words        : ML_Types.String_List;
       Word_Cursor  : Cursor;
       Index        : Positive;
       Vec          : Integer_Array (1 .. Dictionary (Lex_Size)) :=
         (others => 0);
    begin
-      --        Put_Line (Routine_Name & "Data: '" & Data);
       Words := Split_String_On_Spaces (Data);
       Word_Cursor := Words.First;
       while Has_Element (Word_Cursor) loop
@@ -106,18 +103,10 @@ package body Support_6A is
          begin
             if Dictionary.Contains (Word) then
                Num_Known := Num_Known + 1;
-               if Num_Known < 5 then
-                  Put_Line (Routine_Name & "known word: '" & Word & "', " &
-                              "length: " & Integer'Image (Word'Length));
-               end if;
                Index := Dictionary.Element (Word);
                Vec (Index) := Vec (Index) + 1;
             else
                Num_Unknown := Num_Unknown + 1;
-               if Num_Unknown < 5  then
-                  Put_Line (Routine_Name & "unknown word: '" & Word & "', " &
-                              "length: " & Integer'Image (Word'Length));
-               end if;
                Index := Dictionary.Element (Unknown);
                Vec (Index) := Vec (Index) + 1;
             end if;
@@ -138,23 +127,13 @@ package body Support_6A is
       --        Routine_Name : constant String := "Support_6A.Word_List ";
       Curs  : Cursor := Dictionary.First;
       Words : Indef_String_List;
-      --        Count : Natural := 0;
    begin
       while Has_Element (Curs) loop
-         --           Count := Count + 1;
-         declare
-            aWord : constant String := Key (Curs);
-         begin
-            --              if aWord'Length > 1 and aWord /= "" and aWord /= " " then
-            --                 if Count < 6 then
-            --                    Put_Line (Routine_Name & "aWord length: " & Integer'Image (Count) &
-            --                               ", " & Integer'Image (aWord'Length));
-            --                    Put_Line (Routine_Name & "aWord: " & Integer'Image (Count) &
-            --                               ", '" & aWord & "'");
-            --                 end if;
-            Words.Append (aWord);
-            --              end if;
-         end;
+--           declare
+--              aWord : constant String := Key (Curs);
+--           begin
+            Words.Append (Key (Curs));
+--           end;
          Next (Curs);
       end loop;
 

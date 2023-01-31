@@ -45,7 +45,7 @@ package body Tuple_Builder is
       function Py_BuildValue (Format : char_array; T1 : int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
       
---        Routine_Name : constant String := "Python.To_Tuple Integer_Array_List ";
+      --        Routine_Name : constant String := "Python.To_Tuple Integer_Array_List ";
       Tuple        : PyObject;
       Py_Index     : int := -1;
    begin
@@ -77,7 +77,7 @@ package body Tuple_Builder is
 
    function To_Tuple (Data : ML_Types.Integer_List) return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
+      --        Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
       Tuple        : constant PyObject := PyTuple_New (int (Data.Length));
       Long_Value   : long;
       Py_Index     : int := -1;
@@ -97,7 +97,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      --        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
       Num_Cols     : constant Positive := Data'Length (2);
       Row_Size     : constant int := int (Num_Cols);
       Value        : Integer;
@@ -131,7 +131,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) 
                       return PyObject is
       use ML_Arrays_And_Matrices;
---        Routine_Name : constant String := "Python.To_Tuple Integer_Array_3D ";
+      --        Routine_Name : constant String := "Python.To_Tuple Integer_Array_3D ";
       Array_Length : constant Positive := Data'Length (1) * Data'Length (2);
       Array_2D     : Integer_Matrix (1 .. Array_Length, Data'Range (3));
    begin
@@ -152,7 +152,7 @@ package body Tuple_Builder is
 
    function To_Tuple (Data : NL_Types.Boolean_List) return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
+      --        Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
       Tuple_2D     : constant PyObject := PyTuple_New (int (Data.Length));
       Long_Value   : long;
       Py_Index     : int := -1;
@@ -175,7 +175,7 @@ package body Tuple_Builder is
 
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Boolean_List_2D ";
+      --        Routine_Name : constant String := "Python.To_Tuple Boolean_List_2D ";
       Row_Size     : int;
       Long_Value   : long;
       Tuple_2D     : PyObject;
@@ -211,7 +211,7 @@ package body Tuple_Builder is
 
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Bounded_String_List ";
+      --        Routine_Name : constant String := "Python.To_Tuple Bounded_String_List ";
       Tuple        : PyObject;
       Py_Index     : int := -1;
    begin
@@ -235,7 +235,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_Matrix) 
                       return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Real_Float_Matrix ";
+      --        Routine_Name : constant String := "Python.To_Tuple Real_Float_Matrix ";
       Num_Cols     : constant Positive := Data'Length (2);
       Row_Size     : constant int := int (Num_Cols);
       Value        : Float;
@@ -265,7 +265,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_Vector) 
                       return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Real_Float_Vector ";
+      --        Routine_Name : constant String := "Python.To_Tuple Real_Float_Vector ";
       Value        : double;
       Py_Row       : int := -1;
       Result       : constant PyObject := PyTuple_New (int (Data'Length));
@@ -282,10 +282,33 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : ML_Types.Indef_String_List) return PyObject is
+      use Interfaces.C;
+      use ML_Types.Indefinite_String_Package;
+      --        Routine_Name : constant String := "Python.To_Tuple Unbounded_List ";
+      Curs         : Cursor := Data.First;
+      Tuple        : PyObject;
+      Item         : PyObject;
+      Py_Index     : int := -1;
+   begin
+      Tuple := PyTuple_New (int (Data.Length));
+      while Has_Element (Curs) loop
+         Py_Index := Py_Index + 1;
+         Item := PyString_FromString (To_C (Element (Curs)));
+         PyTuple_SetItem (Tuple, Py_Index, Item);
+         Next (Curs);
+      end loop;
+
+      return Tuple;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+ 
    function To_Tuple (Data : ML_Types.Unbounded_List) return PyObject is
       use Interfaces.C;
       use Ada.Strings.Unbounded;
---        Routine_Name : constant String := "Python.To_Tuple Unbounded_List ";
+      --        Routine_Name : constant String := "Python.To_Tuple Unbounded_List ";
       Tuple        : PyObject;
       Py_Index     : int := -1;
    begin
