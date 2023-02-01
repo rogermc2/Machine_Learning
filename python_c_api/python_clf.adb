@@ -221,49 +221,26 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
---     function Get_Attribute (CLF : PyObject; Attribute : String)
---                             return Real_Float_Matrix is
---        use Interfaces.C;
---        Routine_Name : constant String :=
---                         "Python_CLF.Get_Attribute Real_Float_Matrix ";
---        PyString     : constant PyObject :=
---                         PyString_FromString (To_C (Attribute));
---        Py_Result    : PyObject;
---        Row_Size     : Integer;
---        Col_Size     : Integer;
---        Row_0        : PyObject;
---     begin
---        Put_Line (Routine_Name);
---        Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
---        Py_Result := PyObject_GetAttr (CLF, PyString);
---        if Py_Result = System.Null_Address then
---           Put (Routine_Name & "Py error message: ");
---           PyErr_Print;
---        end if;
---
---        Row_Size := Integer (PyTuple_Size (Py_Result));
---        Row_0 := PyTuple_GetItem (Py_Result, 0);
---        Put_Line (Routine_Name & Attribute & " Row_0 set");
---        Col_Size :=  Integer (PyTuple_Size (Row_0));
---        Put_Line (Routine_Name & "declare");
---        declare
---           Tuple_Row  : PyObject;
---           Result     : Real_Float_Matrix (1 .. Row_Size, 1 .. Col_Size);
---        begin
---           for row in 0 .. Row_Size - 1 loop
---              Put_Line (Routine_Name & "row" & Integer'Image (row));
---              Tuple_Row := PyTuple_GetItem (Py_Result, int (row));
---              for col in 0 .. Col_Size - 1 loop
---                 Result (row + 1, col + 1) :=
---                   Float (PyFloat_AsDouble
---                          (PyTuple_GetItem (Tuple_Row, int (col))));
---              end loop;
---           end loop;
---
---           return Result;
---        end;
---
---     end Get_Attribute;
+   function Get_Attribute (CLF : PyObject; Attribute : String)
+                           return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String :=
+                       "Python_CLF.Get_Attribute Real_Float_Matrix ";
+      PyString     : constant PyObject :=
+                       PyString_FromString (To_C (Attribute));
+      Py_Result    : PyObject;
+   begin
+      Put_Line (Routine_Name);
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+      Py_Result := PyObject_GetAttr (CLF, PyString);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      return Py_Result;
+
+   end Get_Attribute;
 
    --  -------------------------------------------------------------------------
 

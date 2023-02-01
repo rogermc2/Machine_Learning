@@ -59,12 +59,14 @@ package body Support_6A is
       use ML_Types.Indefinite_String_Package;
       Class_Log_Prior  : constant Float_Array :=
                            Python_CLF.Get_Attribute (CLF, "class_log_prior_");
---        Feature_Log_Prob : constant Real_Float_Matrix :=
---                             Python_CLF.Get_Attribute (CLF, "feature_log_prob_");
+      Feature_Log_Prob : constant Python_API.PyObject :=
+                           Python_CLF.Get_Attribute (CLF, "feature_log_prob_");
       Curs             : Cursor := Sentence.First;
       Acc              : Float := 1.0;
       Index            : Natural;
       Factor           : Float;
+      Log_Prob_1       : Float;
+      Log_Prob_2       : Float;
    begin
       Labels.Append ("PRIOR");
       Facs.Append (Exp (Class_Log_Prior (1) - Class_Log_Prior (2)));
@@ -72,7 +74,11 @@ package body Support_6A is
       while Has_Element (Curs) loop
          Index := Word_Dict (Sentence (Curs));
          Labels.Append (Sentence (Curs));
---           Factor := Exp (Feature_Log_Prob (1, Index) - Feature_Log_Prob (2, Index));
+         Log_Prob_1 :=
+           Python_CLF.Call (Classifier, "matrix_item", 0, int (Index));
+         Log_Prob_2 :=
+           Python_CLF.Call (Classifier, "matrix_item", 1, int (Index));
+         Factor := Exp (Log_Prob_1 - Log_Prob_2);
          Acc := Acc * Factor;
          Facs.Append (Factor);
          Next (Curs);
