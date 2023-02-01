@@ -3,7 +3,10 @@ with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Characters.Handling;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Maths;
+
 with Neural_Utilities;
+with Python_CLF;
 
 package body Support_6A is
 
@@ -16,7 +19,7 @@ package body Support_6A is
 
    function Get_Data (File_Name : String; Dictionary : ML_Types.String_Map)
                       return Data_Record is
---        Routine_Name : constant String := "Support_6A.Get_Data ";
+      --        Routine_Name : constant String := "Support_6A.Get_Data ";
       File_ID         : File_Type;
       Data            : Data_Record;
    begin
@@ -26,7 +29,7 @@ package body Support_6A is
             aLine : constant String := Get_Line (File_ID);
             Label : constant Integer := Integer'Value (aLine (1 .. 1));
             Token : constant Integer_Array :=
-              Tokenize (aLine (3 .. aLine'Last), Dictionary);
+                      Tokenize (aLine (3 .. aLine'Last), Dictionary);
          begin
             Data.Labels.Append (Label);
             Data.Features.Append (Token);
@@ -35,10 +38,10 @@ package body Support_6A is
 
       Close (File_ID);
 
---        Put_Line (Routine_Name & "Number of words occurring more than once: " &
---                    Integer'Image (Num_Known));
---        Put_Line (Routine_Name & "Number of words occurring only once: " &
---                    Integer'Image (Num_Unknown));
+      --        Put_Line (Routine_Name & "Number of words occurring more than once: " &
+      --                    Integer'Image (Num_Known));
+      --        Put_Line (Routine_Name & "Number of words occurring only once: " &
+      --                    Integer'Image (Num_Unknown));
 
       return Data;
 
@@ -47,7 +50,7 @@ package body Support_6A is
    --  -------------------------------------------------------------------------
 
    function Read_Vocabulary (File_Name : String) return ML_Types.String_Map is
-      Routine_Name : constant String := "Support_6A.Read_Vocabulary ";
+      Routine_Name    : constant String := "Support_6A.Read_Vocabulary ";
       File_ID         : File_Type;
       Lexicon_Size    : Positive := 1;  --  Token
       Word_Dictionary : ML_Types.String_Map;
@@ -61,7 +64,7 @@ package body Support_6A is
             aLine : constant String := Get_Line (File_ID);
             Count : constant Positive := Integer'Value (aLine (1 .. 4));
             Token : constant String (1 .. aLine'Length - 6) :=
-              aLine (aLine'First + 5 .. aLine'Length - 1);
+                      aLine (aLine'First + 5 .. aLine'Length - 1);
          begin
             if Count > 1 then
                Word_Dictionary.Include (Token, Lexicon_Size);
@@ -88,12 +91,12 @@ package body Support_6A is
                       return Integer_Array is
       use Neural_Utilities;
       use ML_Types.String_Package;
---        Routine_Name : constant String := "Support_6A.Tokenize ";
+      --        Routine_Name : constant String := "Support_6A.Tokenize ";
       Words        : ML_Types.String_List;
       Word_Cursor  : Cursor;
       Index        : Positive;
       Vec          : Integer_Array (1 .. Dictionary (Lex_Size)) :=
-        (others => 0);
+                       (others => 0);
    begin
       Words := Split_String_On_Spaces (Data);
       Word_Cursor := Words.First;
@@ -138,6 +141,28 @@ package body Support_6A is
       return Words;
 
    end Word_List;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Plot_Sentence (Classifier : Python.Module;
+                            ClF        : Python_API.PyObject;
+                            Word_Dict  : ML_Types.String_Map;
+                            Sentence   : ML_Types.Indef_String_List) is
+      use Maths.Float_Math_Functions;
+      use ML_Types.Indefinite_String_Package;
+      Log_Prior : constant Real_Float_Matrix :=
+                    Python_CLF.Call (Classifier, "class_log_prior", ClF);
+      Curs      : Cursor := Sentence.First;
+      Acc       : Float := 1.0;
+      Col       : Natural := 0;
+      Factor    : Float;
+   begin
+      while Has_Element (Curs) loop
+         Col := Col + 1;
+         Factor := Exp (Log_Prior (1, Col) - Log_Prior (2, Col));
+         Next (Curs);
+      end loop;
+   end Plot_Sentence;
 
    --  -------------------------------------------------------------------------
 

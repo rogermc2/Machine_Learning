@@ -17,13 +17,13 @@ procedure Lesson_6A is
    Test_File_Name         : constant String := "../../data/spam-test.csv";
    Classifier             : Module;
    Word_Dict              : constant ML_Types.String_Map :=
-     Read_Vocabulary (Vocab_File_Name);
-   Words                  : constant ML_Types.Indef_String_List :=
-     Word_List (Word_Dict);
+                              Read_Vocabulary (Vocab_File_Name);
+--     Words                  : constant ML_Types.Indef_String_List :=
+--                                Word_List (Word_Dict);
    Train_Data             : constant Data_Record :=
-     Get_Data (Train_File_Name, Word_Dict);
+                              Get_Data (Train_File_Name, Word_Dict);
    Test_Data              : constant Data_Record :=
-     Get_Data (Test_File_Name, Word_Dict);
+                              Get_Data (Test_File_Name, Word_Dict);
    CLF                    : Python_API.PyObject;
 
    procedure Do_Predictions is
@@ -57,18 +57,21 @@ begin
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
    Run_Tree;
-   Python_CLF.Call (Classifier, "show_tree", CLF, Words);
+--     Python_CLF.Call (Classifier, "show_tree", CLF, Words);
    Python_API.Py_DecRef (CLF);
 
---     for leaves in 1 .. 15 loop
---        Run (2 * leaves);
---        Python_API.Py_DecRef (CLF);
---     end loop;
+   --     for leaves in 1 .. 15 loop
+   --        Run (2 * leaves);
+   --        Python_API.Py_DecRef (CLF);
+   --     end loop;
 
    CLF := Python_CLF.Call (Classifier, "multinomial_fit",
                            Train_Data.Features, Train_Data.Labels);
    Put_Line ("Naive Bayes predictions:");
    Do_Predictions;
+   Python_CLF.Call
+     (Classifier, "print_confusion", CLF, Test_Data.Features,
+      Test_Data.Labels);
 
    Python.Finalize;
 
