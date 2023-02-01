@@ -60,8 +60,8 @@ package body Support_6A is
          declare
             aLine : constant String := Get_Line (File_ID);
             Count : constant Positive := Integer'Value (aLine (1 .. 4));
-            Token : constant String (1 .. aLine'Last - 6) :=
-              aLine (aLine'First + 5 .. aLine'Last - 1);
+            Token : constant String (1 .. aLine'Length - 6) :=
+              aLine (aLine'First + 5 .. aLine'Length - 1);
          begin
             if Count > 1 then
                Word_Dictionary.Include (Token, Lexicon_Size);
