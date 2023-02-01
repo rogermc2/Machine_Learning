@@ -73,13 +73,13 @@ begin
 
    CLF := Python_CLF.Call (Classifier, "multinomial_fit",
                            Train_Data.Features, Train_Data.Labels);
+   Plot_Sentence (CLF, Word_Dict, Sentence, Facs, Labels);
+
    Put_Line ("Naive Bayes predictions:");
    Do_Predictions;
    Python_CLF.Call
      (Classifier, "print_confusion", CLF, Test_Data.Features,
       Test_Data.Labels);
-
-   Plot_Sentence (CLF, Word_Dict, Sentence, Facs, Labels);
 
    Python.Finalize;
 

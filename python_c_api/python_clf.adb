@@ -37,38 +37,6 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
-   function Get_Attribute (CLF : PyObject; Attribute : String)
-                           return Float_Array is
-      use Interfaces.C;
-      Routine_Name : constant String := "Python_CLF.Call Float_Array ";
-      Py_Result    : PyObject;
-   begin
-      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      Py_Result := PyObject_GetAttrString (CLF, To_C (Attribute));
-      if Py_Result = System.Null_Address then
-         Put (Routine_Name & "Py error message: ");
-         PyErr_Print;
-      end if;
-
-      declare
-         Tuple_Size : constant int := PyTuple_Size (Py_Result);
-         Tuple_Item : PyObject;
-         Result     : Float_Array (1 .. Integer (Tuple_Size));
-      begin
-         for index in 0 .. Tuple_Size - 1 loop
-            Tuple_Item := PyTuple_GetItem (Py_Result, index);
-            Result (Integer (index) + 1) :=
-              Float (PyFloat_AsDouble (Tuple_Item));
-         end loop;
-
-         Py_DecRef (Py_Result);
-         return Result;
-      end;
-
-   end Get_Attribute;
-
-   --  -------------------------------------------------------------------------
-
    function Call (M : Python.Module; Function_Name : String;
                   A : Integer_Array_List; B : ML_Types.Integer_List)
                   return PyObject is
@@ -149,43 +117,6 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Attribute (CLF : PyObject; Attribute : String)
-                           return Real_Float_Matrix is
-      use Interfaces.C;
-      Routine_Name : constant String := "Python_CLF.Call Real_Float_Matrix ";
-      PyString     : constant PyObject := PyBytes_FromString (To_C (Attribute));
-      Py_Result    : PyObject;
-   begin
-      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      Py_Result := PyObject_GetAttr (CLF, PyString);
-      if Py_Result = System.Null_Address then
-         Put (Routine_Name & "Py error message: ");
-         PyErr_Print;
-      end if;
-
-      declare
-         Row_Size   : constant Integer := Integer (PyTuple_Size (Py_Result));
-         Col_Size   : constant Integer :=
-           Integer (PyTuple_Size (PyTuple_GetItem (Py_Result, 0)));
-         Tuple_Row  : PyObject;
-         Result     : Real_Float_Matrix (1 .. Row_Size, 1 .. Col_Size);
-      begin
-         for row in 0 .. Row_Size - 1 loop
-            Tuple_Row := PyTuple_GetItem (Py_Result, int (row));
-            for col in 0 .. Col_Size - 1 loop
-               Result (row + 1, col + 1) :=
-                 Float (PyFloat_AsDouble
-                        (PyTuple_GetItem (Tuple_Row, int (col))));
-            end loop;
-         end loop;
-
-         return Result;
-      end;
-
-   end Get_Attribute;
-
-   --  -------------------------------------------------------------------------
-
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject;
                    A   : Integer_Array_List; B : ML_Types.Integer_List) is
@@ -253,6 +184,86 @@ package body Python_CLF is
       Py_DecRef (PyParams);
 
    end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Get_Attribute (CLF : PyObject; Attribute : String)
+                           return Float_Array is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python_CLF.Get_Attribute Float_Array ";
+      PyString     : constant PyObject :=
+                       PyString_FromString (To_C (Attribute));
+      Py_Result    : PyObject;
+   begin
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+      Py_Result := PyObject_GetAttr (CLF, PyString);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      declare
+         Tuple_Size : constant int := PyTuple_Size (Py_Result);
+         Tuple_Item : PyObject;
+         Result     : Float_Array (1 .. Integer (Tuple_Size));
+      begin
+         for index in 0 .. Tuple_Size - 1 loop
+            Tuple_Item := PyTuple_GetItem (Py_Result, index);
+            Result (Integer (index) + 1) :=
+              Float (PyFloat_AsDouble (Tuple_Item));
+         end loop;
+
+         Py_DecRef (Py_Result);
+         return Result;
+      end;
+
+   end Get_Attribute;
+
+   --  -------------------------------------------------------------------------
+
+   function Get_Attribute (CLF : PyObject; Attribute : String)
+                           return Real_Float_Matrix is
+      use Interfaces.C;
+      Routine_Name : constant String :=
+                       "Python_CLF.Get_Attribute Real_Float_Matrix ";
+      PyString     : constant PyObject :=
+                       PyString_FromString (To_C (Attribute));
+      Py_Result    : PyObject;
+      Row_Size     : Integer;
+      Col_Size     : Integer;
+      Row_0        : PyObject;
+   begin
+      Put_Line (Routine_Name);
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+      Py_Result := PyObject_GetAttr (CLF, PyString);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Row_Size := Integer (PyTuple_Size (Py_Result));
+      Row_0 := PyTuple_GetItem (Py_Result, 0);
+      Put_Line (Routine_Name & Attribute & " Row_0 set");
+      Col_Size :=  Integer (PyTuple_Size (Row_0));
+      Put_Line (Routine_Name & "declare");
+      declare
+         Tuple_Row  : PyObject;
+         Result     : Real_Float_Matrix (1 .. Row_Size, 1 .. Col_Size);
+      begin
+         for row in 0 .. Row_Size - 1 loop
+            Put_Line (Routine_Name & "row" & Integer'Image (row));
+            Tuple_Row := PyTuple_GetItem (Py_Result, int (row));
+            for col in 0 .. Col_Size - 1 loop
+               Result (row + 1, col + 1) :=
+                 Float (PyFloat_AsDouble
+                        (PyTuple_GetItem (Tuple_Row, int (col))));
+            end loop;
+         end loop;
+
+         return Result;
+      end;
+
+   end Get_Attribute;
 
    --  -------------------------------------------------------------------------
 
