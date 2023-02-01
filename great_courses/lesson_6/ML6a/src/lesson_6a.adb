@@ -79,7 +79,7 @@ begin
      (Classifier, "print_confusion", CLF, Test_Data.Features,
       Test_Data.Labels);
 
-   Plot_Sentence (Classifier, CLF, Word_Dict, Sentence, Facs, Labels);
+   Plot_Sentence (CLF, Word_Dict, Sentence, Facs, Labels);
 
    Python.Finalize;
 

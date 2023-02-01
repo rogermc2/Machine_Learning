@@ -49,8 +49,7 @@ package body Support_6A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Plot_Sentence (Classifier : Python.Module;
-                            CLF        : Python_API.PyObject;
+   procedure Plot_Sentence (CLF        : Python_API.PyObject;
                             Word_Dict  : ML_Types.String_Map;
                             Sentence   : ML_Types.Indef_String_List;
                             Facs       : out Real_Float_List;
@@ -58,11 +57,9 @@ package body Support_6A is
       use Maths.Float_Math_Functions;
       use ML_Types.Indefinite_String_Package;
       Class_Log_Prior  : constant Float_Array :=
-                           Python_CLF.Call (Classifier, "get_attribute",
-                                            CLF, "class_log_prior_");
+                           Python_CLF.Get_Attribute (CLF, "class_log_prior_");
       Feature_Log_Prob : constant Real_Float_Matrix :=
-                           Python_CLF.Call (Classifier, "get_attribute",
-                                            CLF, "feature_log_prob_");
+                           Python_CLF.Get_Attribute (CLF, "feature_log_prob_");
       Curs             : Cursor := Sentence.First;
       Acc              : Float := 1.0;
       Index            : Natural;

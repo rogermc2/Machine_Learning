@@ -37,26 +37,14 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
-   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
-                 Attribute : String) return Float_Array is
+   function Get_Attribute (CLF : PyObject; Attribute : String)
+                           return Float_Array is
       use Interfaces.C;
-      use Python;
-
-      function Py_BuildValue (Format : Interfaces.C.char_array;
-                              T1, S1   : PyObject)  return PyObject;
-      pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
       Routine_Name : constant String := "Python_CLF.Call Float_Array ";
-      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
-      PyString     : constant PyObject := PyBytes_FromString (To_C (Attribute));
-      PyParams     : PyObject;
       Py_Result    : PyObject;
    begin
-      PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, PyString);
-      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
-
-      Py_Result := Call_Object (PyFunc, PyParams);
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+      Py_Result := PyObject_GetAttrString (CLF, To_C (Attribute));
       if Py_Result = System.Null_Address then
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
@@ -73,13 +61,11 @@ package body Python_CLF is
               Float (PyFloat_AsDouble (Tuple_Item));
          end loop;
 
-         Py_DecRef (PyFunc);
-         Py_DecRef (PyParams);
          Py_DecRef (Py_Result);
          return Result;
       end;
 
-   end Call;
+   end Get_Attribute;
 
    --  -------------------------------------------------------------------------
 
@@ -163,26 +149,15 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
-   function Call (M   : Python.Module; Function_Name : String; CLF : PyObject;
-                  Attribute : String) return Real_Float_Matrix is
+   function Get_Attribute (CLF : PyObject; Attribute : String)
+                           return Real_Float_Matrix is
       use Interfaces.C;
-      use Python;
-
-      function Py_BuildValue (Format : Interfaces.C.char_array;
-                              T1, S1 : PyObject)  return PyObject;
-      pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
       Routine_Name : constant String := "Python_CLF.Call Real_Float_Matrix ";
-      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       PyString     : constant PyObject := PyBytes_FromString (To_C (Attribute));
-      PyParams     : PyObject;
       Py_Result    : PyObject;
    begin
-      PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, PyString);
-      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
-
-      Py_Result := Call_Object (PyFunc, PyParams);
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+      Py_Result := PyObject_GetAttr (CLF, PyString);
       if Py_Result = System.Null_Address then
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
@@ -204,13 +179,10 @@ package body Python_CLF is
             end loop;
          end loop;
 
-         Py_DecRef (PyFunc);
-         Py_DecRef (PyParams);
-
          return Result;
       end;
 
-   end Call;
+   end Get_Attribute;
 
    --  -------------------------------------------------------------------------
 

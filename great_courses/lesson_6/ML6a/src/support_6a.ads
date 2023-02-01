@@ -3,7 +3,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
-with Python;
 with Python_API;
 
 package Support_6A is
@@ -15,8 +14,7 @@ package Support_6A is
 
    function Get_Data (File_Name : String; Dictionary : ML_Types.String_Map)
                       return Data_Record;
-   procedure Plot_Sentence (Classifier : Python.Module;
-                            ClF        : Python_API.PyObject;
+   procedure Plot_Sentence (ClF        : Python_API.PyObject;
                             Word_Dict  : ML_Types.String_Map;
                             Sentence   : ML_Types.Indef_String_List;
                             Facs       : out Real_Float_List;
