@@ -130,7 +130,7 @@ package body Support_6A is
    begin
       while Has_Element (Curs) loop
          if Curs /= Dictionary.Last then
-            Words.Append (Key (Curs));
+            Words.Prepend (Key (Curs));
          end if;
          Next (Curs);
       end loop;
