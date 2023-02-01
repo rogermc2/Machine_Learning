@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
+with Neural_Utilities;
 with Python; use Python;
 with Python_API;
 with Python_CLF;
@@ -18,8 +19,8 @@ procedure Lesson_6A is
    Classifier             : Module;
    Word_Dict              : constant ML_Types.String_Map :=
                               Read_Vocabulary (Vocab_File_Name);
---     Words                  : constant ML_Types.Indef_String_List :=
---                                Word_List (Word_Dict);
+   --     Words                  : constant ML_Types.Indef_String_List :=
+   --                                Word_List (Word_Dict);
    Train_Data             : constant Data_Record :=
                               Get_Data (Train_File_Name, Word_Dict);
    Test_Data              : constant Data_Record :=
@@ -53,11 +54,16 @@ procedure Lesson_6A is
       Do_Predictions;
    end Run_Tree;
 
+   Sentence : constant ML_Types.Indef_String_List :=
+                Neural_Utilities.Split_String_On_Spaces
+                  ("yo come over carlos will be here soon");
+   Facs     : Real_Float_List;
+   Labels   : ML_Types.Indef_String_List;
 begin
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
    Run_Tree;
---     Python_CLF.Call (Classifier, "show_tree", CLF, Words);
+   --     Python_CLF.Call (Classifier, "show_tree", CLF, Words);
    Python_API.Py_DecRef (CLF);
 
    --     for leaves in 1 .. 15 loop
@@ -72,6 +78,8 @@ begin
    Python_CLF.Call
      (Classifier, "print_confusion", CLF, Test_Data.Features,
       Test_Data.Labels);
+
+   Plot_Sentence (Classifier, CLF, Word_Dict, Sentence, Facs, Labels);
 
    Python.Finalize;
 

@@ -18,7 +18,9 @@ package Support_6A is
    procedure Plot_Sentence (Classifier : Python.Module;
                             ClF        : Python_API.PyObject;
                             Word_Dict  : ML_Types.String_Map;
-                            Sentence   : ML_Types.Indef_String_List);
+                            Sentence   : ML_Types.Indef_String_List;
+                            Facs       : out Real_Float_List;
+                            Labels     : out ML_Types.Indef_String_List);
    function Read_Vocabulary (File_Name : String) return ML_Types.String_Map;
    function Tokenize (Data : String; Dictionary : ML_Types.String_Map)
                       return Integer_Array;

@@ -29,7 +29,7 @@ package body Support_6A is
             aLine : constant String := Get_Line (File_ID);
             Label : constant Integer := Integer'Value (aLine (1 .. 1));
             Token : constant Integer_Array :=
-              Tokenize (aLine (3 .. aLine'Last), Dictionary);
+                      Tokenize (aLine (3 .. aLine'Last), Dictionary);
          begin
             Data.Labels.Append (Label);
             Data.Features.Append (Token);
@@ -49,6 +49,44 @@ package body Support_6A is
 
    --  -------------------------------------------------------------------------
 
+   procedure Plot_Sentence (Classifier : Python.Module;
+                            CLF        : Python_API.PyObject;
+                            Word_Dict  : ML_Types.String_Map;
+                            Sentence   : ML_Types.Indef_String_List;
+                            Facs       : out Real_Float_List;
+                            Labels     : out ML_Types.Indef_String_List) is
+      use Maths.Float_Math_Functions;
+      use ML_Types.Indefinite_String_Package;
+      Class_Log_Prior  : constant Float_Array :=
+                           Python_CLF.Call (Classifier, "get_attribute",
+                                            CLF, "class_log_prior_");
+      Feature_Log_Prob : constant Real_Float_Matrix :=
+                           Python_CLF.Call (Classifier, "get_attribute",
+                                            CLF, "feature_log_prob_");
+      Curs             : Cursor := Sentence.First;
+      Acc              : Float := 1.0;
+      Index            : Natural;
+      Factor           : Float;
+   begin
+      Labels.Append ("PRIOR");
+      Facs.Append (Exp (Class_Log_Prior (1) - Class_Log_Prior (2)));
+
+      while Has_Element (Curs) loop
+         Index := Word_Dict (Sentence (Curs));
+         Labels.Append (Sentence (Curs));
+         Factor := Exp (Feature_Log_Prob (1, Index) - Feature_Log_Prob (2, Index));
+         Acc := Acc * Factor;
+         Facs.Append (Factor);
+         Next (Curs);
+      end loop;
+
+      Labels.Append ("POST");
+      Facs.Append (Acc);
+
+   end Plot_Sentence;
+
+   --  -------------------------------------------------------------------------
+
    function Read_Vocabulary (File_Name : String) return ML_Types.String_Map is
       Routine_Name    : constant String := "Support_6A.Read_Vocabulary ";
       File_ID         : File_Type;
@@ -64,7 +102,7 @@ package body Support_6A is
             aLine : constant String := Get_Line (File_ID);
             Count : constant Positive := Integer'Value (aLine (1 .. 4));
             Token : constant String (1 .. aLine'Length - 6) :=
-              aLine (aLine'First + 5 .. aLine'Length - 1);
+                      aLine (aLine'First + 5 .. aLine'Length - 1);
          begin
             if Count > 1 then
                Word_Dictionary.Include (Token, Lexicon_Size);
@@ -96,7 +134,7 @@ package body Support_6A is
       Word_Cursor  : Cursor;
       Index        : Positive;
       Vec          : Integer_Array (1 .. Dictionary (Lex_Size)) :=
-        (others => 0);
+                       (others => 0);
    begin
       Words := Split_String_On_Spaces (Data);
       Word_Cursor := Words.First;
@@ -141,39 +179,6 @@ package body Support_6A is
       return Words;
 
    end Word_List;
-
-   --  -------------------------------------------------------------------------
-
-   procedure Plot_Sentence (Classifier : Python.Module;
-                            ClF        : Python_API.PyObject;
-                            Word_Dict  : ML_Types.String_Map;
-                            Sentence   : ML_Types.Indef_String_List) is
-      use Maths.Float_Math_Functions;
-      use ML_Types.Indefinite_String_Package;
-      Class_Log_Prior : constant Float_Array :=
-        Python_CLF.Call (Classifier, "class_log_prior", ClF);
-      Feature_Log_Prob : constant Real_Float_Matrix :=
-        Python_CLF.Call (Classifier, "feature_log_prob", ClF);
-      Curs      : Cursor := Sentence.First;
-      Acc       : Float := 1.0;
-      Index     : Natural;
-      Factor    : Float;
-      Facs      : Real_Float_List;
-      Labels    : ML_Types.Indef_String_List;
-   begin
-      Labels.Append ("PRIOR");
-      Facs.Append (Exp (Class_Log_Prior (1) - Class_Log_Prior (2)));
-
-      while Has_Element (Curs) loop
-         Index := Word_Dict (Sentence (Curs));
-         Labels.Append (Sentence (Curs));
-         Factor := Exp (Feature_Log_Prob (1, Index) - Feature_Log_Prob (2, Index));
-         Next (Curs);
-      end loop;
-
-      Labels.Append ("POST");
-
-   end Plot_Sentence;
 
    --  -------------------------------------------------------------------------
 

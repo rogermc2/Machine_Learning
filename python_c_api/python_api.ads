@@ -64,13 +64,7 @@ package Python_API is
    procedure PyList_SetItem (List : PyObject; Position : Interfaces.C.int;
                              Item : Interfaces.C.Int);
    pragma Import (C, PyList_SetItem, "PyList_SetItem");  
-   
-   function PyDouble_AsDouble (Obj : PyObject) return  Interfaces.C.double;
-   pragma Import (C, PyDouble_AsDouble, "PyDouble_AsDouble");
-   
-   function PyDouble_FromDouble (Val : Interfaces.C.double) return PyObject;
-   pragma Import (C, PyDouble_FromDouble, "PyDouble_FromDouble");
-   
+    
    function PyLong_AsLong (Obj : PyObject) return Interfaces.C.long;
    pragma Import (C, PyLong_AsLong, "PyLong_AsLong");
    

@@ -24,10 +24,3 @@ def show_tree (clf, feat_names):
 def print_confusion(clf, testdat, testlabs):
     print ("Confusion matrix:")
     print(confusion_matrix(testlabs, clf.predict (testdat)))
-
-def class_log_prior (clf):
-    return clf.class_log_prior_
-
-
-def feature_log_prob (clf):
-    return clf.feature_log_prob_
