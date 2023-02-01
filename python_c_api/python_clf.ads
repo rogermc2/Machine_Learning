@@ -20,8 +20,8 @@ package Python_CLF is
                   return Integer_Array;
    function Get_Attribute (CLF : PyObject; Attribute : String)
                            return Float_Array;
-   function Get_Attribute (CLF : PyObject; Attribute : String)
-                           return Real_Float_Matrix;
+--     function Get_Attribute (CLF : PyObject; Attribute : String)
+--                             return Real_Float_Matrix;
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject; A : Integer_Array_List;
                    B   : ML_Types.Integer_List);
