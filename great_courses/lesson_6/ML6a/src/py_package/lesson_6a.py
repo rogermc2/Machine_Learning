@@ -24,5 +24,9 @@ def show_tree (clf, feat_names):
 def print_confusion(clf, testdat, testlabs):
     print ("Confusion matrix:")
     print(confusion_matrix(testlabs, clf.predict (testdat)))
+    
+def array_item (array, index):
+    return array [index]
+    
 def matrix_item (matrix, row, col):
     return matrix [row][col]

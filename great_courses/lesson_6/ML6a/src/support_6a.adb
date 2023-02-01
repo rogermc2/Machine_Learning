@@ -57,28 +57,34 @@ package body Support_6A is
                             Labels     : out ML_Types.Indef_String_List) is
       use Maths.Float_Math_Functions;
       use ML_Types.Indefinite_String_Package;
-      Class_Log_Prior  : constant Float_Array :=
-                           Python_CLF.Get_Attribute (CLF, "class_log_prior_");
+      use Python_CLF;
+      Class_Log_Prior  : constant Python_API.PyObject :=
+                           Get_Attribute (CLF, "class_log_prior_");
       Feature_Log_Prob : constant Python_API.PyObject :=
-                           Python_CLF.Get_Attribute (CLF, "feature_log_prob_");
+                           Get_Attribute (CLF, "feature_log_prob_");
       Curs             : Cursor := Sentence.First;
       Acc              : Float := 1.0;
       Index            : Natural;
       Factor           : Float;
+      Log_Prior_1      : constant Float :=
+        Call (Classifier, "array_item", Class_Log_Prior, 0);
+      Log_Prior_2      : constant Float :=
+        Call (Classifier, "array_item", Class_Log_Prior, 1);
       Log_Prob_1       : Float;
       Log_Prob_2       : Float;
    begin
       Labels.Append ("PRIOR");
-      Facs.Append (Exp (Class_Log_Prior (1) - Class_Log_Prior (2)));
+      Facs.Append (Exp (Log_Prior_1 - Log_Prior_2));
+--        Facs.Append (Exp (Class_Log_Prior (1) - Class_Log_Prior (2)));
 
       while Has_Element (Curs) loop
          Index := Word_Dict (Sentence (Curs));
          Labels.Append (Sentence (Curs));
          Log_Prob_1 :=
-           Python_CLF.Call (Classifier, "matrix_item", Feature_Log_Prob,
+           Call (Classifier, "matrix_item", Feature_Log_Prob,
                             0, Index);
          Log_Prob_2 :=
-           Python_CLF.Call (Classifier, "matrix_item", Feature_Log_Prob,
+           Call (Classifier, "matrix_item", Feature_Log_Prob,
                             1, Index);
          Factor := Exp (Log_Prob_1 - Log_Prob_2);
          Acc := Acc * Factor;

@@ -38,6 +38,40 @@ package body Python_CLF is
    -- --------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
+                  Obj : PyObject; A : Integer) return Float is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format     : char_array;
+                              O1 : PyObject; I1 : int)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call Integers ";
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+      Result       : Float;
+   begin
+      PyParams := Py_BuildValue (To_C ("Oi"), Obj, int (A));
+      PyResult := Python.Call_Object (F, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Result := Float (PyFloat_AsDouble (PyResult));
+
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Result;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   function Call (M   : Python.Module; Function_Name : String;
                   Obj : PyObject; A, B : Integer) return Float is
       use Interfaces.C;
 
@@ -222,40 +256,6 @@ package body Python_CLF is
    --  -------------------------------------------------------------------------
 
    function Get_Attribute (CLF : PyObject; Attribute : String)
-                           return Float_Array is
-      use Interfaces.C;
-      Routine_Name : constant String := "Python_CLF.Get_Attribute Float_Array ";
-      PyString     : constant PyObject :=
-                       PyString_FromString (To_C (Attribute));
-      Py_Result    : PyObject;
-   begin
-      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      Py_Result := PyObject_GetAttr (CLF, PyString);
-      if Py_Result = System.Null_Address then
-         Put (Routine_Name & "Py error message: ");
-         PyErr_Print;
-      end if;
-
-      declare
-         Tuple_Size : constant int := PyTuple_Size (Py_Result);
-         Tuple_Item : PyObject;
-         Result     : Float_Array (1 .. Integer (Tuple_Size));
-      begin
-         for index in 0 .. Tuple_Size - 1 loop
-            Tuple_Item := PyTuple_GetItem (Py_Result, index);
-            Result (Integer (index) + 1) :=
-              Float (PyFloat_AsDouble (Tuple_Item));
-         end loop;
-
-         Py_DecRef (Py_Result);
-         return Result;
-      end;
-
-   end Get_Attribute;
-
-   --  -------------------------------------------------------------------------
-
-   function Get_Attribute (CLF : PyObject; Attribute : String)
                            return PyObject is
       use Interfaces.C;
       Routine_Name : constant String :=
@@ -264,7 +264,6 @@ package body Python_CLF is
                        PyString_FromString (To_C (Attribute));
       Py_Result    : PyObject;
    begin
-      Put_Line (Routine_Name);
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
       Py_Result := PyObject_GetAttr (CLF, PyString);
       if Py_Result = System.Null_Address then
