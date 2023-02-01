@@ -37,6 +37,51 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject)
+                  return Float_Array is
+      use Interfaces.C;
+      use Python;
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call Float_Array ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams     : PyObject;
+      Py_Result    : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), CLF);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      Py_Result := Call_Object (PyFunc, PyParams);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      declare
+         Tuple_Size : constant int := PyTuple_Size (Py_Result);
+         Tuple_Item : PyObject;
+         Result     : Float_Array (1 .. Integer (Tuple_Size));
+      begin
+         for index in 0 .. Tuple_Size - 1 loop
+            Tuple_Item := PyTuple_GetItem (Py_Result, index);
+            Result (Integer (index) + 1) :=
+              Float (PyDouble_AsDouble (Tuple_Item));
+         end loop;
+
+         Py_DecRef (PyFunc);
+         Py_DecRef (PyParams);
+         Py_DecRef (Py_Result);
+         return Result;
+      end;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    function Call (M : Python.Module; Function_Name : String;
                   A : Integer_Array_List; B : ML_Types.Integer_List)
                   return PyObject is
@@ -144,7 +189,7 @@ package body Python_CLF is
       declare
          Row_Size   : constant Integer := Integer (PyTuple_Size (Py_Result));
          Col_Size   : constant Integer :=
-                        Integer (PyTuple_Size (PyTuple_GetItem (Py_Result, 0)));
+           Integer (PyTuple_Size (PyTuple_GetItem (Py_Result, 0)));
          Tuple_Row  : PyObject;
          Result     : Real_Float_Matrix (1 .. Row_Size, 1 .. Col_Size);
       begin

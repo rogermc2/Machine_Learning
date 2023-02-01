@@ -28,20 +28,6 @@ def print_confusion(clf, testdat, testlabs):
 def class_log_prior (clf):
     return clf.class_log_prior_
 
-def plotsentence(sentence, clf):
-    acc = 1.0
-    labs = []
-    facs = []
-    factor = np.exp(clf.class_log_prior_[0]- clf.class_log_prior_[1])
-    labs += ["PRIOR"]
-    facs += [factor]
-    acc *= factor
-    for w in sentence:
-        i = word_dict[w]
-        factor = np.exp(clf.feature_log_prob_[0][i]- clf.feature_log_prob_[1][i])
-        labs += [w]
-        facs += [factor]
-        acc *= factor
-    labs += ["POST"]
-    facs += [acc]
-    return((labs,facs))
+
+def feature_log_prob (clf):
+    return clf.feature_log_prob_

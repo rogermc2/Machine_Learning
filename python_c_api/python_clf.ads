@@ -19,6 +19,8 @@ package Python_CLF is
                   CLF : PyObject; A : Integer_Array_List)
                   return Integer_Array;
    function Call (M : Python.Module; Function_Name : String; CLF : PyObject)
+                  return Float_Array;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject)
                   return Real_Float_Matrix;
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject; A : Integer_Array_List;
