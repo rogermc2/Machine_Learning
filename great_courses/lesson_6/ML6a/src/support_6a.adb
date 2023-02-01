@@ -75,9 +75,11 @@ package body Support_6A is
          Index := Word_Dict (Sentence (Curs));
          Labels.Append (Sentence (Curs));
          Log_Prob_1 :=
-           Python_CLF.Call (Classifier, "matrix_item", 0, int (Index));
+           Python_CLF.Call (Classifier, "matrix_item", Feature_Log_Prob,
+                            0, Index);
          Log_Prob_2 :=
-           Python_CLF.Call (Classifier, "matrix_item", 1, int (Index));
+           Python_CLF.Call (Classifier, "matrix_item", Feature_Log_Prob,
+                            1, Index);
          Factor := Exp (Log_Prob_1 - Log_Prob_2);
          Acc := Acc * Factor;
          Facs.Append (Factor);

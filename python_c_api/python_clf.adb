@@ -37,6 +37,40 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M   : Python.Module; Function_Name : String;
+                  Obj : PyObject; A, B : Integer) return Float is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format     : char_array;
+                              O1 : PyObject; I1, I2: int)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call Integers ";
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+      Result       : Float;
+   begin
+      PyParams := Py_BuildValue (To_C ("Oii"), Obj, int (A), int (B));
+      PyResult := Python.Call_Object (F, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Result := Float (PyFloat_AsDouble (PyResult));
+
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Result;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    function Call (M : Python.Module; Function_Name : String;
                   A : Integer_Array_List; B : ML_Types.Integer_List)
                   return PyObject is
