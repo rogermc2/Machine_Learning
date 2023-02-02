@@ -12,8 +12,6 @@ with Python_CLF;
 with Support_6A; use Support_6A;
 
 procedure Lesson_6A is
-   use ML_Types.Indefinite_String_Package;
-   use Real_Float_Package;
    Project_Name           : constant String := "Lesson_6A ";
    Vocab_File_Name        : constant String := "../../data/vocab.txt";
    Train_File_Name        : constant String := "../../data/spam-train.csv";
@@ -56,13 +54,14 @@ procedure Lesson_6A is
       Do_Predictions;
    end Run_Tree;
 
-   Sentence     : constant ML_Types.Indef_String_List :=
+   --  -------------------------------------------------------------------------
+
+   Sentence_1   : constant ML_Types.Indef_String_List :=
                     Neural_Utilities.Split_String_On_Spaces
                       ("yo come over carlos will be here soon");
-   Facs         : Real_Float_List;
-   Labels       : ML_Types.Indef_String_List;
-   Label_Cursor : ML_Types.Indefinite_String_Package.Cursor;
-   Index        : Natural := 0;
+   Sentence_2   : constant ML_Types.Indef_String_List :=
+                    Neural_Utilities.Split_String_On_Spaces
+                      ("congratulations thanks to a good friend u have won");
 begin
    Python.Initialize;
    Classifier := Import_File ("lesson_6a");
@@ -77,27 +76,12 @@ begin
 
    CLF := Python_CLF.Call (Classifier, "multinomial_fit",
                            Train_Data.Features, Train_Data.Labels);
-   Plot_Sentence (Classifier, CLF, Word_Dict, Sentence, Facs, Labels);
-   for fac in Facs.First_Index .. Facs.Last_Index loop
-      if Facs (fac) < 1.0 then
-         Facs.Replace_Element (fac, -1.0 / Facs (fac));
-      end if;
-   end loop;
-
-   New_Line;
-   Put_Line ("Naive Bayes factors:");
-   Label_Cursor := Labels.First;
-   Index := 0;
-   while Has_Element (Label_Cursor) loop
-      Index := Index + 1;
-      Put_Line (Element (Label_Cursor) & ", " &
-                  Float'Image (abs (Facs (Index))));
-      Next (Label_Cursor);
-   end loop;
-   New_Line;
 
    Put_Line ("Naive Bayes predictions:");
    Do_Predictions;
+
+   Print_Bayes_Data (Classifier, CLF, Word_Dict, Sentence_1);
+   Print_Bayes_Data (Classifier, CLF, Word_Dict, Sentence_2);
 
    Python_CLF.Call
      (Classifier, "print_confusion", CLF, Test_Data.Features,

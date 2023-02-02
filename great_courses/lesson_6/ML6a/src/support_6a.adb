@@ -127,6 +127,39 @@ package body Support_6A is
 
    --  -------------------------------------------------------------------------
 
+   procedure Print_Bayes_Data
+     (Classifier : Python.Module; CLF : Python_API.PyObject;
+      Word_Dict  : Dictionary_List; Sentence : ML_Types.Indef_String_List) is
+      use ML_Types.Indefinite_String_Package;
+--        Routine_Name : constant String := "Support_6A.Print_Bayes_Data ";
+      Label_Cursor : Cursor;
+      Facs         : Real_Float_List;
+      Labels       : ML_Types.Indef_String_List;
+      Index        : Natural := 0;
+   begin
+      Plot_Sentence (Classifier, CLF, Word_Dict, Sentence, Facs, Labels);
+      for fac in Facs.First_Index .. Facs.Last_Index loop
+         if Facs (fac) < 1.0 then
+            Facs.Replace_Element (fac, -1.0 / Facs (fac));
+         end if;
+      end loop;
+
+      New_Line;
+      Put_Line ("Naive Bayes factors:");
+      Label_Cursor := Labels.First;
+      Index := 0;
+      while Has_Element (Label_Cursor) loop
+         Index := Index + 1;
+         Put_Line (Element (Label_Cursor) & ", " &
+                     Float'Image (abs (Facs (Index))));
+         Next (Label_Cursor);
+      end loop;
+      New_Line;
+
+   end Print_Bayes_Data;
+
+   --  -------------------------------------------------------------------------
+
    function Read_Vocabulary (File_Name : String) return Dictionary_List is
       --        Routine_Name    : constant String := "Support_6A.Read_Vocabulary ";
       File_ID         : File_Type;

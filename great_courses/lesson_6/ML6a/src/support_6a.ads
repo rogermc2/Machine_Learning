@@ -25,12 +25,9 @@ package Support_6A is
 
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
                       return Data_Record;
-   procedure Plot_Sentence (Classifier : Python.Module;
-                            ClF        : Python_API.PyObject;
-                            Word_Dict  :Dictionary_List;
-                            Sentence   : ML_Types.Indef_String_List;
-                            Facs       : out Real_Float_List;
-                            Labels     : out ML_Types.Indef_String_List);
+   procedure Print_Bayes_Data
+     (Classifier : Python.Module; CLF : Python_API.PyObject;
+      Word_Dict  : Dictionary_List; Sentence : ML_Types.Indef_String_List);
    function Read_Vocabulary (File_Name : String) return Dictionary_List;
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
