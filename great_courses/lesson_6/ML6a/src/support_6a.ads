@@ -1,4 +1,5 @@
 
+with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
@@ -13,18 +14,27 @@ package Support_6A is
       Labels   : ML_Types.Integer_List;
    end record;
 
-   function Get_Data (File_Name : String; Dictionary : ML_Types.String_Map)
+   type Dictionary_Record is record
+      Key   : Unbounded_String;
+      Value : Natural := 0;
+   end record;
+
+   package Dictionary_Package is new
+     Ada.Containers.Doubly_Linked_Lists (Dictionary_Record);
+   subtype Dictionary_List is Dictionary_Package.List;
+
+   function Get_Data (File_Name : String; Dictionary : Dictionary_List)
                       return Data_Record;
    procedure Plot_Sentence (Classifier : Python.Module;
                             ClF        : Python_API.PyObject;
-                            Word_Dict  : ML_Types.String_Map;
+                            Word_Dict  :Dictionary_List;
                             Sentence   : ML_Types.Indef_String_List;
                             Facs       : out Real_Float_List;
                             Labels     : out ML_Types.Indef_String_List);
-   function Read_Vocabulary (File_Name : String) return ML_Types.String_Map;
-   function Tokenize (Data : String; Dictionary : ML_Types.String_Map)
+   function Read_Vocabulary (File_Name : String) return Dictionary_List;
+   function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
-   function Word_List  (Dictionary : ML_Types.String_Map)
+   function Word_List  (Dictionary : Dictionary_List)
                         return ML_Types.Indef_String_List;
 
 end Support_6A;
