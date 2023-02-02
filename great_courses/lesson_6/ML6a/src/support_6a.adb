@@ -75,7 +75,6 @@ package body Support_6A is
    begin
       Labels.Append ("PRIOR");
       Facs.Append (Exp (Log_Prior_1 - Log_Prior_2));
---        Facs.Append (Exp (Class_Log_Prior (1) - Class_Log_Prior (2)));
 
       while Has_Element (Curs) loop
          Index := Word_Dict (Sentence (Curs));
@@ -87,8 +86,8 @@ package body Support_6A is
            Call (Classifier, "matrix_item", Feature_Log_Prob,
                             1, Index);
          Factor := Exp (Log_Prob_1 - Log_Prob_2);
-         Acc := Acc * Factor;
          Facs.Append (Factor);
+         Acc := Acc * Factor;
          Next (Curs);
       end loop;
 
