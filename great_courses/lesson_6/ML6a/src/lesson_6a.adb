@@ -70,10 +70,10 @@ begin
    Python_CLF.Call (Classifier, "show_tree", CLF, Words);
    Python_API.Py_DecRef (CLF);
 
-   for leaves in 1 .. 15 loop
-      Run_Tree (2 * leaves);
-      Python_API.Py_DecRef (CLF);
-   end loop;
+--     for leaves in 1 .. 15 loop
+--        Run_Tree (2 * leaves);
+--        Python_API.Py_DecRef (CLF);
+--     end loop;
 
    CLF := Python_CLF.Call (Classifier, "multinomial_fit",
                            Train_Data.Features, Train_Data.Labels);

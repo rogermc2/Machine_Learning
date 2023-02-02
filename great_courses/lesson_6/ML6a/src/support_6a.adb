@@ -131,12 +131,13 @@ package body Support_6A is
    function Read_Vocabulary (File_Name : String) return Dictionary_List is
       --        Routine_Name    : constant String := "Support_6A.Read_Vocabulary ";
       File_ID         : File_Type;
-      Lexicon_Size    : Positive := 1;  --  Token
+      Lexicon_Size    : Natural := 0;  --  Token
       Word_Dictionary : Dictionary_List;
       Item            : Dictionary_Record;
    begin
       Item := (Unknown, Lexicon_Size);
       Word_Dictionary.Append (Item);
+      Lexicon_Size := Lexicon_Size + 1;
 
       Open (File_ID, In_File, File_Name);
 
@@ -176,9 +177,9 @@ package body Support_6A is
       --        Routine_Name : constant String := "Support_6A.Tokenize ";
       Words        : ML_Types.String_List;
       Word_Cursor  : String_Package.Cursor;
-      Index        : Positive;
+      Index        : Natural;
       Item         : Dictionary_Record;
-      Vec          : Integer_Array (1 .. Positive (Dictionary.Length)) :=
+      Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
                        (others => 0);
       Word         : Unbounded_String;
       Dummy        : Boolean;
