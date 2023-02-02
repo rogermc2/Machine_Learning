@@ -84,40 +84,39 @@ package body Support_6A is
                            Get_Attribute (CLF, "feature_log_prob_");
       Curs             : Cursor := Sentence.First;
       Acc              : Float := 1.0;
-      Factor           : Float;
-      Log_Prior_1      : constant Float :=
+      Log_Prior_0      : constant Float :=
                            Call (Classifier, "array_item", Class_Log_Prior, 0);
-      Log_Prior_2      : constant Float :=
+      Log_Prior_1      : constant Float :=
                            Call (Classifier, "array_item", Class_Log_Prior, 1);
+      Log_Prob_0       : Float;
       Log_Prob_1       : Float;
-      Log_Prob_2       : Float;
-      Index            : Natural := 0;
+      Factor           : Float := Exp (Log_Prior_0 - Log_Prior_1);
    begin
       Labels.Append ("PRIOR");
-      Facs.Append (Exp (Log_Prior_1 - Log_Prior_2));
+      Facs.Append (Factor);
+      Acc := Acc * Factor;
 
       while Has_Element (Curs) loop
          declare
             Word  : constant String := Sentence (Curs);
             Item  : Dictionary_Record;
+            Index : Natural;
          begin
             Assert (Find_Item (Word_Dict, To_Unbounded_String (Word), Item),
                     Routine_Name & Word & " is not in the dictionary");
             Labels.Append (Word);
-            Log_Prob_1 :=
+            Index := Item.Value;
+            Log_Prob_0 :=
               Call (Classifier, "matrix_item", Feature_Log_Prob,
                     0, Index);
-            Log_Prob_2 :=
+            Log_Prob_1 :=
               Call (Classifier, "matrix_item", Feature_Log_Prob,
                     1, Index);
-            Factor := Exp (Log_Prob_1 - Log_Prob_2);
+            Factor := Exp (Log_Prob_0 - Log_Prob_1);
             Facs.Append (Factor);
             Acc := Acc * Factor;
-            Put_Line (Routine_Name & "Factor: " & Float'Image (Factor) &
-                        "  Acc: " & Float'Image (Acc));
          end;
 
-         Index := Index + 1;
          Next (Curs);
       end loop;
 
