@@ -178,7 +178,8 @@ package body Support_6A is
       Word_Cursor  : String_Package.Cursor;
       Index        : Positive;
       Item         : Dictionary_Record;
-      Vec          : Integer_Array (1 .. Item.Value) := (others => 0);
+      Vec          : Integer_Array (1 .. Positive (Dictionary.Length)) :=
+                       (others => 0);
       Word         : Unbounded_String;
       Dummy        : Boolean;
    begin
@@ -208,14 +209,16 @@ package body Support_6A is
    function Word_List  (Dictionary : Dictionary_List)
                         return ML_Types.Indef_String_List is
       use ML_Types;
-      use ML_Types.String_Map_Package;
+      use Dictionary_Package;
       --        Routine_Name : constant String := "Support_6A.Word_List ";
       Curs  : Cursor := Dictionary.First;
       Words : Indef_String_List;
+      Item  : Dictionary_Record;
    begin
       while Has_Element (Curs) loop
          if Curs /= Dictionary.Last then
-            Words.Prepend (Key (Curs));
+            Item := Element (Curs);
+            Words.Append (To_String (Item.Key));
          end if;
          Next (Curs);
       end loop;

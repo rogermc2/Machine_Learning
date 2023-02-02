@@ -19,7 +19,7 @@ procedure Lesson_6A is
    Train_File_Name        : constant String := "../../data/spam-train.csv";
    Test_File_Name         : constant String := "../../data/spam-test.csv";
    Classifier             : Module;
-   Word_Dict              : constant ML_Types.String_Map :=
+   Word_Dict              : constant Dictionary_List :=
                               Read_Vocabulary (Vocab_File_Name);
    --     Words                  : constant ML_Types.Indef_String_List :=
    --                                Word_List (Word_Dict);
