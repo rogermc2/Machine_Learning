@@ -88,7 +88,8 @@ begin
    Index := 0;
    while Has_Element (Label_Cursor) loop
       Index := Index + 1;
-      Put_Line (Element (Label_Cursor) & ", " & Float'Image (Facs (Index)));
+      Put_Line (Element (Label_Cursor) & ", " &
+                  Float'Image (abs (Facs (Index))));
       Next (Label_Cursor);
    end loop;
 

@@ -58,6 +58,7 @@ package body Support_6A is
       use Maths.Float_Math_Functions;
       use ML_Types.Indefinite_String_Package;
       use Python_CLF;
+      Routine_Name : constant String := "Support_6A.Plot_Sentence ";
       Class_Log_Prior  : constant Python_API.PyObject :=
                            Get_Attribute (CLF, "class_log_prior_");
       Feature_Log_Prob : constant Python_API.PyObject :=
@@ -88,6 +89,8 @@ package body Support_6A is
          Factor := Exp (Log_Prob_1 - Log_Prob_2);
          Facs.Append (Factor);
          Acc := Acc * Factor;
+         Put_Line (Routine_Name & "Factor: " & Float'Image (Factor) &
+           "  Acc: " & Float'Image (Acc));
          Next (Curs);
       end loop;
 
