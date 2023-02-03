@@ -13,7 +13,7 @@ def init_classifer(max_leaves):
     return tree.DecisionTreeClassifier(max_leaf_nodes=max_leaves)
 
 def fit (clf, dat, labels):
-    return clf.fit(dat, labels)
+    return clf.fit(dat, labels[0])
 
 def score (clf, dat, labels):
     return clf.score(dat, labels)
