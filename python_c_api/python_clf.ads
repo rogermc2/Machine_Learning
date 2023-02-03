@@ -14,7 +14,7 @@ package Python_CLF is
                   return PyObject;
    function Call (M   : Python.Module; Function_Name : String;
                   Obj : PyObject; A : Integer) return Float;
-   function Call (M : Python.Module; Function_Name : String;A, B : Integer)
+   function Call (M : Python.Module; Function_Name : String; A, B : Integer)
                   return PyObject;
    function Call (M   : Python.Module; Function_Name : String;
                   Obj : PyObject; A, B : Integer) return Float;

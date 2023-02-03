@@ -42,26 +42,6 @@ procedure Lesson_6Q is
    Classifier     : Module;
    CLF            : Python_API.PyObject;
    Score          : Float;
-
-   --     procedure Do_Predictions is
-   --        Predictions : constant Integer_Array := Python_CLF.Call
-   --          (Classifier, "predict", CLF, Train_X);
-   --        Correct     : Natural := 0;
-   --        Accuracy    : Float;
-   --     begin
-   --        for index in Predictions'Range loop
-   --           if Predictions (index) = Test_Y (index) then
-   --              Correct := Correct + 1;
-   --           end if;
-   --        end loop;
-   --
-   --        Accuracy := Float (Correct) / Float (Predictions'Length);
-   --        Put_Line ("Accuracy: " & Float'Image (Accuracy));
-   --
-   --     end Do_Predictions;
-
-   --  -------------------------------------------------------------------------
-
 begin
    Python.Initialize;
    Classifier := Import_File ("lesson_6q");
@@ -69,8 +49,21 @@ begin
    Python_CLF.Call (Classifier, "fit", CLF, Train_X, Train_Y);
    Score := Python_CLF.Call (Classifier, "score", CLF, Test_X, Test_Y);
 
-   Put_Line (Project_Name & "Score: " & Float'Image (Score));
-   --     Do_Predictions;
+   Put_Line (Project_Name & "MLP classifer score: " & Float'Image (Score));
+
+   CLF := Python_CLF.Call (Classifier, "init_classifer", 250);
+   Python_CLF.Call (Classifier, "fit", CLF, Train_X, Train_Y);
+   Score := Python_CLF.Call (Classifier, "score", CLF, Test_X, Test_Y);
+
+   Put_Line (Project_Name & "Decision tree classifier score: " &
+               Float'Image (Score));
+   Python.Finalize;
+
+   Python_CLF.Call (Classifier, "multinomial_fit", CLF, Train_X, Train_Y);
+   Score := Python_CLF.Call (Classifier, "score", CLF, Test_X, Test_Y);
+
+   Put_Line (Project_Name & "Multinomial classifier score: " &
+               Float'Image (Score));
 
    Python.Finalize;
 
