@@ -64,7 +64,7 @@ package Python_API is
    procedure PyList_SetItem (List : PyObject; Position : Interfaces.C.int;
                              Item : Interfaces.C.Int);
    pragma Import (C, PyList_SetItem, "PyList_SetItem");  
-   
+    
    function PyLong_AsLong (Obj : PyObject) return Interfaces.C.long;
    pragma Import (C, PyLong_AsLong, "PyLong_AsLong");
    
@@ -110,6 +110,10 @@ package Python_API is
                                 return Interfaces.C.int;
    pragma Import (C, PyRun_SimpleString, "PyRun_SimpleString");
    
+   function PyRun_String (Command : Interfaces.C.char_array)
+                                return PyObject;
+   pragma Import (C, PyRun_String, "PyRun_String");
+
    procedure Py_SetProgramName (Name : Interfaces.C.char_array);
    pragma Import (C, Py_SetProgramName, "Py_SetProgramName");
     

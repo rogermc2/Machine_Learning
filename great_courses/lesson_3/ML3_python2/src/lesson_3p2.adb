@@ -5,16 +5,17 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types; use ML_Types;
 
+with Basic_Printing; use Basic_Printing;
 with Classifier_Utilities;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
-with Tree_Printing;
 
 procedure Lesson_3P2 is
    use ML_Types.String_Package;
    Routine_Name  : constant String := "Lesson_3P2 ";
    Data          : constant Multi_Output_Data_Record :=
-                     Classifier_Utilities.Load_Data ("../diabetes.csv");
+                     Classifier_Utilities.Load_Data
+                       ("../../data/diabetes.csv");
    --  feats
    Feature_Names : constant String_List := Data.Feature_Names;
    --  dat
@@ -28,7 +29,6 @@ procedure Lesson_3P2 is
    Features      : ML_Types.Unbounded_List;
    Classifier    : Python.Module;
 begin
-   Put_Line (Routine_Name);
    Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
    Put_Line (Routine_Name & "Num_Samples:" & Integer'Image (Num_Samples));
    while Has_Element (Names_Cursor) loop
@@ -36,8 +36,7 @@ begin
       Next (Names_Cursor);
    end loop;
 
---     Printing.Print_Unbounded_List ("Features", Features);
-   Tree_Printing.Print_Value_Data_List ("Features row 16", X_Data_List.Element (16));
+   Print_Integer_Matrix ("Features row 16", X_Data ,16, 16);
    New_Line;
 
    Python.Initialize;

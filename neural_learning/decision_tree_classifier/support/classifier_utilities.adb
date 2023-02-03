@@ -140,6 +140,25 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
+   function Arg_Max (Values : Integer_Array) return Positive is
+      Max_Value  : Integer := Integer'First;
+      Max_Index  : Positive := 1;
+      Value      : Integer;
+   begin
+      for index in Values'Range loop
+         Value := Values (index);
+         if Value > Max_Value then
+            Max_Index := index;
+            Max_Value := Value;
+         end if;
+      end loop;
+
+      return Max_Index;
+
+   end Arg_Max;
+
+   --  -------------------------------------------------------------------------
+
    function Arg_Max (Values : ML_Types.Integer_List) return Positive is
       Max_Value  : Integer := Integer'First;
       Max_Index  : Positive := 1;

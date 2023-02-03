@@ -236,8 +236,9 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
-                                  Start : Positive := 1; Finish : Natural := 0) is
+   procedure Print_Integer_Array
+     (Name  : String; anArray : Integer_Array;
+      Start : Positive := 1; Finish : Natural := 0) is
       Last  : Positive;
       Count : Positive := 1;
    begin
@@ -266,12 +267,42 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Integer_List (Name  : String;
-                                 aList : ML_Types.Integer_List) is
+   procedure Print_Integer_Array_List
+     (Name  : String; aList : Integer_Array_List;
+      List_Start : Positive := 1; List_Finish : Natural := 0;
+      Start : Positive := 1; Finish : Natural := 0) is
+      List_Last  : Positive;
+   begin
+      Put_Line (Name);
+      if List_Finish > 0 then
+         List_Last := List_Finish;
+      else
+         List_Last := Integer (aList.Length);
+      end if;
+
+      for index in List_Start .. List_Last loop
+         Print_Integer_Array ("" & Integer'Image (index),
+                              aList (index), Start, Finish);
+      end loop;
+
+   end Print_Integer_Array_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Integer_List
+     (Name  : String; aList : ML_Types.Integer_List;
+      Start : Positive := 1; Finish : Natural := 0) is
+      Last  : Positive;
       Count : Integer := 1;
    begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (aList.Length);
+      end if;
+
       Put_Line (Name & ": ");
-      for Index in aList.First_Index .. aList.Last_Index loop
+      for Index in Start .. Last loop
          Put (Integer'Image (aList (Index)) & "  ");
          Count := Count + 1;
          if Count > 10 then
@@ -517,6 +548,41 @@ package body Basic_Printing is
       New_Line;
 
    end Print_Unbound_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_String_Map (Name : String; aMap : ML_Types.String_Map;
+                                Start : Natural := 0; Finish : Natural := 0) is
+      use ML_Types.String_Map_Package;
+      Curs  : Cursor := aMap.First;
+      Last  : Natural;
+      Count : Natural := 0;
+   begin
+      if Integer (aMap.Length) > 0 then
+         if Finish > 0 and Finish <= Natural (aMap.Length) then
+            Last := Finish;
+         else
+            Last := Integer (aMap.Length);
+         end if;
+
+         while Has_Element (Curs) and Count <= Start loop
+            Count := Count + 1;
+            Next (Curs);
+         end loop;
+
+         Put_Line (Name & ": ");
+         while Has_Element (Curs) and Count < Last loop
+            Count := Count + 1;
+            declare
+               aKey : constant String := Key (Curs);
+            begin
+               Put_Line (aKey & ": " & Integer'Image (Element (Curs)));
+            end;
+            Next (Curs);
+         end loop;
+      end if;
+
+   end Print_String_Map;
 
    --  ------------------------------------------------------------------------
 

@@ -18,10 +18,10 @@ project Lesson_03_P2 is
       case Operating_System is
 
          when "high_sierra" =>
-            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.1/Frameworks/Python.framework/versions/3.11/lib", "-lpython3.11");
 
          when "ventura" =>
-            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.1/Frameworks/Python.framework/versions/3.11/lib", "-lpython3.11");
       end case;
    end Linker;
 

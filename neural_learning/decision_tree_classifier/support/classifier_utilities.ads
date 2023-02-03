@@ -16,6 +16,7 @@ package Classifier_Utilities is
    function Arg_Max (Values : NL_Types.Float_List) return Positive;
    function Arg_Max (Values : Real_Float_List) return Positive;
    function Arg_Max (Values : Real_Float_Matrix) return Integer_Array;
+   function Arg_Max (Values : Integer_Array) return Positive;
    function Arg_Max (Values : ML_Types.Integer_List) return Positive;
    function Bin_Count (Numbers : NL_Types.Natural_List)
                        return NL_Types.Natural_List;

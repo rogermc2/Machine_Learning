@@ -14,7 +14,7 @@ procedure Lesson_3 is
    Data_File : File_Type;
 begin
    Put_Line ("Lesson 3 ");
-   Open (Data_File, In_File, "../diabetes.csv");
+   Open (Data_File, In_File, "../../data/diabetes.csv");
    declare
       Row_Data    : Rows_Vector;
       Data        : Data_Record;

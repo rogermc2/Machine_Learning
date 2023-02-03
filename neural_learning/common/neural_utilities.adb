@@ -702,6 +702,52 @@ package body Neural_Utilities is
    end Split_String_On_Spaces;
 
    --  -------------------------------------------------------------------------
+
+   function Split_String_On_Spaces (aString : String)
+                                    return Indef_String_List is
+      use Ada.Strings;
+      --        Routine_Name : constant String := "Utilities.Split_String_On_Spaces ";
+      HT_String    : constant String (1 .. 1) :=
+                       (1 => Ada.Characters.Latin_1.HT);
+      Last_Char    : constant Integer := aString'Last;
+      A_Index      : Integer := 1;
+      B_Index      : Integer := aString'First;
+      Split_List   : Indef_String_List;
+   begin
+      while B_Index < aString'Last and A_Index > 0 loop
+         A_Index :=
+           Fixed.Index (aString (B_Index .. Last_Char), " ");
+         if A_Index = 0 then
+            A_Index := Fixed.Index (aString (B_Index .. Last_Char), HT_String);
+         end if;
+         if A_Index = 0 then
+            A_Index := Last_Char;
+         end if;
+         if A_Index /= Last_Char then
+            Split_List.Append (aString (B_Index .. A_Index - 1));
+         else
+            Split_List.Append (aString (B_Index .. A_Index));
+         end if;
+
+         B_Index := A_Index + 1;
+         if A_Index < Last_Char then
+            while aString (B_Index) = ' ' or
+              aString (B_Index) = Ada.Characters.Latin_1.HT loop
+               B_Index := B_Index + 1;
+            end loop;
+         end if;
+      end loop;
+
+      --  process last string
+      if B_Index < Last_Char then
+         Split_List.Append (aString (B_Index .. Last_Char));
+      end if;
+
+      return Split_List;
+
+   end Split_String_On_Spaces;
+
+   --  -------------------------------------------------------------------------
    --  Swap swaps matrix rows
    procedure Swap (Data : in out Binary_Matrix; L, R : Positive) is
       Val : Natural;

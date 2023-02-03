@@ -74,6 +74,7 @@ package Neural_Utilities is
                                  Value   : Value_Record);
    function Split_String (aString, Pattern : String)
                            return String_List;
+   function Split_String_On_Spaces (aString : String) return Indef_String_List;
    function Split_String_On_Spaces (aString : String) return String_List;
    procedure Swap (Data : in out Binary_Matrix; L, R : Positive);
    procedure Swap (Data : in out Boolean_Matrix; L, R : Positive);
