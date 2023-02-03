@@ -1,0 +1,24 @@
+project ML6Q is
+
+   for Source_Dirs use ("src", "../../../common", "../../../neural_learning/common", "../../../neural_learning/base", "../../../neural_learning/neural_network", 
+      "../../../neural_learning/decision_tree_classifier/support", "../../../neural_learning/utils", "../../../scipy/optimise", "../../../neural_learning/datasets", "../../../neural_learning/test", 
+      "../../../neural_learning/metrics", "../../../neural_learning/model_selection", "../../../python_c_api");
+   for Object_Dir use "obj";
+   for Main use ("lesson_6q.adb");
+   for Exec_Dir use ".";
+   for Languages use ("Ada");
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");
+   end Compiler;
+
+   package Linker is
+      for Switches ("ada") use ("-L/usr/local/gfortran/lib", "-lgfortran", "-llapack", "-lblas");
+   end Linker;
+
+   package Naming is
+      for Body_Suffix ("fortran") use ".f";
+   end Naming;
+
+end ML6Q;
+
