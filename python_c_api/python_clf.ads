@@ -31,10 +31,10 @@ package Python_CLF is
                    CLF : in out PyObject; A : ML_Types.Indef_String_List);
    procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject; 
                    A : ML_Arrays_And_Matrices.Real_Float_Matrix;
-                   B : ML_Arrays_And_Matrices.Integer_Matrix);
+                   B : ML_Arrays_And_Matrices.Integer_Array);
    function Call (M  : Python.Module; Function_Name : String; CLF : PyObject; 
                    A : ML_Arrays_And_Matrices.Real_Float_Matrix;
-                   B : ML_Arrays_And_Matrices.Integer_Matrix) return Float;
+                   B : ML_Arrays_And_Matrices.Integer_Array) return Float;
    function Get_Attribute (CLF : PyObject; Attribute : String)
                            return PyObject;
    

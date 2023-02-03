@@ -14,6 +14,18 @@ with Python_CLF;
 
 procedure Lesson_6Q is
    use CSV_Data_Loader;
+
+   function To_Integer_Array (Data : Integer_Matrix) return Integer_Array is
+      Array_1D : Integer_Array (Data'Range);
+   begin
+      for row in Data'Range loop
+         Array_1D (row) := Data (row, 1);
+      end loop;
+
+      return Array_1D;
+
+   end To_Integer_Array;
+
    Project_Name   : constant String := "Lesson 6Q ";
    Data_File_Name : constant String :=
                       "../../../neural_learning/datasets/mnist_784";
@@ -24,9 +36,9 @@ procedure Lesson_6Q is
                                        Test_Size, Y_Categorized => False,
                                        Reload => False);
    Train_X        : constant Real_Float_Matrix := Data.Train_X;
-   Train_Y        : constant Integer_Matrix := Data.Train_Y;
+   Train_Y        : constant Integer_Array := To_Integer_Array (Data.Train_Y);
    Test_X         : constant Real_Float_Matrix := Data.Test_X;
-   Test_Y         : constant Integer_Matrix := Data.Test_Y;
+   Test_Y         : constant Integer_Array := To_Integer_Array (Data.Test_Y);
    Classifier     : Module;
    CLF            : Python_API.PyObject;
    Score          : Float;

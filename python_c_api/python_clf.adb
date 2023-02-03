@@ -286,7 +286,7 @@ package body Python_CLF is
 
    procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
                    A : ML_Arrays_And_Matrices.Real_Float_Matrix;
-                   B : ML_Arrays_And_Matrices.Integer_Matrix) is
+                   B : ML_Arrays_And_Matrices.Integer_Array) is
       use Python;
 
       function Py_BuildValue (Format  : Interfaces.C.char_array;
@@ -317,7 +317,7 @@ package body Python_CLF is
 
    function Call (M  : Python.Module; Function_Name : String; CLF : PyObject;
                    A : ML_Arrays_And_Matrices.Real_Float_Matrix;
-                   B : ML_Arrays_And_Matrices.Integer_Matrix) return Float is
+                   B : ML_Arrays_And_Matrices.Integer_Array) return Float is
       use Python;
 
       function Py_BuildValue (Format  : Interfaces.C.char_array;
