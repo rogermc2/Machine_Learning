@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
 with Python_CLF;
 
@@ -131,7 +131,7 @@ package body Support_6A is
      (Classifier : Python.Module; CLF : Python_API.PyObject;
       Word_Dict  : Dictionary_List; Sentence : ML_Types.Indef_String_List) is
       use ML_Types.Indefinite_String_Package;
-      Routine_Name : constant String := "Support_6A.Print_Bayes_Data ";
+--        Routine_Name : constant String := "Support_6A.Print_Bayes_Data ";
       Label_Cursor : Cursor;
       Facs         : Real_Float_List;
       Labels       : ML_Types.Indef_String_List;
@@ -151,10 +151,9 @@ package body Support_6A is
       while Has_Element (Label_Cursor) loop
          Index := Index + 1;
          Put_Line (Element (Label_Cursor) & ", " &
-                     Float'Image (abs (Facs (Index))));
+                     Float'Image (Facs (Index)));
          Next (Label_Cursor);
       end loop;
-      Print_Real_Float_List (Routine_Name & "Facs", Facs);
       New_Line;
 
    end Print_Bayes_Data;
