@@ -14,6 +14,8 @@ package Python_CLF is
                   return PyObject;
    function Call (M   : Python.Module; Function_Name : String;
                   Obj : PyObject; A : Integer) return Float;
+   function Call (M : Python.Module; Function_Name : String; A, B : Integer)
+                  return PyObject;
    function Call (M   : Python.Module; Function_Name : String;
                   Obj : PyObject; A, B : Integer) return Float;
    function Call (M    : Python.Module; Function_Name : String;
@@ -25,8 +27,15 @@ package Python_CLF is
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject; A : Integer_Array_List;
                    B   : ML_Types.Integer_List);
-   procedure Call (M : Python.Module; Function_Name : String;
+   procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject; A : ML_Types.Indef_String_List);
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject; 
+                   A : Real_Float_Matrix; B : Integer_Array);
+   function Call (M  : Python.Module; Function_Name : String; CLF : PyObject; 
+                   A : Real_Float_Matrix; B : Integer_Array) return Float;
+   function Call (M : Python.Module; Function_Name : String;
+                  A : Real_Float_Matrix; B : Integer_Array)
+                  return PyObject;
    function Get_Attribute (CLF : PyObject; Attribute : String)
                            return PyObject;
    
