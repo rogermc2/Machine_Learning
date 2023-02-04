@@ -42,7 +42,7 @@ package body Python_CLF is
       use Interfaces.C;
 
       function Py_BuildValue (Format     : char_array;
-                              O1 : PyObject; I1 : int)
+                              O1         : PyObject; I1 : int)
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -72,7 +72,7 @@ package body Python_CLF is
    -- --------------------------------------------------------------------------
 
    function Call (M : Python.Module; Function_Name : String; A, B : Integer)
-                   return PyObject is
+                  return PyObject is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; I1, I2: int) return PyObject;
@@ -104,8 +104,8 @@ package body Python_CLF is
                   Obj : PyObject; A, B : Integer) return Float is
       use Interfaces.C;
 
-      function Py_BuildValue (Format     : char_array;
-                              O1 : PyObject; I1, I2: int)
+      function Py_BuildValue (Format : char_array;
+                              O1     : PyObject; I1, I2: int)
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -219,8 +219,8 @@ package body Python_CLF is
                    A   : Integer_Array_List; B : ML_Types.Integer_List) is
       use Python;
 
-      function Py_BuildValue (Format             : Interfaces.C.char_array;
-                              T1, T2, T3         : PyObject)  return PyObject;
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
+                              T1, T2, T3 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String := "Python_CLF.Call 4 * Integer_Array_List ";
@@ -285,25 +285,29 @@ package body Python_CLF is
    --  -------------------------------------------------------------------------
 
    procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
-                   A : ML_Arrays_And_Matrices.Real_Float_Matrix;
-                   B : ML_Arrays_And_Matrices.Integer_Array) is
+                   A : Real_Float_Matrix; B : Integer_Array) is
       use Python;
 
-      function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              O1, T1, T2  : PyObject) return PyObject;
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
+                              O1, T1, T2 : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      B_Tuple  : constant PyObject := To_Tuple (B);
-      PyParams : PyObject;
-      PyResult : PyObject;
-      Result   : aliased Interfaces.C.long;
+      Routine_Name : constant String :=
+                       "Python_CLF.Call Float_Matrix, Integer_Array ";
+      F            : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
    begin
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
       PyResult := Call_Object (F, PyParams);
-      Result := PyInt_AsLong (PyResult);
+
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
@@ -316,12 +320,11 @@ package body Python_CLF is
    --  -------------------------------------------------------------------------
 
    function Call (M  : Python.Module; Function_Name : String; CLF : PyObject;
-                   A : ML_Arrays_And_Matrices.Real_Float_Matrix;
-                   B : ML_Arrays_And_Matrices.Integer_Array) return Float is
+                  A  : Real_Float_Matrix; B  : Integer_Array) return Float is
       use Python;
 
-      function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              O1, T1, T2  : PyObject) return PyObject;
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
+                              O1, T1, T2 : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject := Get_Symbol (M, Function_Name);
