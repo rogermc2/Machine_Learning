@@ -7,7 +7,7 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with Neural_Utilities;
 with Python;
 with Python_API;
---  with Python_CLF;
+with Python_CLF;
 
 with Support_7A; use Support_7A;
 
@@ -29,8 +29,10 @@ begin
    Classifier := Python.Import_File ("lesson_7a");
 
    Python.Call (Classifier, "plot_data", Train_X, Train_Y);
+
    Genetic_Estimator :=
      Python.Call (Classifier, "init_SymbolicRegressor", Population_Size, Parsimony_Coeff);
+   Python_CLF.Call (Classifier, "fit", Genetic_Estimator, Train_X, Train_Y);
 
    --     Python_API.Py_DecRef (Genetic_Estimator);
 
