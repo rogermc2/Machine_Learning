@@ -234,13 +234,38 @@ package body Python is
                                  Interfaces.C.int (B));
       PyResult := Call_Object (F, PyParams);
       Result := PyInt_AsLong (PyResult);
+      
       Py_DecRef (F);
-      Py_DecRef (PyParams);
-      Py_DecRef (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
       return Integer (Result);
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Call (M : Module; Function_Name : String; A : Integer; B : Float)
+                  return Python_API.PyObject is
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              A      : Interfaces.C.int;
+                              B      : Interfaces.C.double) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("if"), Interfaces.C.int (A),
+                                 Interfaces.C.double (B));
+      PyResult := Call_Object (F, PyParams);
+      
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return PyResult;
+      
    end Call;
 
    --  -------------------------------------------------------------------------
