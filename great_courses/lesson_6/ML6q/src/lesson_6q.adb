@@ -57,9 +57,9 @@ begin
 
    Put_Line (Project_Name & "Decision tree classifier score: " &
                Float'Image (Score));
-   Python.Finalize;
 
-   Python_CLF.Call (Classifier, "multinomial_fit", CLF, Train_X, Train_Y);
+   Python_API.Py_DecRef (CLF);
+   CLF := Python_CLF.Call (Classifier, "multinomial_fit", Train_X, Train_Y);
    Score := Python_CLF.Call (Classifier, "score", CLF, Test_X, Test_Y);
 
    Put_Line (Project_Name & "Multinomial classifier score: " &

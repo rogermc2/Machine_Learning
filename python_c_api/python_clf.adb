@@ -348,6 +348,35 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
+   function Call (M : Python.Module; Function_Name : String;
+                  A : Real_Float_Matrix; B : Integer_Array)
+                  return PyObject is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; T1, T2 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    function Get_Attribute (CLF : PyObject; Attribute : String)
                            return PyObject is
       use Interfaces.C;
