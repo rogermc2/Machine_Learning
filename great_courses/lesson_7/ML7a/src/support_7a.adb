@@ -13,12 +13,12 @@ package body Support_7A is
 
    --  -------------------------------------------------------------------------
 
-   function Fit (Data : Real_Float_Vector) return Real_Float_Vector is
+   function Fit (Data : Real_Float_Matrix) return Real_Float_Vector is
       --        Routine_Name : constant String := "Support_7A.Load_Data ";
       Result            : Real_Float_Vector (Data'Range);
    begin
       for index in Data'Range loop
-         Result (index) := Target (Data (index));
+         Result (index) := Target (Data (index, 1));
       end loop;
 
       return Result;
@@ -27,12 +27,12 @@ package body Support_7A is
 
    --  -------------------------------------------------------------------------
 
-   function Load_Data (Num_Samples : Positive) return Real_Float_Vector is
+   function Load_Data (Num_Samples : Positive) return Real_Float_Matrix is
       --        Routine_Name : constant String := "Support_7A.Load_Data ";
-      Data            : Real_Float_Vector (1 .. Num_Samples);
+      Data            : Real_Float_Matrix (1 .. Num_Samples, 1 .. 1);
    begin
       for index in Data'Range loop
-         Data (index) := 10.0 * Maths.Random_Float;
+         Data (index, 1) := 10.0 * Maths.Random_Float;
       end loop;
 
       return Data;

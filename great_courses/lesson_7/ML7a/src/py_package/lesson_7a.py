@@ -11,6 +11,7 @@ def init_SymbolicRegressor(pop_size, parsimony_coeff):
     return SymbolicRegressor(population_size=pop_size, parsimony_coefficient=parsimony_coeff, function_set = ('add', 'mul'))
     
 def fit (est_gp, X_train, y_train):
+    print ("est_gp.fit")
     est_gp.fit(X_train=X_train, y_train=y_train)
 
 def plot_data(X_train, y_train):

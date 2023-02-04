@@ -15,7 +15,7 @@ procedure Lesson_7A is
 
    Project_Name : constant String := "Lesson 7A ";
    Num_Samples  : constant Positive := 50;
-   Train_X      : constant Real_Float_Vector := Load_Data (Num_Samples);
+   Train_X      : constant Real_Float_Matrix := Load_Data (Num_Samples);
    Train_Y      : constant Real_Float_Vector := Fit (Train_X);
 --     Test_X       : constant Real_Float_Vector := Load_Data (Num_Samples);
 --     Test_Y       : constant Real_Float_Vector := Fit (Test_X);

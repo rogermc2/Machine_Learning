@@ -251,8 +251,9 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
-   procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : in out PyObject; A, B : Real_Float_Vector) is
+   procedure Call
+     (M   : Python.Module; Function_Name : String;
+      CLF : in out PyObject; A : Real_Float_Matrix; B : Real_Float_Vector) is
       use Python;
 
       function Py_BuildValue (Format     : Interfaces.C.char_array;
@@ -271,8 +272,9 @@ package body Python_CLF is
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
-
+      Put_Line (Routine_Name & "Call_Object");
       CLF := Call_Object (PyFunc, PyParams);
+
       if CLF = System.Null_Address then
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;

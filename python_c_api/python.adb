@@ -327,7 +327,7 @@ package body Python is
    --  -------------------------------------------------------------------------
 
    procedure Call (M    : Module; Function_Name : String;
-                   A, B : ML_Arrays_And_Matrices.Real_Float_Vector) is
+                   A, B : ML_Arrays_And_Matrices.Real_Float_Matrix) is
 
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject) return PyObject;
