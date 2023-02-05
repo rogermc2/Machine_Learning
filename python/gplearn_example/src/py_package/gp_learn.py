@@ -22,6 +22,11 @@ def fit (est_gp):
     # Training samples
     X_train = rng.uniform(-1, 1, 100).reshape(50, 2)
     y_train = X_train[:, 0]**2 - X_train[:, 1]**2 + X_train[:, 1] - 1
+    print ("X_train type", type(X_train))
+    print ("y_train type", type(y_train))
+    print ("X_train length", X_train.shape)
+    print ("y_train length", y_train.shape)
+    print ("X_train 0 .. 2", X_train[:2])
     est_gp.fit(X_train, y_train)
 
 #def plot_data(X_train, y_train):
