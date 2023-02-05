@@ -12,7 +12,7 @@ def init_SymbolicRegressor(pop_size, parsimony_coeff):
     
 def fit (est_gp, X_train, y_train):
     print ("est_gp.fit")
-    est_gp.fit(X_train=X_train, y_train=y_train)
+    est_gp.fit(X_train, y_train)
 
 def plot_data(X_train, y_train):
     pyplot.scatter(X_train, y_train)
