@@ -14,19 +14,9 @@ def init_SymbolicRegressor():
                               max_samples=0.9, verbose=1,
                               parsimony_coefficient=0.01, random_state=0)
     
-#def fit (est_gp, X_train, y_train):
-def fit (est_gp):
+def fit (est_gp, X_train, y_train):
+#def fit (est_gp):
     print ("est_gp.fit")
-    rng = check_random_state(0)
-
-    # Training samples
-    X_train = rng.uniform(-1, 1, 100).reshape(50, 2)
-    y_train = X_train[:, 0]**2 - X_train[:, 1]**2 + X_train[:, 1] - 1
-    print ("X_train type", type(X_train))
-    print ("y_train type", type(y_train))
-    print ("X_train length", X_train.shape)
-    print ("y_train length", y_train.shape)
-    print ("X_train 0 .. 2", X_train[:2])
     est_gp.fit(X_train, y_train)
 
 #def plot_data(X_train, y_train):
@@ -37,10 +27,9 @@ def plot_data():
     x0, x1 = np.meshgrid(x0, x1)
     y_truth = x0**2 - x1**2 + x1 - 1
 
-#    print ("x0", x0[0])
     ax = plt.figure().add_subplot(projection='3d')
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
     surf = ax.plot_surface(x0, x1, y_truth, rstride=1, cstride=1,
                            color='green', alpha=0.5)
-#    plt.show()
+    plt.show()
