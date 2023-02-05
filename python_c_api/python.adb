@@ -232,6 +232,28 @@ package body Python is
    end Call;
 
    -- --------------------------------------------------------------------------
+ 
+   function Call (M : Module; Function_Name : String; A : Integer)
+                  return Python_API.PyObject is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; A : int) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("(i)"), int (A));
+      PyResult := Call_Object (F, PyParams);
+      
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
 
    function Call (M : Module; Function_Name : String; A, B : Integer)
                   return Integer is
@@ -272,13 +294,12 @@ package body Python is
       PyParams : PyObject;
       PyResult : PyObject;
    begin
-      PyParams := Py_BuildValue (Interfaces.C.To_C ("if"), Interfaces.C.int (A),
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("id"), Interfaces.C.int (A),
                                  Interfaces.C.double (B));
       PyResult := Call_Object (F, PyParams);
       
       Py_DecRef (F);
       Py_DecRef (PyParams);
-      Py_DecRef (PyResult);
 
       return PyResult;
       

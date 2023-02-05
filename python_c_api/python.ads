@@ -31,6 +31,8 @@ package Python is
    procedure Call (M : Module; Function_Name, A : String);
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer;
+   function Call (M : Module; Function_Name : String; A : Integer)
+                  return Python_API.PyObject;
    function Call (M : Module; Function_Name : String; A, B : Integer)
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer; B : Float)

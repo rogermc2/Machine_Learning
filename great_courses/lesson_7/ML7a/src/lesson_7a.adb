@@ -17,6 +17,8 @@ procedure Lesson_7A is
    Train_Y      : constant Real_Float_Vector := Fit (Train_X);
 --     Test_X       : constant Real_Float_Vector := Load_Data (Num_Samples);
 --     Test_Y       : constant Real_Float_Vector := Fit (Test_X);
+   Population        : constant Positive := 10000;
+   Parsimony         : constant Float := 0.1;
    Classifier        : Python.Module;
    Genetic_Estimator : Python_API.PyObject;
 
@@ -27,11 +29,10 @@ begin
    Python.Call (Classifier, "plot_data", Train_X, Train_Y);
 
    Genetic_Estimator :=
-     Python.Call (Classifier, "init_SymbolicRegressor");
+     Python.Call (Classifier, "init_SymbolicRegressor", Population, Parsimony);
    Python_CLF.Call (Classifier, "fit", Genetic_Estimator, Train_X, Train_Y);
 
    Python_API.Py_DecRef (Genetic_Estimator);
---     Python.Call (Classifier, "fit", Train_X, Train_Y);
 
    Python.Finalize;
 
