@@ -29,7 +29,7 @@ package Python_CLF is
                    CLF : in out PyObject; A : Integer_Array_List;
                    B   : ML_Types.Integer_List);
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : in out PyObject; A : Real_Float_Matrix;
+                   CLF : PyObject; A : Real_Float_Matrix;
                    B   : Real_Float_Vector);
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject; A : ML_Types.Indef_String_List);
