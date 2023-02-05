@@ -163,6 +163,38 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
+   procedure Call (M   : Python.Module; Function_Name : String;
+                   CLF : PyObject) is
+      use Python;
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              C1     : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams     : PyObject;
+      Py_Result    : PyObject;
+   begin
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), CLF);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      Py_Result := Call_Object (PyFunc, PyParams);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (PyParams);
+      Py_DecRef (Py_Result);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Integer_Array_List)
                   return Integer_Array is
