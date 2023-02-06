@@ -687,15 +687,14 @@ package body Python is
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOOO"),
                        A_Tuple, B_Tuple, C_Tuple, D_Tuple);
+
+      PyResult := Call_Object (Py_Func, PyParams);
+      Py_DecRef (Py_Func);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
       Py_DecRef (D_Tuple);
-
-      PyResult := Call_Object (Py_Func, PyParams);
-      Py_DecRef (Py_Func);
       Py_DecRef (PyParams);
-  
       Py_DecRef (PyResult);
 
    end Call;
