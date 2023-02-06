@@ -1,11 +1,9 @@
 
---  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 --  with Basic_Printing; use Basic_Printing;
---  with Python_CLF;
 
 package body Support_7A is
 
@@ -38,6 +36,28 @@ package body Support_7A is
       return Data;
 
    end Load_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Sorted_Data (Num_Samples : Positive)
+                              return Real_Float_Matrix is
+      --        Routine_Name : constant String := "Support_7A.Load_Sorted_Data ";
+      Data_Array      : Float_Array (1 .. Num_Samples);
+      Data            : Real_Float_Matrix (1 .. Num_Samples, 1 .. 1);
+   begin
+      for index in Data_Array'Range loop
+         Data_Array (index) := 10.0 * Maths.Random_Float;
+      end loop;
+
+      Float_Array_Sort (Data_Array);
+
+      for index in Data'Range loop
+         Data (index, 1) := Data_Array (index);
+      end loop;
+
+      return Data;
+
+   end Load_Sorted_Data;
 
    --  -------------------------------------------------------------------------
 
