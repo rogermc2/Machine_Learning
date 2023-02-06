@@ -11,14 +11,12 @@ def init_treeclassifer(max_leaves):
 
 def init_SymbolicRegressor(pop_size, pars):
     return SymbolicRegressor(population_size=pop_size,parsimony_coefficient=pars,
-                             function_set=('add', 'mul'),verbose=1,generations=3)
+                             function_set=('add', 'mul'),verbose=1)
 def fit (est, X_train, y_train):
     est.fit(X_train, y_train)
 
 def predict (est, X):
-    print ("predict X", X[:3])
-    print ("est.predict X", est.predict(X)[:3])
-    return est.predict(X)
+    return tuple(est.predict(X))
 
 def plot_data(X_train, y_train):
     pyplot.scatter(X_train, y_train)

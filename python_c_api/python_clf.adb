@@ -330,18 +330,28 @@ package body Python_CLF is
                   return Real_Float_Vector is
       use Interfaces.C;
       use Python;
+      Routine_Name : constant String :=
+                       "Python_CLF.Call 2 * Real_Float_Vector ";
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      Routine_Name : constant String := "Python_CLF.Call 2 * Real_Float_Vector ";
+      procedure Parse_Tuple (Tuple : PyObject;
+                             Vec   : in out Real_Float_Vector) is
+      begin
+         Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
+                   "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
+                 & " /= Vec'Length" & Integer'Image (Vec'Length));
+         for index in 1 .. PyTuple_Size (Tuple) loop
+            Vec (Integer (index)) := Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, index - 1)));
+         end loop;
+      end Parse_Tuple;
+
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
       PyParams     : PyObject;
       PyResult     : PyObject;
-      PyItem       : PyObject;
-      PyIndex      : int := 0;
       Result       : Real_Float_Vector (A'Range);
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
@@ -359,17 +369,7 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
-      Put_Line (Routine_Name & "PyResult size: " &
-                  int'Image (PyObject_Size (PyResult)));
-      for index in Result'Range loop
-         PyItem := PyTuple_GetItem (PyResult, PyIndex);
-         Put_Line (Routine_Name & "PyResult size: " &
-                  int'Image (PyTuple_Size (PyItem)));
-         Result (index) := Float (PyFloat_AsDouble (PyItem));
---           Put_Line (Routine_Name & "Result: " &
---                       double'Image (PyFloat_AsDouble (PyItem)));
-         PyIndex := PyIndex + 1;
-      end loop;
+      Parse_Tuple (PyResult, Result);
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
