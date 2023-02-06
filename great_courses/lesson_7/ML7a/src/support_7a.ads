@@ -1,7 +1,5 @@
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
---  with Python;
---  with Python_API;
 
 package Support_7A is
 
