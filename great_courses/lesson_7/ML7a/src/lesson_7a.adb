@@ -28,7 +28,7 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_7a");
 
-   Python.Call (Classifier, "plot_data", Train_X, Train_Y);
+--     Python.Call (Classifier, "plot_data", Train_X, Train_Y);
 
    Genetic_Estimator :=
      Python.Call (Classifier, "init_SymbolicRegressor", Population, Parsimony);

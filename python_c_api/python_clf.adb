@@ -359,9 +359,15 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
+      Put_Line (Routine_Name & "PyResult size: " &
+                  int'Image (PyObject_Size (PyResult)));
       for index in Result'Range loop
          PyItem := PyTuple_GetItem (PyResult, PyIndex);
-         Result (index) := Float (PyFloat_ASDouble (PyItem));
+         Put_Line (Routine_Name & "PyResult size: " &
+                  int'Image (PyTuple_Size (PyItem)));
+         Result (index) := Float (PyFloat_AsDouble (PyItem));
+--           Put_Line (Routine_Name & "Result: " &
+--                       double'Image (PyFloat_AsDouble (PyItem)));
          PyIndex := PyIndex + 1;
       end loop;
 
@@ -478,11 +484,11 @@ package body Python_CLF is
 
    function Call (M : Python.Module; Function_Name : String;
                   A : Real_Float_Matrix; B : Integer_Array)
-                     return PyObject is
+                  return PyObject is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; T1, T2 : PyObject)
-                                 return PyObject;
+                              return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
@@ -506,7 +512,7 @@ package body Python_CLF is
    -- --------------------------------------------------------------------------
 
    function Get_Attribute (CLF : PyObject; Attribute : String)
-                              return PyObject is
+                           return PyObject is
       use Interfaces.C;
       Routine_Name : constant String :=
                        "Python_CLF.Get_Attribute Real_Float_Matrix ";
