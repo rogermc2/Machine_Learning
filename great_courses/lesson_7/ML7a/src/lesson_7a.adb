@@ -35,7 +35,7 @@ begin
    Python_CLF.Call (Classifier, "fit", Genetic_Estimator, Train_X, Train_Y);
    Predictions := Python_CLF.Call (Classifier, "predict", Genetic_Estimator,
                                    X_Lots);
-   Print_Float_Vector ("Predictions", Predictions, 1, 2);
+   Print_Float_Vector ("Predictions", Predictions, 1, 10);
    Python.Call (Classifier, "plot_prediction", Test_X, Test_Y,
                X_Lots, Predictions);
 
