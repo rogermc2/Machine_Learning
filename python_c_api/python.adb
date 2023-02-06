@@ -666,6 +666,44 @@ package body Python is
 
    procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Real_Float_Vector;
+                   C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   D    : ML_Arrays_And_Matrices.Real_Float_Vector) is
+      --        Routine_Name : constant String := "Python.Call ABCD MV ";
+
+      function Py_BuildValue (Format          : Interfaces.C.char_array;
+                              T1, T2, T3, T4  : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Py_Func  : PyObject;
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      C_Tuple  : constant PyObject := To_Tuple (C);
+      D_Tuple  : constant PyObject := To_Tuple (D);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      Py_Func := Get_Symbol (M, Function_Name);
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOOO"),
+                       A_Tuple, B_Tuple, C_Tuple, D_Tuple);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (C_Tuple);
+      Py_DecRef (D_Tuple);
+
+      PyResult := Call_Object (Py_Func, PyParams);
+      Py_DecRef (Py_Func);
+      Py_DecRef (PyParams);
+  
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M    : Module; Function_Name : String;
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Matrix) is
 
       function Py_BuildValue (Format  : Interfaces.C.char_array;

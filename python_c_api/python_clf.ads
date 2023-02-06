@@ -31,12 +31,15 @@ package Python_CLF is
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : PyObject; A : Real_Float_Matrix;
                    B   : Real_Float_Vector);
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject; A : Real_Float_Matrix)
+                  return Real_Float_Vector;
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject; A : ML_Types.Indef_String_List);
    procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject; 
                    A : Real_Float_Matrix; B : Integer_Array);
    function Call (M  : Python.Module; Function_Name : String; CLF : PyObject; 
-                   A : Real_Float_Matrix; B : Integer_Array) return Float;
+                  A  : Real_Float_Matrix; B : Integer_Array) return Float;
    function Call (M : Python.Module; Function_Name : String;
                   A : Real_Float_Matrix; B : Integer_Array)
                   return PyObject;

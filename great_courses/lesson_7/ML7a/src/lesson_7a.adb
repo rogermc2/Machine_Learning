@@ -1,7 +1,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 with Python_CLF;
@@ -11,11 +11,13 @@ with Support_7A; use Support_7A;
 
 procedure Lesson_7A is
 
-   Project_Name : constant String := "Lesson 7A ";
-   Num_Samples  : constant Positive := 50;
-   Train_X      : constant Real_Float_Matrix := Load_Data (Num_Samples);
-   Train_Y      : constant Real_Float_Vector := Fit (Train_X);
-   X_Lots       : constant Real_Float_Matrix := Load_Data (250);
+   Project_Name      : constant String := "Lesson 7A ";
+   Num_Samples       : constant Positive := 50;
+   Train_X           : constant Real_Float_Matrix := Load_Data (Num_Samples);
+   Train_Y           : constant Real_Float_Vector := Fit (Train_X);
+   Test_X            : constant Real_Float_Matrix := Load_Data (Num_Samples);
+   Test_Y            : constant Real_Float_Vector := Fit (Test_X);
+   X_Lots            : constant Real_Float_Matrix := Load_Data (250);
    Predictions       : Real_Float_Vector (X_Lots'Range);
    Population        : constant Positive := 10000;
    Parsimony         : constant Float := 0.1;
@@ -33,6 +35,9 @@ begin
    Python_CLF.Call (Classifier, "fit", Genetic_Estimator, Train_X, Train_Y);
    Predictions := Python_CLF.Call (Classifier, "predict", Genetic_Estimator,
                                    X_Lots);
+   Print_Float_Vector ("Predictions", Predictions, 1, 2);
+   Python.Call (Classifier, "plot_prediction", Test_X, Test_Y,
+               X_Lots, Predictions);
 
    Python_API.Py_DecRef (Genetic_Estimator);
 
