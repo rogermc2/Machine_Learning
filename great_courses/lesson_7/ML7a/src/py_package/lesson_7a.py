@@ -15,6 +15,9 @@ def init_SymbolicRegressor(pop_size, pars):
 def fit (est, X_train, y_train):
     est.fit(X_train, y_train)
 
+def predict (est, X):
+    est.fit(X)
+
 def plot_data(X_train, y_train):
     pyplot.scatter(X_train, y_train)
     pyplot.title('Target distance')
