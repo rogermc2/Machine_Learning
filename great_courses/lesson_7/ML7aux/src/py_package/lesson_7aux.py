@@ -2,6 +2,7 @@ import matplotlib
 from matplotlib import pyplot
 
 def plot_xy(X_List, Y_List):
+    print (X_List[-1])
     pyplot.plot(X_List, Y_List)
 
 def show_plot(X, Y):
