@@ -15,6 +15,7 @@ procedure Lesson_7Aux is
    Steps        : constant Positive := 3600;
    Angles       : Real_Float_Vector (1 .. Steps);
    Landing      : Real_Float_Vector (Angles'Range);
+   Xs_Ys        : XY_Data;
    Classifier   : Python.Module;
 begin
    for index in Angles'Range loop
@@ -29,6 +30,9 @@ begin
    Classifier := Python.Import_File ("lesson_7aux");
 
    Python.Call (Classifier, "plot_data", Angles, Landing);
+
+   Xs_Ys := Show (360.0);
+   Python.Call (Classifier, "plot_launcher", Xs_Ys.Xs, Xs_Ys.Ys);
 
    Python.Finalize;
 

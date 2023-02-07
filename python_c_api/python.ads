@@ -57,6 +57,8 @@ package Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Vector);
    procedure Call (M    : Module; Function_Name : String;
+                   A, B : NL_Types.Float_List);
+   procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Array;
                    C    : ML_Arrays_And_Matrices.Real_Float_Matrix;

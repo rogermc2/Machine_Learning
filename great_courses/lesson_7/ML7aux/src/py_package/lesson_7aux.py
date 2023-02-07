@@ -7,3 +7,10 @@ def plot_data(angles, landing):
     pyplot.xlabel('angle')
     pyplot.ylabel('distance')
     pyplot.show()
+
+def plot_launcher(X, Y):
+    pyplot.scatter(X, Y)
+    pyplot.title('Launcher position')
+    pyplot.xlabel('X')
+    pyplot.ylabel('Y')
+    pyplot.show()
