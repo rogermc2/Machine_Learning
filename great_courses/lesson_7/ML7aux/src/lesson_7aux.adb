@@ -18,11 +18,9 @@ procedure Lesson_7Aux is
    Angles       : Real_Float_Vector (1 .. Steps);
    Landing      : Real_Float_Vector (Angles'Range);
    Population   : Real_Float_Vector (1 .. 10);
-   Children     : Real_Float_Vector (Population'Range);
-   Generation   : Real_Float_Vector (1 .. 20);
    Values       : Real_Float_Vector (Population'Range)  :=
                     (others => 0.0);
-   Gen_Values   : Real_Float_Vector (Generation'Range);
+   Pop_List     : Real_Float_List;
    Xs_Ys        : XY_Data;
    Traject      : XY_Data;
    Threshold    : Float;
@@ -59,51 +57,61 @@ begin
                 Population, Values);
 
    for index in Population'Range loop
-      if  Values (index) < Threshold then
-         Population (index) :=
-           Float (Maths.Random_Integer (0, 3600)) / 10.0;
-         Values (index) := Shoot (Population (index));
-         Children (index) := Population (index) + 5.0 * Maths.Random_Float;
-         Generation (index) := Population (index);
-         Generation (index + Population'Last) := Children (index);
-      else
-         Population (index) := 0.0;
+      if Values (index) < Threshold then
+         Pop_List.Append (Population  (index));
       end if;
    end loop;
 
-   Python.Call (Classifier, "plot_values", Angles, Landing,
-                Population, Values);
+   declare
+      Population2  : Real_Float_Vector (1 .. Integer (Pop_List.Length));
+      Children     : Real_Float_Vector (Population2'Range);
+      Generation   : Real_Float_Vector (1 .. 20);
+      Values2       : Real_Float_Vector (Population2'Range)  :=
+                       (others => 0.0);
+      Gen_Values   : Real_Float_Vector (Generation'Range);
+   begin
+      for index in Population2'Range loop
+         Population2 (index) := Pop_List (index);
+         Values2 (index) := Shoot (Population2 (index));
+         Children (index) := Population2 (index) + 5.0 * Maths.Random_Float;
+         Generation (index) := Population2 (index);
+         Generation (index + Population2'Last) := Children (index);
+      end loop;
 
-   for index in Generation'Range loop
-      Gen_Values (index) := Shoot (Generation (index));
-   end loop;
-   Put_Line ("Minimum value: " & Float'Image (Min (Gen_Values)));
-   Python.Call (Classifier, "plot_values", Angles, Landing,
-                Generation, Gen_Values);
+      Python.Call (Classifier, "plot_values", Angles, Landing,
+                   Population2, Values2);
 
-   Traject := Trajectory (180.0);
-   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
-   Traject := Trajectory (60.0);
-   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
-   Traject := Trajectory (280.0);
-   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      for index in Generation'Range loop
+         Gen_Values (index) := Shoot (Generation (index));
+      end loop;
+      Put_Line ("Minimum value: " & Float'Image (Min (Gen_Values)));
+      Python.Call (Classifier, "plot_values", Angles, Landing,
+                   Generation, Gen_Values);
 
-   Python.Call (Classifier, "show_plot", 20, 0);
-   New_Line;
-   Traject := Trajectory (42.0);
-   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
-   Traject := Trajectory (90.0);
-   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
-   Traject := Trajectory (138.0);
-   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
-   Traject := Trajectory (200.0);
-   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
-   Traject := Trajectory (270.0);
-   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
-   Traject := Trajectory (340.0);
-   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (180.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (60.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (280.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
 
-   Python.Call (Classifier, "show_plot", 20, 0);
+      Python.Call (Classifier, "show_plot", 20, 0);
+      New_Line;
+      Traject := Trajectory (42.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (90.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (138.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (200.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (270.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (340.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+
+      Python.Call (Classifier, "show_plot", 20, 0);
+   end;
 
    Python.Finalize;
 
