@@ -1,6 +1,13 @@
 import matplotlib
 from matplotlib import pyplot
 
+def plot_xy(X_List, Y_List):
+    pyplot.plot(X_List, Y_List)
+
+def show_plot(X, Y):
+    pyplot.scatter([X], [Y])
+    pyplot.show()
+
 def plot_data(angles, landing):
     pyplot.scatter(angles, landing)
     pyplot.title('Target distance')

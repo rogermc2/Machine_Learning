@@ -33,6 +33,7 @@ package Python is
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Python_API.PyObject;
+   procedure Call (M : Module; Function_Name : String; A, B : Integer);
    function Call (M : Module; Function_Name : String; A, B : Integer)
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer; B : Float)

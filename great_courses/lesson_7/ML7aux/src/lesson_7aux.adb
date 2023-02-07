@@ -24,6 +24,7 @@ procedure Lesson_7Aux is
                     (others => 0.0);
    Gen_Values   : Real_Float_Vector (Generation'Range);
    Xs_Ys        : XY_Data;
+   Traject      : XY_Data;
    Threshold    : Float;
    Classifier   : Python.Module;
 begin
@@ -64,6 +65,15 @@ begin
    Put_Line ("Minimum value: " & Float'Image (Min (Gen_Values)));
    Python.Call (Classifier, "plot_values", Angles, Landing,
                 Generation, Gen_Values);
+
+   Traject := Trajectory (180.0);
+   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+   Traject := Trajectory (60.0);
+   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+   Traject := Trajectory (280.0);
+   Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+
+   Python.Call (Classifier, "show_plot", 20, 0);
 
    Python.Finalize;
 
