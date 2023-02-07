@@ -121,6 +121,7 @@ package body Maths is
    function Random_Integer return Integer is
       use Random_Integer_Package;
    begin
+      Reset (Integer_Gen);
       return Integer (Random (Integer_Gen));
    end Random_Integer;
 
@@ -133,6 +134,7 @@ package body Maths is
       use Random_Integer_Package;
       Gen : Generator;
    begin
+      Reset (Gen);
       return Random (Gen);
 
    end Random_Integer;

@@ -14,3 +14,11 @@ def plot_launcher(X, Y):
     pyplot.xlabel('X')
     pyplot.ylabel('Y')
     pyplot.show()
+
+def plot_values(angles, landing, population, vals):
+    pyplot.scatter(angles, landing)
+    pyplot.scatter(population, vals)
+    pyplot.title('Target distance')
+    pyplot.xlabel('angle')
+    pyplot.ylabel('distance')
+    pyplot.show()
