@@ -8,6 +8,39 @@ with Maths;
 
 package body Support_7Aux is
 
+   function Median (Data : Real_Float_Vector) return Float is
+      Data_Length : constant Positive := Data'Length;
+      Sorted_Data : Real_Float_Vector := Data;
+      Min_Index   : Integer;
+      Min_Value   : Float;
+      theMedian   : Float;
+      Swap        : Float;
+   begin
+      for index in Data'Range loop
+         Min_Index := index;
+         Min_Value := Sorted_Data (index);
+
+         for index_2 in index + 1 .. Sorted_Data'Last loop
+            if Sorted_Data (index_2) < Min_Value then
+               Min_Index := index_2;
+               Min_Value := Sorted_Data (index_2);
+            end if;
+         end loop;
+
+         Swap := Sorted_Data (index);
+         Sorted_Data (index) := Sorted_Data (Min_Index);
+         Sorted_Data (Min_Index) := Swap;
+      end loop;
+
+      if Data_Length mod 2 /= 0 then
+         theMedian := Data (Data_Length / 2 + 1);
+      else
+         theMedian := Data (Data_Length / 2) + Data (Data_Length / 2 + 1) / 2.0;
+      end if;
+
+      return theMedian;
+
+   end Median;
    --  -------------------------------------------------------------------------
 
    function Shoot (Angle : Float) return Float is

@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 --  with Python_CLF;
@@ -18,9 +18,12 @@ procedure Lesson_7Aux is
    Angles       : Real_Float_Vector (1 .. Steps);
    Landing      : Real_Float_Vector (Angles'Range);
    Population   : Real_Float_Vector (1 .. 10);
-   Values       : Real_Float_Vector (Population'Range) :=
+   Children     : Real_Float_Vector (Population'Range);
+   Generation   : Real_Float_Vector (1 .. 20);
+   Values       : Real_Float_Vector (Population'Range)  :=
                     (others => 0.0);
    Xs_Ys        : XY_Data;
+   Threshold    : Float;
    Classifier   : Python.Module;
 begin
    for index in Angles'Range loop
@@ -43,8 +46,13 @@ begin
       Population (index) :=
         Float (Maths.Random_Integer (0, 3600)) / 10.0;
       Values (index) := Shoot (Population (index));
+      Children (index) := Population (index) + 5.0 * Maths.Random_Float;
+      Generation (index) := Population (index);
+      Generation (index + Population'Last) := Children (index);
    end loop;
-   Print_Float_Vector ("Population", Population);
+   Threshold := Median (Values);
+
+   Put_Line ("Minimum value: " & Float'Image (Min (Values)));
 
    Python.Call (Classifier, "plot_values", Angles, Landing,
                Population, Values);
