@@ -108,4 +108,12 @@ package body Support_7Aux is
 
    --  -------------------------------------------------------------------------
 
+   function Trajectory (Angle : Float) return XY_Data is
+   begin
+      return Show (Angle);
+
+   end Trajectory;
+
+   --  -------------------------------------------------------------------------
+
 end Support_7Aux;

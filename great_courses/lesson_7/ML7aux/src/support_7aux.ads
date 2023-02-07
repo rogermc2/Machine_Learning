@@ -12,5 +12,6 @@ package Support_7Aux is
    function Median (Data : Real_Float_Vector) return Float;
    function Shoot (Angle : Float) return Float;
    function Show (Angle : Float) return XY_Data;
+   function Trajectory (Angle : Float) return XY_Data;
 
 end Support_7Aux;

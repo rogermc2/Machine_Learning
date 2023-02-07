@@ -22,6 +22,7 @@ procedure Lesson_7Aux is
    Generation   : Real_Float_Vector (1 .. 20);
    Values       : Real_Float_Vector (Population'Range)  :=
                     (others => 0.0);
+   Gen_Values   : Real_Float_Vector (Generation'Range);
    Xs_Ys        : XY_Data;
    Threshold    : Float;
    Classifier   : Python.Module;
@@ -55,7 +56,14 @@ begin
    Put_Line ("Minimum value: " & Float'Image (Min (Values)));
 
    Python.Call (Classifier, "plot_values", Angles, Landing,
-               Population, Values);
+                Population, Values);
+
+   for index in Generation'Range loop
+      Gen_Values (index) := Shoot (Generation (index));
+   end loop;
+   Put_Line ("Minimum value: " & Float'Image (Min (Gen_Values)));
+   Python.Call (Classifier, "plot_values", Angles, Landing,
+                Generation, Gen_Values);
 
    Python.Finalize;
 
