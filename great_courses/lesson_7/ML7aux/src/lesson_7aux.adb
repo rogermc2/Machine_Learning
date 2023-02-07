@@ -6,8 +6,6 @@ with Maths;
 --  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
---  with Python_CLF;
---  with Python_API;
 
 with Support_7Aux; use Support_7Aux;
 
@@ -37,7 +35,8 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_7aux");
 
-   --     Python.Call (Classifier, "plot_data", Angles, Landing);
+   --  Plot landing distance from target relative to launch angle
+   Python.Call (Classifier, "plot_data", Angles, Landing);
 
    Xs_Ys := Show (360.0);
    --     Python.Call (Classifier, "plot_launcher", Xs_Ys.Xs, Xs_Ys.Ys);
