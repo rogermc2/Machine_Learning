@@ -19,6 +19,8 @@ procedure Lesson_7Qs is
    Num_Samples  : constant Positive := 50;
    X            : constant Real_Float_Matrix := Load_Data (Num_Samples);
    Y            : constant Real_Float_Vector := Fit (X);
+   X_Lots       : constant Real_Float_Matrix :=  Load_Sorted_Data (250);
+   Predictions  : Real_Float_Vector (X_Lots'Range);
    Classifier   : Python.Module;
    Genetic_Estimator : Python_API.PyObject;
 begin
@@ -27,6 +29,11 @@ begin
    Genetic_Estimator :=
      Python.Call (Classifier, "init_SymbolicRegressor", Population, Parsimony);
    Python_CLF.Call (Classifier, "fit", Genetic_Estimator, X, Y);
+
+   Predictions := Python_CLF.Call (Classifier, "predict", Genetic_Estimator,
+                                   X_Lots);
+   Python_CLF.Call (Classifier, "print_program", Genetic_Estimator);
+   Python.Call (Classifier, "plot_prediction", X, Y, X_Lots, Predictions);
 
    Python.Finalize;
 
