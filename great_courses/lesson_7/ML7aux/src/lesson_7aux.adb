@@ -110,6 +110,15 @@ begin
       Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
 
       Python.Call (Classifier, "show_plot", 20, 0);
+
+      Traject := Trajectory (170.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (168.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+      Traject := Trajectory (169.0);
+      Python.Call (Classifier, "plot_xy", Traject.Xs, Traject.Ys);
+
+      Python.Call (Classifier, "show_plot", 20, 0);
    end;
 
    Python.Finalize;
