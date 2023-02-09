@@ -1,5 +1,5 @@
 
---  That is, it solves a regression problem by finding a symbolic expression
+--  Lesson_7Qs solves a regression problem by finding a symbolic expression
 --  that is a small piece of a program.
 --  The program it finds will use 'add' for add, 'mul' for multiply and
 --  'abs' for absolute value.
