@@ -28,10 +28,10 @@ package body Support_8A is
    function Load_Data (File_Name : String) return Data_Record is
 --        File_ID  : File_Type;
 --        Data  : Real_Float_Matrix (1 .. Num_Samples, 1 .. 1);
-      Raw_Data : ML_Types.Raw_Data_Vector;
+      Raw_Data : ML_Types.Unbounded_List;
       Data     : Data_Record;
    begin
-      Raw_Data := Neural_Utilities.Load_Raw_CSV_Data (File_Name);
+      Raw_Data := Neural_Utilities.Load_CSV_Data (File_Name);
 
       return Data;
 
