@@ -113,6 +113,7 @@ package body Maths is
       use Ada.Numerics.Float_Random;
       --  Random range 0.0 .. 1.0
    begin
+      Reset (Float_Gen);
       return 2.0 * Float (Random (Float_Gen)) - 1.0;
    end Random_Float;
 
@@ -121,6 +122,7 @@ package body Maths is
    function Random_Integer return Integer is
       use Random_Integer_Package;
    begin
+      Reset (Integer_Gen);
       return Integer (Random (Integer_Gen));
    end Random_Integer;
 
@@ -133,6 +135,7 @@ package body Maths is
       use Random_Integer_Package;
       Gen : Generator;
    begin
+      Reset (Gen);
       return Random (Gen);
 
    end Random_Integer;

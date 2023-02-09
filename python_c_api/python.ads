@@ -26,15 +26,24 @@ package Python is
    --  Overloads for "all" needed combinations of parameters and return types:
    
    procedure Call (M : Module; Function_Name : String);
+   function Call (M : Module; Function_Name : String)
+                  return Python_API.PyObject;
    procedure Call (M : Module; Function_Name, A : String);
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer;
+   function Call (M : Module; Function_Name : String; A : Integer)
+                  return Python_API.PyObject;
+   procedure Call (M : Module; Function_Name : String; A, B : Integer);
    function Call (M : Module; Function_Name : String; A, B : Integer)
                   return Integer;
+   function Call (M : Module; Function_Name : String; A : Integer; B : Float)
+                  return Python_API.PyObject;
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Integer_Matrix);
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : ML_Arrays_And_Matrices.Real_Float_Matrix);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Integer_Matrix;
                    C    : ML_Types.Unbounded_List);
@@ -47,6 +56,12 @@ package Python is
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Array);
    procedure Call (M    : Module; Function_Name : String;
+                   A, B : ML_Arrays_And_Matrices.Real_Float_Vector);
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B, C, D : ML_Arrays_And_Matrices.Real_Float_Vector);
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : NL_Types.Float_List);
+   procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Array;
                    C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
@@ -56,6 +71,11 @@ package Python is
                    B    : in out ML_Arrays_And_Matrices.Integer_Matrix;
                    C    : in out ML_Arrays_And_Matrices.Real_Float_Matrix;
                    D    : in out ML_Arrays_And_Matrices.Integer_Matrix);
+   procedure Call (M    : Module; Function_Name : String;
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Real_Float_Vector;
+                   C    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   D    : ML_Arrays_And_Matrices.Real_Float_Vector);
    procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Integer_Matrix);

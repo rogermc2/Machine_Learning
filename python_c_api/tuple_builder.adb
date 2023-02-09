@@ -232,6 +232,29 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : NL_Types.Float_List) return PyObject is
+      use Interfaces.C;
+      --        Routine_Name : constant String := "Python.To_Tuple Bounded_String_List ";
+      Tuple        : PyObject;
+      Py_Index     : int := -1;
+   begin
+      Tuple := PyTuple_New (int (Data.Length));
+      for index in Data.First_Index .. Data.Last_Index loop
+         Py_Index := Py_Index + 1;
+         declare
+            Value : constant double := double (Data.Element (index));
+            Item  : constant PyObject := PyFloat_FromDouble (Value);
+         begin
+            PyTuple_SetItem (Tuple, Py_Index, Item);
+         end;
+      end loop;
+
+      return Tuple;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_Matrix) 
                       return PyObject is
       use Interfaces.C;

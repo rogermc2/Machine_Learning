@@ -20,6 +20,7 @@ package Tuple_Builder is
    function To_Tuple (Data : NL_Types.Boolean_List) return PyObject;
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject;
+   function To_Tuple (Data : NL_Types.Float_List) return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_Matrix) 
                       return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_Vector) 
