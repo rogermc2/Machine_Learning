@@ -2,7 +2,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
-with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+--  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 --  with Python_CLF;
 with Python_API;
@@ -13,7 +13,10 @@ procedure Lesson_8A is
 
    Project_Name : constant String := "Lesson 8A ";
    --     Num_Samples  : constant Positive := 50;
-   Data         : Data_Record;
+   Train_Data       : Data_Record :=
+                        Load_Data ("../../data/malware-train.csv");
+   Test_Data        : Data_Record :=
+                        Load_Data ("../../data/malware-test.csv");
 --     X            : constant Real_Float_Matrix := Load_Data (Num_Samples);
 --     Y            : constant Real_Float_Vector := Fit (X);
 --     Predictions  : Real_Float_Vector (X_Lots'Range);

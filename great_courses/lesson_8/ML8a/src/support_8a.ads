@@ -5,7 +5,7 @@ with ML_Types;
 package Support_8A is
 
    type Data_Record is record
-      Features : Integer_Array_List;
+      Features : Real_Float_List;
       Labels   : ML_Types.Integer_List;
    end record;
 
