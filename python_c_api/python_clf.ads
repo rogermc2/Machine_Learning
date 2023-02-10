@@ -32,6 +32,9 @@ package Python_CLF is
                    CLF : PyObject; A : Real_Float_Matrix;
                    B   : Real_Float_Vector);
    function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject; A : Real_Float_List)
+                  return Real_Float_Vector;
+   function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_Matrix)
                   return Real_Float_Vector;
    procedure Call (M   : Python.Module; Function_Name : String;

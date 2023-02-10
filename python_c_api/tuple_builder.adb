@@ -255,6 +255,26 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_List) 
+                      return PyObject is
+      use Interfaces.C;
+      --        Routine_Name : constant String := "Python.To_Tuple Real_Float_Vector ";
+      Value        : double;
+      Py_Row       : int := -1;
+      Result       : constant PyObject := PyTuple_New (int (Data.Length));
+   begin
+      for row in Data.First_Index .. Data.Last_Index loop
+         Py_Row := Py_Row + 1;
+         Value := double (Data.Element (row));
+         PyTuple_SetItem (Result, Py_Row, PyFloat_FromDouble (Value));
+      end loop;
+
+      return Result;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_Matrix) 
                       return PyObject is
       use Interfaces.C;

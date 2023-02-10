@@ -326,6 +326,64 @@ package body Python_CLF is
    --  -------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject; A : Real_Float_List)
+                  return Real_Float_Vector is
+      use Interfaces.C;
+      use Python;
+      Routine_Name : constant String :=
+                       "Python_CLF.Call Real_Float_List ";
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              O1, T1 : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      procedure Parse_Tuple (Tuple : PyObject;
+                             Vec   : in out Real_Float_Vector) is
+      begin
+         Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
+                   "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
+                 & " /= Vec'Length" & Integer'Image (Vec'Length));
+         for index in 1 .. PyTuple_Size (Tuple) loop
+            Vec (Integer (index)) :=
+              Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, index - 1)));
+         end loop;
+      end Parse_Tuple;
+
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+      Result       : Real_Float_Vector (1 .. Integer (A.Length));
+   begin
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+      Assert (PyFunc /= Null_Address, Routine_Name & "PyFunc is null");
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Parse_Tuple (PyResult, Result);
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Result;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_Matrix)
                   return Real_Float_Vector is
       use Interfaces.C;
