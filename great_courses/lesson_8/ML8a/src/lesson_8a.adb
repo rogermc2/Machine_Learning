@@ -20,14 +20,14 @@ procedure Lesson_8A is
                         Load_Data ("../../data/malware-train.csv");
    Test_Data        : constant Data_Record :=
                         Load_Data ("../../data/malware-test.csv");
-   X                : Real_Float_Matrix (1 .. 1, 1 .. Num_Samples);
-   Y                : Integer_Matrix (1 .. 1, 1 .. Num_Samples);
+   X                : Real_Float_Matrix (1 .. Num_Samples, 1 .. 1);
+   Y                : Integer_Array (1 .. Num_Samples);
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
 begin
    for index in X'Range loop
-      X (1, index) := Train_Data.Features (index);
-      Y (1, index) := Train_Data.Labels (index);
+      X (index, 1) := Train_Data.Features (index);
+      Y (index) := Train_Data.Labels (index);
    end loop;
 
    Python.Initialize;
@@ -43,10 +43,11 @@ begin
 
    declare
       Predictions : Real_Float_Vector :=
-                      Python_CLF.Call (Classifier, "predict",
-                                       Estimator, Train_Data.Features);
+                      Python_CLF.Call (Classifier, "predict",  Estimator, X);
+      Accuracy    : Float :=
+                      Float (Test_Score (Predictions, Y)) / Float (Num_Samples);
    begin
-      null;
+      Put_Line ("Accuracy: " & Float'Image (Accuracy));
        --     Python_CLF.Call (Classifier, "print_program", Genetic_Estimator);
       --     Python.Call (Classifier, "plot_prediction", X, Y, X_Lots, Predictions);
    end;

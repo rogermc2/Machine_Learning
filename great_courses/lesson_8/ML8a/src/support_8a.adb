@@ -61,7 +61,7 @@ package body Support_8A is
    --  -------------------------------------------------------------------------
 
    function Test_Score (Predictions : Real_Float_Vector;
-                        Labels      : ML_Types.Integer_List) return Natural is
+                        Labels      : Integer_Array) return Natural is
 --        Routine_Name : constant String := "Support_8A.Test_Score ";
       Correct      : Natural := 0;
    begin

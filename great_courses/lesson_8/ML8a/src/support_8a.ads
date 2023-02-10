@@ -11,6 +11,6 @@ package Support_8A is
 
    function Load_Data (File_Name : String) return Data_Record;
    function Test_Score (Predictions : Real_Float_Vector;
-                        Labels      : ML_Types.Integer_List) return Natural;
+                        Labels      : Integer_Array) return Natural;
 
 end Support_8A;
