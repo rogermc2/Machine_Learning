@@ -5,7 +5,7 @@ from sklearn import neighbors
 import matplotlib
 from matplotlib import pyplot
 
-def init_NeighborsClassifier():
+def init_NeighborsClassifier(k):
     return neighbors.KNeighborsClassifier(n_neighbors=k,metric="cosine")
 
 def fit (est, X_train, y_train):

@@ -508,6 +508,41 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                   A : Real_Float_Vector; B : Integer_Array) is
+      use Python;
+
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
+                              O1, T1, T2 : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String :=
+                       "Python_CLF.Call Float_Matrix, Integer_Array ";
+      F            : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
+      PyResult := Call_Object (F, PyParams);
+
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    function Call (M  : Python.Module; Function_Name : String; CLF : PyObject;
                   A  : Real_Float_Matrix; B  : Integer_Array) return Float is
       use Python;

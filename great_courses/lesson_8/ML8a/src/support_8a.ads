@@ -9,7 +9,8 @@ package Support_8A is
       Labels   : ML_Types.Integer_List;
    end record;
 
---     function Fit (Data : Real_Float_Matrix) return Real_Float_Vector;
    function Load_Data (File_Name : String) return Data_Record;
+   function Test_Score (Predictions : Real_Float_Vector;
+                        Labels      : ML_Types.Integer_List) return Natural;
 
 end Support_8A;

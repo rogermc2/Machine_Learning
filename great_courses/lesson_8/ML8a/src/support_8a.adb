@@ -12,21 +12,6 @@ package body Support_8A is
 
    --  -------------------------------------------------------------------------
 
---     function Fit (Data : Real_Float_Matrix) return Real_Float_Vector is
---        Routine_Name : constant String := "Support_8A.Load_Data ";
---        Result            : Real_Float_Vector (Data'Range);
---     begin
---        for index in Data'Range loop
---           null;
---           Result (index) := Target (Data (index, 1));
---        end loop;
---
---        return Result;
---
---     end Fit;
-
-   --  -------------------------------------------------------------------------
-
    function Load_Data (File_Name : String) return Data_Record is
       use Ada.Strings;
       use Ada.Strings.Unbounded;
@@ -72,6 +57,23 @@ package body Support_8A is
       return Data;
 
    end Load_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Test_Score (Predictions : Real_Float_Vector;
+                        Labels      : ML_Types.Integer_List) return Natural is
+--        Routine_Name : constant String := "Support_8A.Test_Score ";
+      Correct      : Natural := 0;
+   begin
+      for index in Predictions'Range loop
+         if Integer (Predictions (index)) =  Labels (index) then
+            Correct := Correct + 1;
+         end if;
+      end loop;
+
+      return Correct;
+
+   end Test_Score;
 
    --  -------------------------------------------------------------------------
 
