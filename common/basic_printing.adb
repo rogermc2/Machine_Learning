@@ -337,7 +337,7 @@ package body Basic_Printing is
    procedure Print_Integer_Matrix
      (Name  : String; aMatrix : Integer_Matrix;
       Start : Natural := 0; Finish : Integer := 0) is
-      First : constant Integer := aMatrix'First;
+      First : Integer := aMatrix'First;
       Last  : Integer;
    begin
       if Finish > 0 then
@@ -346,9 +346,13 @@ package body Basic_Printing is
          Last := aMatrix'Last;
       end if;
 
+      if Start > First and Start <= Last then
+         First := Start;
+      end if;
+
       Put_Line (Name & ": ");
-      if Start >= First and then Finish <= aMatrix'Last then
-         for row in Start .. Last loop
+      if Finish <= aMatrix'Last then
+         for row in First .. Last loop
             for col in aMatrix'Range (2) loop
                Put (Integer'Image (aMatrix (row, col)) & "  ");
             end loop;
@@ -356,7 +360,7 @@ package body Basic_Printing is
          end loop;
 
       else
-         Put_Line ("Print_Float_Matrix called with invalid start or " &
+         Put_Line ("Print_Integer_Matrix called with invalid start or " &
                      "finish index.");
       end if;
 

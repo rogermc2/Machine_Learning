@@ -1,6 +1,5 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
@@ -43,6 +42,7 @@ begin
                       Float (Data.Test_Y'Length);
    begin
       Print_Float_Vector ("Predictions", Predictions);
+      Print_Integer_Matrix ("Data.Test_Y", Data.Test_Y);
       Put_Line ("Accuracy: " & Float'Image (Accuracy));
       --     Python_CLF.Call (Classifier, "print_program", Genetic_Estimator);
       --     Python.Call (Classifier, "plot_prediction", X, Y, X_Lots, Predictions);
