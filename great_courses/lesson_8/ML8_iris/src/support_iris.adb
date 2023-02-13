@@ -10,6 +10,22 @@ package body Support_Iris is
 
    --  -------------------------------------------------------------------------
 
+   function Categorize (Labels : ML_Types.Unbounded_List)
+                        return Integer_Array is
+      Lab    : Natural := 0;
+      Result : Integer_Array (Labels.First_Index .. Labels.Last_Index);
+   begin
+      for index in Result'Range loop
+         Lab := Lab + 1;
+         Result (index) := Lab;
+      end loop;
+
+      return Result;
+
+   end Categorize;
+
+   --  -------------------------------------------------------------------------
+
    function Load_Data (File_Name : String) return Data_Record is
       use Ada.Strings;
       use Ada.Strings.Unbounded;
