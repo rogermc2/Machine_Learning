@@ -10,16 +10,14 @@ with Python;
 with Python_CLF;
 with Python_API;
 
-with Support_8A; use Support_8A;
+with Support_Iris; use Support_Iris;
 
-procedure Lesson_8A is
+procedure ML8_Iris is
    use System;
-   Project_Name     : constant String := "Lesson 8A ";
+   Project_Name     : constant String := "ML8 Iris ";
    Num_Samples      : constant Positive := 4000;
-   Train_Data       : constant Data_Record :=
-                        Load_Data ("../../data/malware-train.csv");
-   Test_Data        : constant Data_Record :=
-                        Load_Data ("../../data/malware-test.csv");
+   Train_Data       : constant Data_Record := Load_Data
+     ("../../../neural_learning/datasets/iris.csv");
    Tests            : constant Integer_Array (1 .. 4) := (1, 5, 7,9);
    X                : Real_Float_Matrix (1 .. Num_Samples, 1 .. 1);
    Y                : Integer_Array (1 .. Num_Samples);
@@ -33,7 +31,7 @@ begin
    end loop;
 
    Python.Initialize;
-   Classifier := Python.Import_File ("lesson_8a");
+   Classifier := Python.Import_File ("ml8_iris");
    Assert (Classifier /= Null_Address, Project_Name &
              "Import_File returned null.");
 
@@ -59,4 +57,4 @@ begin
    Put_Line (Project_Name & "finished.");
    New_Line;
 
-end Lesson_8A;
+end ML8_Iris;
