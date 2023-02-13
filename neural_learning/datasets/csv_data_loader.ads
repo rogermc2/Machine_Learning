@@ -23,8 +23,7 @@ package CSV_Data_Loader is
    function Get_Split_State
      (Dataset_Name  : String; Data_Type : Data_Kind;
       Train_Size    : Positive; Test_Size : Positive;
-      Y_Categorized : Boolean := True; Shuffle : Boolean := True;
-      Reload : Boolean := False)
+      Y_Categorized, Shuffle, Reload : Boolean := False)
       return Base_Split_State;
 
 end CSV_Data_Loader;

@@ -22,10 +22,7 @@ procedure ML8_Iris is
    Train_Size       : constant Positive := 4000;
    Test_Size        : constant Positive := 2000;
    Data             : constant Base_Split_State :=
-                        Get_Split_State ("iris.csv", Iris_Data, Train_Size, Test_Size,
-                                         Y_Categorized => False,
-                                         Shuffle       => False,
-                                         Reload        => False);
+                        Get_Split_State ("iris.csv", Iris_Data, Train_Size, Test_Size);
    X                : Real_Float_Matrix (1 .. Train_Size, 1 .. 1);
    Y                : Integer_Array (1 .. Train_Size);
    Num_Neighbours   : Positive;
