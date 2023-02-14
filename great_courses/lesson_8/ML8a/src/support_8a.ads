@@ -3,8 +3,8 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Support_8A is
 
-   type Data_Record (Num_Items : Positive) is record
-      Features : Real_Float_Matrix (1 .. Num_Items, 1 .. 1);
+   type Data_Record (Num_Items, Num_Features : Positive) is record
+      Features : Real_Float_Matrix (1 .. Num_Items, 1 .. Num_Features);
       Labels   : Integer_Array (1 .. Num_Items);
    end record;
 
