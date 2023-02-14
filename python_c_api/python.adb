@@ -386,6 +386,54 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   function Call (M : Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Real_Float_List)
+                  return ML_Arrays_And_Matrices.Real_Float_Vector is
+      use ML_Arrays_And_Matrices;
+      
+      procedure Parse_Tuple (Tuple : PyObject; Vec : in out Real_Float_Vector) is
+         use Interfaces.C;
+         T_Row : PyObject;
+      begin
+         Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
+                 "Parse_Tuple Real_Float_List Tuple Size" &
+                   int'Image (PyTuple_Size (Tuple))
+                 & " /= Vec Length" & Integer'Image (Vec'Length));
+         for row in 1 .. PyTuple_Size (Tuple) loop
+            T_Row := PyTuple_GetItem (Tuple, row - 1);
+            Vec (Integer (row)) :=
+              Float (PyLong_AsLong (PyTuple_GetItem (T_Row, 0)));
+         end loop;
+      end Parse_Tuple;
+      
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : ML_Arrays_And_Matrices.Real_Float_Vector
+        (1 .. Integer (A.Length));
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+
+      PyResult := Call_Object (F, PyParams);
+      Parse_Tuple (PyResult, Result);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+      
+      return Result;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Matrix) is
 
@@ -590,9 +638,38 @@ package body Python is
    --  -------------------------------------------------------------------------
 
    procedure Call (M    : Module; Function_Name : String;
+                   A    : ML_Arrays_And_Matrices.Real_Float_Vector;
+                   B    : ML_Arrays_And_Matrices.Integer_Array) is
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1, T2 : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : constant PyObject := 
+                   Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M          : Module; Function_Name : String;
                    A, B, C, D : ML_Arrays_And_Matrices.Real_Float_Vector) is
 
-      function Py_BuildValue (Format  : Interfaces.C.char_array;
+      function Py_BuildValue (Format          : Interfaces.C.char_array;
                               T1, T2, T3, T4  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 

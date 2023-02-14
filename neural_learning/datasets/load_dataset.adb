@@ -61,9 +61,9 @@ package body Load_Dataset is
 
          if Num_Classes < 10 then
             Put_Line (Routine_Name & "Num_Classes:" &
-                      Integer'Image (Num_Classes));
+                        Integer'Image (Num_Classes));
             Put_Line (Routine_Name & "Index_Values Length:" &
-                      Integer'Image (Index_Values'Length));
+                        Integer'Image (Index_Values'Length));
             for index in Index_Values'Range loop
                List_Row := To_Integer_List (Digit_Values (index));
                Index_Values (index) := List_Row (1) < Num_Classes;
@@ -117,7 +117,7 @@ package body Load_Dataset is
       Features  : ML_Arrays_And_Matrices.Real_Float_Matrix
         (1 .. Positive (CSV_Data.Length) - 1, 1 .. Num_Features);
    begin
-    Put_Line ("Loading " & File_Name & " Features");
+      Put_Line ("Loading " & File_Name & " Features");
       --  First row of CSV_Data is header of feature names
       for row in Features'Range loop
          List_Row := CSV_Data (row + 1);
@@ -133,20 +133,23 @@ package body Load_Dataset is
    --  -------------------------------------------------------------------------
 
    function Load_Iris (File_Name : String) return Iris_Data_Record is
+      use Ada.Strings;
       use Classifier_Utilities;
       use ML_Types;
       Routine_Name  : constant String := "Load_Dataset.Load_Iris ";
       Iris_Data     : constant ML_Types.Multi_Output_Data_Record :=
                         Load_Data (File_Name);
       Class_Names   : Class_Names_List;
-      --        Features        : NL_Types.Feature_Names_List;
+--        Feature_Names : String_List := Iris_Data.Feature_Names;
+--        Label_Names   : ML_Types.Unbounded_List := Iris_Data.Label_Names;
       Iris_Features : constant Value_Data_Lists_2D :=
                         Iris_Data.Feature_Values;
       Iris_Labels   : constant Value_Data_Lists_2D :=
                         Iris_Data.Label_Values;
-      Iris_Row      : Value_Data_List;
       Num_Samples   : constant Natural := Natural (Iris_Features.Length);
+      Iris_Row      : Value_Data_List;
       Data          : Iris_Data_Record;
+      Species       : Unbounded_String;
    begin
       Class_Names.Append (To_Unbounded_String ("Setosa"));
       Class_Names.Append (To_Unbounded_String ("Versicolour"));
@@ -162,19 +165,20 @@ package body Load_Dataset is
       for row in Iris_Labels.First_Index .. Iris_Labels.Last_Index loop
          Iris_Row := Iris_Labels.Element (row);
          if Iris_Row.Element (1).Value_Kind = UB_String_Type then
-            if To_String (Iris_Row.Element (1).UB_String_Value) = "Setosa" then
+            Species := Trim (Iris_Row.Element (1).UB_String_Value, Both);
+            if To_String (Species) = "setosa" then
                Data.Target.Append (1);
-            elsif To_String (Iris_Row.Element (1).UB_String_Value) =
-              "Versicolour" then
+            elsif To_String (Species) = "versicolor" then
                Data.Target.Append (2);
-            elsif To_String (Iris_Row.Element (1).UB_String_Value) =
-              "Virginica" then
+            elsif To_String (Species) = "virginica" then
                Data.Target.Append (3);
             else
-               Data.Target.Append (0);
+               Assert (False, Routine_Name & "row" & Integer'Image (row) &
+                         ": invalid species '" & To_String (Species) & "'");
             end if;
          else
-            Data.Target.Append (0);
+            Assert (False, Routine_Name & "row" & Integer'Image (row) &
+                      ": invalid species '" & To_String (Species) & "'");
          end if;
       end loop;
 
@@ -193,7 +197,7 @@ package body Load_Dataset is
       Labels     : Integer_Matrix (1 .. Positive (CSV_Data.Length) - 1,
                                    1 .. Num_Outputs);
    begin
-    Put_Line ("Loading " & File_Name & " Labels");
+      Put_Line ("Loading " & File_Name & " Labels");
       --  First row is header of label names
       for row in Labels'Range loop
          Data_Row := CSV_Data.Element (row + 1);

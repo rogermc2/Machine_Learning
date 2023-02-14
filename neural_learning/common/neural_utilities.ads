@@ -53,8 +53,7 @@ package Neural_Utilities is
    procedure Permute (anArray : in out Integer_Array);
    function Permute (aMatrix : Integer_Matrix) return Integer_Matrix;
    procedure Permute (aList : in out String_List);
-   function Permute (aMatrix : ML_Types.Real_Float_Matrix)
-                     return ML_Types.Real_Float_Matrix;
+   function Permute (aMatrix : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline (Permute);
    procedure Print_Feature_Values (Message : String; Rows : Rows_Vector;
                                    Column  : Class_Range);
@@ -78,7 +77,7 @@ package Neural_Utilities is
    function Split_String_On_Spaces (aString : String) return String_List;
    procedure Swap (Data : in out Binary_Matrix; L, R : Positive);
    procedure Swap (Data : in out Boolean_Matrix; L, R : Positive);
-   procedure Swap (Data : in out ML_Types.Real_Float_Matrix; L, R : Positive);
+   procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive);
    procedure Swap (Data : in out Float_Array; L, R : Positive);
    procedure Swap (Data : in out Integer_Array; L, R : Positive);
    procedure Swap (Data : in out Integer_Matrix; L, R : Positive);

@@ -30,7 +30,13 @@ package Python_CLF is
                    B   : ML_Types.Integer_List);
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : PyObject; A : Real_Float_Matrix;
+                   B   : Integer_Matrix);
+   procedure Call (M   : Python.Module; Function_Name : String;
+                   CLF : PyObject; A : Real_Float_Matrix;
                    B   : Real_Float_Vector);
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject; A : Real_Float_List)
+                  return Real_Float_Vector;
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_Matrix)
                   return Real_Float_Vector;
@@ -38,6 +44,8 @@ package Python_CLF is
                    CLF : in out PyObject; A : ML_Types.Indef_String_List);
    procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject; 
                    A : Real_Float_Matrix; B : Integer_Array);
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject; 
+                   A : Real_Float_Vector; B : Integer_Array);
    function Call (M  : Python.Module; Function_Name : String; CLF : PyObject; 
                   A  : Real_Float_Matrix; B : Integer_Array) return Float;
    function Call (M : Python.Module; Function_Name : String;

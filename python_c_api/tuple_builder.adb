@@ -97,16 +97,14 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject is
       use Interfaces.C;
-      --        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+--        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
       Num_Cols     : constant Positive := Data'Length (2);
       Row_Size     : constant int := int (Num_Cols);
       Value        : Integer;
-      Long_Value   : long;
       Item         : PyObject;
       Py_Row       : int := -1;
       Py_Col       : int := -1;
-      Py_Matrix    : constant PyObject := PyTuple_New (int (Data'Length));
-      Result       : constant PyObject := PyTuple_New (1);
+      Result       : constant PyObject := PyTuple_New (int (Data'Length));
    begin
       for row in Data'Range loop
          Item := PyTuple_New (Row_Size);
@@ -115,13 +113,10 @@ package body Tuple_Builder is
          for col in Data'Range (2) loop
             Py_Col := Py_Col + 1;
             Value := Data (row, col);
-            Long_Value := long (Value);
-            PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (Long_Value));
+            PyTuple_SetItem (Item, Py_Col, PyFloat_FromDouble (double (Value)));
          end loop;
-         PyTuple_SetItem (Py_Matrix, Py_Row, Item);
+         PyTuple_SetItem (Result, Py_Row, Item);
       end loop;
-      PyTuple_SetItem (Result, 0, Py_Matrix);
-
       return Result;
 
    end To_Tuple;
@@ -250,6 +245,26 @@ package body Tuple_Builder is
       end loop;
 
       return Tuple;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_List) 
+                      return PyObject is
+      use Interfaces.C;
+      --        Routine_Name : constant String := "Python.To_Tuple Real_Float_Vector ";
+      Value        : double;
+      Py_Row       : int := -1;
+      Result       : constant PyObject := PyTuple_New (int (Data.Length));
+   begin
+      for row in Data.First_Index .. Data.Last_Index loop
+         Py_Row := Py_Row + 1;
+         Value := double (Data.Element (row));
+         PyTuple_SetItem (Result, Py_Row, PyFloat_FromDouble (Value));
+      end loop;
+
+      return Result;
 
    end To_Tuple;
 

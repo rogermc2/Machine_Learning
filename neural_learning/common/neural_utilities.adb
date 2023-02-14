@@ -359,11 +359,10 @@ package body Neural_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aMatrix :  ML_Types.Real_Float_Matrix)
-                     return ML_Types.Real_Float_Matrix is
+   function Permute (aMatrix :  Real_Float_Matrix) return Real_Float_Matrix is
       List_Length  : constant Positive := Positive (aMatrix'Length);
       Rand         : Positive;
-      Permutation  : ML_Types.Real_Float_Matrix := aMatrix;
+      Permutation  : Real_Float_Matrix := aMatrix;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop
@@ -775,8 +774,7 @@ package body Neural_Utilities is
 
    --  -------------------------------------------------------------------------
    --  Swap swaps matrix rows
-   procedure Swap (Data : in out  ML_Types.Real_Float_Matrix;
-                   L, R : Positive) is
+   procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive) is
       Val : Float;
    begin
       for col in Data'First (2) .. Data'Last (2) loop

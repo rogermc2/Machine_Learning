@@ -8,7 +8,7 @@ with Python_API;
 
 package Python is
 
-   type Module is new System.Address;
+   subtype Module is System.Address;
    
    Interpreter_Error : exception;
    
@@ -42,6 +42,9 @@ package Python is
                    A : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Integer_Matrix);
+   function Call (M : Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Real_Float_List)
+                  return ML_Arrays_And_Matrices.Real_Float_Vector;
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Matrix);
    procedure Call (M    : Module; Function_Name : String;
@@ -58,6 +61,9 @@ package Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Vector);
    procedure Call (M    : Module; Function_Name : String;
+                   A    : ML_Arrays_And_Matrices.Real_Float_Vector;
+                   B    : ML_Arrays_And_Matrices.Integer_Array);
+   procedure Call (M          : Module; Function_Name : String;
                    A, B, C, D : ML_Arrays_And_Matrices.Real_Float_Vector);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : NL_Types.Float_List);
