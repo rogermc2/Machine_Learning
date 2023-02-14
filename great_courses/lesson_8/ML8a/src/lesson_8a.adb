@@ -4,7 +4,7 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 with Python_CLF;
@@ -37,14 +37,16 @@ begin
                     Train_Data.Labels);
 
    declare
-      Predictions : Real_Float_Vector :=
-        Python_CLF.Call (Classifier, "predict",  Estimator, Test_Data.Features);
-      Accuracy    : Float :=
-        Float (Test_Score (Predictions, Test_Data.Labels)) / Float (Test_Size);
+      Predictions : constant Real_Float_Vector :=
+        Python_CLF.Call (Classifier, "predict", Estimator, Test_Data.Features);
+      Accuracy    : Real_Float_List;
+      Accuracy_2D : Real_Float_List_2D;
    begin
-      Put_Line ("Accuracy: " & Float'Image (Accuracy));
-      --     Python_CLF.Call (Classifier, "print_program", Genetic_Estimator);
-      --     Python.Call (Classifier, "plot_prediction", X, Y, X_Lots, Predictions);
+      Accuracy.Append (Float (Test_Score (Predictions, Test_Data.Labels)) /
+                         Float (Test_Size));
+      Print_Real_Float_List ("Accuracy", Accuracy);
+      Accuracy_2D.Append (Accuracy);
+      Python.Call (Classifier, "plot", Accuracy_2D);
    end;
    Python.Finalize;
 

@@ -3,7 +3,7 @@ import numpy as np
 from sklearn import neighbors
 
 import matplotlib
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 
 def init_NeighborsClassifier(k):
     return neighbors.KNeighborsClassifier(n_neighbors=k,metric="cosine")
@@ -14,14 +14,10 @@ def fit (est, X, y):
 def predict (est, X):
     return tuple(est.predict(X))
 
-def plot_prediction(X, y, X_lots, y_gp):
-    pyplot.scatter(X, y)
-    pyplot.plot(X_lots, y_gp)
-    pyplot.title('Function')
-    pyplot.xlabel('Y')
-    pyplot.ylabel('X')
-    pyplot.show()
-
-def print_program (est_gp):
-    print ("genetic program:")
-    print("  ", est_gp._program)
+def plot(acc):
+    plt.plot([v[0] for v in acc], [v[1] for v in acc], c="blue")
+    plt.plot([v[0] for v in acc], [v[2] for v in acc], c="red")
+    plt.title('malware')
+    plt.xlabel('k')
+    plt.ylabel('acc')
+    plt.show()

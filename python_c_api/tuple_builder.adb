@@ -204,6 +204,41 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_List_2D)
+                      return PyObject is
+      use Interfaces.C;
+      --        Routine_Name : constant String := "Python.To_Tuple Real_Float_List_2D ";
+      Row_Data     : ML_Arrays_And_Matrices.Real_Float_List;
+      Row_Size     : int;
+      Value        : Float;
+      Tuple_2D     : PyObject;
+      Tuple        : PyObject;
+      Py_Row       : int := -1;
+      Py_Col       : int := -1;
+   begin
+      Tuple_2D := PyTuple_New (int (Data.Length));
+      for row in Data.First_Index .. Data.Last_Index loop
+         Row_Data := Data (row);
+         Row_Size := int (Row_Data.Length);
+         Tuple := PyTuple_New (Row_Size);
+         Py_Row := Py_Row + 1;
+         Py_Col := -1;
+         for col in Row_Data.First_Index .. Row_Data.Last_Index loop
+            Py_Col := Py_Col + 1;
+            Value := Row_Data (col);
+            PyTuple_SetItem (Tuple, Py_Col,
+                             PyFloat_FromDouble (double (Value)));
+         end loop;
+
+         PyTuple_SetItem (Tuple_2D, Py_Row, Tuple);
+      end loop;
+
+      return Tuple_2D;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : ML_Types.Bounded_String_List) return PyObject is
       use Interfaces.C;
       --        Routine_Name : constant String := "Python.To_Tuple Bounded_String_List ";

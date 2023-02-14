@@ -26,8 +26,7 @@ package body Support_8A is
       Labels       : ML_Types.Integer_List;
    begin
       Raw_Data := Neural_Utilities.Load_CSV_Data (File_Name);
-      Put_Line (Routine_Name & "Raw_Data.Length" &
-                  Integer'Image (Integer (Raw_Data.Length)));
+      Put_Line (Routine_Name & File_Name & " loaded");
 
       for row in Raw_Data.First_Index .. Raw_Data.Last_Index loop
          Row_Words :=
