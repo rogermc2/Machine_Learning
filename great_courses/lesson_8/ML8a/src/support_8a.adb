@@ -4,13 +4,14 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
+with ML_Types;
 with Neural_Utilities;
 
 package body Support_8A is
 
    --  -------------------------------------------------------------------------
 
-   function Load_Data (File_Name : String) return Data_Record is
+   function Get_Data (File_Name : String) return Data_Record is
       use Ada.Strings;
       use Ada.Strings.Unbounded;
       use ML_Types;
@@ -21,7 +22,8 @@ package body Support_8A is
       Words       : String_List;
       aWord       : Unbounded_String;
       Word_Cursor : Cursor;
-      Data        : Data_Record;
+      Features    : Real_Float_List;
+      Labels      : ML_Types.Integer_List;
    begin
       Raw_Data := Neural_Utilities.Load_CSV_Data (File_Name);
       for index in Raw_Data.First_Index .. Raw_Data.Last_Index loop
@@ -36,25 +38,30 @@ package body Support_8A is
          end loop;
 
          if Words.First_Element = "pe-malicious" then
-            Data.Labels.Append (1);
+            Labels.Append (1);
          else
-            Data.Labels.Append (0);
+            Labels.Append (0);
          end if;
 
          Word_Cursor := Words.First;
          Next (Word_Cursor);
          while Has_Element (Word_Cursor) loop
             aWord := Element (Word_Cursor);
-            Data.Features.Append
+            Features.Append
               (Float'Value (To_String (Element (Word_Cursor))));
             Next (Word_Cursor);
          end loop;
 
       end loop;
 
-      return Data;
+      declare
+         Data  : Data_Record (Integer (Features.Length));
+      begin
 
-   end Load_Data;
+         return Data;
+      end;
+
+   end Get_Data;
 
    --  -------------------------------------------------------------------------
 

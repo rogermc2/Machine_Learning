@@ -1,15 +1,14 @@
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with ML_Types;
 
 package Support_8A is
 
-   type Data_Record is record
-      Features : Real_Float_List;
-      Labels   : ML_Types.Integer_List;
+   type Data_Record (Num_Items : Positive) is record
+      Features : Real_Float_Matrix (1 .. Num_Items, 1 .. 1);
+      Labels   : Integer_Array (1 .. Num_Items);
    end record;
 
-   function Load_Data (File_Name : String) return Data_Record;
+   function Get_Data (File_Name : String) return Data_Record;
    function Test_Score (Predictions : Real_Float_Vector;
                         Labels      : Integer_Array) return Natural;
 
