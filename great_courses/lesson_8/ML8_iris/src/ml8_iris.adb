@@ -18,13 +18,15 @@ procedure ML8_Iris is
    Test_Size        : constant Positive := 10;
    Data             : constant Base_Split_State := Get_Split_State
      ("../../../neural_learning/datasets/iris.csv", Iris_Data,
-       Train_Size, Test_Size, Shuffle => True, Reload => False);
+       Train_Size, Test_Size, Shuffle => True, Reload => True);
    Num_Neighbours   : constant Positive := 5;
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
 begin
    Print_Matrix_Dimensions ("Data.Train_X", Data.Train_X);
    Print_Matrix_Dimensions ("Data.Train_Y", Data.Train_Y);
+
+   Print_Integer_Matrix ("Data.Test_Y", Data.Test_Y);
 
    Python.Initialize;
    Classifier := Python.Import_File ("ml8_iris");
