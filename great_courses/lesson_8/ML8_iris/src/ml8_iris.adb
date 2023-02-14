@@ -45,6 +45,7 @@ begin
    begin
       Print_Float_Vector ("Predictions", Predictions);
       Print_Integer_Matrix ("Data.Test_Y", Data.Test_Y);
+      New_Line;
       Put_Line ("Accuracy: " & Float'Image (Accuracy));
       --     Python_CLF.Call (Classifier, "print_program", Genetic_Estimator);
       --     Python.Call (Classifier, "plot_prediction", X, Y, X_Lots, Predictions);

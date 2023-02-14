@@ -97,8 +97,7 @@ package body CSV_Data_Loader is
             Put_Line (Routine_Name & "splitting data");
             Train_Test_Split
               (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
-               Train_X => Data.Train_X , Train_Y => Train_Y
-,
+               Train_X => Data.Train_X , Train_Y => Train_Y,
                Test_X => Data.Test_X, Test_Y => Test_Y);
 
             if Y_Categorized then
@@ -182,6 +181,8 @@ package body CSV_Data_Loader is
               (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
                Train_X => Data.Train_X , Train_Y => Train_Y,
                Test_X => Data.Test_X, Test_Y => Test_Y);
+            Data.Train_Y := To_Integer_Matrix (Train_Y);
+            Data.Test_Y := To_Integer_Matrix (Test_Y);
 
             Save_State (File_Name, Data, Num_Features);
             return Data;
@@ -193,8 +194,8 @@ package body CSV_Data_Loader is
    --  -------------------------------------------------------------------------
 
    function Get_Split_State
-     (File_Name   : String; Data_Type : Data_Kind;
-      Train_Size  : Positive; Test_Size : Positive;
+     (File_Name                      : String; Data_Type : Data_Kind;
+      Train_Size                     : Positive; Test_Size : Positive;
       Y_Categorized, Shuffle, Reload : Boolean := False)
       return Base_Split_State is
       Routine_Name   : constant String := "CSV_Data_Loader.Get_Split_State ";

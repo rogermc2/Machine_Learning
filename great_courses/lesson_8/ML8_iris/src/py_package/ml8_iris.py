@@ -9,7 +9,7 @@ def init_NeighborsClassifier(k):
     return neighbors.KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski', metric_params=None, n_jobs=1, n_neighbors=k, p=2, weights='uniform')
 
 def fit (est, X, y):
-    est.fit(X, y)
+    est.fit(X, np.ravel(y))
 
 def predict (est, X):
     return tuple(est.predict(X))

@@ -356,8 +356,12 @@ package body Basic_Printing is
             for col in aMatrix'Range (2) loop
                Put (Integer'Image (aMatrix (row, col)) & "  ");
             end loop;
-            New_Line;
+
+            if aMatrix'Length (2) > 1 then
+               New_Line;
+            end if;
          end loop;
+         New_Line;
 
       else
          Put_Line ("Print_Integer_Matrix called with invalid start or " &
