@@ -73,27 +73,14 @@ package body Support_8A is
 
    function Test_Score (Predictions : Real_Float_Vector;
                         Labels      : Integer_Array) return Natural is
-      Routine_Name : constant String := "Support_8A.Test_Score ";
+--        Routine_Name : constant String := "Support_8A.Test_Score ";
       Correct      : Natural := 0;
-      Incorrect    : Natural := 0;
    begin
       for index in Predictions'Range loop
          if Integer (Predictions (index)) = Labels (index) then
             Correct := Correct + 1;
-         else
-            Incorrect := Incorrect + 1;
-            if Incorrect < 10 then
-               Put_Line (Routine_Name & "incorrect prediction:" &
-                           Float'Image (Predictions (index))  &  " for " &
-                           Integer'Image (Labels (index)));
-            end if;
          end if;
       end loop;
-
-      Put_Line (Routine_Name & "correct predictions:" &
-                  Integer'Image (Correct));
-      Put_Line (Routine_Name & "incorrect predictions:" &
-                  Integer'Image (Incorrect));
 
       return Correct;
 
