@@ -49,6 +49,9 @@ package Python is
                   return ML_Arrays_And_Matrices.Real_Float_Vector;
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Matrix);
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B : ML_Arrays_And_Matrices.Boolean_Array);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Integer_Matrix;
                    C    : ML_Types.Unbounded_List);

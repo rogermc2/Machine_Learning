@@ -1,8 +1,6 @@
 
---  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 with Python_CLF;
@@ -19,7 +17,6 @@ procedure Lesson_8A is
    Train_Size       : constant Positive := Train_Data.Features'Length;
    Test_Size        : constant Positive := Test_Data.Features'Length;
    Tests            : constant Integer_Array (1 .. 4) := (1, 5, 7,9);
---     Train_Vec        : Real_Float_Vector (Train_Data.Features'Range);
    Num_Neighbours   : Positive;
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
@@ -28,10 +25,6 @@ procedure Lesson_8A is
 begin
    Put_Line ("Train_Size" & Integer'Image (Train_Size));
    Put_Line ("Test_Size" & Integer'Image (Test_Size));
-
---     for row in Train_Vec'Range loop
---        Train_Vec (row) := Train_Data.Features (row, 1);
---     end loop;
 
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_8a");
@@ -60,9 +53,6 @@ begin
       end;
       Python_API.Py_DecRef (Estimator);
 
---        Put_Line ("Accuracy for" & Integer'Image (Num_Neighbours) &
---                    " neighbours:" & Float'Image (Accuracy (2)) & " " &
---                    Float'Image (Accuracy (3)));
       Accuracy_2D.Append (Accuracy);
    end loop;
 

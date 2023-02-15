@@ -1,0 +1,29 @@
+project ML8Aux is
+
+   type Operating_System_Type is
+      ("high_sierra", "ventura");
+   Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
+   for Source_Dirs use ("src", "../../../gid", "../../../common", "../../../neural_learning/common", "../../../python_c_api", "src/py_package", "../../../neural_learning/test", 
+      "../../../neural_learning/decision_tree_classifier/support", "../../../neural_learning/utils", "../../../neural_learning/datasets");
+   for Object_Dir use "obj";
+   for Main use ("lesson_8aux.adb");
+   for Exec_Dir use ".";
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");
+   end Compiler;
+
+   package Linker is
+
+      case Operating_System is
+
+         when "high_sierra" =>
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.1/Frameworks/Python.framework/Versions/3.11/lib", "-lpython3.11");
+
+         when "ventura" =>
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.1/Frameworks/Python.framework/Versions/3.11/lib", "-lpython3.11");
+      end case;
+   end Linker;
+
+end ML8Aux;
+

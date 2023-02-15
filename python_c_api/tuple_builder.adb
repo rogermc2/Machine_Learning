@@ -123,6 +123,36 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Boolean_Array) 
+                      return PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python.To_Tuple Boolean_Array ";
+      Value        : long;
+      Py_Row       : int := -1;
+      Result       : constant PyObject := PyTuple_New (int (Data'Length));
+   begin
+      for row in Data'Range loop
+         Py_Row := Py_Row + 1;
+         if Data (row) then
+            Value := long (1);
+         else
+            Value := long (0);
+         end if;
+         
+         PyTuple_SetItem (Result, Py_Row, PyBool_FromLong (Value));
+      end loop;
+
+      return Result;
+
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) 
                       return PyObject is
       use ML_Arrays_And_Matrices;
