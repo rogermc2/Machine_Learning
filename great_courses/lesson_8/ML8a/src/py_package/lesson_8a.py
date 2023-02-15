@@ -15,8 +15,10 @@ def predict (est, X):
     return tuple(est.predict(X))
 
 def plot(acc):
-    plt.plot([v[0] for v in acc], [v[1] for v in acc], c="blue")
-    plt.plot([v[0] for v in acc], [v[2] for v in acc], c="red")
+    print ("k ", [v[0] for v in acc])
+    print ("k ", [int(v[0]) for v in acc])
+    plt.plot([int(v[0]) for v in acc], [v[1] for v in acc], c="blue")
+    plt.plot([int(v[0]) for v in acc], [v[2] for v in acc], c="red")
     plt.title('malware')
     plt.xlabel('k')
     plt.ylabel('acc')
