@@ -26,8 +26,8 @@ procedure Lesson_8Aux is
    Test_Labs        : Boolean_Array (1 .. Test_Size);
    Classifier       : Python.Module;
    Decision_Tree    : Python_API.PyObject;
-   --     Accuracy         : Real_Float_List;
-   --     Accuracy_2D      : Real_Float_List_2D;
+   Comfy            : Real_Vector_List;
+   Uncomfy          : Real_Vector_List;
 begin
    for row in All_Data'Range loop
       All_Data (row, 1) := 65.0 + 12.0 * abs (Maths.Random_Float);
@@ -36,6 +36,14 @@ begin
 
    for row in Labs'Range loop
       Labs (row) := Comfort (All_Data (row, 1), All_Data (row, 2));
+   end loop;
+
+   for row in All_Data'Range loop
+      if Labs (row) then
+         Comfy.Append ((All_Data  (row, 1), All_Data  (row, 2)));
+      else
+         Uncomfy.Append ((All_Data  (row, 1), All_Data  (row, 2)));
+      end if;
    end loop;
 
    Train_Test_Split
@@ -47,7 +55,7 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_8aux");
 
-   Python.Call (Classifier, "plot", Data, Train_Labs);
+   Python.Call (Classifier, "xy_plot", Comfy, Uncomfy);
    Decision_Tree := Python.Call (Classifier, "init_DecisionTreeClassifier",
                                  Max_Leaf_Nodes);
 

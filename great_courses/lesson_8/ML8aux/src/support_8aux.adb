@@ -29,13 +29,13 @@ package body Support_8Aux is
       X3b    : constant Real_Float_Vector (1 .. 2) := (58.3,74.3);
       X4a    : constant Real_Float_Vector := X3b;
       X4b    : constant Real_Float_Vector (1 .. 2) := (86.5,67.1);
-      T_H    : constant Real_Float_Vector (1 .. 2) := (Temp, Rel_Humid);
+      H_T    : constant Real_Float_Vector (1 .. 2) := (Rel_Humid, Temp);
    begin
       return
-        Above_Line (X1a, x1b, T_H) and
-        Above_Line (X2a, x2b, T_H) and
-        not Above_Line (X3a, x3b, T_H) and
-        not Above_Line (X4a, x4b, T_H);
+        Above_Line (X1a, X1b, H_T) and
+        Above_Line (X2a, X2b, H_T) and
+        not Above_Line (X3a, X3b, H_T) and
+        not Above_Line (X4a, X4b, H_T);
 
    end Comfort;
 

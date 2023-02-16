@@ -32,6 +32,8 @@ package Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_Vector) 
                       return PyObject;
    function To_Tuple (Data : ML_Types.Indef_String_List) return PyObject;
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Vector_List)
+                      return PyObject;
    function To_Tuple (Data : ML_Types.Unbounded_List) return PyObject;
    
 end Tuple_Builder;
