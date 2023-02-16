@@ -73,7 +73,7 @@ package body Support_8Aux is
 
    function Accuracy (Predictions : Boolean_Array; Labels : Boolean_Array)
                       return Float is
-      --        Routine_Name : constant String := "Support_8Aux.Accuracy ";
+--        Routine_Name : constant String := "Support_8Aux.Accuracy ";
       Correct      : Natural := 0;
    begin
       for index in Predictions'Range loop

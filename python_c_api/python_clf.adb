@@ -365,23 +365,19 @@ package body Python_CLF is
 
    function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
                   A : Real_Float_Matrix) return Boolean_Array is
-
+--        Routine_Name : constant String := "Python_Clf.Call FM ";
       procedure Parse_Tuple (Tuple : PyObject;
                              Vec   : in out Boolean_Array) is
          use Interfaces.C;
          T_Row : PyObject;
       begin
          Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
-                 "Parse_Tuple Real_Float_List Tuple Size" &
+                 "Parse_Tuple Real_Float_List Tuple Size " &
                    int'Image (PyTuple_Size (Tuple))
                  & " /= Vec Length" & Integer'Image (Vec'Length));
          for row in 1 .. PyTuple_Size (Tuple) loop
             T_Row := PyTuple_GetItem (Tuple, row - 1);
-            if PyLong_AsLong (PyTuple_GetItem (T_Row, 0)) /= 0 then
-               Vec (Integer (row)) := True;
-            else
-               Vec (Integer (row)) := False;
-            end if;
+               Vec (Integer (row)) := PyObject_IsTrue (T_Row) /= 0;
          end loop;
       end Parse_Tuple;
 

@@ -53,10 +53,15 @@ begin
 
    Python_CLF.Call (Classifier, "fit", Decision_Tree, Data, Train_Labs);
    declare
-      Predictions : constant Boolean_Array := Python_CLF.Call
+      Train_Pred : constant Boolean_Array := Python_CLF.Call
         (Classifier, "predict", Decision_Tree, Data);
+      Test_Pred : constant Boolean_Array := Python_CLF.Call
+        (Classifier, "predict", Decision_Tree, Test_Data);
    begin
-      Put_Line ("Accuracy: " & Float'Image (Accuracy (Predictions, Labs)));
+      Put_Line ("Train accuracy: " &
+                  Float'Image (Accuracy (Train_Pred, Labs)));
+      Put_Line ("Test accuracy: " &
+                  Float'Image (Accuracy (Test_Pred, Test_Labs)));
    end;
 
    Python_API.Py_DecRef (Decision_Tree);
