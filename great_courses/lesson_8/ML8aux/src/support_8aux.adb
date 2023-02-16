@@ -71,20 +71,20 @@ package body Support_8Aux is
 
    --  -------------------------------------------------------------------------
 
-   function Correct (Predictions : Boolean_Array; Labels : Boolean_Array)
-                      return Natural is
-      --        Routine_Name : constant String := "Support_8Aux.Correct ";
-      Result      : Natural := 0;
+   function Accuracy (Predictions : Boolean_Array; Labels : Boolean_Array)
+                      return Float is
+      --        Routine_Name : constant String := "Support_8Aux.Accuracy ";
+      Correct      : Natural := 0;
    begin
       for index in Predictions'Range loop
          if Predictions (index) = Labels (index) then
-            Result := Result + 1;
+            Correct := Correct + 1;
          end if;
       end loop;
 
-      return Result;
+      return Float (Correct) / Float (Predictions'Length);
 
-   end Correct;
+   end Accuracy;
 
    --  -------------------------------------------------------------------------
 

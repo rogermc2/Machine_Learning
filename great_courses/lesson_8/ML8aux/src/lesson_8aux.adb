@@ -56,9 +56,7 @@ begin
       Predictions : constant Boolean_Array := Python_CLF.Call
         (Classifier, "predict", Decision_Tree, Data);
    begin
-      Put_Line ("Accuracy: " &
-                  Float'Image (Float  (Correct (Predictions, Labs)) /
-                    Float  (Train_Size)));
+      Put_Line ("Accuracy: " & Float'Image (Accuracy (Predictions, Labs)));
    end;
 
    Python_API.Py_DecRef (Decision_Tree);
