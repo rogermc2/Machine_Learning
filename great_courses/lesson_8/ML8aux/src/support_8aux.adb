@@ -71,20 +71,20 @@ package body Support_8Aux is
 
    --  -------------------------------------------------------------------------
 
-   function Test_Score (Predictions : Real_Float_Vector;
-                        Labels      : Integer_Array) return Natural is
-      --        Routine_Name : constant String := "Support_8A.Test_Score ";
-      Correct      : Natural := 0;
+   function Correct (Predictions : Boolean_Array; Labels : Boolean_Array)
+                      return Natural is
+      --        Routine_Name : constant String := "Support_8Aux.Correct ";
+      Result      : Natural := 0;
    begin
       for index in Predictions'Range loop
-         if Integer (Predictions (index)) = Labels (index) then
-            Correct := Correct + 1;
+         if Predictions (index) = Labels (index) then
+            Result := Result + 1;
          end if;
       end loop;
 
-      return Correct;
+      return Result;
 
-   end Test_Score;
+   end Correct;
 
    --  -------------------------------------------------------------------------
 

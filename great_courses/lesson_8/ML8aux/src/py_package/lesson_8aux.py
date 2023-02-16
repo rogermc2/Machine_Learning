@@ -8,6 +8,9 @@ import matplotlib
 from matplotlib import pyplot as plt
 import seaborn as sns
 
+def init_DecisionTreeClassifier(max_nodes):
+    return tree.DecisionTreeClassifier(max_leaf_nodes=max_nodes)
+
 def init_NeighborsClassifier(k):
     return neighbors.KNeighborsClassifier(n_neighbors=k,metric="cosine")
 

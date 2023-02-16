@@ -14,7 +14,7 @@ package Support_8Aux is
       Train_Size : Natural; Test_Size  : Natural;
       Train_X    : out Real_Float_Matrix; Train_Y : out Boolean_Array;
       Test_X     : out Real_Float_Matrix; Test_Y : out Boolean_Array);
-   function Test_Score (Predictions : Real_Float_Vector;
-                        Labels      : Integer_Array) return Natural;
+   function Correct (Predictions : Boolean_Array; Labels : Boolean_Array)
+                     return Natural;
 
 end Support_8Aux;

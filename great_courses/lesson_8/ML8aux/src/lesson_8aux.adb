@@ -7,8 +7,8 @@ with Maths;
 --  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
---  with Python_CLF;
---  with Python_API;
+with Python_CLF;
+with Python_API;
 
 with Support_8Aux; use Support_8Aux;
 
@@ -17,6 +17,7 @@ procedure Lesson_8Aux is
    Num_Samples      : constant Positive := 10500;
    Test_Size        : constant Positive := 1000;
    Train_Size       : constant Positive := Num_Samples - Test_Size;
+   Max_Leaf_Nodes   : constant Positive := 7;
    All_Data         : Real_Float_Matrix (1 .. Num_Samples, 1 .. 2);
    Labs             : Boolean_Array (1 .. Num_Samples);
    Data             : Real_Float_Matrix (1 .. Train_Size, 1 .. 2);
@@ -24,7 +25,7 @@ procedure Lesson_8Aux is
    Train_Labs       : Boolean_Array (1 .. Train_Size);
    Test_Labs        : Boolean_Array (1 .. Test_Size);
    Classifier       : Python.Module;
---     Estimator        : Python_API.PyObject;
+   Decision_Tree    : Python_API.PyObject;
    --     Accuracy         : Real_Float_List;
    --     Accuracy_2D      : Real_Float_List_2D;
 begin
@@ -47,13 +48,20 @@ begin
    Classifier := Python.Import_File ("lesson_8aux");
 
    Python.Call (Classifier, "plot", Data, Train_Labs);
-   --     Estimator :=
-   --       Python.Call (Classifier, "init_NeighborsClassifier", Num_Neighbours);
+   Decision_Tree := Python.Call (Classifier, "init_DecisionTreeClassifier",
+                                 Max_Leaf_Nodes);
 
-   --     Python_CLF.Call (Classifier, "fit", Estimator, Train_Data.Features,
-   --                      Train_Data.Labels);
+   Python_CLF.Call (Classifier, "fit", Decision_Tree, Data, Train_Labs);
+   declare
+      Predictions : constant Boolean_Array := Python_CLF.Call
+        (Classifier, "predict", Decision_Tree, Data);
+   begin
+      Put_Line ("Accuracy: " &
+                  Float'Image (Float  (Correct (Predictions, Labs)) /
+                    Float  (Train_Size)));
+   end;
 
-   --     Python_API.Py_DecRef (Estimator);
+   Python_API.Py_DecRef (Decision_Tree);
 
    Python.Finalize;
 
