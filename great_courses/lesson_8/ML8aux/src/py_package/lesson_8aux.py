@@ -34,15 +34,14 @@ def xy_plot(dat1, dat2):
     plt.tight_layout()
     plt.show()
 
-def plot_predictions(true_negative, true_positive, false_negative, false_positive):
-    true_neg = np.asarray (true_negative)
-    true_pos = np.asarray (true_positive)
-    false_neg = np.asarray (false_negative)
-    false_pos = np.asarray (false_positive)
-    plt.scatter (true_neg, color='blue')
-    plt.scatter (true_pos, color='orange')
-    plt.scatter (false_neg, color='red')
-    plt.scatter (false_pos, color='green')
+def plot_predictions(dat):
+    dat1 = np.asarray (dat)
+#    dat1 = np.asarray (dat[0:500,:])
+    plt.scatter (dat1[:,1], dat1[:,0])
+#    plt.scatter (true_neg, color='blue')
+#    plt.scatter (true_pos, color='orange')
+#    plt.scatter (false_neg, color='red')
+#    plt.scatter (false_pos, color='green')
     plt.ylim(65,77)
     plt.xlim(15,90)
     plt.legend(["True Negative", "True Positive", "False  Negative", "False Positive"], bbox_to_anchor=(0.5, -0.15), loc="upper center", ncol=2)

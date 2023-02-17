@@ -65,19 +65,18 @@ begin
         (Classifier, "predict", Decision_Tree, Data);
       Test_Pred      : constant Boolean_Array := Python_CLF.Call
         (Classifier, "predict", Decision_Tree, Test_Data);
-      True_Neg       : Integer_Array_List;
-      True_Pos       : Integer_Array_List;
-      False_Neg      : Integer_Array_List;
-      False_Pos      : Integer_Array_List;
+      --        True_Neg       : Integer_Array_List;
+      --        True_Pos       : Integer_Array_List;
+      --        False_Neg      : Integer_Array_List;
+      --        False_Pos      : Integer_Array_List;
+      Predictions    : constant Unbounded_String_Array :=
+                         Get_Predictions (Test_Pred, Test_Labs);
    begin
-      Get_Predictions (Test_Pred, Test_Labs,
-                       True_Neg, True_Pos, False_Neg, False_Pos);
       Put_Line ("Train accuracy: " &
                   Float'Image (Accuracy (Train_Pred, Labs)));
       Put_Line ("Test accuracy: " &
                   Float'Image (Accuracy (Test_Pred, Test_Labs)));
-      Python.Call (Classifier, "plot_predictions",
-                   True_Neg, True_Pos, False_Neg, False_Pos);
+      Python.Call (Classifier, "plot_predictions", Predictions);
    end;
 
    Python_API.Py_DecRef (Decision_Tree);

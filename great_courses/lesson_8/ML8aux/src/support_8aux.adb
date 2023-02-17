@@ -42,29 +42,29 @@ package body Support_8Aux is
 
    --  -------------------------------------------------------------------------
 
-   procedure Get_Predictions
-     (Predictions, Labels            : Boolean_Array;
-      True_Negative, True_Positive,
-      False_Negative, False_Positive : out Integer_Array_List) is
-      use  Ada.Strings.Unbounded;
+   function Get_Predictions (Predictions, Labels : Boolean_Array)
+                             return Unbounded_String_Array is
+      use Ada.Strings.Unbounded;
       --        Routine_Name : constant String := "Support_8Aux.Get_Predictions ";
-      Result      : Unbounded_String_Array (Predictions'Range);
+      Info      : Unbounded_String_Array (Predictions'Range);
    begin
       for index in Predictions'Range loop
          if not Predictions (index) then
             if not Labels (index) then
-               Result (index) := To_Unbounded_String ("False_Negative");
+               Info (index) := To_Unbounded_String ("False_Negative");
             else
-               Result (index) := To_Unbounded_String ("False_Positive");
+               Info (index) := To_Unbounded_String ("False_Positive");
             end if;
          else
             if not Labels (index) then
-               Result (index) := To_Unbounded_String ("True_Negative");
+               Info (index) := To_Unbounded_String ("True_Negative");
             else
-               Result (index) := To_Unbounded_String ("True_Positive");
+               Info (index) := To_Unbounded_String ("True_Positive");
             end if;
          end if;
       end loop;
+
+      return Info;
 
    end Get_Predictions;
 

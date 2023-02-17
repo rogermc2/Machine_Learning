@@ -39,6 +39,8 @@ package Python is
    function Call (M : Module; Function_Name : String; A : Integer; B : Float)
                   return Python_API.PyObject;
    procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Integer_Array);
+   procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Integer_Matrix);
