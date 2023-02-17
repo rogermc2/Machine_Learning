@@ -34,10 +34,13 @@ def xy_plot(dat1, dat2):
     plt.tight_layout()
     plt.show()
 
-def plot_predictions(dat):
+def plot_predictions(dat, pred):
     dat1 = np.asarray (dat)
+    pred1 = np.asarray (pred)
+    print ("dat1", dat1.shape)
 #    dat1 = np.asarray (dat[0:500,:])
-    plt.scatter (dat1[:,1], dat1[:,0])
+    color=['blue','orange','red', 'green']
+    plt.scatter (dat1[:,1], dat1[:,0], c=pred1)
 #    plt.scatter (true_neg, color='blue')
 #    plt.scatter (true_pos, color='orange')
 #    plt.scatter (false_neg, color='red')
