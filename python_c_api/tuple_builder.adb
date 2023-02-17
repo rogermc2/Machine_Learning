@@ -97,7 +97,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      --        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
       Num_Cols     : constant Positive := Data'Length (2);
       Row_Size     : constant int := int (Num_Cols);
       Value        : Integer;
@@ -496,4 +496,38 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
  
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Unbounded_String_Matrix) 
+                      return PyObject is
+      use Interfaces.C;
+      use Ada.Strings.Unbounded;
+      --        Routine_Name : constant String := "Python.To_Tuple Unbounded_String_Matrix ";
+      Num_Cols     : constant Positive := Data'Length (2);
+      Row_Size     : constant int := int (Num_Cols);
+      Row_Item     : PyObject;
+      Py_Row       : int := -1;
+      Py_Col       : int;
+      Result       : constant PyObject := PyTuple_New (int (Data'Length));
+   begin
+      for row in Data'Range loop
+         Row_Item := PyTuple_New (Row_Size);
+         Py_Row := Py_Row + 1;
+         Py_Col := -1;
+         for col in Data'Range (2) loop
+            Py_Col := Py_Col + 1;
+            declare
+               Text : constant char_array := To_C (To_String (Data (row, col)));
+               Item : constant PyObject := PyString_FromString (Text);
+            begin
+               PyTuple_SetItem (Row_Item, Py_Col, Item);
+            end;
+         end loop;
+         PyTuple_SetItem (Result, Py_Row, Row_Item);
+      end loop;
+
+      return Result;
+      
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
 end Tuple_Builder;

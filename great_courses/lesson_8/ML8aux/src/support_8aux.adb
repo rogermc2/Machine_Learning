@@ -43,25 +43,30 @@ package body Support_8Aux is
    --  -------------------------------------------------------------------------
 
    function Get_Predictions (Predictions, Labels : Boolean_Array)
-                             return Unbounded_String_Array is
+                             return Unbounded_String_Matrix is
       use Ada.Strings.Unbounded;
       --        Routine_Name : constant String := "Support_8Aux.Get_Predictions ";
-      Info      : Unbounded_String_Array (Predictions'Range);
+      Info      : Unbounded_String_Matrix (Predictions'Range, 1 .. 2);
+      Pred      : Unbounded_String;
    begin
-      for index in Predictions'Range loop
-         if not Predictions (index) then
-            if not Labels (index) then
-               Info (index) := To_Unbounded_String ("False_Negative");
+      for row in Predictions'Range loop
+         if not Predictions (row) then
+            if not Labels (row) then
+               Pred := To_Unbounded_String ("False_Negative");
             else
-               Info (index) := To_Unbounded_String ("False_Positive");
+               Pred := To_Unbounded_String ("False_Positive");
             end if;
          else
-            if not Labels (index) then
-               Info (index) := To_Unbounded_String ("True_Negative");
+            if not Labels (row) then
+               Pred := To_Unbounded_String ("True_Negative");
             else
-               Info (index) := To_Unbounded_String ("True_Positive");
+               Pred := To_Unbounded_String ("True_Positive");
             end if;
          end if;
+
+         for col in Info'Range (2) loop
+            Info (row, col) := Pred;
+         end loop;
       end loop;
 
       return Info;
