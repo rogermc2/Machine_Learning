@@ -41,6 +41,33 @@ package body Support_8Aux is
 
    --  -------------------------------------------------------------------------
 
+   function Get_Predictions (Predictions : Boolean_Array; Labels : Boolean_Array)
+                             return Prediction_Info is
+      --        Routine_Name : constant String := "Support_8Aux.Get_Predictions ";
+      Result      : Prediction_Info (Predictions'Range);
+   begin
+      for index in Predictions'Range loop
+         if not Predictions (index) then
+            if not Labels (index) then
+               Result (index) := False_Negative;
+            else
+               Result (index) := False_Positive;
+            end if;
+         else
+            if not Labels (index) then
+               Result (index) := True_Negative;
+            else
+               Result (index) := True_Positive;
+            end if;
+         end if;
+      end loop;
+
+      return Result;
+
+   end Get_Predictions;
+
+   --  -------------------------------------------------------------------------
+
    procedure Train_Test_Split
      (X          : Real_Float_Matrix; Y : Boolean_Array;
       Train_Size : Natural; Test_Size  : Natural;
@@ -73,7 +100,7 @@ package body Support_8Aux is
 
    function Accuracy (Predictions : Boolean_Array; Labels : Boolean_Array)
                       return Float is
---        Routine_Name : constant String := "Support_8Aux.Accuracy ";
+      --        Routine_Name : constant String := "Support_8Aux.Accuracy ";
       Correct      : Natural := 0;
    begin
       for index in Predictions'Range loop
