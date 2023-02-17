@@ -1,10 +1,16 @@
 
+with Interfaces.C;
+
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
+with Python;
+with Python_API;
 
 package body Support_8Aux is
+
+   function To_Tuple (Data : Prediction_Info)  return Python_API.PyObject;
 
    --  -------------------------------------------------------------------------
    --  Above_Line computes a slope and intercept based on variables x1 and x2.
@@ -17,6 +23,32 @@ package body Support_8Aux is
       return X3 (2) > M * X3 (1) + B;
 
    end Above_Line;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Python.Module; Function_Name : String; A : Prediction_Info) is
+      use Python_API;
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      PyParams : constant PyObject :=
+                   Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+      PyResult : PyObject;
+      Result   : aliased Interfaces.C.long;
+   begin
+      PyResult := Python.Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
 
    --  -------------------------------------------------------------------------
 
@@ -65,6 +97,26 @@ package body Support_8Aux is
       return Result;
 
    end Get_Predictions;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : Prediction_Info) return Python_API.PyObject is
+      use Interfaces.C;
+      use Python_API;
+      Routine_Name : constant String := "Support_8Aux.To_Tuple ";
+      Value        : Prediction_Kind;
+      Py_Row       : int := -1;
+      Result       : constant PyObject := PyTuple_New (int (Data'Length));
+   begin
+      for row in Data'Range loop
+         Py_Row := Py_Row + 1;
+         Value := Data (row);
+         PyTuple_SetItem (Result, Py_Row, PyLong_FromLong (long (Value)));
+      end loop;
+
+      return Result;
+
+   end To_Tuple;
 
    --  -------------------------------------------------------------------------
 

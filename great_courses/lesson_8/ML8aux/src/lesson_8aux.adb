@@ -70,6 +70,7 @@ begin
                   Float'Image (Accuracy (Train_Pred, Labs)));
       Put_Line ("Test accuracy: " &
                   Float'Image (Accuracy (Test_Pred, Test_Labs)));
+      Python.Call (Classifier, "xy_plot", Get_Predictions (Test_Pred, Test_Labs));
    end;
 
    Python_API.Py_DecRef (Decision_Tree);
