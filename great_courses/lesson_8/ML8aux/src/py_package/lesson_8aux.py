@@ -34,17 +34,26 @@ def xy_plot(dat1, dat2):
     plt.tight_layout()
     plt.show()
 
+def pltcolor(lst):
+    cols=[]
+    for l in lst:
+        if l=="False_Positive":
+            cols.append('cyan')
+        elif l=="False_Negative":
+            cols.append('green')
+        elif l=="True_Negative":
+            cols.append('orange')
+        elif l=="True_Positive":
+            cols.append('red')
+        else:
+            cols.append('black')
+    return cols
+
 def plot_predictions(dat, pred):
     dat1 = np.asarray (dat)
-    pred1 = np.asarray (pred)
-    print ("dat1", dat1.shape)
-#    dat1 = np.asarray (dat[0:500,:])
-    color=['blue','orange','red', 'green']
-    plt.scatter (dat1[:,1], dat1[:,0], c=pred1)
-#    plt.scatter (true_neg, color='blue')
-#    plt.scatter (true_pos, color='orange')
-#    plt.scatter (false_neg, color='red')
-#    plt.scatter (false_pos, color='green')
+    pred1 = list (pred)
+    cols=pltcolor(pred1)
+    plt.scatter (dat1[:,1], dat1[:,0], c=cols)
     plt.ylim(65,77)
     plt.xlim(15,90)
     plt.legend(["True Negative", "True Positive", "False  Negative", "False Positive"], bbox_to_anchor=(0.5, -0.15), loc="upper center", ncol=2)

@@ -97,6 +97,9 @@ package Python is
                    B    : ML_Arrays_And_Matrices.Real_Float_Vector);
    procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Unbounded_String_Array);
+   procedure Call (M    : Module; Function_Name : String;
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B    : ML_Arrays_And_Matrices.Unbounded_String_Matrix);
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Real_Float_Vector);
