@@ -471,4 +471,29 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
  
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Unbounded_String_Array)
+                      return PyObject is
+      use Interfaces.C;
+      use Ada.Strings.Unbounded;
+      --        Routine_Name : constant String := "Python.To_Tuple Unbounded_List ";
+      Tuple        : PyObject;
+      Py_Index     : int := -1;
+   begin
+      Tuple := PyTuple_New (int (Data'Length));
+      for row in Data'Range loop
+         Py_Index := Py_Index + 1;
+         declare
+            Text : constant char_array := To_C (To_String (Data (row)));
+            Item : constant PyObject := PyString_FromString (Text);
+         begin
+            PyTuple_SetItem (Tuple, Py_Index, Item);
+         end;
+      end loop;
+
+      return Tuple;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+ 
 end Tuple_Builder;

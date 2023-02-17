@@ -33,3 +33,15 @@ def xy_plot(dat1, dat2):
     plt.ylabel('temp (F)')
     plt.tight_layout()
     plt.show()
+
+def plot_predictions(dat):
+    dat1 = np.asarray (dat)
+    plt.scatter (dat1)
+    plt.ylim(65,77)
+    plt.xlim(15,90)
+    plt.legend(["True", "False"], bbox_to_anchor=(0.5, -0.15), loc="upper center", ncol=2)
+    plt.title('Comfort: Decision Tree Model')
+    plt.xlabel('relative humidity')
+    plt.ylabel('temp (F)')
+    plt.tight_layout()
+    plt.show()

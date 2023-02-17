@@ -55,22 +55,29 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_8aux");
 
-   Python.Call (Classifier, "xy_plot", Comfy, Uncomfy);
+   --     Python.Call (Classifier, "xy_plot", Comfy, Uncomfy);
    Decision_Tree := Python.Call (Classifier, "init_DecisionTreeClassifier",
                                  Max_Leaf_Nodes);
 
    Python_CLF.Call (Classifier, "fit", Decision_Tree, Data, Train_Labs);
    declare
-      Train_Pred : constant Boolean_Array := Python_CLF.Call
+      Train_Pred     : constant Boolean_Array := Python_CLF.Call
         (Classifier, "predict", Decision_Tree, Data);
-      Test_Pred : constant Boolean_Array := Python_CLF.Call
+      Test_Pred      : constant Boolean_Array := Python_CLF.Call
         (Classifier, "predict", Decision_Tree, Test_Data);
+      True_Neg       : Integer_Array_List;
+      True_Pos       : Integer_Array_List;
+      False_Neg      : Integer_Array_List;
+      False_Pos      : Integer_Array_List;
    begin
+      Get_Predictions (Test_Pred, Test_Labs,
+                       True_Neg, True_Pos, False_Neg, False_Pos);
       Put_Line ("Train accuracy: " &
                   Float'Image (Accuracy (Train_Pred, Labs)));
       Put_Line ("Test accuracy: " &
                   Float'Image (Accuracy (Test_Pred, Test_Labs)));
-      Python.Call (Classifier, "xy_plot", Get_Predictions (Test_Pred, Test_Labs));
+      Python.Call (Classifier, "plot_predictions",
+                   True_Neg, True_Pos, False_Neg, False_Pos);
    end;
 
    Python_API.Py_DecRef (Decision_Tree);
