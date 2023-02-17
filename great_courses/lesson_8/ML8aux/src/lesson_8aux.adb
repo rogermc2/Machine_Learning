@@ -15,7 +15,7 @@ with Support_8Aux; use Support_8Aux;
 procedure Lesson_8Aux is
    Project_Name     : constant String := "Lesson 8Aux ";
    Num_Samples      : constant Positive := 10500;
-   Test_Size        : constant Positive := 1000;
+   Test_Size        : constant Positive := 10000;
    Train_Size       : constant Positive := Num_Samples - Test_Size;
    Max_Leaf_Nodes   : constant Positive := 7;
    All_Data         : Real_Float_Matrix (1 .. Num_Samples, 1 .. 2);
