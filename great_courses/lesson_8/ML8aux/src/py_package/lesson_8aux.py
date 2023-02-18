@@ -12,7 +12,7 @@ def init_DecisionTreeClassifier(max_nodes):
     return tree.DecisionTreeClassifier(max_leaf_nodes=max_nodes)
 
 def init_NeighborsClassifier(k):
-    return neighbors.KNeighborsClassifier(n_neighbors=k,metric="cosine")
+    return neighbors.KNeighborsClassifier(n_neighbors=k)
 
 def fit (est, X, y):
     est.fit(X, y)
@@ -34,21 +34,6 @@ def xy_plot(dat1, dat2):
     plt.tight_layout()
     plt.show()
 
-#def pltcolor(lst):
-#    cols=[]
-#    for l in lst:
-#        if l=="False_Positive":
-#            cols.append('cyan')
-#        elif l=="False_Negative":
-#            cols.append('green')
-#        elif l=="True_Negative":
-#            cols.append('orange')
-#        elif l=="True_Positive":
-#            cols.append('red')
-#        else:
-#            cols.append('black')
-#    return cols
-    
 def split_data (data, pred):
     fp=[]
     fn=[]
@@ -68,7 +53,8 @@ def split_data (data, pred):
             tp.append(coords)
     return fp, fn, tn, tp
 
-def plot_predictions(dat, pred):
+def plot_predictions(model, dat, pred):
+    title = 'Comfort: ' + model
     dat1 = np.asarray (dat)
     pred1 = list (pred)
     split = split_data (dat, pred)
@@ -84,7 +70,7 @@ def plot_predictions(dat, pred):
     plt.ylim(65,77)
     plt.xlim(15,90)
     plt.legend(["False Positive", "False  Negative", "True Negative", "True Positive"], bbox_to_anchor=(0.5, -0.15), loc="upper center", ncol=2)
-    plt.title('Comfort: Decision Tree Model')
+    plt.title(title)
     plt.xlabel('relative humidity')
     plt.ylabel('temp (F)')
     plt.tight_layout()

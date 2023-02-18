@@ -24,8 +24,11 @@ procedure Lesson_8Aux is
    Test_Data        : Real_Float_Matrix (1 .. Test_Size, 1 .. 2);
    Train_Labs       : Boolean_Array (1 .. Train_Size);
    Test_Labs        : Boolean_Array (1 .. Test_Size);
+   Train_Pred       : Boolean_Array (Data'Range);
+   Test_Pred        : Boolean_Array (Test_Data'Range);
    Classifier       : Python.Module;
    Decision_Tree    : Python_API.PyObject;
+   Neighbours       : Python_API.PyObject;
    Comfy            : Real_Vector_List;
    Uncomfy          : Real_Vector_List;
 begin
@@ -60,24 +63,44 @@ begin
                                  Max_Leaf_Nodes);
 
    Python_CLF.Call (Classifier, "fit", Decision_Tree, Data, Train_Labs);
+
+   Train_Pred := Python_CLF.Call (Classifier, "predict",
+                                  Decision_Tree, Data);
+   Test_Pred := Python_CLF.Call (Classifier, "predict",
+                                 Decision_Tree, Test_Data);
    declare
-      Train_Pred     : constant Boolean_Array := Python_CLF.Call
-        (Classifier, "predict", Decision_Tree, Data);
-      Test_Pred      : constant Boolean_Array := Python_CLF.Call
-        (Classifier, "predict", Decision_Tree, Test_Data);
-      Predictions    : constant Unbounded_String_Array :=
-                         Get_Predictions (Test_Pred, Test_Labs);
+      Predictions : constant Unbounded_String_Array :=
+                      Get_Predictions (Test_Pred, Test_Labs);
    begin
-      Put_Line ("Train accuracy: " &
+      Put_Line ("Decision Tree Train accuracy: " &
                   Float'Image (Accuracy (Train_Pred, Labs)));
-      Put_Line ("Test accuracy: " &
+      Put_Line ("Decision Tree Test accuracy: " &
                   Float'Image (Accuracy (Test_Pred, Test_Labs)));
-      Python.Call (Classifier, "plot_predictions", Test_Data, Predictions);
+      Python.Call (Classifier, "plot_predictions", "Decision Tree Model", Test_Data, Predictions);
    end;
 
    Python_CLF.Call (Classifier, "print_tree", Decision_Tree);
 
    Python_API.Py_DecRef (Decision_Tree);
+
+   Neighbours:= Python.Call (Classifier, "init_NeighborsClassifier", 1);
+   Python_CLF.Call (Classifier, "fit", Neighbours, Data, Train_Labs);
+   Train_Pred := Python_CLF.Call (Classifier, "predict",
+                                  Neighbours, Data);
+   Test_Pred := Python_CLF.Call (Classifier, "predict",
+                                 Neighbours, Test_Data);
+   declare
+      Predictions : constant Unbounded_String_Array :=
+                      Get_Predictions (Test_Pred, Test_Labs);
+   begin
+      Put_Line ("Neighbours Train accuracy: " &
+                  Float'Image (Accuracy (Train_Pred, Labs)));
+      Put_Line ("Neighbours Test accuracy: " &
+                  Float'Image (Accuracy (Test_Pred, Test_Labs)));
+      Python.Call (Classifier, "plot_predictions", "K-Nearest Neighbours",
+                   Test_Data, Predictions);
+   end;
+   Python_API.Py_DecRef (Neighbours);
 
    Python.Finalize;
 
