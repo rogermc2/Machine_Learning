@@ -65,10 +65,6 @@ begin
         (Classifier, "predict", Decision_Tree, Data);
       Test_Pred      : constant Boolean_Array := Python_CLF.Call
         (Classifier, "predict", Decision_Tree, Test_Data);
-      --        True_Neg       : Integer_Array_List;
-      --        True_Pos       : Integer_Array_List;
-      --        False_Neg      : Integer_Array_List;
-      --        False_Pos      : Integer_Array_List;
       Predictions    : constant Unbounded_String_Array :=
                          Get_Predictions (Test_Pred, Test_Labs);
    begin

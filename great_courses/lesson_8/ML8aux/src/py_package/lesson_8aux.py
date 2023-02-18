@@ -48,15 +48,43 @@ def pltcolor(lst):
         else:
             cols.append('black')
     return cols
+    
+def split_data (data, pred):
+    fp=[]
+    fn=[]
+    tn=[]
+    tp=[]
+#    data1 = np.asarray (data)
+    index=-1
+    for item in pred:
+        index = index + 1
+        coords=[data[index][0], data[index][1]]
+        if item=="False_Positive":
+            fp.append(coords)
+        elif item=="False_Negative":
+            fn.append(coords)
+        elif item=="True_Negative":
+            tn.append(coords)
+        else:
+            tp.append(coords)
+    return fp, fn, tn, tp
 
 def plot_predictions(dat, pred):
     dat1 = np.asarray (dat)
     pred1 = list (pred)
-    cols=pltcolor(pred1)
-    plt.scatter (dat1[:,1], dat1[:,0], c=cols)
+    split = split_data (dat, pred)
+    fp = np.asarray(split[0])
+    fn = np.asarray(split[1])
+    tn = np.asarray(split[2])
+    tp = np.asarray(split[3])
+    plt.scatter (fp[:,1], fp[:,0])
+    plt.scatter (fn[:,1], fn[:,0])
+    plt.scatter (tn[:,1], tn[:,0])
+    plt.scatter (tp[:,1], tp[:,0])
+    
     plt.ylim(65,77)
     plt.xlim(15,90)
-    plt.legend(["True Negative", "True Positive", "False  Negative", "False Positive"], bbox_to_anchor=(0.5, -0.15), loc="upper center", ncol=2)
+    plt.legend(["False Positive", "False  Negative", "True Negative", "True Positive"], bbox_to_anchor=(0.5, -0.15), loc="upper center", ncol=2)
     plt.title('Comfort: Decision Tree Model')
     plt.xlabel('relative humidity')
     plt.ylabel('temp (F)')
