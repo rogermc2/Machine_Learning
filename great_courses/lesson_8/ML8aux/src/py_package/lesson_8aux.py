@@ -90,3 +90,10 @@ def plot_predictions(dat, pred):
     plt.ylabel('temp (F)')
     plt.tight_layout()
     plt.show()
+
+def print_tree (clf):
+    feat_names=["temp","humididty"]
+    tree.plot_tree (clf, feature_names=feat_names, filled=True,
+                    rounded=True, fontsize=8)
+    plt.show()
+    print()

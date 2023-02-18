@@ -75,6 +75,8 @@ begin
       Python.Call (Classifier, "plot_predictions", Test_Data, Predictions);
    end;
 
+   Python_CLF.Call (Classifier, "print_tree", Decision_Tree);
+
    Python_API.Py_DecRef (Decision_Tree);
 
    Python.Finalize;
