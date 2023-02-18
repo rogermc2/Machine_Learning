@@ -55,7 +55,7 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_8aux");
 
-   --     Python.Call (Classifier, "xy_plot", Comfy, Uncomfy);
+   Python.Call (Classifier, "xy_plot", Comfy, Uncomfy);
    Decision_Tree := Python.Call (Classifier, "init_DecisionTreeClassifier",
                                  Max_Leaf_Nodes);
 

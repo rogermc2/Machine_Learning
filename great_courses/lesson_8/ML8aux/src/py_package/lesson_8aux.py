@@ -34,27 +34,26 @@ def xy_plot(dat1, dat2):
     plt.tight_layout()
     plt.show()
 
-def pltcolor(lst):
-    cols=[]
-    for l in lst:
-        if l=="False_Positive":
-            cols.append('cyan')
-        elif l=="False_Negative":
-            cols.append('green')
-        elif l=="True_Negative":
-            cols.append('orange')
-        elif l=="True_Positive":
-            cols.append('red')
-        else:
-            cols.append('black')
-    return cols
+#def pltcolor(lst):
+#    cols=[]
+#    for l in lst:
+#        if l=="False_Positive":
+#            cols.append('cyan')
+#        elif l=="False_Negative":
+#            cols.append('green')
+#        elif l=="True_Negative":
+#            cols.append('orange')
+#        elif l=="True_Positive":
+#            cols.append('red')
+#        else:
+#            cols.append('black')
+#    return cols
     
 def split_data (data, pred):
     fp=[]
     fn=[]
     tn=[]
     tp=[]
-#    data1 = np.asarray (data)
     index=-1
     for item in pred:
         index = index + 1
@@ -91,6 +90,10 @@ def plot_predictions(dat, pred):
     plt.tight_layout()
     plt.show()
 
+#   The color of a filled node shows whether the value of the node is associated
+#   with high, medium or low values of the target.
+#   The color of the node is based on the average of the target for the measure.
+#   The higher the average value of the target for a node, the darker the color.
 def print_tree (clf):
     feat_names=["temp","humididty"]
     tree.plot_tree (clf, feature_names=feat_names, filled=True,
