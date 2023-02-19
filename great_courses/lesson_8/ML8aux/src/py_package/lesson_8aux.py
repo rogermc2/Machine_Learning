@@ -57,7 +57,9 @@ def plot_predictions(model, dat, pred):
     title = 'Comfort: ' + model
     dat1 = np.asarray (dat)
     pred1 = list (pred)
+    print("dat1", dat1.shape)
     split = split_data (dat, pred)
+    print("split[0]", np.asarray(split[0]).shape)
     fp = np.asarray(split[0])
     fn = np.asarray(split[1])
     tn = np.asarray(split[2])

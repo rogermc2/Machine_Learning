@@ -107,8 +107,7 @@ begin
    Scaled_Data := Scale_Data (Data, Scale);
    Neighbours:= Python.Call (Classifier, "init_NeighborsClassifier", 1);
    Python_CLF.Call (Classifier, "fit", Neighbours, Scaled_Data, Train_Labs);
-   Train_Pred := Python_CLF.Call (Classifier, "predict",
-                                  Neighbours, Scaled_Data);
+   Train_Pred := Python_CLF.Call (Classifier, "predict", Neighbours, Scaled_Data);
 --     Test_Pred := Python_CLF.Call (Classifier, "predict",
 --                                   Neighbours, Test_Data);
    declare
@@ -119,7 +118,7 @@ begin
                   Float'Image (Accuracy (Train_Pred, Labs)));
 --        Put_Line ("Neighbours Test accuracy: " &
 --                    Float'Image (Accuracy (Test_Pred, Test_Labs)));
-      Python.Call (Classifier, "plot_predictions", "K-Nearest Neighbours",
+      Python.Call (Classifier, "plot_predictions", "Scaled K-Nearest Neighbours",
                    Scaled_Data, Predictions);
    end;
 
