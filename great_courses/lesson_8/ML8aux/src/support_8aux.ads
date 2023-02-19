@@ -11,6 +11,8 @@ package Support_8Aux is
    function Comfort (Temp, Rel_Humid : Float) return Boolean;
    function Get_Predictions (Predictions, Labels : Boolean_Array)
                              return Unbounded_String_Array;
+   function Scale_Data (Data : Real_Float_Matrix; Scale : Positive)
+                        return Real_Float_Matrix;
    procedure Train_Test_Split
      (X          : Real_Float_Matrix; Y : Boolean_Array;
       Train_Size : Natural; Test_Size  : Natural;

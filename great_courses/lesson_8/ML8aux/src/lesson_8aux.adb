@@ -18,9 +18,11 @@ procedure Lesson_8Aux is
    Test_Size        : constant Positive := 10000;
    Train_Size       : constant Positive := Num_Samples - Test_Size;
    Max_Leaf_Nodes   : constant Positive := 7;
+   Scale            : constant Positive := 7;
    All_Data         : Real_Float_Matrix (1 .. Num_Samples, 1 .. 2);
    Labs             : Boolean_Array (1 .. Num_Samples);
    Data             : Real_Float_Matrix (1 .. Train_Size, 1 .. 2);
+   Scaled_Data      : Real_Float_Matrix (Data'Range, Data'Range (2));
    Test_Data        : Real_Float_Matrix (1 .. Test_Size, 1 .. 2);
    Train_Labs       : Boolean_Array (1 .. Train_Size);
    Test_Labs        : Boolean_Array (1 .. Test_Size);
@@ -102,6 +104,26 @@ begin
    end;
    Python_API.Py_DecRef (Neighbours);
 
+   Scaled_Data := Scale_Data (Data, Scale);
+   Neighbours:= Python.Call (Classifier, "init_NeighborsClassifier", 1);
+   Python_CLF.Call (Classifier, "fit", Neighbours, Scaled_Data, Train_Labs);
+   Train_Pred := Python_CLF.Call (Classifier, "predict",
+                                  Neighbours, Scaled_Data);
+--     Test_Pred := Python_CLF.Call (Classifier, "predict",
+--                                   Neighbours, Test_Data);
+   declare
+      Predictions : constant Unbounded_String_Array :=
+                      Get_Predictions (Train_Pred, Train_Labs);
+   begin
+      Put_Line ("Neighbours Scaled Train accuracy: " &
+                  Float'Image (Accuracy (Train_Pred, Labs)));
+--        Put_Line ("Neighbours Test accuracy: " &
+--                    Float'Image (Accuracy (Test_Pred, Test_Labs)));
+      Python.Call (Classifier, "plot_predictions", "K-Nearest Neighbours",
+                   Scaled_Data, Predictions);
+   end;
+
+   Python_API.Py_DecRef (Neighbours);
    Python.Finalize;
 
    Put_Line (Project_Name & "finished.");

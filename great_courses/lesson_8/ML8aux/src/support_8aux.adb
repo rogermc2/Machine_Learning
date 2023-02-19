@@ -51,13 +51,13 @@ package body Support_8Aux is
       for row in Predictions'Range loop
          if not Predictions (row) then
             if not Labels (row) then
-               Info (row) := To_Unbounded_String ("False_Negative");
+               Info (row) := To_Unbounded_String ("True_Negative");
             else
                Info (row) := To_Unbounded_String ("False_Positive");
             end if;
          else
             if not Labels (row) then
-               Info (row) := To_Unbounded_String ("True_Negative");
+               Info (row) := To_Unbounded_String ("False_Negative");
             else
                Info (row) := To_Unbounded_String ("True_Positive");
             end if;
@@ -67,6 +67,20 @@ package body Support_8Aux is
       return Info;
 
    end Get_Predictions;
+
+   --  -------------------------------------------------------------------------
+
+   function Scale_Data (Data : Real_Float_Matrix; Scale : Positive)
+                        return Real_Float_Matrix is
+      Scaled : Real_Float_Matrix := Data;
+   begin
+      for row in Data'Range loop
+         Scaled (row, 1) := Float (Scale) * Scaled (row, 1);
+      end loop;
+
+      return Scaled;
+
+   end Scale_Data;
 
    --  -------------------------------------------------------------------------
 
