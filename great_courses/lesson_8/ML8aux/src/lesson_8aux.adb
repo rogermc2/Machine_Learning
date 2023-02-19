@@ -22,7 +22,7 @@ procedure Lesson_8Aux is
    All_Data         : Real_Float_Matrix (1 .. Num_Samples, 1 .. 2);
    Labs             : Boolean_Array (1 .. Num_Samples);
    Data             : Real_Float_Matrix (1 .. Train_Size, 1 .. 2);
-   Scaled_Data      : Real_Float_Matrix (Data'Range, Data'Range (2));
+   Scaled_Data      : Real_Float_Matrix (1 .. Scale * Num_Samples, Data'Range (2));
    Test_Data        : Real_Float_Matrix (1 .. Test_Size, 1 .. 2);
    Train_Labs       : Boolean_Array (1 .. Train_Size);
    Test_Labs        : Boolean_Array (1 .. Test_Size);
@@ -37,6 +37,11 @@ begin
    for row in All_Data'Range loop
       All_Data (row, 1) := 65.0 + 12.0 * abs (Maths.Random_Float);
       All_Data (row, 2) := 15.0 + 75.0 * abs (Maths.Random_Float);
+   end loop;
+
+   for row in Scaled_Data'Range loop
+      Scaled_Data (row, 1) := 65.0 + 12.0 * abs (Maths.Random_Float);
+      Scaled_Data (row, 2) := 15.0 + 75.0 * abs (Maths.Random_Float);
    end loop;
 
    for row in Labs'Range loop
@@ -104,7 +109,6 @@ begin
    end;
    Python_API.Py_DecRef (Neighbours);
 
-   Scaled_Data := Scale_Data (Data, Scale);
    Neighbours:= Python.Call (Classifier, "init_NeighborsClassifier", 1);
    Python_CLF.Call (Classifier, "fit", Neighbours, Scaled_Data, Train_Labs);
    Train_Pred := Python_CLF.Call (Classifier, "predict", Neighbours, Scaled_Data);

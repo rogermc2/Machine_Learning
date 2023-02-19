@@ -59,15 +59,18 @@ def plot_predictions(model, dat, pred):
     pred1 = list (pred)
     print("dat1", dat1.shape)
     split = split_data (dat, pred)
-    print("split[0]", np.asarray(split[0]).shape)
     fp = np.asarray(split[0])
     fn = np.asarray(split[1])
     tn = np.asarray(split[2])
     tp = np.asarray(split[3])
-    plt.scatter (fp[:,1], fp[:,0])
-    plt.scatter (fn[:,1], fn[:,0])
-    plt.scatter (tn[:,1], tn[:,0])
-    plt.scatter (tp[:,1], tp[:,0])
+    if len(fp) > 0:
+        plt.scatter (fp[:,1], fp[:,0])
+    if len(fn) > 0:
+        plt.scatter (fn[:,1], fn[:,0])
+    if len(tn) > 0:
+        plt.scatter (tn[:,1], tn[:,0])
+    if len(tp) > 0:
+        plt.scatter (tp[:,1], tp[:,0])
     
     plt.ylim(65,77)
     plt.xlim(15,90)
