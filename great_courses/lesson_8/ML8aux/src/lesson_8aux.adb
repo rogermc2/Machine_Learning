@@ -24,7 +24,7 @@ procedure Lesson_8Aux is
                                          Data'Range (2));
    Test_Data        : Real_Float_Matrix (1 .. Test_Size, 1 .. 2);
    Train_Labs       : Boolean_Array (1 .. Train_Size);
-   Scaled_Labs      : Boolean_Array (Scaled_Data'Range (2));
+   Scaled_Labs      : Boolean_Array (Scaled_Data'Range);
    Test_Labs        : Boolean_Array (1 .. Test_Size);
    Classifier       : Python.Module;
    Comfy            : Real_Vector_List;
@@ -72,6 +72,8 @@ begin
                                     Scaled_Data (row, 2));
    end loop;
 
+   New_Line;
+   Put_Line (Project_Name & "Scaled_Data test.");
    Process_Neighbours (Classifier, Scaled_Data, Test_Data , Scaled_Labs,
                        Test_Labs, 1);
 

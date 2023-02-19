@@ -1,4 +1,5 @@
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Python_API;
@@ -46,13 +47,18 @@ package body Process is
      (Classifier            : Python.Module;
       Data, Test_Data       : Real_Float_Matrix;
       Train_Labs, Test_Labs : Boolean_Array; Num_Neighbours: Positive) is
-      Neighbours       : constant Python_API.PyObject :=
-                           Python.Call (Classifier, "init_NeighborsClassifier",
-                                        Num_Neighbours);
-      Train_Pred       : Boolean_Array (Data'Range);
-      Test_Pred        : Boolean_Array (Test_Data'Range);
+      Routine_Name : constant String := "Process.Process_Neighbours ";
+      Neighbours   : constant Python_API.PyObject :=
+                       Python.Call (Classifier, "init_NeighborsClassifier",
+                                    Num_Neighbours);
+      Train_Pred   : Boolean_Array (Data'Range);
+      Test_Pred    : Boolean_Array (Test_Data'Range);
    begin
+      Assert (Train_Labs'Length = Data'Length, Routine_Name
+              & "Train Labs length" & Integer'Image (Train_Labs'Length) &
+                " is different to Data length" & Integer'Image (Data'Length));
       Python_CLF.Call (Classifier, "fit", Neighbours, Data, Train_Labs);
+
       Train_Pred := Python_CLF.Call (Classifier, "predict", Neighbours, Data);
       Test_Pred := Python_CLF.Call (Classifier, "predict", Neighbours,
                                     Test_Data);

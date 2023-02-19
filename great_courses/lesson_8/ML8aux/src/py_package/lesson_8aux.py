@@ -5,8 +5,6 @@ from sklearn import neighbors
 
 import matplotlib
 from matplotlib import pyplot as plt
-from matplotlib import colors as cl
-import matplotlib.cm as cm
 
 def init_DecisionTreeClassifier(max_nodes):
     return tree.DecisionTreeClassifier(max_leaf_nodes=max_nodes)
@@ -55,9 +53,6 @@ def split_data (data, pred):
 
 def plot_predictions(model, dat, pred):
     title = 'Comfort: ' + model
-    dat1 = np.asarray (dat)
-    pred1 = list (pred)
-    print("dat1", dat1.shape)
     split = split_data (dat, pred)
     fp = np.asarray(split[0])
     fn = np.asarray(split[1])
