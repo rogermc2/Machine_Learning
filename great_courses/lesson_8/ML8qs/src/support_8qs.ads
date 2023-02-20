@@ -8,7 +8,9 @@ package Support_8QS is
       Labels   : Integer_Array (1 .. Num_Items);
    end record;
 
-   function Get_Data (File_Name : String) return Data_Record;
+   function Get_Data (File_Name : String; Num_Samples : Positive)
+                      return Data_Record;
+   function Get_Mins (M1, M2 : Real_Float_Matrix)  return Real_Float_List;
    function Test_Score (Predictions : Real_Float_Vector;
                         Labels      : Integer_Array) return Natural;
 

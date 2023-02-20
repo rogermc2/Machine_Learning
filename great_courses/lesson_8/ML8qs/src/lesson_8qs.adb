@@ -10,11 +10,12 @@ with Support_8QS; use Support_8QS;
 
 procedure Lesson_8QS is
    Project_Name     : constant String := "Lesson 8QS ";
+   Num_Samples      : constant := 4000;
    Train_Data       : constant Data_Record :=
-                        Get_Data ("../../data/malware-train.csv");
+                        Get_Data ("../../data/malware-train.csv", Num_Samples);
    Test_Data        : constant Data_Record :=
-                        Get_Data ("../../data/malware-test.csv");
-   Train_Size       : constant Positive := Train_Data.Features'Length;
+     Get_Data ("../../data/malware-test.csv", Num_Samples);
+   Train_Size       : constant Positive := Num_Samples;
    Test_Size        : constant Positive := Test_Data.Features'Length;
    Tests            : constant Integer_Array (1 .. 4) := (1, 5, 7,9);
    Num_Neighbours   : Positive;
@@ -23,8 +24,6 @@ procedure Lesson_8QS is
    Accuracy         : Real_Float_List;
    Accuracy_2D      : Real_Float_List_2D;
 begin
-   Put_Line ("Train_Size" & Integer'Image (Train_Size));
-   Put_Line ("Test_Size" & Integer'Image (Test_Size));
 
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_8qs");
