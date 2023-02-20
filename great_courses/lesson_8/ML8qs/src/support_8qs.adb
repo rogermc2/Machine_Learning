@@ -11,14 +11,14 @@ package body Support_8QS is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Data (File_Name : String; Num_Samples : Positive)
+   function Get_Data (File_Name : String; Num_Samples : Natural := 0)
                       return Data_Record is
       use Ada.Strings;
       use Ada.Strings.Unbounded;
       use ML_Types;
       use String_Package;
       Routine_Name : constant String := "Support_8QS.Get_Data ";
-      Last         : Positive := Num_Samples;
+      Last         : Positive;
       Raw_Data     : Unbounded_List;
       Row_Words    : String_List;
       aWord        : Unbounded_String;
@@ -30,9 +30,12 @@ package body Support_8QS is
       Raw_Data := Neural_Utilities.Load_CSV_Data (File_Name);
       Put_Line (Routine_Name & File_Name & " loaded");
 
-      if Integer (Raw_Data.Length) < Last then
+      if Num_Samples = 0 or else Num_Samples > Integer (Raw_Data.Length) then
          Last := Integer (Raw_Data.Length);
+      else  --  Num_Samples < Raw_Data.Length
+         Last := Num_Samples;
       end if;
+
       for row in Raw_Data.First_Index .. Last loop
          Row_Words :=
            Neural_Utilities.Split_String (To_String (Raw_Data (row)), ",");
@@ -91,6 +94,7 @@ package body Support_8QS is
          Diff := (M2 - Vec) ** 2;
          Total := Sum_Each_Column (Diff);
          Dists.Append (Total);
+         Min_Dists.Append (Min (Total));
       end loop;
 
       return Min_Dists;
