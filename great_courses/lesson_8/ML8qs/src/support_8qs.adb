@@ -81,17 +81,20 @@ package body Support_8QS is
 
    function Get_Mins (M1, M2 : Real_Float_Matrix)  return Real_Float_List is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Support_8QS.Get_Mins ";
-      Vec            : Real_Float_Vector (M1'Range (2));
+--        Routine_Name   : constant String := "Support_8QS.Get_Mins ";
+      Vec            : Real_Float_Vector (M2'Range (2));
       Diff           : Real_Float_Matrix (M1'Range, M1'Range (2));
       Total          : Real_Float_Vector (M1'Range (2));
       Dists          : Real_Vector_List;
       Min_Dists      : Real_Float_List;
    begin
-      for row in M1'Range loop
-         Vec := Get_Row (M1, row);
+      for row in M2'Range loop
+         Vec := Get_Row (M2, row);
 
-         Diff := (M2 - Vec) ** 2;
+         for col in M1'Range (2) loop
+            Diff (row, col) := (M1 (row, col) - Vec (col)) ** 2;
+         end loop;
+
          Total := Sum_Each_Column (Diff);
          Dists.Append (Total);
          Min_Dists.Append (Min (Total));
@@ -105,7 +108,7 @@ package body Support_8QS is
 
    function Test_Score (Predictions : Real_Float_Vector;
                         Labels      : Integer_Array) return Natural is
---        Routine_Name : constant String := "Support_8QS.Test_Score ";
+      --        Routine_Name : constant String := "Support_8QS.Test_Score ";
       Correct      : Natural := 0;
    begin
       for index in Predictions'Range loop
