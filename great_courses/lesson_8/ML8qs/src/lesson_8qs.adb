@@ -14,9 +14,9 @@ procedure Lesson_8QS is
    Num_Samples      : constant := 4000;
    Num_Neighbours   : constant Positive := 1;
    Train_Data       : Data_Record :=
-                        Get_Data ("../../data/malware-train.csv", Num_Samples);
+     Get_Data ("../../data/malware-train.csv", Num_Samples);
    Test_Data        : constant Data_Record :=
-                        Get_Data ("../../data/malware-test.csv");
+     Get_Data ("../../data/malware-test.csv");
    Train_Size       : constant Positive := Train_Data.Features'Length;
    Test_Size        : constant Positive := Test_Data.Features'Length;
 --     Min_Data         : Real_Float_List := Get_Mins (Train_Data.Features,
@@ -24,7 +24,8 @@ procedure Lesson_8QS is
 
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
-   Accuracy         : Real_Float_List;
+   Train_Accuracy   : Float;
+   Test_Accuracy    : Float;
    Accuracy_2D      : Real_Float_List_2D;
 begin
    Python.Initialize;
@@ -36,22 +37,21 @@ begin
                     Train_Data.Labels);
    declare
       Train_Pred : constant Real_Float_Vector :=
-                     Python_CLF.Call (Classifier, "predict", Estimator,
-                                      Train_Data.Features);
+        Python_CLF.Call (Classifier, "predict", Estimator,
+                         Train_Data.Features);
       Test_Pred  : constant Real_Float_Vector :=
-                     Python_CLF.Call (Classifier, "predict", Estimator,
-                                      Test_Data.Features);
+        Python_CLF.Call (Classifier, "predict", Estimator,
+                         Test_Data.Features);
    begin
-      Accuracy.Clear;
-      Accuracy.Append (Float (Num_Neighbours));
-      Accuracy.Append (Float (Test_Score (Train_Pred, Train_Data.Labels)) /
-                         Float (Train_Size));
-      Accuracy.Append (Float (Test_Score (Test_Pred, Test_Data.Labels)) /
-                         Float (Test_Size));
+      Train_Accuracy := Float (Test_Score (Train_Pred, Train_Data.Labels)) /
+                               Float (Train_Size);
+      Test_Accuracy := Float (Test_Score (Test_Pred, Test_Data.Labels)) /
+        Float (Test_Size);
+      Put_Line ("Train Accuracy: " & Float'Image (Train_Accuracy));
+      Put_Line ("Test Accuracy: " & Float'Image (Test_Accuracy));
    end;
-   Python_API.Py_DecRef (Estimator);
 
-   Accuracy_2D.Append (Accuracy);
+   Python_API.Py_DecRef (Estimator);
 
    Shuffler.Shuffle (Train_Data.Features, Train_Data.Labels);
 
