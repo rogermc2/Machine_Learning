@@ -19,8 +19,8 @@ procedure Lesson_8QS is
      Get_Data ("../../data/malware-test.csv");
    Train_Size       : constant Positive := Train_Data.Features'Length;
    Test_Size        : constant Positive := Test_Data.Features'Length;
---     Min_Data         : Real_Float_List := Get_Mins (Train_Data.Features,
---                                                     Test_Data.Features);
+   Min_Data         : Real_Float_List := Get_Mins (Train_Data.Features,
+                                                   Test_Data.Features);
 
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
