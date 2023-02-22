@@ -19,14 +19,15 @@ procedure Lesson_8QS is
      Get_Data ("../../data/malware-test.csv");
    Train_Size       : constant Positive := Train_Data.Features'Length;
    Test_Size        : constant Positive := Test_Data.Features'Length;
-   Min_Data         : Real_Float_List := Get_Mins (Train_Data.Features,
-                                                   Test_Data.Features);
+   Min_Data         : constant Real_Float_List :=
+                        Get_Mins (Train_Data.Features,
+                                  Test_Data.Features);
+   Min_Scrambled    : Real_Float_List;
 
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
    Train_Accuracy   : Float;
    Test_Accuracy    : Float;
-   Accuracy_2D      : Real_Float_List_2D;
 begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_8qs");
@@ -54,8 +55,9 @@ begin
    Python_API.Py_DecRef (Estimator);
 
    Shuffler.Shuffle (Train_Data.Features, Train_Data.Labels);
+   Min_Scrambled := Get_Mins (Train_Data.Features, Test_Data.Features);
 
-   Python.Call (Classifier, "plot", Accuracy_2D);
+   Python.Call (Classifier, "hist_plot", Min_Data, Min_Scrambled);
    Python.Finalize;
 
    Put_Line (Project_Name & "finished.");

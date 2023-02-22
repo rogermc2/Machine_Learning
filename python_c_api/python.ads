@@ -143,6 +143,8 @@ package Python is
                    A : ML_Arrays_And_Matrices.Real_Vector_List);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Vector_List);
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : ML_Arrays_And_Matrices.Real_Float_List);
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unbounded_String_Array);
    procedure Call (M : Module; Function_Name : String;

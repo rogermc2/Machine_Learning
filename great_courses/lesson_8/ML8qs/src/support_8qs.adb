@@ -9,6 +9,10 @@ with Neural_Utilities;
 
 package body Support_8QS is
 
+   function Get_Diff (M : Real_Float_Matrix; V : Real_Float_Vector)
+                      return Real_Float_Matrix;
+   pragma Inline (Get_Diff);
+
    --  -------------------------------------------------------------------------
 
    function Get_Data (File_Name : String; Num_Samples : Natural := 0)
@@ -79,9 +83,25 @@ package body Support_8QS is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Mins (M1, M2 : Real_Float_Matrix)  return Real_Float_List is
+   function Get_Diff (M : Real_Float_Matrix; V : Real_Float_Vector)
+                      return Real_Float_Matrix is
+      Diff : Real_Float_Matrix (M'Range, M'Range (2));
+   begin
+      for row in M'Range loop
+         for col in M'Range (2) loop
+            Diff (row, col) := (M (row, col) - V (col)) ** 2;
+         end loop;
+      end loop;
+
+      return Diff;
+
+   end Get_Diff;
+
+   --  -------------------------------------------------------------------------
+
+   function Get_Mins (M1, M2 : Real_Float_Matrix) return Real_Float_List is
       use Real_Float_Arrays;
---        Routine_Name   : constant String := "Support_8QS.Get_Mins ";
+      --        Routine_Name   : constant String := "Support_8QS.Get_Mins ";
       Vec            : Real_Float_Vector (M2'Range (2));
       Diff           : Real_Float_Matrix (M1'Range, M1'Range (2));
       Total          : Real_Float_Vector (M1'Range (2));
@@ -91,9 +111,7 @@ package body Support_8QS is
       for row in M2'Range loop
          Vec := Get_Row (M2, row);
 
-         for col in M1'Range (2) loop
-            Diff (row, col) := (M1 (row, col) - Vec (col)) ** 2;
-         end loop;
+         Diff := Get_Diff (M1, Vec);
 
          Total := Sum_Each_Column (Diff);
          Dists.Append (Total);
