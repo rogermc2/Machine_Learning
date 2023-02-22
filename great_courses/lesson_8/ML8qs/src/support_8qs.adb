@@ -3,13 +3,13 @@ with Ada.Strings;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Utilities;
 
 package body Support_8QS is
 
-   function Get_Diff (M : Real_Float_Matrix; V : Real_Float_Vector)
+   function Get_Diff (Train : Real_Float_Matrix; Vec : Real_Float_Vector)
                       return Real_Float_Matrix;
    pragma Inline (Get_Diff);
 
@@ -83,13 +83,13 @@ package body Support_8QS is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Diff (M : Real_Float_Matrix; V : Real_Float_Vector)
+   function Get_Diff (Train : Real_Float_Matrix; Vec : Real_Float_Vector)
                       return Real_Float_Matrix is
-      Diff : Real_Float_Matrix (M'Range, M'Range (2));
+      Diff : Real_Float_Matrix (Train'Range, Train'Range (2));
    begin
-      for row in M'Range loop
-         for col in M'Range (2) loop
-            Diff (row, col) := (M (row, col) - V (col)) ** 2;
+      for row in Train'Range loop
+         for col in Train'Range (2) loop
+            Diff (row, col) := (Train (row, col) - Vec (col)) ** 2;
          end loop;
       end loop;
 
@@ -98,25 +98,40 @@ package body Support_8QS is
    end Get_Diff;
 
    --  -------------------------------------------------------------------------
-
-   function Get_Mins (M1, M2 : Real_Float_Matrix) return Real_Float_List is
+   --  Get_Mins finds the distances between each test data instance and its
+   --  nearest neighbor in the training set.
+   function Get_Mins (Train, Test : Real_Float_Matrix) return Real_Float_List is
       use Real_Float_Arrays;
-      --        Routine_Name   : constant String := "Support_8QS.Get_Mins ";
-      Vec            : Real_Float_Vector (M2'Range (2));
-      Diff           : Real_Float_Matrix (M1'Range, M1'Range (2));
-      Total          : Real_Float_Vector (M1'Range (2));
+      Routine_Name   : constant String := "Support_8QS.Get_Mins ";
+      Vec            : Real_Float_Vector (Test'Range (2));
+      Diff           : Real_Float_Matrix (Train'Range, Train'Range (2));
+      Total          : Real_Float_Vector (Train'Range (2));
       Dists          : Real_Vector_List;
       Min_Dists      : Real_Float_List;
+      Num_Zero       : Natural := 0;
    begin
-      for row in M2'Range loop
-         Vec := Get_Row (M2, row);
+      for row in Test'Range loop
+         Vec := Get_Row (Test, row);
 
-         Diff := Get_Diff (M1, Vec);
-
+         Diff := Get_Diff (Train, Vec);
          Total := Sum_Each_Column (Diff);
+         if row > 100 and row < 103 then
+            Print_Float_Vector (Routine_Name & "Vec", Vec, 10, 16);
+            Print_Float_Matrix (Routine_Name & "Diff", Diff, 100, 103, 10, 16);
+            Print_Float_Vector (Routine_Name & "Total", Total, 10, 16);
+            Put_Line (Routine_Name & "Min (Total)" & Float'Image (Min (Total)));
+         end if;
          Dists.Append (Total);
+         if Min (Total) > 0.0 then
+            Put_Line ("********" & Routine_Name & "row Min (Total)" & Integer'Image (row) &
+                        ": " & Float'Image (Min (Total)));
+         else
+            Num_Zero := Num_Zero + 1;
+         end if;
          Min_Dists.Append (Min (Total));
       end loop;
+      Print_Real_Float_List (Routine_Name & "Min_Dists", Min_Dists, 10, 16);
+      Put_Line (Routine_Name & "Num_Zero" & Integer'Image (Num_Zero));
 
       return Min_Dists;
 

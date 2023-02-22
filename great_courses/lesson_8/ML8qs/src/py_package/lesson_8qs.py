@@ -4,6 +4,7 @@ from sklearn import neighbors
 
 import matplotlib
 from matplotlib import pyplot as plt
+import seaborn as sns
 
 def init_NeighborsClassifier(k):
     return neighbors.KNeighborsClassifier(n_neighbors=k,metric="cosine")
@@ -15,7 +16,9 @@ def predict (est, X):
     return tuple(est.predict(X))
 
 def hist_plot(dat1, dat2):
-    plt.hist(dat1)
-    plt.hist(dat2)
-    plt.gca().set(title='Malware Histogram', ylabel='Frequency');
+#    plt.hist(dat1)
+#    plt.hist(dat2)
+#    plt.gca().set(title='Malware Histogram', ylabel='Frequency');
+    sns.distplot(dat1)
+    sns.distplot(dat2)
     plt.show()

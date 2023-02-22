@@ -10,7 +10,7 @@ package Support_8QS is
 
    function Get_Data (File_Name : String; Num_Samples : Natural := 0)
                       return Data_Record;
-   function Get_Mins (M1, M2 : Real_Float_Matrix)  return Real_Float_List;
+   function Get_Mins (Train, Test : Real_Float_Matrix)  return Real_Float_List;
    function Test_Score (Predictions : Real_Float_Vector;
                         Labels      : Integer_Array) return Natural;
 
