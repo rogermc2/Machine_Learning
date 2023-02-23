@@ -3,7 +3,7 @@ with Ada.Strings;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Utilities;
 
@@ -90,10 +90,10 @@ package body Support_8QS is
       for row in Train'Range loop
          for col in Train'Range (2) loop
             Diff (row, col) := (Train (row, col) - Vec (col)) ** 2;
---              if Diff (row, col) = 0.0 then
---                 Put_Line (" Get_Diffzero row col" & Integer'Image (row) &
---                             ", " & Integer'Image (col));
---              end if;
+            --              if Diff (row, col) = 0.0 then
+            --                 Put_Line (" Get_Diffzero row col" & Integer'Image (row) &
+            --                             ", " & Integer'Image (col));
+            --              end if;
          end loop;
       end loop;
 
@@ -106,36 +106,21 @@ package body Support_8QS is
    --  nearest neighbor in the training set.
    function Get_Mins (Train, Test : Real_Float_Matrix) return Real_Float_List is
       use Real_Float_Arrays;
-      Routine_Name   : constant String := "Support_8QS.Get_Mins ";
+--        Routine_Name   : constant String := "Support_8QS.Get_Mins ";
       Vec            : Real_Float_Vector (Test'Range (2));
       Diff           : Real_Float_Matrix (Train'Range, Train'Range (2));
-      Total          : Real_Float_Vector (Train'Range (2));
+      Total          : Real_Float_Vector (Train'Range);
       Dists          : Real_Vector_List;
       Min_Dists      : Real_Float_List;
---        Num_Zero       : Natural := 0;
    begin
       for row in Test'Range loop
          Vec := Get_Row (Test, row);
 
          Diff := Get_Diff (Train, Vec);
-         Total := Sum_Each_Column (Diff);
-         --           if row > 100 and row < 103 then
-         --              Print_Float_Vector (Routine_Name & "Vec", Vec, 10, 16);
-         --              Print_Float_Matrix (Routine_Name & "Diff", Diff, 100, 103, 10, 16);
-         --              Print_Float_Vector (Routine_Name & "Total", Total, 10, 16);
-         --              Put_Line (Routine_Name & "Min (Total)" & Float'Image (Min (Total)));
-         --           end if;
+         Total := Sum (Diff);
          Dists.Append (Total);
-         --           if Min (Total) > 0.0 then
-         --              Put_Line ("********" & Routine_Name & "row Min (Total)" & Integer'Image (row) &
-         --                          ": " & Float'Image (Min (Total)));
-         --           else
-         --              Num_Zero := Num_Zero + 1;
-         --           end if;
          Min_Dists.Append (Min (Total));
       end loop;
---        Print_Real_Float_List (Routine_Name & "Min_Dists", Min_Dists, 10, 16);
---        Put_Line (Routine_Name & "Num_Zero" & Integer'Image (Num_Zero));
 
       return Min_Dists;
 

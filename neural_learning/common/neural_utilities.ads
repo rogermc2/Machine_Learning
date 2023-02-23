@@ -33,7 +33,7 @@ package Neural_Utilities is
    procedure Check_Rows (Rows : in out ML_Types.Rows_Vector);
    function Get_Column (List_2D      : Value_Data_Lists_2D;
                         Column_Index : Positive)
-                         return Value_Data_List;
+                        return Value_Data_List;
    function Get_Data_Type (Data : Unbounded_String) return Data_Type;
    function Is_Boolean (Item : Unbounded_String) return Boolean;
    function Is_Float (Item : Unbounded_String) return Boolean;
@@ -54,6 +54,8 @@ package Neural_Utilities is
    function Permute (aMatrix : Integer_Matrix) return Integer_Matrix;
    procedure Permute (aList : in out String_List);
    function Permute (aMatrix : Real_Float_Matrix) return Real_Float_Matrix;
+   procedure Permute (aMatrix : in out Real_Float_Matrix;
+                      anArray : in out Integer_Array);
    pragma Inline (Permute);
    procedure Print_Feature_Values (Message : String; Rows : Rows_Vector;
                                    Column  : Class_Range);
@@ -72,7 +74,7 @@ package Neural_Utilities is
    procedure Print_Value_Record (Message : String;
                                  Value   : Value_Record);
    function Split_String (aString, Pattern : String)
-                           return String_List;
+                          return String_List;
    function Split_String_On_Spaces (aString : String) return Indef_String_List;
    function Split_String_On_Spaces (aString : String) return String_List;
    procedure Swap (Data : in out Binary_Matrix; L, R : Positive);
@@ -83,6 +85,6 @@ package Neural_Utilities is
    procedure Swap (Data : in out Integer_Matrix; L, R : Positive);
    pragma Inline (Swap);
    function XY_To_Rows (X, Y : Value_Data_Lists_2D)
-                         return Rows_Vector;
+                        return Rows_Vector;
 
 end Neural_Utilities;
