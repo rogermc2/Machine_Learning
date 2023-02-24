@@ -16,7 +16,7 @@ def predict (est, X):
     return tuple(est.predict(X))
 
 def hist_plot(dat1, dat2):
-    plt.hist([dat1, dat2], bins=20, density=True)
+    plt.hist([dat1, dat2], bins=60, density=True)
     plt.gca().set(title='Malware Distance Histogram', xlabel='Distance', ylabel='Frequency');
 #    sns.distplot(dat1)
 #    sns.distplot(dat2)

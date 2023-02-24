@@ -19,10 +19,11 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with Neural_Utilities;
+--  with Neural_Utilities;
 with Python;
 with Python_CLF;
 with Python_API;
+with Shuffler;
 
 with Support_8QS; use Support_8QS;
 
@@ -32,7 +33,7 @@ procedure Lesson_8QS is
    Num_Neighbours   : constant Positive := 1;
    Train_Data       : Data_Record :=
                         Get_Data ("../../data/malware-train.csv", Num_Samples);
-   Test_Data        : constant Data_Record :=
+   Test_Data        : Data_Record :=
                         Get_Data ("../../data/malware-test.csv");
    Train_Size       : constant Positive := Train_Data.Features'Length;
    Test_Size        : constant Positive := Test_Data.Features'Length;
@@ -71,7 +72,8 @@ begin
 
    Python_API.Py_DecRef (Estimator);
 
-   Neural_Utilities.Permute (Train_Data.Features, Train_Data.Labels);
+   Shuffler.Column_Shuffle (Train_Data.Features);
+   Shuffler.Column_Shuffle (Test_Data.Features);
    Min_Scrambled := Get_Mins (Train_Data.Features, Test_Data.Features);
 
    Python.Call (Classifier, "hist_plot", Min_Data, Min_Scrambled);
