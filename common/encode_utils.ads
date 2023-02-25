@@ -8,11 +8,11 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Encode_Utils is
 
-   package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
-   package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
+--     package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
+--     package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
-   package UB_String_Sets is new
-     Ada.Containers.Ordered_Sets (Unbounded_String);
+--     package UB_String_Sets is new
+--       Ada.Containers.Ordered_Sets (Unbounded_String);
 
    Encode_Error : exception;
 

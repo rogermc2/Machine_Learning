@@ -679,13 +679,13 @@ package body Classifier_Utilities is
                       return NL_Types.Natural_List is
       use NL_Types;
       use NL_Types.Natural_Package;
-      Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
+      Unique_Vals : constant Integer_Array := Encode_Utils.Unique (Values);
       aVal        : Integer;
       U_Index     : Positive;
       Found       : Boolean;
       Diff        : NL_Types.Natural_List;
    begin
-      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
+      for index in Unique_Vals'Range loop
          aVal := Unique_Vals (index);
          Found := False;
          U_Index := Uniques'First;
@@ -709,13 +709,13 @@ package body Classifier_Utilities is
                       return NL_Types.Natural_List is
       use NL_Types;
       use NL_Types.Natural_Package;
-      Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
+      Unique_Vals : constant Integer_Array := Encode_Utils.Unique (Values);
       aVal        : Natural;
       U_Index     : Positive;
       Found       : Boolean;
       Diff        : Natural_List;
    begin
-      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
+      for index in Unique_Vals'Range loop
          aVal := Unique_Vals (index);
          Found := False;
          U_Index := Uniques'First;
@@ -737,13 +737,13 @@ package body Classifier_Utilities is
                       return NL_Types.Natural_List is
       use NL_Types;
       use NL_Types.Natural_Package;
-      Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
+      Unique_Vals : constant Natural_Array := Encode_Utils.Unique (Values);
       aVal        : Natural;
       U_Index     : Positive;
       Found       : Boolean;
       Diff        : Natural_List;
    begin
-      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
+      for index in Unique_Vals'Range loop
          aVal := Unique_Vals (index);
          Found := False;
          U_Index := Uniques'First;
@@ -764,19 +764,14 @@ package body Classifier_Utilities is
    function Set_Diff (Values, Uniques : Boolean_Array)
                       return NL_Types.Boolean_List is
       use NL_Types;
-      Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
+      Unique_Vals : constant Boolean_Array := Encode_Utils.Unique (Values);
       aVal        : Boolean;
       U_Index     : Positive;
       Found       : Boolean;
       Diff        : Boolean_List;
    begin
-      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
-         if Unique_Vals (index) = 0 then
-            aVal := False;
-         else
-            aVal := True;
-         end if;
-
+      for index in Unique_Vals'Range loop
+         aVal := Unique_Vals (index);
          Found := False;
          U_Index := Uniques'First;
          while U_Index <= Uniques'Last and not Found loop
