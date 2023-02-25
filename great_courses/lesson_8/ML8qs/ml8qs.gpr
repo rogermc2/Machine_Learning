@@ -1,4 +1,4 @@
-project ML8A is
+project ML8Qs is
 
    type Operating_System_Type is
       ("high_sierra", "ventura");
@@ -6,7 +6,7 @@ project ML8A is
    for Source_Dirs use ("src", "../../../gid", "../../../common", "../../../neural_learning/common", "../../../python_c_api", "src/py_package", "../../../neural_learning/test", 
       "../../../neural_learning/decision_tree_classifier/support", "../../../neural_learning/utils", "../../../neural_learning/datasets");
    for Object_Dir use "obj";
-   for Main use ("lesson_8a.adb");
+   for Main use ("lesson_8qs.adb");
    for Exec_Dir use ".";
 
    package Compiler is
@@ -25,5 +25,5 @@ project ML8A is
       end case;
    end Linker;
 
-end ML8A;
+end ML8Qs;
 

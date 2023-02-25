@@ -7,16 +7,22 @@ with Ada.Text_IO; use Ada.Text_IO;
 with ML_Types;
 with Neural_Utilities;
 
-package body Support_8A is
+package body Support_8QS is
+
+   function Get_Diff (Train : Real_Float_Matrix; Vec : Real_Float_Vector)
+                      return Real_Float_Matrix;
+   pragma Inline (Get_Diff);
 
    --  -------------------------------------------------------------------------
 
-   function Get_Data (File_Name : String) return Data_Record is
+   function Get_Data (File_Name : String; Num_Samples : Natural := 0)
+                      return Data_Record is
       use Ada.Strings;
       use Ada.Strings.Unbounded;
       use ML_Types;
       use String_Package;
-      Routine_Name : constant String := "Support_8A.Get_Data ";
+      Routine_Name : constant String := "Support_8QS.Get_Data ";
+      Last         : Positive;
       Raw_Data     : Unbounded_List;
       Row_Words    : String_List;
       aWord        : Unbounded_String;
@@ -28,7 +34,13 @@ package body Support_8A is
       Raw_Data := Neural_Utilities.Load_CSV_Data (File_Name);
       Put_Line (Routine_Name & File_Name & " loaded");
 
-      for row in Raw_Data.First_Index .. Raw_Data.Last_Index loop
+      if Num_Samples = 0 or else Num_Samples > Integer (Raw_Data.Length) then
+         Last := Integer (Raw_Data.Length);
+      else  --  Num_Samples < Raw_Data.Length
+         Last := Num_Samples;
+      end if;
+
+      for row in Raw_Data.First_Index .. Last loop
          Row_Words :=
            Neural_Utilities.Split_String (To_String (Raw_Data (row)), ",");
          Word_Cursor := Row_Words.First;
@@ -71,9 +83,50 @@ package body Support_8A is
 
    --  -------------------------------------------------------------------------
 
+   function Get_Diff (Train : Real_Float_Matrix; Vec : Real_Float_Vector)
+                      return Real_Float_Matrix is
+      Diff : Real_Float_Matrix (Train'Range, Train'Range (2));
+   begin
+      for row in Train'Range loop
+         for col in Train'Range (2) loop
+            Diff (row, col) := (Train (row, col) - Vec (col)) ** 2;
+         end loop;
+      end loop;
+
+      return Diff;
+
+   end Get_Diff;
+
+   --  -------------------------------------------------------------------------
+   --  Get_Mins finds the distances between each test data instance and its
+   --  nearest neighbor in the training set.
+   function Get_Mins (Train, Test : Real_Float_Matrix) return Real_Float_List is
+      use Real_Float_Arrays;
+--        Routine_Name   : constant String := "Support_8QS.Get_Mins ";
+      Vec            : Real_Float_Vector (Test'Range (2));
+      Diff           : Real_Float_Matrix (Train'Range, Train'Range (2));
+      Total          : Real_Float_Vector (Train'Range);
+      Dists          : Real_Vector_List;
+      Min_Dists      : Real_Float_List;
+   begin
+      for row in Test'Range loop
+         Vec := Get_Row (Test, row);
+
+         Diff := Get_Diff (Train, Vec);
+         Total := Sum (Diff);
+         Dists.Append (Total);
+         Min_Dists.Append (Min (Total));
+      end loop;
+
+      return Min_Dists;
+
+   end Get_Mins;
+
+   --  -------------------------------------------------------------------------
+
    function Test_Score (Predictions : Real_Float_Vector;
                         Labels      : Integer_Array) return Natural is
---        Routine_Name : constant String := "Support_8A.Test_Score ";
+      --        Routine_Name : constant String := "Support_8QS.Test_Score ";
       Correct      : Natural := 0;
    begin
       for index in Predictions'Range loop
@@ -88,4 +141,4 @@ package body Support_8A is
 
    --  -------------------------------------------------------------------------
 
-end Support_8A;
+end Support_8QS;

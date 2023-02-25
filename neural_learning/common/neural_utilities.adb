@@ -378,6 +378,24 @@ package body Neural_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   procedure Permute (aMatrix  : in out Real_Float_Matrix;
+                      anArray  : in out Integer_Array) is
+      List_Length  : constant Positive := Positive (aMatrix'Length);
+      Rand         : Positive;
+   begin
+      if List_Length > 1 then
+         for index in 1 .. List_Length - 1 loop
+            Rand := index +
+              Natural (abs (Maths.Random_Float) * Float (List_Length - index));
+            Swap (aMatrix, index, Rand);
+            Swap (anArray, index, Rand);
+         end loop;
+      end if;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
    procedure Print_Value_Record (Message : String; Value : Value_Record) is
       Value_Kind : constant Data_Type := Value.Value_Kind;
    begin

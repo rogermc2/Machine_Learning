@@ -331,6 +331,32 @@ package body Python is
    --  -------------------------------------------------------------------------
 
    procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Integer_Array) is
+
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1      : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
+
+      PyResult := Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix) is
 
       function Py_BuildValue (Format  : Interfaces.C.char_array;
@@ -341,13 +367,11 @@ package body Python is
       A_Tuple  : constant PyObject := To_Tuple (A);
       PyParams : PyObject;
       PyResult : PyObject;
-      Result   : aliased Interfaces.C.long;
    begin
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
 
       PyResult := Call_Object (F, PyParams);
-      Result := PyInt_AsLong (PyResult);
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
@@ -379,6 +403,32 @@ package body Python is
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Real_Float_List) is
+      
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+
+      PyResult := Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
@@ -436,6 +486,35 @@ package body Python is
 
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Matrix) is
+
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1, T2  : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+
+      PyResult := Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B : ML_Arrays_And_Matrices.Boolean_Array) is
 
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject) return PyObject;
@@ -933,12 +1012,96 @@ package body Python is
       B_Tuple  : constant PyObject := To_Tuple (B);
       PyParams : PyObject;
       PyResult : PyObject;
-      Result   : aliased Interfaces.C.long;
    begin
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
       PyResult := Call_Object (F, PyParams);
-      Result := PyInt_AsLong (PyResult);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B : ML_Arrays_And_Matrices.Unbounded_String_Array) is
+
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1, T2  : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+      PyResult := Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name, Text : String;
+                   A : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B : ML_Arrays_And_Matrices.Unbounded_String_Array) is
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              S1     : Interfaces.C.char_array;
+                              T1, T2 : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Text_C   : constant Interfaces.C.char_array := Interfaces.C.To_C (Text);
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("sOO"), Text_C, A_Tuple, B_Tuple);
+      PyResult := Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M    : Module; Function_Name : String;
+                   A    : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                   B    : ML_Arrays_And_Matrices.Unbounded_String_Matrix) is
+
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1, T2  : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+      PyResult := Call_Object (F, PyParams);
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
@@ -1077,8 +1240,8 @@ package body Python is
                    A : NL_Types.Boolean_List_2D;
                    B : ML_Types.Bounded_String_List) is
       use System;
-      function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              T1, T2  : PyObject)  return PyObject;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1, T2 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String := "Python.Call 2 ";
@@ -1109,6 +1272,40 @@ package body Python is
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Real_Float_List_2D) is
+      use System;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call RF2D ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
@@ -1385,6 +1582,182 @@ package body Python is
       Py_DecRef (PyResult);
       
       return Float (Result);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Real_Vector_List) is
+      use System;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call Real_Vector_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : ML_Arrays_And_Matrices.Real_Vector_List) is
+      use System;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1, T2     : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call 2 * Real_Vector_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : ML_Arrays_And_Matrices.Real_Float_List) is
+      use System;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1, T2     : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call 2 * Real_Vector_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Unbounded_String_Array) is
+      use System;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call Unbounded_String_Array ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Unbounded_String_Matrix) is
+      use System;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call Unbounded_String_Array ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
 
    end Call;
 

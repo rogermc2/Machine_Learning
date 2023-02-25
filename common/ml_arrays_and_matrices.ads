@@ -82,6 +82,10 @@ package ML_Arrays_And_Matrices is
      (Positive, Binary_Matrix);
    subtype Binary_Matrix_List is Binary_Matrix_List_Package.Vector;
 
+   package Boolean_Array_List_Package is new Ada.Containers.Indefinite_Vectors
+     (Positive, Boolean_Array);
+   subtype Boolean_Array_List is Boolean_Array_List_Package.Vector;
+
    package Boolean_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
      (Positive, Boolean_Matrix);
    subtype Boolean_Matrix_List is Boolean_Matrix_List_Package.Vector;
