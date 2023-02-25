@@ -123,6 +123,69 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
 
+   function Unique (Values : ML_Arrays_And_Matrices.Boolean_Array)
+                    return NL_Types.Natural_List is
+      use NL_Types.Natural_Package;
+      use NL_Types.Natural_Sorting;
+      Value       : Natural;
+      Uniq_List   : NL_Types.Natural_List;
+   begin
+      for index in Values'Range loop
+         if Values (index) then
+            Value := 1;
+         else
+            Value := 0;
+         end if;
+         if not Uniq_List.Contains (Value) then
+            Uniq_List.Append (Value);
+         end if;
+      end loop;
+
+      Sort (Uniq_List);
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : ML_Arrays_And_Matrices.Integer_Array)
+                    return NL_Types.Natural_List is
+      use NL_Types.Natural_Package;
+      use NL_Types.Natural_Sorting;
+      Uniq_List   : NL_Types.Natural_List;
+   begin
+      for index in Values'Range loop
+         if not Uniq_List.Contains (Values (index)) then
+            Uniq_List.Append (Values (index));
+         end if;
+      end loop;
+
+      Sort (Uniq_List);
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : ML_Arrays_And_Matrices.Natural_Array)
+                    return NL_Types.Natural_List is
+      use NL_Types.Natural_Package;
+      use NL_Types.Natural_Sorting;
+      Uniq_List   : NL_Types.Natural_List;
+   begin
+      for index in Values'Range loop
+         if not Uniq_List.Contains (Values (index)) then
+            Uniq_List.Append (Values (index));
+         end if;
+      end loop;
+
+      Sort (Uniq_List);
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
    function Unique (Values : NL_Types.Natural_List)
                     return NL_Types.Natural_List is
       use NL_Types.Natural_Package;

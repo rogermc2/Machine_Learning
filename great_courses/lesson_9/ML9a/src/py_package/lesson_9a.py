@@ -1,25 +1,23 @@
-from sklearn import tree
+import numpy as np
+
+from sklearn import svm
 
 import matplotlib
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 
-def classify (dat, lab, feat_names):
-    data = dat[0]
-    labels = lab[0]
-    clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)
-    clf = clf.fit(data, labels)
+def init_svc(degree):
+    return svm.SVC(gamma='scale',kernel='poly', degree=degree)
 
-    correct = 0
-    for i in range(len(data)):
-        if clf.predict([data[i]]) == labels[i]:
-            correct = correct + 1
-    percent_correct = 100.0 * correct / len (data)
-    print("Percentage correct: ", percent_correct)
-    
-    print ("feat_names: ", feat_names)
-    tree.plot_tree (clf, feature_names=feat_names, filled=True,
-                    rounded=True, fontsize=8)
-    pyplot.show()
-    print()
-    return percent_correct
+def fit (est, X, y):
+    est.fit(X, y)
 
+def predict (est, X):
+    return tuple(est.predict(X))
+
+def plot(acc):
+    plt.plot([int(v[0]) for v in acc], [v[1] for v in acc], c="blue")
+    plt.plot([int(v[0]) for v in acc], [v[2] for v in acc], c="red")
+    plt.title('malware')
+    plt.xlabel('k')
+    plt.ylabel('acc')
+    plt.show()

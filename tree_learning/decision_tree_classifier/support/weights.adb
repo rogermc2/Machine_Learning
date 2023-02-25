@@ -101,7 +101,7 @@ package body Weights is
       Classes_Full          : Value_Data_List;
       Inverse               : NL_Types.Natural_List :=
                                 NL_Types.Natural_Package.Empty_Vector;
-      K_Indices             : Classifier_Types.Integer_List;
+      K_Indices             : Integer_List;
       Weight_K              : Weight_List;
       aWeight               : Float;
       Weights               : Weight_List;
@@ -161,7 +161,7 @@ package body Weights is
       Classes_Subsample     : Value_Data_List;
       Weight_K              : Weight_List;
       aWeight               : Float;
-      K_Indices             : Classifier_Types.Integer_List;
+      K_Indices             : Integer_List;
       Inverse               : NL_Types.Natural_List;
       Class_K_Weights       : Weight_List;
       Expanded_Class_Weight : Weight_Lists_2D;

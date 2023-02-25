@@ -198,14 +198,14 @@ package body CSV_Data_Loader is
       Train_Size                     : Positive; Test_Size : Positive;
       Y_Categorized, Shuffle, Reload : Boolean := False)
       return Base_Split_State is
-      Routine_Name   : constant String := "CSV_Data_Loader.Get_Split_State ";
+--        Routine_Name   : constant String := "CSV_Data_Loader.Get_Split_State ";
       Dummy_Data     : Base_Split_State (Train_Size, Test_Size, 1, True);
    begin
       case Data_Type is
          when Diabetes_Data =>
-            Put_Line (Routine_Name &
-                        "Diabetes data processing not implemented");
-            return Dummy_Data;
+            return Get_Iris_Split_State (File_Name, Train_Size, Test_Size,
+                                         Shuffle, Reload);
+
          when Digits_Data =>
             return Get_Digits_Split_State (File_Name, Train_Size, Test_Size,
                                            Y_Categorized, Shuffle, Reload);

@@ -2,6 +2,7 @@
 with Ada.Containers.Ordered_Sets;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+with ML_Arrays_And_Matrices;
 with ML_Types;
 with NL_Types;
 
@@ -20,6 +21,12 @@ package Encode_Utils is
     function Map_To_Integer (Values  : ML_Types.Value_Data_List;
                              Uniques : ML_Types.Value_Data_List)
                              return NL_Types.Natural_List;
+   function Unique (Values : ML_Arrays_And_Matrices.Boolean_Array)
+                    return NL_Types.Natural_List;
+   function Unique (Values : ML_Arrays_And_Matrices.Integer_Array)
+                    return NL_Types.Natural_List;
+   function Unique (Values : ML_Arrays_And_Matrices.Natural_Array)
+                    return NL_Types.Natural_List;
    function Unique (Values : NL_Types.Natural_List)
                      return NL_Types.Natural_List;
     function Unique (Values : ML_Types.Value_Data_List)

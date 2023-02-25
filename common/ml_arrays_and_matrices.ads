@@ -21,10 +21,10 @@ package ML_Arrays_And_Matrices is
    type Float_Array is array (Integer range <>) of Float;
    procedure Float_Array_Sort is new Ada.Containers.Generic_Array_Sort
      (Integer, Float, Float_Array);
-   type Integer_Array is array (Natural range <>) of Integer;
+   type Integer_Array is array (Integer range <>) of Integer;
    type Natural_Array is array (Integer range <>) of Natural;
    procedure Integer_Array_Sort is new Ada.Containers.Generic_Array_Sort
-     (Natural, Integer, Integer_Array);
+     (Integer, Integer, Integer_Array);
 
    type Unbounded_String_Array is array (Integer range <>) of
      Ada.Strings.Unbounded.Unbounded_String;
