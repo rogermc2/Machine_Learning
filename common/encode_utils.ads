@@ -27,7 +27,8 @@ package Encode_Utils is
    function Unique (Values : Boolean_Array) return Boolean_Array;
    function Unique (Values : Integer_Array) return ML_Types.Integer_List;
    function Unique (List : Integer_Array_List) return ML_Types.Integer_List;
-   function Unique (Values : ML_Types.Integer_List) return ML_Types.Integer_List;
+   function Unique (Values : ML_Types.Integer_List)
+                    return ML_Types.Integer_List;
    function Unique (Values : ML_Types.Integer_List; Inverse : out Natural_Array)
                     return ML_Types.Integer_List;
    function Unique (Values : Integer_Array; Inverse : out Natural_Array)
@@ -35,10 +36,16 @@ package Encode_Utils is
    function Unique (Values : Integer_Matrix) return Integer_Array;
    function Unique (Values : Integer_Matrix) return ML_Types.Integer_List;
    function Unique (Values : Integer_Matrix) return Int_Sets.Set;
-   function Unique (Values : ML_Types.Array_Of_Integer_Lists) return ML_Types.Integer_List;
+   function Unique (Values : ML_Types.Array_Of_Integer_Lists)
+                    return ML_Types.Integer_List;
    function Unique (Values : Real_Float_Matrix) return NL_Types.Float_List;
-   function Unique (Values : Unbounded_String_Array) return ML_Types.Unbounded_List;
-   function Unique (Values : Unbounded_String_Array_List) return ML_Types.Unbounded_List;
-   function Unique (Values : Unbounded_String_Matrix) return ML_Types.Unbounded_List;
+   function Unique (Values : Unbounded_String_Array)
+                    return ML_Types.Unbounded_List;
+   function Unique (Values : Unbounded_String_Array_List)
+                    return ML_Types.Unbounded_List;
+   function Unique (Values : Unbounded_String_Matrix)
+                    return ML_Types.Unbounded_List;
+   function Unique (Values : ML_Types.Value_Data_List)
+                    return ML_Types.Value_Data_List;
 
 end Encode_Utils;

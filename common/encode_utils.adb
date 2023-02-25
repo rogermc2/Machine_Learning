@@ -23,8 +23,6 @@ package body Encode_Utils is
    function Map_To_Integer (Values  : ML_Types.Value_Data_List;
                             Uniques : ML_Types.Value_Data_List)
                             return NL_Types.Natural_List;
-   function Unique (Values : ML_Types.Value_Data_List)
-                    return ML_Types.Value_Data_List;
 
    --  -------------------------------------------------------------------------
 
