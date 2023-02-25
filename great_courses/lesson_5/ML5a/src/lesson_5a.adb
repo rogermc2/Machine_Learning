@@ -22,32 +22,32 @@ procedure Lesson_5A is
    Green_File_Name        : constant String := "../greenML.png";
    Forest_File_Name       : constant String := "../forest.jpg";
    Image_Data             : constant Unsigned_8_Array_3D :=
-     Get_Picture (Green_File_Name);
+                              Get_Picture (Green_File_Name);
    Forest_Image_Data      : constant Unsigned_8_Array_3D :=
-     Get_Picture (Forest_File_Name);
+                              Get_Picture (Forest_File_Name);
    Green_Data             : constant Unsigned_8_Array_3D :=
-     Get_Pixels (Image_Data, Image_Data'First,
-                 Image_Data'Last, Image_Data'First (2),
-                 Image_Data'First (2) + 359);
+                              Get_Pixels (Image_Data, Image_Data'First,
+                                          Image_Data'Last, Image_Data'First (2),
+                                          Image_Data'First (2) + 359);
    Fore_Data              : constant Unsigned_8_Array_3D :=
-     Get_Pixels (Image_Data, 31, Image_Data'Last,
-                 547, 619);
+                              Get_Pixels (Image_Data, 31, Image_Data'Last,
+                                          547, 619);
    Flat_Data              : constant Integer_Matrix :=
-     To_2D (Get_Pixels (Image_Data, Image_Data'First,
-            Image_Data'Last, Image_Data'First (2),
-            Image_Data'Last (2), 4));
+                              To_2D (Get_Pixels (Image_Data, Image_Data'First,
+                                     Image_Data'Last, Image_Data'First (2),
+                                     Image_Data'Last (2), 4));
    Yes_Length             : constant Positive := Green_Data'Length *
-     Green_Data'Length (2);
+                              Green_Data'Length (2);
    No_Length              : constant Positive := Fore_Data'Length *
-     Fore_Data'Length (2);
+                              Fore_Data'Length (2);
    Yes_List               : constant Integer_Matrix (1 .. Yes_Length,
                                                      Green_Data'Range (3)) :=
-     To_2D (Green_Data);
+                              To_2D (Green_Data);
    No_List                : constant Integer_Matrix (1 .. No_Length,
                                                      Fore_Data'Range (3)) :=
-     To_2D (Fore_Data);
+                              To_2D (Fore_Data);
    All_Data               : constant Integer_Matrix :=
-     Set_All_Data (Yes_List, No_List);
+                              Set_All_Data (Yes_List, No_List);
    Labels                 : Integer_Array (All_Data'Range);
    Py_Module              : Module;
    Seen_List              : Integer3_List;
@@ -65,9 +65,9 @@ begin
    Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
    Python.Initialize;
    Py_Module := Import_File ("lesson_5a");
-   --     Python.Call (Py_Module, "show_bitmap", Image_Data);
-   --     Python.Call (Py_Module, "show_bitmap", Green_Data);
-   --     Python.Call (Py_Module, "show_bitmap", Fore_Data);
+   Python.Call (Py_Module, "show_bitmap", Image_Data);
+   Python.Call (Py_Module, "show_bitmap", Green_Data);
+   Python.Call (Py_Module, "show_bitmap", Fore_Data);
 
    for index in Yes_List'Range loop
       for col in Pixel_Colour'Range loop
@@ -93,18 +93,18 @@ begin
    --  Result is very dependent on the initial weights
    Weights := (-2.0, 0.0, 0.093, -0.713);
    --  Lesson 5q tries different weights
---     for count in 1 .. 9 loop
---        for index in Weights'Range loop
---           Weights (index) := Maths.Random_Float;
---        end loop;
---     end loop;
+   --     for count in 1 .. 9 loop
+   --        for index in Weights'Range loop
+   --           Weights (index) := Maths.Random_Float;
+   --        end loop;
+   --     end loop;
    Fit (Weights, All_Data, Labels);
    Print_Float_Vector ("Fitted weights", Weights);
 
    declare
       New_Array : constant Unsigned_8_Array_3D :=
-        To_Picture (Flat_Data, Image_Data'Length,
-                    Image_Data'Length (2), Weights);
+                    To_Picture (Flat_Data, Image_Data'Length,
+                                Image_Data'Length (2), Weights);
    begin
       Python.Call (Py_Module, "show_bitmap", New_Array);
       --        Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
