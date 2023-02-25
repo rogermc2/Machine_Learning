@@ -20,9 +20,6 @@ package body Encode_Utils is
    function Encode_Check_Unknown
      (Values : Integer_Array; Uniques : Integer_Array)
       return Integer_Array;
-   function Map_To_Integer (Values  : ML_Types.Value_Data_List;
-                            Uniques : ML_Types.Value_Data_List)
-                            return NL_Types.Natural_List;
 
    --  -------------------------------------------------------------------------
 
