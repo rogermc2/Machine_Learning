@@ -90,10 +90,6 @@ package body Support_8QS is
       for row in Train'Range loop
          for col in Train'Range (2) loop
             Diff (row, col) := (Train (row, col) - Vec (col)) ** 2;
-            --              if Diff (row, col) = 0.0 then
-            --                 Put_Line (" Get_Diffzero row col" & Integer'Image (row) &
-            --                             ", " & Integer'Image (col));
-            --              end if;
          end loop;
       end loop;
 
