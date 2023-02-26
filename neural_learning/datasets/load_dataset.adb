@@ -4,6 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Classifier_Loader;
 with Classifier_Utilities;
 --  with Printing;
 with Neural_Utilities;
@@ -22,6 +23,7 @@ package body Load_Dataset is
    function Load_Digits (File_Name : String; Num_Classes : Natural := 10;
                          Max_Lines : Positive := 20000)
                          return Digits_Data_Record is
+      use Classifier_Loader;
       use Classifier_Utilities;
       Routine_Name    : constant String := "Load_Dataset.Load_Digits ";
       Digit_Features  : ML_Types.Value_Data_Lists_2D;
@@ -135,6 +137,7 @@ package body Load_Dataset is
 
    function Load_Iris (File_Name : String) return Iris_Data_Record is
       use Ada.Strings;
+      use Classifier_Loader;
       use Classifier_Utilities;
       use ML_Types;
       Routine_Name  : constant String := "Load_Dataset.Load_Iris ";

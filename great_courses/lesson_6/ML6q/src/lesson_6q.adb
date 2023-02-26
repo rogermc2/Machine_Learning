@@ -1,13 +1,9 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Base;
---  with Base_Neural;
 with CSV_Data_Loader;
 --  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
---  with ML_Types;
---  with Neural_Utilities;
 with Python; use Python;
 with Python_API;
 with Python_CLF;
@@ -34,7 +30,7 @@ procedure Lesson_6Q is
    Data           : constant Base_Split_State :=
                       Get_Split_State (Data_File_Name, Digits_Data, Train_Size,
                                        Test_Size, Y_Categorized => False,
-                                       Reload => False);
+                                       Reload => True);
    Train_X        : constant Real_Float_Matrix := Data.Train_X;
    Train_Y        : constant Integer_Array := To_Integer_Array (Data.Train_Y);
    Test_X         : constant Real_Float_Matrix := Data.Test_X;
