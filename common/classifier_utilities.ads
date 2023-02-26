@@ -1,6 +1,5 @@
 
 with Base_Decision_Tree;
---  with Classifier_Types;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with NL_Types;
