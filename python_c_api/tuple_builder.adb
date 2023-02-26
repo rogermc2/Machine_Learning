@@ -97,7 +97,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject is
       use Interfaces.C;
-      --        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+--        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
       Num_Cols     : constant Positive := Data'Length (2);
       Row_Size     : constant int := int (Num_Cols);
       Value        : Integer;
@@ -113,10 +113,11 @@ package body Tuple_Builder is
          for col in Data'Range (2) loop
             Py_Col := Py_Col + 1;
             Value := Data (row, col);
-            PyTuple_SetItem (Item, Py_Col, PyFloat_FromDouble (double (Value)));
+            PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (long (Value)));
          end loop;
          PyTuple_SetItem (Result, Py_Row, Item);
       end loop;
+      
       return Result;
 
    end To_Tuple;

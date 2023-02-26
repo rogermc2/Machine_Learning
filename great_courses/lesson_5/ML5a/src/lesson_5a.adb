@@ -2,13 +2,13 @@
 with Ada.Containers.Vectors;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
 
 --  with Maths;
 
-with ML; use ML;
+with ML;
 with Support_5A; use Support_5A;
 
 procedure Lesson_5A is
@@ -62,12 +62,11 @@ begin
       end if;
    end loop;
 
-   Print_Matrix_Dimensions (Project_Name & "Image", Image_Data);
    Python.Initialize;
    Py_Module := Import_File ("lesson_5a");
-   Python.Call (Py_Module, "show_bitmap", Image_Data);
-   Python.Call (Py_Module, "show_bitmap", Green_Data);
-   Python.Call (Py_Module, "show_bitmap", Fore_Data);
+   Call (Py_Module, "show_bitmap", Image_Data);
+   Call (Py_Module, "show_bitmap", Green_Data);
+   Call (Py_Module, "show_bitmap", Fore_Data);
 
    for index in Yes_List'Range loop
       for col in Pixel_Colour'Range loop
@@ -98,18 +97,18 @@ begin
    --           Weights (index) := Maths.Random_Float;
    --        end loop;
    --     end loop;
-   Fit (Weights, All_Data, Labels);
-   Print_Float_Vector ("Fitted weights", Weights);
+   --     Fit (Weights, All_Data, Labels);
+   --     Print_Float_Vector ("Fitted weights", Weights);
 
    declare
       New_Array : constant Unsigned_8_Array_3D :=
                     To_Picture (Flat_Data, Image_Data'Length,
                                 Image_Data'Length (2), Weights);
    begin
-      Python.Call (Py_Module, "show_bitmap", New_Array);
-      --        Python.Call (Py_Module, "show_bitmap", Forest_Image_Data);
-      Python.Call (Py_Module, "show_bitmap",
-                   Ml.Composite (New_Array, Image_Data, Forest_Image_Data));
+      Call (Py_Module, "show_bitmap", New_Array);
+      Call (Py_Module, "show_bitmap", Forest_Image_Data);
+      Call (Py_Module, "show_bitmap",
+            Ml.Composite (New_Array, Image_Data, Forest_Image_Data));
    end;
 
    Python.Finalize;
