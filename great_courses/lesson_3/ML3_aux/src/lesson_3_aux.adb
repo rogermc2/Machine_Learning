@@ -11,7 +11,7 @@ begin
    Put_Line ("Lesson 3 Aux");
 
    Python.Initialize;
-   Classifier := Python.Import_File ("word_classifier.py");
+   Classifier := Python.Import_File ("word_classifier");
    New_Line;
    Put_Line (Routine_Name & "word_classifier.py file executed");
 
