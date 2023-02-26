@@ -8,11 +8,9 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Encode_Utils is
 
-   --     package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
-   --     package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
-   --     package UB_String_Sets is new
-   --       Ada.Containers.Ordered_Sets (Unbounded_String);
+   package UB_String_Sets is new
+     Ada.Containers.Ordered_Sets (Unbounded_String);
 
    Encode_Error : exception;
 
@@ -20,14 +18,14 @@ package Encode_Utils is
    function Encode (Values        : Integer_Array; Uniques : Integer_Array;
                     Check_Unknown : Boolean := True) return Natural_Array;
    function Encode (Values : ML_Types.Value_Data_List)
-                     return ML_Types.Value_Data_List;
+                    return ML_Types.Value_Data_List;
    function Encode (Values        : ML_Types.Value_Data_List;
                     Uniques       : ML_Types.Value_Data_List;
                     Check_Unknown : Boolean := True)
-                     return NL_Types.Natural_List;
+                    return NL_Types.Natural_List;
    function Map_To_Integer (Values  : ML_Types.Value_Data_List;
                             Uniques : ML_Types.Value_Data_List)
-                             return NL_Types.Natural_List;
+                            return NL_Types.Natural_List;
    function Map_To_Integer (Values  : Integer_Array;
                             Uniques : Integer_Array) return Natural_Array;
    function Unique (Values : Binary_Matrix) return ML_Types.Integer_List;
@@ -66,6 +64,6 @@ package Encode_Utils is
                     return ML_Types.Value_Data_List;
    function Unique (Values  : ML_Types.Value_Data_List;
                     Inverse : out NL_Types.Natural_List)
-                     return ML_Types.Value_Data_List;
+                    return ML_Types.Value_Data_List;
 
 end Encode_Utils;

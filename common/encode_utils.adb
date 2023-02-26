@@ -14,8 +14,6 @@ package body Encode_Utils is
      (Values : ML_Types.Value_Data_List; Uniques : ML_Types.Value_Data_List)
       return ML_Types.Value_Data_List;
    package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
-   package UB_String_Sets is new
-     Ada.Containers.Ordered_Sets (Unbounded_String);
 
    function Encode_Check_Unknown
      (Values : Integer_Array; Uniques : Integer_Array)
