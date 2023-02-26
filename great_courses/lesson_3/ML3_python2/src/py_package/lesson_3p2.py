@@ -4,8 +4,8 @@ import matplotlib
 from matplotlib import pyplot
 
 def classify (dat, lab, feat_names):
-    data = dat[0]
-    labels = lab[0]
+    data = dat
+    labels = lab
     clf = tree.DecisionTreeClassifier(max_leaf_nodes=8)
     clf = clf.fit(data, labels)
 
