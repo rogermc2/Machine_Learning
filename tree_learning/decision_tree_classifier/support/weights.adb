@@ -4,8 +4,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Label;
---  with Printing;
+--  with Label;
+--  with Printing
+with Tree_Label;
 
 package body Weights is
 
@@ -17,10 +18,10 @@ package body Weights is
    function Compute_Balanced_Class_Weights
      (Classes : ML_Types.Value_Data_List;  Y : ML_Types.Value_Data_List)
       return Weight_List is
-      use Label;
       use NL_Types.Natural_Package;
+      use Tree_Label;
       Weights             : Weight_List;
-      LE                  : Label.Label_Encoder (Class_Unique);
+      LE                  : Label_Encoder (Class_Unique);
 --                                                   Integer (Y.Length));
       Y_Index             : NL_Types.Natural_List;
       aWeight             : Float;
@@ -35,14 +36,14 @@ package body Weights is
       --  n_samples / (n_classes * Bin_Count (Y)); that is
       --  Y.Length / (Classes.Length * Bin_Count (Y)).
       --  but, this is Recip_Freq
-      Y_Index := Label.Fit_Transform (LE, Y);
+      Y_Index := Fit_Transform (LE, Y);
       Bins := Classifier_Utilities.Bin_Count (Y_Index);
       Scale := Float (Y.Length) / Float (LE.Uniques.Length);
       for index in Bins.First_Index .. Bins.Last_Index loop
          Recip_Freq.Append (Scale / Float (Bins.Element (index)));
       end loop;
 
-      Transformed_Classes := Label.Transform (LE, Classes);
+      Transformed_Classes := Transform (LE, Classes);
       Weights.Clear;
       for index in Transformed_Classes.First_Index ..
         Transformed_Classes.Last_Index loop
