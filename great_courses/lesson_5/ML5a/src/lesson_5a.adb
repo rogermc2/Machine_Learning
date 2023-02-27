@@ -2,11 +2,11 @@
 with Ada.Containers.Vectors;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python; use Python;
 
---  with Maths;
+with Maths;
 
 with ML;
 with Support_5A; use Support_5A;
@@ -78,27 +78,27 @@ begin
       end if;
    end loop;
 
-   --     Put_Line (Project_Name & "Loss vs weights examples:");
-   --     for count in 1 .. 10 loop
-   --        for index in Weights'Range loop
-   --           Weights (index) := Maths.Random_Float;
-   --        end loop;
-   --        Put ("Loss: " & Float'Image (Loss (Weights, All_Data, Labels)));
-   --        Print_Float_Vector_As_Line ("Weights", Weights);
-   --     end loop;
-   --     New_Line;
+   Put_Line (Project_Name & "Loss vs weights examples:");
+   for count in 1 .. 10 loop
+      for index in Weights'Range loop
+         Weights (index) := Maths.Random_Float;
+      end loop;
+      Put ("Loss: " & Float'Image (ML.Loss (Weights, All_Data, Labels)));
+      Print_Float_Vector_As_Line ("Weights", Weights);
+   end loop;
+   New_Line;
 
    --  Train the model.
    --  Result is very dependent on the initial weights
    Weights := (-2.0, 0.0, 0.093, -0.713);
    --  Lesson 5q tries different weights
-   --     for count in 1 .. 9 loop
-   --        for index in Weights'Range loop
-   --           Weights (index) := Maths.Random_Float;
-   --        end loop;
-   --     end loop;
-   --     Fit (Weights, All_Data, Labels);
-   --     Print_Float_Vector ("Fitted weights", Weights);
+   for count in 1 .. 9 loop
+      for index in Weights'Range loop
+         Weights (index) := Maths.Random_Float;
+      end loop;
+   end loop;
+   ML.Fit (Weights, All_Data, Labels);
+   Print_Float_Vector ("Fitted weights", Weights);
 
    declare
       New_Array : constant Unsigned_8_Array_3D :=
