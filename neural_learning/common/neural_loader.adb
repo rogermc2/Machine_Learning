@@ -1,10 +1,7 @@
 
-with Ada.Containers;
 with Ada.Strings.Fixed;
 
 package body Neural_Loader is
-
-   function Split_String (aString, Pattern : String) return String_List;
 
    --  -------------------------------------------------------------------------
 
