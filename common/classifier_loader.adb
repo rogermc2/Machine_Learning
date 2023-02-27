@@ -4,7 +4,6 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Neural_Loader;
-with Neural_Utilities;
 
 package body Classifier_Loader is
 
@@ -89,7 +88,7 @@ package body Classifier_Loader is
                     To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
                Feature_Types (Positive (f_index)) :=
-                 Neural_Utilities.Get_Data_Type (aRow (Positive (f_index)));
+                 Neural_Loader.Get_Data_Type (aRow (Positive (f_index)));
             end;
          end loop;
 
@@ -105,7 +104,7 @@ package body Classifier_Loader is
                     To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
                Label_Types (Positive (l_index)) :=
-                 Neural_Utilities.Get_Data_Type
+                 Neural_Loader.Get_Data_Type
                    (aRow (Positive (Num_Features + l_index)));
             end;
          end loop;

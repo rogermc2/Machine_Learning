@@ -5,7 +5,7 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
-with Classifier_Utilities;
+with Classifier_Loader;
 with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
@@ -23,12 +23,11 @@ package body Classification is
    procedure Classify_Iris  is
       use Ada.Containers;
       use Ada.Strings.Unbounded;
-      use Classifier_Utilities;
+      use Classifier_Loader;
       use Decision_Tree_Classification;
       use NL_Types.Float_Package;
       use Tree_Printing;
-      Routine_Name    : constant String :=
-                          "Classification.Classify_Iris ";
+      Routine_Name    : constant String := "Classification.Classify_Iris ";
       Iris_Data       : constant Multi_Output_Data_Record :=
                             Load_Data ("src/iris.csv");
       theClassifier   : Base_Decision_Tree.Classifier

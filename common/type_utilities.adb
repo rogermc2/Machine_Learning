@@ -38,7 +38,7 @@ package body Type_Utilities is
       for index in F.First_Index .. F.Last_Index loop
          Item := F.Element (index);
          Assert (Item.Value_Kind = Float_Type,
-                 "Classifier_Utilities.To_Float_List invalid item "
+                 "Type_Utilities.To_Float_List invalid item "
                  & Integer'Image (index) & " data type is " &
                    Data_Type'Image (Item.Value_Kind));
          Floats.Append (Item.Float_Value);
@@ -112,7 +112,7 @@ package body Type_Utilities is
       for index in Ints.First_Index .. Ints.Last_Index loop
          Item := Ints.Element (index);
          Assert (Item.Value_Kind = Integer_Type,
-                 "Classifier_Utilities.To_Float_List invalid item "
+                 "Type_Utilities.To_Float_List invalid item "
                  & Integer'Image (index) & " data type is " &
                    Data_Type'Image (Item.Value_Kind));
          Values.Append (Item.Integer_Value);
@@ -240,8 +240,7 @@ package body Type_Utilities is
 
    function To_PL_Array (List_1D : NL_Types.Float_List; Num_Rows : Positive)
                          return Real_Float_Matrix is
-      Routine_Name : constant String :=
-                       "Classifier_Utilities.To_PL_Array ";
+      Routine_Name : constant String := "Type_Utilities.To_PL_Array ";
       Length_1D    : constant Positive := Positive (List_1D.Length);
       Num_Cols     : constant Positive := Length_1D / Num_Rows;
       End_Offset   : constant Positive := Num_Cols - 1;
@@ -286,8 +285,7 @@ package body Type_Utilities is
    function To_Value_2D_List (List_1D  : ML_Types.Value_Data_List;
                               Num_Rows : Positive)
                               return ML_Types.Value_Data_Lists_2D is
-      Routine_Name : constant String :=
-                       "Type_Utilities.To_Value_2D_List ";
+      Routine_Name : constant String := "Type_Utilities.To_Value_2D_List ";
       Length_1D    : constant Positive := Positive (List_1D.Length);
       Num_Cols     : constant Positive := Length_1D / Num_Rows;
       End_Offset   : constant Positive := Num_Cols - 1;

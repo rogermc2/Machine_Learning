@@ -3,7 +3,7 @@ project Lesson_9A is
    type Operating_System_Type is
       ("high_sierra", "ventura");
    Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
-   for Source_Dirs use ("src", "../../../python_c_api", "../../../common");
+   for Source_Dirs use ("src", "../../../python_c_api", "../../../common", "../../../neural_learning/datasets", "../../../neural_learning/common");
    for Object_Dir use "obj";
    for Main use ("lesson_9a.adb");
    for Exec_Dir use ".";

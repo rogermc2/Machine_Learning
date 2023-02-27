@@ -135,6 +135,69 @@ package body Load_Dataset is
 
    --  -------------------------------------------------------------------------
 
+   function Load_Diabetes (File_Name : String) return Diabetes_Data_Record is
+      use Ada.Strings;
+      use Classifier_Loader;
+      use Type_Utilities;
+      use ML_Types;
+      Routine_Name      : constant String := "Load_Dataset.Load_Iris ";
+      Diabetes_Data     : constant ML_Types.Multi_Output_Data_Record :=
+                            Load_Data (File_Name);
+      Class_Names       : Class_Names_List;
+      --        Feature_Names : String_List := Diabetes_Data.Feature_Names;
+      --        Label_Names   : ML_Types.Unbounded_List := Diabetes_Data.Label_Names;
+      Diabetes_Features : constant Value_Data_Lists_2D :=
+                            Diabetes_Data.Feature_Values;
+      Diabetes_Labels   : constant Value_Data_Lists_2D :=
+                            Diabetes_Data.Label_Values;
+      Num_Samples       : constant Natural :=
+                            Natural (Diabetes_Features.Length);
+      Diabetes_Row      : Value_Data_List;
+      Data              : Diabetes_Data_Record;
+      Species           : Unbounded_String;
+   begin
+      Class_Names.Append (To_Unbounded_String ("Pregnancies"));
+      Class_Names.Append (To_Unbounded_String ("Glucose"));
+      Class_Names.Append (To_Unbounded_String ("BloodPressure"));
+      Class_Names.Append (To_Unbounded_String ("SkinThickness"));
+      Class_Names.Append (To_Unbounded_String ("Insulin"));
+      Class_Names.Append (To_Unbounded_String ("BMI"));
+      Class_Names.Append (To_Unbounded_String ("DiabetesPedigreeFunction"));
+      Class_Names.Append (To_Unbounded_String ("Age"));
+
+      Assert (Num_Samples > 0, Routine_Name &
+                " called with empty Features vector.");
+      Assert (Integer (Diabetes_Data.Label_Values.Length) = Num_Samples,
+              Routine_Name & " invalid Diabetes Target vector");
+      Data.Features := To_Float_List_2D (Diabetes_Data.Feature_Values);
+      Data.Num_Features := Positive (Data.Features (1).Length);
+
+      for row in Diabetes_Labels.First_Index .. Diabetes_Labels.Last_Index loop
+         Diabetes_Row := Diabetes_Labels.Element (row);
+         if Diabetes_Row.Element (1).Value_Kind = UB_String_Type then
+            Species := Trim (Diabetes_Row.Element (1).UB_String_Value, Both);
+            if To_String (Species) = "setosa" then
+               Data.Target.Append (1);
+            elsif To_String (Species) = "versicolor" then
+               Data.Target.Append (2);
+            elsif To_String (Species) = "virginica" then
+               Data.Target.Append (3);
+            else
+               Assert (False, Routine_Name & "row" & Integer'Image (row) &
+                         ": invalid species '" & To_String (Species) & "'");
+            end if;
+         else
+            Assert (False, Routine_Name & "row" & Integer'Image (row) &
+                      ": invalid species '" & To_String (Species) & "'");
+         end if;
+      end loop;
+
+      return Data;
+
+   end Load_Diabetes;
+
+   --  -------------------------------------------------------------------------
+
    function Load_Iris (File_Name : String) return Iris_Data_Record is
       use Ada.Strings;
       use Classifier_Loader;
@@ -144,8 +207,8 @@ package body Load_Dataset is
       Iris_Data     : constant ML_Types.Multi_Output_Data_Record :=
                         Load_Data (File_Name);
       Class_Names   : Class_Names_List;
---        Feature_Names : String_List := Iris_Data.Feature_Names;
---        Label_Names   : ML_Types.Unbounded_List := Iris_Data.Label_Names;
+      --        Feature_Names : String_List := Iris_Data.Feature_Names;
+      --        Label_Names   : ML_Types.Unbounded_List := Iris_Data.Label_Names;
       Iris_Features : constant Value_Data_Lists_2D :=
                         Iris_Data.Feature_Values;
       Iris_Labels   : constant Value_Data_Lists_2D :=

@@ -1,9 +1,87 @@
 
+with Ada.Assertions; use Ada.Assertions;
+with Ada.Characters.Handling;
 with Ada.Strings.Fixed;
 
 package body Neural_Loader is
 
+   function Is_Boolean (Item : in Unbounded_String) return Boolean;
+   function Is_Float (Item : in Unbounded_String) return Boolean;
+   function Is_Integer (Item : Unbounded_String) return Boolean;
+
    --  -------------------------------------------------------------------------
+
+   function Get_Data_Type (Data : Unbounded_String) return Data_Type is
+      theType   : Data_Type;
+      aString   : constant String := To_String (Data);
+      S_Last    : constant Integer := aString'Last;
+      Last_Char : Character;
+      UB_Data   : Unbounded_String := Data;
+   begin
+      Assert (aString'Length > 0,
+              "Utilities.Get_Data_Type called with empty string");
+      Last_Char := aString (S_Last);
+      if Character'Pos (Last_Char) < 32 then
+         UB_Data := To_Unbounded_String (aString (1 .. S_Last - 1));
+      end if;
+
+      if Is_Integer (UB_Data) then
+         theType := Integer_Type;
+      elsif Is_Float (UB_Data) then
+         theType := Float_Type;
+      elsif Is_Boolean (UB_Data) then
+         theType := Boolean_Type;
+      else
+         theType := UB_String_Type;
+      end if;
+
+      return theType;
+
+   end Get_Data_Type;
+
+   --  ---------------------------------------------------------------------------
+
+   function Is_Boolean (Item : in Unbounded_String) return Boolean is
+      Item_String : constant String :=
+                      Ada.Characters.Handling.To_Upper (To_String (Item));
+   begin
+      return Item_String = "TRUE" or else Item_String = "FALSE";
+   end Is_Boolean;
+
+   --  -------------------------------------------------------------------------
+
+   function Is_Float (Item : in Unbounded_String) return Boolean is
+      Item_String : constant String := To_String (Item);
+      use Ada.Strings;
+   begin
+      return Fixed.Count (Item_String, ".") = 1;
+   end Is_Float;
+
+   --  -------------------------------------------------------------------------
+
+   function Is_Integer (Item : Unbounded_String) return Boolean is
+      UB_String : Unbounded_String := Item;
+      Dig       : Boolean := True;
+   begin
+      UB_String := Trim (UB_String, Ada.Strings.Left);
+      UB_String := Trim (UB_String, Ada.Strings.Right);
+
+      declare
+         Item_String : constant String := To_String (UB_String);
+      begin
+         for index in Item_String'First .. Item_String'Last loop
+            Dig := Dig and then
+              (Ada.Characters.Handling.Is_Decimal_Digit
+                 (Item_String (index)) or else
+               Character'Pos (Item_String (index)) < 32);
+         end loop;
+      end;
+
+      return Dig;
+
+   end Is_Integer;
+
+   --  ---------------------------------------------------------------------------
 
    function Load_CSV_Data (File_Name : String) return Unbounded_List is
       Data_File : File_Type;

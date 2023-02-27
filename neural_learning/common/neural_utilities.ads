@@ -37,14 +37,7 @@ package Neural_Utilities is
    function Is_Boolean (Item : Unbounded_String) return Boolean;
    function Is_Float (Item : Unbounded_String) return Boolean;
    function Is_Integer (Item : Unbounded_String) return Boolean;
---     function Load_CSV_Data (File_Name : String) return Unbounded_List;
---     function Load_CSV_Data (Data_File : File_Type) return Unbounded_List;
---     function Load_Raw_CSV_Data (File_Name : String;
---                                 Max_Lines : Positive := 20000)
---                                 return Raw_Data_Vector;
---     function Load_Raw_CSV_Data (Data_File : File_Type;
---                                 Max_Lines : Positive := 20000)
---                                 return Raw_Data_Vector;
+
    function Number_Of_Features (Rows : Rows_Vector) return Class_Range;
    function Number_Of_Features (Rows : Value_Data_List) return Class_Range;
    function Pair_Items (A, B : Integer_Array) return Integer_Pair_List;
