@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with ML_Types;
 
 with Base_Decision_Tree;
-with Classifier_Utilities;
+with Classifier_Loader;
 with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
@@ -22,7 +22,7 @@ procedure Lesson_3 is
    Routine_Name  : constant String := "Lesson_3";
    Min_Split     : constant String := "2";
    Data          : constant Multi_Output_Data_Record :=
-                     Classifier_Utilities.Load_Data ("../../data/diabetes.csv");
+                     Classifier_Loader.Load_Data ("../../data/diabetes.csv");
    Feature_Names : constant String_List := Data.Feature_Names;
    X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
    Num_Samples   : constant Natural := Natural (X_Data.Length);
