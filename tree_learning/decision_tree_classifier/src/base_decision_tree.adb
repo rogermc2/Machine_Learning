@@ -7,6 +7,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Depth_First_Builder;
 with Best_First_Builder;
 with Classifier_Utilities;
+with Type_Utilities;
 with Encode_Utils;
 --  with Printing;
 with Tree_Build;
@@ -458,7 +459,7 @@ package body Base_Decision_Tree is
       end loop;
 
       --  Transposed Predictions, num samples x num outputs
-      return Classifier_Utilities.Transpose (Predictions);
+      return Type_Utilities.Transpose (Predictions);
 
    end Predict;
 
