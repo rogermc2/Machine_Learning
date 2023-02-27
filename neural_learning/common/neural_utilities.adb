@@ -4,6 +4,7 @@ with Ada.Characters.Handling;
 with Ada.Characters.Latin_1;
 with Ada.Containers;
 with Ada.Strings.Fixed;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -153,78 +154,78 @@ package body Neural_Utilities is
    end Is_Integer;
 
    --  ---------------------------------------------------------------------------
-
-   function Load_CSV_Data (File_Name : String) return Unbounded_List is
-      Data_File : File_Type;
-      Data      : Unbounded_List;
-   begin
-      Open (Data_File, In_File, File_Name);
-      Data := Load_CSV_Data (Data_File);
-      Close (Data_File);
-
-      return Data;
-
-   end Load_CSV_Data;
-
-   --  -------------------------------------------------------------------------
-
-   function Load_CSV_Data (Data_File : File_Type) return Unbounded_List is
-      Data : Unbounded_List;
-   begin
-      while not End_Of_File (Data_File) loop
-         Data.Append (To_Unbounded_String (Get_Line (Data_File)));
-      end loop;
-
-      return Data;
-
-   end Load_CSV_Data;
-
-   --  -------------------------------------------------------------------------
-
-   function Load_Raw_CSV_Data (File_Name : String;
-                               Max_Lines : Positive := 20000)
-                               return Raw_Data_Vector is
-      Data_File : File_Type;
-      Data      : Raw_Data_Vector;
-   begin
-      Put_Line ("Loading " & File_Name & " CSV Data");
-      Open (Data_File, In_File, File_Name);
-      Data := Load_Raw_CSV_Data (Data_File, Max_Lines);
-      Close (Data_File);
-
-      return Data;
-
-   end Load_Raw_CSV_Data;
-
-   --  -------------------------------------------------------------------------
-
-   function Load_Raw_CSV_Data (Data_File : File_Type;
-                               Max_Lines : Positive := 20000)
-                               return Raw_Data_Vector is
-      use String_Package;
-      Data_Line : Unbounded_String;
-      CSV_Line  : String_List;
-      Curs      : String_Package.Cursor;
-      Num_Lines : Natural := 0;
-      Values    : Unbounded_List;
-      Data      : Raw_Data_Vector;
-   begin
-      while not End_Of_File (Data_File) and Num_Lines <= Max_Lines loop
-         Data_Line := To_Unbounded_String (Get_Line (Data_File));
-         Num_Lines := Num_Lines + 1;
-         CSV_Line := Split_String (To_String (Data_Line), ",");
-         Curs := CSV_Line.First;
-         Values.Clear;
-         while Has_Element (Curs) loop
-            Values.Append (Element (Curs));
-            Next (Curs);
-         end loop;
-         Data.Append (Values);
-      end loop;
-
-      return Data;
-
-   end Load_Raw_CSV_Data;
+--
+--     function Load_CSV_Data (File_Name : String) return Unbounded_List is
+--        Data_File : File_Type;
+--        Data      : Unbounded_List;
+--     begin
+--        Open (Data_File, In_File, File_Name);
+--        Data := Load_CSV_Data (Data_File);
+--        Close (Data_File);
+--
+--        return Data;
+--
+--     end Load_CSV_Data;
+--
+--     --  -------------------------------------------------------------------------
+--
+--     function Load_CSV_Data (Data_File : File_Type) return Unbounded_List is
+--        Data : Unbounded_List;
+--     begin
+--        while not End_Of_File (Data_File) loop
+--           Data.Append (To_Unbounded_String (Get_Line (Data_File)));
+--        end loop;
+--
+--        return Data;
+--
+--     end Load_CSV_Data;
+--
+--     --  -------------------------------------------------------------------------
+--
+--     function Load_Raw_CSV_Data (File_Name : String;
+--                                 Max_Lines : Positive := 20000)
+--                                 return Raw_Data_Vector is
+--        Data_File : File_Type;
+--        Data      : Raw_Data_Vector;
+--     begin
+--        Put_Line ("Loading " & File_Name & " CSV Data");
+--        Open (Data_File, In_File, File_Name);
+--        Data := Load_Raw_CSV_Data (Data_File, Max_Lines);
+--        Close (Data_File);
+--
+--        return Data;
+--
+--     end Load_Raw_CSV_Data;
+--
+--     --  -------------------------------------------------------------------------
+--
+--     function Load_Raw_CSV_Data (Data_File : File_Type;
+--                                 Max_Lines : Positive := 20000)
+--                                 return Raw_Data_Vector is
+--        use String_Package;
+--        Data_Line : Unbounded_String;
+--        CSV_Line  : String_List;
+--        Curs      : String_Package.Cursor;
+--        Num_Lines : Natural := 0;
+--        Values    : Unbounded_List;
+--        Data      : Raw_Data_Vector;
+--     begin
+--        while not End_Of_File (Data_File) and Num_Lines <= Max_Lines loop
+--           Data_Line := To_Unbounded_String (Get_Line (Data_File));
+--           Num_Lines := Num_Lines + 1;
+--           CSV_Line := Split_String (To_String (Data_Line), ",");
+--           Curs := CSV_Line.First;
+--           Values.Clear;
+--           while Has_Element (Curs) loop
+--              Values.Append (Element (Curs));
+--              Next (Curs);
+--           end loop;
+--           Data.Append (Values);
+--        end loop;
+--
+--        return Data;
+--
+--     end Load_Raw_CSV_Data;
 
    --  -------------------------------------------------------------------------
 

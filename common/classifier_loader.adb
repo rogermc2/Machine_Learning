@@ -3,6 +3,7 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Neural_Loader;
 with Neural_Utilities;
 
 package body Classifier_Loader is
@@ -25,7 +26,7 @@ package body Classifier_Loader is
    begin
       Put_Line (Routine_Name & "loading " & File_Name);
       Open (Data_File, In_File, File_Name);
-      Raw_CSV_Data := Neural_Utilities.Load_Raw_CSV_Data (Data_File, Max_Lines);
+      Raw_CSV_Data := Neural_Loader.Load_Raw_CSV_Data (Data_File, Max_Lines);
       Close (Data_File);
 
       Put_Line (Routine_Name & "splitting " & File_Name);
