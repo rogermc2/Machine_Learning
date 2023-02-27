@@ -9,7 +9,7 @@ def init_svc(degree):
     return svm.SVC(gamma='scale',kernel='poly', degree=degree)
 
 def fit (est, X, y):
-    est.fit(X, y)
+    est.fit(X, np.ravel(y))
 
 def predict (est, X):
     return tuple(est.predict(X))

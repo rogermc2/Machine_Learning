@@ -6,9 +6,9 @@ with NL_Types;
 package Load_Dataset is
 
    type Diabetes_Data_Record is record
-      Features    : ML_Types.Value_Data_Lists_2D;
-      Target      : ML_Types.Integer_List;
-      Class_Names : ML_Types.Class_Names_List;
+      Features      : NL_Types.Float_List_2D;
+      Target        : ML_Types.Integer_List;
+      Feature_Names : ML_Types.String_List;
    end record;
 
    type Digits_Data_Record

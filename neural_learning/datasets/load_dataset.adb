@@ -136,15 +136,11 @@ package body Load_Dataset is
    --  -------------------------------------------------------------------------
 
    function Load_Diabetes (File_Name : String) return Diabetes_Data_Record is
-      use Ada.Strings;
       use Classifier_Loader;
-      use Type_Utilities;
       use ML_Types;
       Routine_Name      : constant String := "Load_Dataset.Load_Diabetes ";
       Diabetes_Data     : constant ML_Types.Multi_Output_Data_Record :=
                             Load_Data (File_Name);
-      --        Feature_Names : String_List := Diabetes_Data.Feature_Names;
-      --        Label_Names   : ML_Types.Unbounded_List := Diabetes_Data.Label_Names;
       Diabetes_Features : constant Value_Data_Lists_2D :=
                             Diabetes_Data.Feature_Values;
       Diabetes_Labels   : constant Value_Data_Lists_2D :=
@@ -152,32 +148,34 @@ package body Load_Dataset is
       Num_Samples       : constant Natural :=
                             Natural (Diabetes_Features.Length);
       Diabetes_Row      : Value_Data_List;
+      New_Row           : NL_Types.Float_List;
       Data              : Diabetes_Data_Record;
-      Value             : Integer;
    begin
-      Put_Line (Routine_Name);
---        Data.Class_Names.Append (To_Unbounded_String ("Pregnancies"));
---        Data.Class_Names.Append (To_Unbounded_String ("Glucose"));
---        Data.Class_Names.Append (To_Unbounded_String ("BloodPressure"));
---        Data.Class_Names.Append (To_Unbounded_String ("SkinThickness"));
---        Data.Class_Names.Append (To_Unbounded_String ("Insulin"));
---        Data.Class_Names.Append (To_Unbounded_String ("BMI"));
---        Data.Class_Names.Append (To_Unbounded_String ("DiabetesPedigreeFunction"));
---        Data.Class_Names.Append (To_Unbounded_String ("Age"));
-
       Assert (Num_Samples > 0, Routine_Name &
                 " called with empty Features vector.");
       Assert (Integer (Diabetes_Data.Label_Values.Length) = Num_Samples,
               Routine_Name & " invalid Diabetes Target vector");
-      Data.Features := Diabetes_Data.Feature_Values;
+      Data.Feature_Names := Diabetes_Data.Feature_Names;
+
+      for row in Diabetes_Data.Feature_Values.First_Index ..
+        Diabetes_Data.Feature_Values.Last_Index loop
+         Diabetes_Row := Diabetes_Features.Element (row);
+         New_Row.Clear;
+         for col in Diabetes_Row.First_Index .. Diabetes_Row.Last_Index loop
+            if Diabetes_Row.Element (1).Value_Kind = Integer_Type then
+               New_Row.Append (Float (Diabetes_Row.Element (1).Integer_Value));
+            else
+               New_Row.Append (Diabetes_Row.Element (1).Float_Value);
+            end if;
+         end loop;
+         Data.Features.Append (New_Row);
+      end loop;
 
       for row in Diabetes_Data.Label_Values.First_Index ..
         Diabetes_Data.Label_Values.Last_Index loop
          Diabetes_Row := Diabetes_Labels.Element (row);
          Data.Target.Append (Diabetes_Row.Element (1).Integer_Value);
       end loop;
-
-      Data.Class_Names := Diabetes_Data.Feature_Names;
 
       return Data;
 

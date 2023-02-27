@@ -71,8 +71,8 @@ package body CSV_Data_Loader is
          Put_Line (Routine_Name & "fetching data");
          declare
             use Real_Float_Arrays;
-            Data_Record  : constant Load_Dataset.Iris_Data_Record :=
-                             Load_Dataset.Load_Iris (File_Name);
+            Data_Record  : constant Load_Dataset.Diabetes_Data_Record :=
+                             Load_Dataset.Load_Diabetes (File_Name);
             X            : Real_Float_Matrix :=
                              To_Real_Float_Matrix (Data_Record.Features);
             Y            : Integer_Array :=
