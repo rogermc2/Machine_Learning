@@ -18,7 +18,7 @@ package body Classifier_Loader is
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1;
                        Max_Lines : Positive := 20000)
                        return ML_Types.Multi_Output_Data_Record is
-      Routine_Name : constant String := "Classifier_Utilities.Load_Data ";
+      Routine_Name : constant String := "Classifier_Loader.Load_Data ";
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
       Output_Data  : ML_Types.Multi_Output_Data_Record;
@@ -62,7 +62,7 @@ package body Classifier_Loader is
       use Ada.Strings;
       use Ada.Strings.Unbounded;
       --        Routine_Name   : constant String :=
-      --                           "Classifier_Utilities.Split_Raw_Data ";
+      --                           "Classifier_Loader.Split_Raw_Data ";
       aRow           : ML_Types.Unbounded_List := Raw_Data.First_Element;
       Num_Items      : constant Positive := Positive (aRow.Length);
       Num_Features   : constant Positive := Num_Items - Num_Outputs;
