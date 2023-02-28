@@ -14,10 +14,13 @@ def fit (est, X, y):
 def predict (est, X):
     return tuple(est.predict(X))
 
-def plot(acc):
-    plt.plot([int(v[0]) for v in acc], [v[1] for v in acc], c="blue")
-    plt.plot([int(v[0]) for v in acc], [v[2] for v in acc], c="red")
-    plt.title('malware')
-    plt.xlabel('k')
-    plt.ylabel('acc')
+def plot(degrees, trainerr, testerr):
+    plt.scatter(degrees, trainerr)
+    plt.plot(degrees, trainerr, label='training error')
+    plt.scatter(degrees, testerr)
+    plt.plot(degrees, testerr, label='test error')
+    plt.legend()
+    plt.title('Prediction error by polynomial kernel degree')
+    plt.xlabel('degree')
+    plt.ylabel('accuracy')
     plt.show()

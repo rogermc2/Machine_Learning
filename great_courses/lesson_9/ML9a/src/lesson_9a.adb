@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use Basic_Printing;
 with CSV_Data_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_Types;
 with Python;
 with Python_API;
 with Python_CLF;
@@ -20,12 +21,16 @@ procedure Lesson_9A is
                                       Reload => True);
    Classifier    : Python.Module;
    Estimator     : Python_API.PyObject;
+   Degrees       : ML_Types.Integer_List;
+   Train_Error   : Real_Float_List;
+   Test_Error    : Real_Float_List;
 begin
+   New_Line;
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_9a");
    --     for degree in 0 .. 7 loop
-   for degree in 0 .. 5 loop
+   for degree in 0 .. 7 loop
       Estimator := Python.Call (Classifier, "init_svc", degree);
 
       Put_Line (Routine_Name & "fitting degree: " & Integer'Image (degree));
@@ -33,20 +38,33 @@ begin
                        Data.Train_Y);
       Put_Line (Routine_Name & "fitted");
       declare
-         Predictions : constant Real_Float_Vector :=
-                         Python_CLF.Call (Classifier, "predict", Estimator, Data.Train_X);
-         Accuracy    : constant Float :=
-                         Float (Test_Score (Predictions, Data.Test_Y)) /
-                         Float (Data.Test_Y'Length);
+         Train_Predictions : constant Real_Float_Vector :=
+                               Python_CLF.Call (Classifier, "predict",
+                                                Estimator, Data.Train_X);
+         Test_Predictions  : constant Real_Float_Vector :=
+                               Python_CLF.Call (Classifier, "predict",
+                                                Estimator, Data.Test_X);
+         Train_Accuracy    : constant Float :=
+                               Float (Test_Score (Train_Predictions,
+                                      Data.Train_Y)) /
+                               Float (Data.Train_Y'Length);
+         Test_Accuracy     : constant Float :=
+                               Float (Test_Score (Test_Predictions,
+                                      Data.Test_Y)) /
+                               Float (Data.Test_Y'Length);
       begin
---           Print_Float_Vector ("Predictions", Predictions);
---           Print_Integer_Matrix ("Data.Test_Y", Data.Test_Y);
---           New_Line;
-         Put_Line ("Accuracy: " & Float'Image (Accuracy));
+         Degrees.Append (degree);
+         Train_Error.Append (Train_Accuracy);
+         Test_Error.Append (Test_Accuracy);
+         Put_Line ("Train Accuracy: " & Float'Image (Train_Accuracy));
+         Put_Line ("Test Accuracy: " & Float'Image (Test_Accuracy));
       end;
+
       Python_API.Py_DecRef (Estimator);
       New_Line;
    end loop;
+
+   Python.Call (Classifier, "plot", Degrees, Train_Error, Test_Error);
 
    Python.Close_Module (Classifier);
    Python.Finalize;
