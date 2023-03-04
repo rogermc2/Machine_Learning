@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Classifier_Loader;
 with Neural_Loader;
 with Type_Utilities;
@@ -35,13 +35,14 @@ package body Load_Dataset is
 
       for row in Diabetes_Data.Feature_Values.First_Index ..
         Diabetes_Data.Feature_Values.Last_Index loop
-         Diabetes_Row := Diabetes_Features.Element (row);
+         Diabetes_Row := Diabetes_Data.Feature_Values.Element (row);
          New_Row.Clear;
          for col in Diabetes_Row.First_Index .. Diabetes_Row.Last_Index loop
-            if Diabetes_Row.Element (1).Value_Kind = Integer_Type then
-               New_Row.Append (Float (Diabetes_Row.Element (1).Integer_Value));
+            if Diabetes_Row.Element (col).Value_Kind = Integer_Type then
+               New_Row.Append
+                 (Float (Diabetes_Row.Element (col).Integer_Value));
             else
-               New_Row.Append (Diabetes_Row.Element (1).Float_Value);
+               New_Row.Append (Diabetes_Row.Element (col).Float_Value);
             end if;
          end loop;
          Data.Features.Append (New_Row);
@@ -52,8 +53,6 @@ package body Load_Dataset is
          Diabetes_Row := Diabetes_Labels.Element (row);
          Data.Target.Append (Diabetes_Row.Element (1).Integer_Value);
       end loop;
-      Print_Float_Lists_2D (Routine_Name & "Features", Data.Features, 1, 8);
-      Print_Integer_List (Routine_Name & "Target", Data.Target, 1, 8);
 
       return Data;
 

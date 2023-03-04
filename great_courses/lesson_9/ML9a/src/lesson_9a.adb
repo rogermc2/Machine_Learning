@@ -32,8 +32,6 @@ begin
 
    for degree in 0 .. 7 loop
       Estimator := Python.Call (Classifier, "init_svc", degree);
-
-      Put_Line (Routine_Name & "fitting degree: " & Integer'Image (degree));
       Python_CLF.Call (Classifier, "fit", Estimator, Data.Train_X,
                        Data.Train_Y);
 
@@ -52,12 +50,9 @@ begin
          Degrees.Append (degree);
          Train_Error_List.Append (Train_Error);
          Test_Error_List.Append (Test_Error);
-         Put_Line ("Train Error: " & Float'Image (Train_Error));
-         Put_Line ("Test Error: " & Float'Image (Test_Error));
       end;
 
       Python_API.Py_DecRef (Estimator);
-      New_Line;
    end loop;
 
    Python.Call (Classifier, "plot", Degrees, Train_Error_List,
