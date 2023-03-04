@@ -5,11 +5,10 @@ package Support_9AUX is
 
    type Data_Record (Num_Items, Num_Features : Positive) is record
       Features : Real_Float_Matrix (1 .. Num_Items, 1 .. Num_Features);
-      Labels   : Integer_Array (1 .. Num_Items);
+      Labels   : Integer_Matrix (1 .. Num_Items, 1 .. 1);
    end record;
 
-   function Get_Data (File_Name : String) return Data_Record;
    function Error (Predictions : Real_Float_Vector;
-                   Labels      : Integer_Array) return Float;
+                   Labels      : Integer_Matrix) return Float;
 
 end Support_9AUX;

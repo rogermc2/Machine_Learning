@@ -2,6 +2,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
+with CSV_Data_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;
@@ -10,13 +11,14 @@ with Python_CLF;
 with Support_9AUX; use Support_9AUX;
 
 procedure Lesson_9AUX is
+   use CSV_Data_Loader;
    Routine_Name     : constant String := "Lesson Lesson_9AUX ";
-   Train_Data       : constant Data_Record :=
-                        Get_Data ("../../data/diabetes.csv");
-   Test_Data        : constant Data_Record :=
-                        Get_Data ("../../data/diabetes.csv");
---     Train_Size       : constant Positive := Train_Data.Features'Length;
---     Test_Size        : constant Positive := Test_Data.Features'Length;
+   Train_Size       : constant Positive := 500;
+   Test_Size        : constant Positive := 200;
+   Data             : constant Base_Split_State := Get_Split_State
+     ("../../data/diabetes.csv", Diabetes_Data, Train_Size,
+      Test_Size, Shuffle => True, Reload => True);
+
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
    Train_Error_List : Real_Float_List;
@@ -28,25 +30,25 @@ begin
 
    Classifier := Python.Import_File ("lesson_9aux");
 
---     for nodes in 2 .. 30 loop
+   --     for nodes in 2 .. 30 loop
    for nodes in 2 .. 3 loop
       Estimator := Python.Call (Classifier, "init_tree", nodes);
 
       Put_Line (Routine_Name & "fitting nodes: " & Integer'Image (nodes));
-      Python_CLF.Call (Classifier, "fit", Estimator, Train_Data.Features,
-                       Train_Data.Labels);
+      Python_CLF.Call (Classifier, "fit", Estimator, Data.Train_X,
+                       Data.Train_Y);
 
       declare
          Train_Predictions : constant Real_Float_Vector :=
                                Python_CLF.Call (Classifier, "predict",
-                                                Estimator, Train_Data.Features);
+                                                Estimator, Data.Train_X);
          Test_Predictions  : constant Real_Float_Vector :=
                                Python_CLF.Call (Classifier, "predict",
-                                                Estimator, Test_Data.Features);
-         Train_Error    : constant Float :=
-                               Error (Train_Predictions, Train_Data.Labels);
-         Test_Error     : constant Float :=
-                               Error (Test_Predictions,  Test_Data.Labels);
+                                                Estimator, Data.Test_X);
+         Train_Error       : constant Float :=
+                               Error (Train_Predictions, Data.Train_Y);
+         Test_Error        : constant Float :=
+                               Error (Test_Predictions,  Data.Test_Y);
       begin
          Leaves.Append (nodes);
          Train_Error_List.Append (Train_Error);
