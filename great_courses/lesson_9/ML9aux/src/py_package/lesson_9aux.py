@@ -1,12 +1,12 @@
 import numpy as np
 
-from sklearn import svm
+from sklearn import tree
 
 import matplotlib
 from matplotlib import pyplot as plt
 
-def init_svc(degree):
-    return svm.SVC(gamma='scale',kernel='poly', degree=degree)
+def init_tree(nodes):
+    return tree.DecisionTreeClassifier(max_leaf_nodes=nodes)
 
 def fit (est, X, y):
     est.fit(X, np.ravel(y))
@@ -14,13 +14,10 @@ def fit (est, X, y):
 def predict (est, X):
     return tuple(est.predict(X))
 
-def plot(degrees, trainerr, testerr):
-    plt.scatter(degrees, trainerr)
-    plt.plot(degrees, trainerr, label='training error')
-    plt.scatter(degrees, testerr)
-    plt.plot(degrees, testerr, label='test error')
-    plt.legend()
-    plt.title('Prediction error by polynomial kernel degree')
-    plt.xlabel('degree')
-    plt.ylabel('accuracy')
+def plot(leaves, trainerr, testerr):
+    plt.scatter(leaves, trainerr)
+    plt.plot(leaves, testerr)
+    plt.title('Prediction error by number of leaves')
+    plt.xlabel('leaves')
+    plt.ylabel('error')
     plt.show()
