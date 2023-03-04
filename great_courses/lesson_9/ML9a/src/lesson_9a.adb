@@ -19,24 +19,24 @@ procedure Lesson_9A is
                      Get_Split_State ("../../data/diabetes.csv", Diabetes_Data,
                                       Train_Size, Test_Size, Shuffle => True,
                                       Reload => True);
-   Classifier    : Python.Module;
-   Estimator     : Python_API.PyObject;
-   Degrees       : ML_Types.Integer_List;
-   Train_Error   : Real_Float_List;
-   Test_Error    : Real_Float_List;
+   Classifier       : Python.Module;
+   Estimator        : Python_API.PyObject;
+   Degrees          : ML_Types.Integer_List;
+   Train_Error_List : Real_Float_List;
+   Test_Error_List  : Real_Float_List;
 begin
    New_Line;
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_9a");
-   --     for degree in 0 .. 7 loop
+
    for degree in 0 .. 7 loop
       Estimator := Python.Call (Classifier, "init_svc", degree);
 
       Put_Line (Routine_Name & "fitting degree: " & Integer'Image (degree));
       Python_CLF.Call (Classifier, "fit", Estimator, Data.Train_X,
                        Data.Train_Y);
-      Put_Line (Routine_Name & "fitted");
+
       declare
          Train_Predictions : constant Real_Float_Vector :=
                                Python_CLF.Call (Classifier, "predict",
@@ -44,27 +44,24 @@ begin
          Test_Predictions  : constant Real_Float_Vector :=
                                Python_CLF.Call (Classifier, "predict",
                                                 Estimator, Data.Test_X);
-         Train_Accuracy    : constant Float :=
-                               Float (Test_Score (Train_Predictions,
-                                      Data.Train_Y)) /
-                               Float (Data.Train_Y'Length);
-         Test_Accuracy     : constant Float :=
-                               Float (Test_Score (Test_Predictions,
-                                      Data.Test_Y)) /
-                               Float (Data.Test_Y'Length);
+         Train_Error    : constant Float :=
+                               Error (Train_Predictions, Data.Train_Y);
+         Test_Error     : constant Float :=
+                               Error (Test_Predictions,  Data.Test_Y);
       begin
          Degrees.Append (degree);
-         Train_Error.Append (Train_Accuracy);
-         Test_Error.Append (Test_Accuracy);
-         Put_Line ("Train Accuracy: " & Float'Image (Train_Accuracy));
-         Put_Line ("Test Accuracy: " & Float'Image (Test_Accuracy));
+         Train_Error_List.Append (Train_Error);
+         Test_Error_List.Append (Test_Error);
+         Put_Line ("Train Error: " & Float'Image (Train_Error));
+         Put_Line ("Test Error: " & Float'Image (Test_Error));
       end;
 
       Python_API.Py_DecRef (Estimator);
       New_Line;
    end loop;
 
-   Python.Call (Classifier, "plot", Degrees, Train_Error, Test_Error);
+   Python.Call (Classifier, "plot", Degrees, Train_Error_List,
+                Test_Error_List);
 
    Python.Close_Module (Classifier);
    Python.Finalize;
