@@ -31,7 +31,7 @@ begin
    Classifier := Python.Import_File ("lesson_9aux");
 
    --     for nodes in 2 .. 30 loop
-   for nodes in 2 .. 3 loop
+   for nodes in 2 .. 10 loop
       Estimator := Python.Call (Classifier, "init_tree", nodes);
 
       Put_Line (Routine_Name & "fitting nodes: " & Integer'Image (nodes));
