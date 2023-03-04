@@ -8,11 +8,11 @@ with ML_Types;
 with Python;
 with Python_API;
 with Python_CLF;
-with Support_9AUX; use Support_9AUX;
+with Support_9AUX_2; use Support_9AUX_2;
 
-procedure Lesson_9AUX is
+procedure Lesson_9AUX_2 is
    use CSV_Data_Loader;
-   Routine_Name     : constant String := "Lesson Lesson_9AUX ";
+   Routine_Name     : constant String := "Lesson Lesson_9AUX_2 ";
    Train_Size       : constant Positive := 500;
    Test_Size        : constant Positive := 200;
    Data             : constant Base_Split_State := Get_Split_State
@@ -28,7 +28,7 @@ begin
    New_Line;
    Python.Initialize;
 
-   Classifier := Python.Import_File ("lesson_9aux");
+   Classifier := Python.Import_File ("lesson_9aux_2");
 
    for nodes in 2 .. 30 loop
       Estimator := Python.Call (Classifier, "init_tree", nodes);
@@ -66,4 +66,4 @@ begin
    Put_Line ("----------------------------------------------");
    New_Line;
 
-end Lesson_9AUX;
+end Lesson_9AUX_2;
