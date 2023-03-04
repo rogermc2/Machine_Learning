@@ -4,12 +4,62 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Basic_Printing; use Basic_Printing;
 with Classifier_Loader;
 with Neural_Loader;
 with Type_Utilities;
---  with Printing;
 
 package body Load_Dataset is
+
+   function Load_Diabetes (File_Name : String) return Diabetes_Data_Record is
+      use Classifier_Loader;
+      use ML_Types;
+      Routine_Name      : constant String := "Load_Dataset.Load_Diabetes ";
+      Diabetes_Data     : constant ML_Types.Multi_Output_Data_Record :=
+                            Load_Data (File_Name);
+      Diabetes_Features : constant Value_Data_Lists_2D :=
+                            Diabetes_Data.Feature_Values;
+      Diabetes_Labels   : constant Value_Data_Lists_2D :=
+                            Diabetes_Data.Label_Values;
+      Num_Samples       : constant Natural :=
+                            Natural (Diabetes_Features.Length);
+      Diabetes_Row      : Value_Data_List;
+      New_Row           : NL_Types.Float_List;
+      Data              : Diabetes_Data_Record;
+   begin
+      Assert (Num_Samples > 0, Routine_Name &
+                " called with empty Features vector.");
+      Assert (Integer (Diabetes_Data.Label_Values.Length) = Num_Samples,
+              Routine_Name & " invalid Diabetes Target vector");
+      Data.Feature_Names := Diabetes_Data.Feature_Names;
+
+      for row in Diabetes_Data.Feature_Values.First_Index ..
+        Diabetes_Data.Feature_Values.Last_Index loop
+         Diabetes_Row := Diabetes_Features.Element (row);
+         New_Row.Clear;
+         for col in Diabetes_Row.First_Index .. Diabetes_Row.Last_Index loop
+            if Diabetes_Row.Element (1).Value_Kind = Integer_Type then
+               New_Row.Append (Float (Diabetes_Row.Element (1).Integer_Value));
+            else
+               New_Row.Append (Diabetes_Row.Element (1).Float_Value);
+            end if;
+         end loop;
+         Data.Features.Append (New_Row);
+      end loop;
+
+      for row in Diabetes_Data.Label_Values.First_Index ..
+        Diabetes_Data.Label_Values.Last_Index loop
+         Diabetes_Row := Diabetes_Labels.Element (row);
+         Data.Target.Append (Diabetes_Row.Element (1).Integer_Value);
+      end loop;
+      Print_Float_Lists_2D (Routine_Name & "Features", Data.Features, 1, 8);
+      Print_Integer_List (Routine_Name & "Target", Data.Target, 1, 8);
+
+      return Data;
+
+   end Load_Diabetes;
+
+   --  -------------------------------------------------------------------------
 
    --  Each Digits datapoint is an 8x8 matrix of a digit image.
    --  =================   ==============
@@ -132,54 +182,6 @@ package body Load_Dataset is
       return Features;
 
    end Load_Features;
-
-   --  -------------------------------------------------------------------------
-
-   function Load_Diabetes (File_Name : String) return Diabetes_Data_Record is
-      use Classifier_Loader;
-      use ML_Types;
-      Routine_Name      : constant String := "Load_Dataset.Load_Diabetes ";
-      Diabetes_Data     : constant ML_Types.Multi_Output_Data_Record :=
-                            Load_Data (File_Name);
-      Diabetes_Features : constant Value_Data_Lists_2D :=
-                            Diabetes_Data.Feature_Values;
-      Diabetes_Labels   : constant Value_Data_Lists_2D :=
-                            Diabetes_Data.Label_Values;
-      Num_Samples       : constant Natural :=
-                            Natural (Diabetes_Features.Length);
-      Diabetes_Row      : Value_Data_List;
-      New_Row           : NL_Types.Float_List;
-      Data              : Diabetes_Data_Record;
-   begin
-      Assert (Num_Samples > 0, Routine_Name &
-                " called with empty Features vector.");
-      Assert (Integer (Diabetes_Data.Label_Values.Length) = Num_Samples,
-              Routine_Name & " invalid Diabetes Target vector");
-      Data.Feature_Names := Diabetes_Data.Feature_Names;
-
-      for row in Diabetes_Data.Feature_Values.First_Index ..
-        Diabetes_Data.Feature_Values.Last_Index loop
-         Diabetes_Row := Diabetes_Features.Element (row);
-         New_Row.Clear;
-         for col in Diabetes_Row.First_Index .. Diabetes_Row.Last_Index loop
-            if Diabetes_Row.Element (1).Value_Kind = Integer_Type then
-               New_Row.Append (Float (Diabetes_Row.Element (1).Integer_Value));
-            else
-               New_Row.Append (Diabetes_Row.Element (1).Float_Value);
-            end if;
-         end loop;
-         Data.Features.Append (New_Row);
-      end loop;
-
-      for row in Diabetes_Data.Label_Values.First_Index ..
-        Diabetes_Data.Label_Values.Last_Index loop
-         Diabetes_Row := Diabetes_Labels.Element (row);
-         Data.Target.Append (Diabetes_Row.Element (1).Integer_Value);
-      end loop;
-
-      return Data;
-
-   end Load_Diabetes;
 
    --  -------------------------------------------------------------------------
 

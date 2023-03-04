@@ -12,6 +12,8 @@ package body Support_9AUX is
 --        Routine_Name : constant String := "Support_9AUX.Error ";
       Incorrect    : Natural := 0;
    begin
+--        Print_Float_Vector ("Predictions", Predictions, 100, 110);
+--        Print_Integer_Matrix ("Labels", Labels, 100, 110);
       for index in Predictions'Range loop
          if Integer (Predictions (index)) /= Labels (index, 1) then
             Incorrect := Incorrect + 1;

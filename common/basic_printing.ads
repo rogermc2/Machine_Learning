@@ -14,10 +14,16 @@ package Basic_Printing is
                                Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
                                 Start : Positive := 1; Finish : Natural := 0);
-   procedure Print_Float_Matrix (Name       : String; aMatrix : Real_Float_Matrix;
-                                 Start      : Positive := 1; Finish : Natural := 0;
-                                 Col_Start  : Positive := 1;
-                                 Col_Finish : Natural := 0);
+   procedure Print_Float_List (Name : String; theList : NL_Types.Float_List);
+   procedure Print_Float_Lists_2D (Name  : String;
+                                   Data  : NL_Types.Float_List_2D;
+                                   Start : Positive := 1;
+                                   Last  : Positive := 10);
+   procedure Print_Float_Matrix
+     (Name       : String; aMatrix : Real_Float_Matrix;
+      Start      : Positive := 1; Finish : Natural := 0;
+      Col_Start  : Positive := 1;
+      Col_Finish : Natural := 0);
    procedure Print_Float_Matrix_List
      (Name  : String; aList : Real_Matrix_List;
       Start : Positive := 1; Finish : Natural := 0);
@@ -60,8 +66,8 @@ package Basic_Printing is
                                   UB   : Unbounded_String_Array);
    procedure Print_Unbound_List (Name : String; UB : ML_Types.Unbounded_List);
 
-   procedure Print_String_Map (Name : String; aMap : ML_Types.String_Map;
-                                Start : Natural := 0; Finish : Natural := 0);
+   procedure Print_String_Map (Name  : String; aMap : ML_Types.String_Map;
+                               Start : Natural := 0; Finish : Natural := 0);
    procedure Print_Unbound_Matrix (Name : String;
                                    UB   : Unbounded_String_Matrix);
 
