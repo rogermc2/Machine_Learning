@@ -18,47 +18,48 @@ procedure Lesson_9AUX_2 is
    Data             : constant Base_Split_State := Get_Split_State
      ("../../data/diabetes.csv", Diabetes_Data, Train_Size,
       Test_Size, Shuffle => True, Reload => True);
+   Repeats          : constant Positive := 20;
+   Max_Leaves       : constant Positive := 5;
 
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
+   MS               : Real_Float_Vector (1 .. 10);
    Train_Error_List : Real_Float_List;
    Test_Error_List  : Real_Float_List;
-   MS               : Real_Float_Vector (1 .. 10);
    Leaves           : ML_Types.Integer_List;
 begin
    New_Line;
-   for index in MS'Range loop
-      MS (index) := (Float'Ceiling (Float (index * Train_Size) / 10.0));
-   end loop;
 
    Python.Initialize;
-
    Classifier := Python.Import_File ("lesson_9aux_2");
 
-   for nodes in 2 .. 30 loop
-      Estimator := Python.Call (Classifier, "init_tree", nodes);
-      Python_CLF.Call (Classifier, "fit", Estimator, Data.Train_X,
-                       Data.Train_Y);
-
+   for index in 1 .. Repeats loop
       declare
-         Train_Predictions : constant Real_Float_Vector :=
-                               Python_CLF.Call (Classifier, "predict",
-                                                Estimator, Data.Train_X);
-         Test_Predictions  : constant Real_Float_Vector :=
-                               Python_CLF.Call (Classifier, "predict",
-                                                Estimator, Data.Test_X);
-         Train_Error       : constant Float :=
-                               Error (Train_Predictions, Data.Train_Y);
-         Test_Error        : constant Float :=
-                               Error (Test_Predictions,  Data.Test_Y);
+         Mini : constant Data_Record := Mini_Data (Data, MS);
       begin
-         Leaves.Append (nodes);
-         Train_Error_List.Append (Train_Error);
-         Test_Error_List.Append (Test_Error);
-      end;
+         Estimator := Python.Call (Classifier, "init_tree", Max_Leaves);
+         Python_CLF.Call (Classifier, "fit", Estimator, Mini.Features,
+                          Mini.Labels);
+         declare
+            Train_Predictions : constant Real_Float_Vector :=
+                                  Python_CLF.Call (Classifier, "predict",
+                                                   Estimator, Mini.Features);
+            Test_Predictions  : constant Real_Float_Vector :=
+                                  Python_CLF.Call (Classifier, "predict",
+                                                   Estimator, Data.Test_X);
+            Train_Error       : constant Float :=
+                                  Error (Train_Predictions, Mini.Labels);
+            Test_Error        : constant Float :=
+                                  Error (Test_Predictions,  Data.Test_Y);
+         begin
 
-      Python_API.Py_DecRef (Estimator);
-      New_Line;
+            Train_Error_List.Append (Train_Error);
+            Test_Error_List.Append (Test_Error);
+         end;
+
+         Python_API.Py_DecRef (Estimator);
+         New_Line;
+      end;
    end loop;
 
    Python.Call (Classifier, "plot", Leaves, Train_Error_List,
