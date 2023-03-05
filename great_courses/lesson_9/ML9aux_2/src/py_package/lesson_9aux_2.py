@@ -17,7 +17,7 @@ def predict (est, X):
 def plot(ms, minierr):
     plt.scatter(ms, minierr)
     plt.plot(ms, minierr)
-    plt.title('Prediction error by number of leaves')
-    plt.xlabel('leaves')
+    plt.title('Prediction error by train size')
+    plt.xlabel('train size')
     plt.ylabel('error')
     plt.show()
