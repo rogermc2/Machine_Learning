@@ -45,10 +45,16 @@ package Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Integer_Array;
+                   B : ML_Arrays_And_Matrices.Real_Float_List);
+   procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Real_Float_List);
    procedure Call (M : Module; Function_Name : String;
                    A    : ML_Types.Integer_List;
                    B, C : ML_Arrays_And_Matrices.Real_Float_List);
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Real_Float_Vector;
+                   B : ML_Arrays_And_Matrices.Real_Float_List);
    function Call (M : Module; Function_Name : String;
                   A : ML_Arrays_And_Matrices.Real_Float_List)
                   return ML_Arrays_And_Matrices.Real_Float_Vector;

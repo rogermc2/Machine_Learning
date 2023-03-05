@@ -4,7 +4,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use Basic_Printing;
 with CSV_Data_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with ML_Types;
 with Python;
 with Python_API;
 with Python_CLF;
@@ -23,47 +22,45 @@ procedure Lesson_9AUX_2 is
 
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
-   MS               : Real_Float_Vector (1 .. 10);
-   Train_Error_List : Real_Float_List;
+   MS               : Integer_Array (1 .. 10);
+   Mini_Error_List  : Real_Float_List;
    Test_Error_List  : Real_Float_List;
-   Leaves           : ML_Types.Integer_List;
 begin
    New_Line;
 
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_9aux_2");
 
-   for index in 1 .. Repeats loop
-      declare
-         Mini : constant Data_Record := Mini_Data (Data, MS);
-      begin
-         Estimator := Python.Call (Classifier, "init_tree", Max_Leaves);
-         Python_CLF.Call (Classifier, "fit", Estimator, Mini.Features,
-                          Mini.Labels);
+   for ms_index in MS'Range loop
+      for index in 1 .. Repeats loop
          declare
-            Train_Predictions : constant Real_Float_Vector :=
-                                  Python_CLF.Call (Classifier, "predict",
-                                                   Estimator, Mini.Features);
-            Test_Predictions  : constant Real_Float_Vector :=
-                                  Python_CLF.Call (Classifier, "predict",
-                                                   Estimator, Data.Test_X);
-            Train_Error       : constant Float :=
-                                  Error (Train_Predictions, Mini.Labels);
-            Test_Error        : constant Float :=
-                                  Error (Test_Predictions,  Data.Test_Y);
+            Mini : constant Data_Record := Mini_Data (Data, MS);
          begin
+            Estimator := Python.Call (Classifier, "init_tree", Max_Leaves);
+            Python_CLF.Call (Classifier, "fit", Estimator, Mini.Features,
+                             Mini.Labels);
+            declare
+               Train_Predictions : constant Real_Float_Vector :=
+                                     Python_CLF.Call (Classifier, "predict",
+                                                      Estimator, Mini.Features);
+               Test_Predictions  : constant Real_Float_Vector :=
+                                     Python_CLF.Call (Classifier, "predict",
+                                                      Estimator, Data.Test_X);
+               Mini_Error        : constant Float :=
+                                     Error (Train_Predictions, Mini.Labels);
+               Test_Error        : constant Float :=
+                                     Error (Test_Predictions,  Data.Test_Y);
+            begin
+               Mini_Error_List.Append (Mini_Error);
+               Test_Error_List.Append (Test_Error);
+            end;
 
-            Train_Error_List.Append (Train_Error);
-            Test_Error_List.Append (Test_Error);
+            Python_API.Py_DecRef (Estimator);
          end;
-
-         Python_API.Py_DecRef (Estimator);
-         New_Line;
-      end;
+      end loop;
    end loop;
 
-   Python.Call (Classifier, "plot", Leaves, Train_Error_List,
-                Test_Error_List);
+   Python.Call (Classifier, "plot", MS, Mini_Error_List);
 
    Python.Close_Module (Classifier);
    Python.Finalize;

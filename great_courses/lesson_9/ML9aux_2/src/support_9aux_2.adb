@@ -27,13 +27,14 @@ package body Support_9AUX_2 is
    --  -------------------------------------------------------------------------
 
    function Mini_Data (Data : CSV_Data_Loader.Base_Split_State;
-                       MS   : out Real_Float_Vector) return Data_Record is
+                       MS   : out Integer_Array) return Data_Record is
       Data_Length      : Natural := 0;
       Data_Index       : Natural := 0;
       Mini_Mask        : Boolean_Array (1 .. Data.Num_Train);
    begin
       for index in MS'Range loop
-         MS (index) := (Float'Ceiling (Float (index * Data.Num_Train) / 10.0));
+         MS (index) :=
+           Integer (Float'Ceiling (Float (index * Data.Num_Train) / 10.0));
       end loop;
 
       for mask_index in Mini_Mask'Range loop

@@ -14,12 +14,9 @@ def fit (est, X, y):
 def predict (est, X):
     return tuple(est.predict(X))
 
-def plot(leaves, trainerr, testerr):
-    plt.scatter(leaves, trainerr)
-    plt.plot(leaves, trainerr, label='training error')
-    plt.scatter(leaves, testerr)
-    plt.plot(leaves, testerr, label='test error')
-    plt.legend()
+def plot(ms, minierr):
+    plt.scatter(ms, minierr)
+    plt.plot(ms, minierr)
     plt.title('Prediction error by number of leaves')
     plt.xlabel('leaves')
     plt.ylabel('error')
