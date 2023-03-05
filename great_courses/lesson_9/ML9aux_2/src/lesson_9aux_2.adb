@@ -23,9 +23,14 @@ procedure Lesson_9AUX_2 is
    Estimator        : Python_API.PyObject;
    Train_Error_List : Real_Float_List;
    Test_Error_List  : Real_Float_List;
+   MS               : Real_Float_Vector (1 .. 10);
    Leaves           : ML_Types.Integer_List;
 begin
    New_Line;
+   for index in MS'Range loop
+      MS (index) := (Float'Ceiling (Float (index * Train_Size) / 10.0));
+   end loop;
+
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_9aux_2");
