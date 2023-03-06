@@ -37,7 +37,7 @@ begin
       Test_Total := 0.0;
       for index in 1 .. Repeats loop
          declare
-            Mini : constant Data_Record := Mini_Data (Data, ms_index);
+            Mini : constant Data_Record := Mini_Data (Data, MS (ms_index));
          begin
             Estimator := Python.Call (Classifier, "init_tree", Max_Leaves);
             Python_CLF.Call (Classifier, "fit", Estimator, Mini.Features,

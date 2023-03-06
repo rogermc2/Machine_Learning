@@ -10,6 +10,8 @@ package Basic_Printing is
                                   Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Boolean_List (Name  : String;
                                  aList : NL_Types.Boolean_List);
+   procedure Print_Boolean_Array (Name  : String; anArray : Boolean_Array;
+                                  Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Byte_Array (Name  : String; anArray : Byte_Array;
                                Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;

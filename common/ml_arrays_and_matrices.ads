@@ -19,6 +19,7 @@ package ML_Arrays_And_Matrices is
    type Boolean_Array is array (Integer range <>) of Boolean;
    type Byte_Array is array (Integer range <>) of Interfaces.Unsigned_8;
    type Float_Array is array (Integer range <>) of Float;
+
    procedure Float_Array_Sort is new Ada.Containers.Generic_Array_Sort
      (Integer, Float, Float_Array);
    type Integer_Array is array (Integer range <>) of Integer;
@@ -89,6 +90,10 @@ package ML_Arrays_And_Matrices is
    package Boolean_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
      (Positive, Boolean_Matrix);
    subtype Boolean_Matrix_List is Boolean_Matrix_List_Package.Vector;
+
+   package Float_Array_Package is new
+     Ada.Containers.Indefinite_Vectors (Positive, Float_Array);
+   subtype Float_Array_List is Float_Array_Package.Vector;
 
    package Real_Float_Package is new
      Ada.Containers.Vectors (Positive, Float);

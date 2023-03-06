@@ -1,4 +1,11 @@
 
+--  with Ada.Text_IO; use Ada.Text_IO;
+
+with Maths;
+
+--  with Basic_Printing; use Basic_Printing;
+with ML_Types;
+
 package body Support_9AUX_2 is
 
    --  -------------------------------------------------------------------------
@@ -35,26 +42,45 @@ package body Support_9AUX_2 is
 
    function Mini_Data (Data    : CSV_Data_Loader.Base_Split_State;
                        MS_Size : Positive) return Data_Record is
-      Data_Index       : Natural := 0;
-      Mini_Mask        : Boolean_Array (1 .. Data.Num_Train);
+      type Data_List_Record is record
+         Features : Float_Array_List;
+         Labels   : ML_Types.Integer_List;
+      end record;
+
+      Data_Index : Natural := 0;
+      Mini_Mask  : Boolean_Array (1 .. Data.Num_Train);
+      Features   : Float_Array (1 .. Data.Num_Features);
+      Data_List  : Data_List_Record;
    begin
       for index in Mini_Mask'Range loop
          Mini_Mask (index) :=
-           Integer (Float'Ceiling (Float (index * Data.Num_Train) / 10.0))
-           <= MS_Size;
+           Maths.Random_Integer (1, Data.Num_Train) <= MS_Size;
+      end loop;
+
+      for row in Data.Train_X'Range loop
+         if Mini_Mask (row) then
+            Data_Index := Data_Index + 1;
+            for col in Data.Train_X'Range (2) loop
+               Features (col) := Data.Train_X (row, col);
+            end loop;
+            Data_List.Features.Append (Features);
+            Data_List.Labels.Append (Data.Train_Y (row, 1));
+         end if;
       end loop;
 
       declare
-         Result : Data_Record (MS_Size, Data.Num_Features);
+         Features : Float_Array (1 .. Data.Num_Features);
+         Result   : Data_Record (Positive (Data_List.Features.Length),
+                                 Data.Num_Features);
       begin
-         for row in Data.Train_X'Range loop
-            if Mini_Mask (row) then
-               Data_Index := Data_Index + 1;
-               for col in Data.Train_X'Range (2) loop
-                  Result.Features (Data_Index, col) := Data.Train_X (row, col);
-                  Result.Labels (Data_Index, 1) := Data.Train_Y (row, 1);
-               end loop;
-            end if;
+         for row in 1 .. Data_List.Features.Length loop
+            Features := Data_List.Features (Integer (row));
+            for col in 1 .. Data.Num_Features loop
+               Result.Features (Integer (row), col) := Features (col);
+            end loop;
+
+            Result.Labels (Integer (row), 1) :=
+              Data_List.Labels (Integer (row));
          end loop;
 
          return Result;

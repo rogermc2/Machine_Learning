@@ -53,6 +53,38 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Boolean_Array
+     (Name  : String; anArray : Boolean_Array;
+      Start : Positive := 1; Finish : Natural := 0) is
+      Last  : Positive;
+      Count : Positive := 1;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (anArray'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= anArray'First and then Finish <= anArray'Last then
+         for Index in Start .. Last loop
+            Put (Boolean'Image (anArray (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+      else
+         Put_Line
+           ("Print_Boolean_Array called with invalid start or finish index.");
+      end if;
+      New_Line;
+
+   end Print_Boolean_Array;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Byte_Array (Name  : String; anArray : Byte_Array;
                                Start : Positive := 1; Finish : Natural := 0) is
       Last  : Positive;
