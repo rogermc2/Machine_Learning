@@ -17,11 +17,11 @@ procedure Lesson_9AUX_2 is
    Data         : constant Base_Split_State := Get_Split_State
      ("../../data/diabetes.csv", Diabetes_Data, Train_Size,
       Test_Size, Shuffle => True, Reload => True);
+   MS           : constant Integer_Array := Init_MS (Train_Size);
    Repeats      : constant Positive := 20;
    Max_Leaves   : constant Positive := 5;
    Classifier   : Python.Module;
    Estimator    : Python_API.PyObject;
-   MS           : Integer_Array (1 .. 10);
    Mini_Total   : Float;
    Test_Total   : Float;
    Mini_Error   : Real_Float_List;
@@ -37,7 +37,7 @@ begin
       Test_Total := 0.0;
       for index in 1 .. Repeats loop
          declare
-            Mini : constant Data_Record := Mini_Data (Data, MS);
+            Mini : constant Data_Record := Mini_Data (Data, ms_index);
          begin
             Estimator := Python.Call (Classifier, "init_tree", Max_Leaves);
             Python_CLF.Call (Classifier, "fit", Estimator, Mini.Features,
