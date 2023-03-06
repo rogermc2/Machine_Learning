@@ -65,6 +65,7 @@ begin
    end loop;
 
    Print_Integer_Array ("MS", MS);
+   Print_Real_Float_List ("Mini_Error", Mini_Error);
    Python.Call (Classifier, "plot", MS, Mini_Error);
 
    Python.Close_Module (Classifier);
