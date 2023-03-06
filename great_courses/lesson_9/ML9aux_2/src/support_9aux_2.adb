@@ -1,17 +1,10 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
-
-with Maths;
-
---  with Basic_Printing; use Basic_Printing;
-
 package body Support_9AUX_2 is
 
    --  -------------------------------------------------------------------------
 
    function Error (Predictions : Real_Float_Vector;
                    Labels      : Integer_Matrix) return Float is
-      --        Routine_Name : constant String := "Support_9AUX_2.Error ";
       Incorrect    : Natural := 0;
    begin
       for index in Predictions'Range loop
@@ -40,28 +33,19 @@ package body Support_9AUX_2 is
 
    --  -------------------------------------------------------------------------
 
-   function Mini_Data (Data : CSV_Data_Loader.Base_Split_State; MS : Positive)
-                       return Data_Record is
-      Data_Length      : Natural := 0;
+   function Mini_Data (Data    : CSV_Data_Loader.Base_Split_State;
+                       MS_Size : Positive) return Data_Record is
       Data_Index       : Natural := 0;
       Mini_Mask        : Boolean_Array (1 .. Data.Num_Train);
    begin
       for index in Mini_Mask'Range loop
          Mini_Mask (index) :=
            Integer (Float'Ceiling (Float (index * Data.Num_Train) / 10.0))
-           <= MS;
-      end loop;
-
-      for mask_index in Mini_Mask'Range loop
-         Mini_Mask (mask_index) :=
-           Maths.Random_Integer (1, Data.Num_Train) <= mask_index;
-         if Mini_Mask (mask_index) then
-            Data_Length := Data_Length + 1;
-         end if;
+           <= MS_Size;
       end loop;
 
       declare
-         Result : Data_Record (Data_Length, Data.Num_Features);
+         Result : Data_Record (MS_Size, Data.Num_Features);
       begin
          for row in Data.Train_X'Range loop
             if Mini_Mask (row) then

@@ -12,7 +12,7 @@ package Support_9AUX_2 is
    function Error (Predictions : Real_Float_Vector;
                    Labels      : Integer_Matrix) return Float;
    function Init_MS (Length : Positive) return Integer_Array;
-   function Mini_Data (Data : CSV_Data_Loader.Base_Split_State;
-                       MS   : Positive) return Data_Record;
+   function Mini_Data (Data    : CSV_Data_Loader.Base_Split_State;
+                       MS_Size : Positive) return Data_Record;
 
 end Support_9AUX_2;
