@@ -53,7 +53,7 @@ begin
                Mini_Total := Mini_Total +
                  Error (Train_Predictions, Mini.Labels);
                Test_Total := Test_Total +
-                 Error (Test_Predictions,  Data.Test_Y);
+                 Error (Test_Predictions, Data.Test_Y);
             end;
 
             Python_API.Py_DecRef (Estimator);
@@ -65,8 +65,7 @@ begin
    end loop;
 
    Print_Integer_Array ("MS", MS);
-   Print_Real_Float_List ("Mini_Error", Mini_Error);
-   Python.Call (Classifier, "plot", MS, Mini_Error);
+   Python.Call (Classifier, "plot", MS, Mini_Error, Test_Error);
 
    Python.Close_Module (Classifier);
    Python.Finalize;
