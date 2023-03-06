@@ -1783,6 +1783,39 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   function Call (M : Module; Function_Name : String; A : Unbounded_String)
+                  return Python_API.PyObject is
+      use System;
+      function Py_BuildValue (Format, S1 : Interfaces.C.char_array)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call Unbounded_String_Array ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_String     : constant Interfaces.C.char_array :=
+                       Interfaces.C.To_C (To_String (A));
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(s)"), A_String);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (PyParams);
+      
+      return (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unbounded_String_Array) is
       use System;

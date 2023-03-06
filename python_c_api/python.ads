@@ -1,6 +1,8 @@
 
 with System;
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 with ML_Types;
 with NL_Types;
 with ML_Arrays_And_Matrices;
@@ -47,12 +49,12 @@ package Python is
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Array;
                    B : ML_Arrays_And_Matrices.Real_Float_List);
-   procedure Call (M : Module; Function_Name : String;
+   procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Integer_Array;
                    B, C : ML_Arrays_And_Matrices.Real_Float_List);
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Real_Float_List);
-   procedure Call (M : Module; Function_Name : String;
+   procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Types.Integer_List;
                    B, C : ML_Arrays_And_Matrices.Real_Float_List);
    procedure Call (M : Module; Function_Name : String;
@@ -155,6 +157,8 @@ package Python is
                    A, B : ML_Arrays_And_Matrices.Real_Vector_List);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_List);
+   function Call (M : Module; Function_Name : String; A : Unbounded_String)
+                  return Python_API.PyObject;
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unbounded_String_Array);
    procedure Call (M : Module; Function_Name : String;

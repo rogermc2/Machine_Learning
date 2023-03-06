@@ -1,4 +1,5 @@
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
@@ -9,6 +10,7 @@ with Python_API;
 with Support_9QS; use Support_9QS;
 
 procedure Lesson_9QS is
+
    Project_Name     : constant String := "Lesson 9QS ";
    Train_Data       : constant Data_Record :=
                         Get_Data ("../../data/malware-train.csv");
@@ -16,12 +18,16 @@ procedure Lesson_9QS is
                         Get_Data ("../../data/malware-test.csv");
    Train_Size       : constant Positive := Train_Data.Features'Length;
    Test_Size        : constant Positive := Test_Data.Features'Length;
-   Tests            : constant Integer_Array (1 .. 4) := (1, 5, 7,9);
-   Num_Neighbours   : Positive;
+   Tests            : constant Unbounded_String_Array (1 .. 4) :=
+                        (To_Unbounded_String ("linear"),
+                         To_Unbounded_String ("poly"),
+                         To_Unbounded_String ("sigmoid"),
+                         To_Unbounded_String ("rbf"));
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
    Accuracy         : Real_Float_List;
    Accuracy_2D      : Real_Float_List_2D;
+   Kernel           : Unbounded_String;
 begin
    Put_Line ("Train_Size" & Integer'Image (Train_Size));
    Put_Line ("Test_Size" & Integer'Image (Test_Size));
@@ -30,9 +36,9 @@ begin
    Classifier := Python.Import_File ("lesson_9qs");
 
    for k in Tests'Range loop
-      Num_Neighbours := Tests (k);
+      Kernel :=  Tests (k);
       Estimator :=
-        Python.Call (Classifier, "init_NeighborsClassifier", Num_Neighbours);
+        Python.Call (Classifier, "init_svc", Kernel);
 
       Python_CLF.Call (Classifier, "fit", Estimator, Train_Data.Features,
                        Train_Data.Labels);
@@ -45,7 +51,7 @@ begin
                                           Test_Data.Features);
       begin
          Accuracy.Clear;
-         Accuracy.Append (Float (Num_Neighbours));
+         Accuracy.Append (Float (Tests'Length));
          Accuracy.Append (Float (Test_Score (Train_Pred, Train_Data.Labels)) /
                             Float (Train_Size));
          Accuracy.Append (Float (Test_Score (Test_Pred, Test_Data.Labels)) /
