@@ -25,8 +25,6 @@ procedure Lesson_9QS is
                          To_Unbounded_String ("rbf"));
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
-   Accuracy         : Real_Float_List;
-   Accuracy_2D      : Real_Float_List_2D;
    Kernel           : Unbounded_String;
 begin
    Put_Line ("Train_Size" & Integer'Image (Train_Size));
@@ -47,16 +45,18 @@ begin
                      Python_CLF.Call (Classifier, "predict", Estimator,
                                       Test_Data.Features);
    begin
-      Put_Line ("Train accuracy: " &
+      Put_Line ("Neighbours train accuracy: " &
                   Float'Image ((Test_Score (Train_Pred, Train_Data.Labels)) /
-                         Float (Train_Size)));
-      Put_Line ("Test accuracy: " &
+                    Float (Train_Size)));
+      Put_Line ("Neighbours test accuracy: " &
                   Float'Image ((Test_Score (Test_Pred, Test_Data.Labels)) /
-                         Float (Test_Size)));
+                    Float (Test_Size)));
    end;
+   New_Line;
 
    Python_API.Py_DecRef (Estimator);
 
+   Put_Line ("Train and test accuracies: ");
    for k in Tests'Range loop
       Kernel :=  Tests (k);
       Estimator := Python.Call (Classifier, "init_svc", Kernel);
@@ -71,19 +71,16 @@ begin
                         Python_CLF.Call (Classifier, "predict", Estimator,
                                          Test_Data.Features);
       begin
-         Accuracy.Clear;
-         Accuracy.Append (Float (Tests'Length));
-         Accuracy.Append (Float (Test_Score (Train_Pred, Train_Data.Labels)) /
-                            Float (Train_Size));
-         Accuracy.Append (Float (Test_Score (Test_Pred, Test_Data.Labels)) /
-                            Float (Test_Size));
+         Put_Line (To_String (Kernel) & " accuracy: " &
+                     Float'Image ((Test_Score (Train_Pred, Train_Data.Labels)) /
+                       Float (Train_Size)) & " " &
+                     Float'Image ((Test_Score (Test_Pred, Test_Data.Labels)) /
+                       Float (Test_Size)));
       end;
-      Python_API.Py_DecRef (Estimator);
 
-      Accuracy_2D.Append (Accuracy);
+      Python_API.Py_DecRef (Estimator);
    end loop;
 
-   Python.Call (Classifier, "plot", Accuracy_2D);
    Python.Finalize;
 
    Put_Line (Project_Name & "finished.");
