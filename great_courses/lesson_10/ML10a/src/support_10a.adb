@@ -3,6 +3,8 @@ with Ada.Strings;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Maths;
+
 --  with Basic_Printing; use Basic_Printing;
 with Neural_Loader;
 
@@ -113,16 +115,56 @@ package body Support_10A is
          return Data;
       end;
 
---        declare
---           Data  : Data_Record (Integer (Features.Length),
---                                Integer (Features (1).Length));
---        begin
---           Data.Features := To_Real_Float_Matrix (Features);
---           Data.Labels := To_Integer_Array (Labels);
---           return Data;
---        end;
-
    end Get_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Split_Data (Data : Data_Record) return Split_Data_Record is
+      type Data_List_Record is record
+         Features : Float_Array_List;
+         Labels   : ML_Types.Integer_List;
+      end record;
+
+      Data_Index : Natural := 0;
+      Mask       : Boolean_Array (1 .. Data.Num_Items);
+      Features   : Float_Array (1 .. Data.Num_Features);
+      Data_List  : Data_List_Record;
+   begin
+      for index in Mask'Range loop
+         Mask (index) :=
+           Maths.Random_Integer (1, Data.Num_Items) <= MS_Size;
+      end loop;
+
+      for row in Data.Features'Range loop
+         if Mask (row) then
+            Data_Index := Data_Index + 1;
+            for col in Data.Features'Range (2) loop
+               Features (col) := Data.Features (row, col);
+            end loop;
+            Data_List.Features.Append (Features);
+            Data_List.Labels.Append (Data.Labels (row, 1));
+         end if;
+      end loop;
+
+      declare
+         Features : Float_Array (1 .. Data.Num_Features);
+         Result   : Data_Record (Positive (Data_List.Features.Length),
+                                 Data.Num_Features);
+      begin
+         for row in 1 .. Data_List.Features.Length loop
+            Features := Data_List.Features (Integer (row));
+            for col in 1 .. Data.Num_Features loop
+               Result.Features (Integer (row), col) := Features (col);
+            end loop;
+
+            Result.Labels (Integer (row), 1) :=
+              Data_List.Labels (Integer (row));
+         end loop;
+
+         return Result;
+      end;
+
+   end Split_Data;
 
    --  -------------------------------------------------------------------------
 
