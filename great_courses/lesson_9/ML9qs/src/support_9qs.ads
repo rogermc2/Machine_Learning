@@ -10,6 +10,6 @@ package Support_9QS is
 
    function Get_Data (File_Name : String) return Data_Record;
    function Test_Score (Predictions : Real_Float_Vector;
-                        Labels      : Integer_Array) return Natural;
+                        Labels      : Integer_Array) return Float;
 
 end Support_9QS;

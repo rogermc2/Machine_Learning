@@ -72,7 +72,7 @@ package body Support_9QS is
    --  -------------------------------------------------------------------------
 
    function Test_Score (Predictions : Real_Float_Vector;
-                        Labels      : Integer_Array) return Natural is
+                        Labels      : Integer_Array) return Float is
 --        Routine_Name : constant String := "Support_9QS.Test_Score ";
       Correct      : Natural := 0;
    begin
@@ -82,7 +82,7 @@ package body Support_9QS is
          end if;
       end loop;
 
-      return Correct;
+      return Float (Correct);
 
    end Test_Score;
 

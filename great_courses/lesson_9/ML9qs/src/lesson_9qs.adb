@@ -35,20 +35,41 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_9qs");
 
+   Estimator := Python.Call (Classifier, "init_neighbours");
+
+   Python_CLF.Call (Classifier, "fit", Estimator, Train_Data.Features,
+                    Train_Data.Labels);
+   declare
+      Train_Pred : constant Real_Float_Vector :=
+                     Python_CLF.Call (Classifier, "predict", Estimator,
+                                      Train_Data.Features);
+      Test_Pred  : constant Real_Float_Vector :=
+                     Python_CLF.Call (Classifier, "predict", Estimator,
+                                      Test_Data.Features);
+   begin
+      Put_Line ("Train accuracy: " &
+                  Float'Image ((Test_Score (Train_Pred, Train_Data.Labels)) /
+                         Float (Train_Size)));
+      Put_Line ("Test accuracy: " &
+                  Float'Image ((Test_Score (Test_Pred, Test_Data.Labels)) /
+                         Float (Test_Size)));
+   end;
+
+   Python_API.Py_DecRef (Estimator);
+
    for k in Tests'Range loop
       Kernel :=  Tests (k);
-      Estimator :=
-        Python.Call (Classifier, "init_svc", Kernel);
+      Estimator := Python.Call (Classifier, "init_svc", Kernel);
 
       Python_CLF.Call (Classifier, "fit", Estimator, Train_Data.Features,
                        Train_Data.Labels);
       declare
          Train_Pred : constant Real_Float_Vector :=
-                         Python_CLF.Call (Classifier, "predict", Estimator,
-                                          Train_Data.Features);
+                        Python_CLF.Call (Classifier, "predict", Estimator,
+                                         Train_Data.Features);
          Test_Pred  : constant Real_Float_Vector :=
                         Python_CLF.Call (Classifier, "predict", Estimator,
-                                          Test_Data.Features);
+                                         Test_Data.Features);
       begin
          Accuracy.Clear;
          Accuracy.Append (Float (Tests'Length));
