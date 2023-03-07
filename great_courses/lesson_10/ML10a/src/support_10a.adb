@@ -84,8 +84,12 @@ package body Support_10A is
             Unbound_Value.UB_String_Value := Element (Word_Cursor);
             Data.Features (row - 1, 2) := Unbound_Value;
             Next (Word_Cursor);              --  Age
-            Integer_Value.Integer_Value :=
-              Integer'Value (To_String (Element (Word_Cursor)));
+            if To_String (Element (Word_Cursor))'Length = 0 then
+               Integer_Value.Integer_Value := 50;
+            else
+               Integer_Value.Integer_Value :=
+                 Integer'Value (To_String (Element (Word_Cursor)));
+            end if;
             Data.Features (row - 1, 3) := Integer_Value;
             Next (Word_Cursor);              --  SibSp
             Integer_Value.Integer_Value :=
