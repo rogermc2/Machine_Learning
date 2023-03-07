@@ -13,10 +13,10 @@ with Support_10A; use Support_10A;
 procedure Lesson_10A is
    use CSV_Data_Loader;
    Routine_Name  : constant String := "Lesson 10A ";
-   Train_Size    : constant Positive := 768 / 2;
-   Test_Size     : constant Positive := Train_Size;
+   Train_Size    : constant Positive := 580;
+   Test_Size     : constant Positive := 300;
    Data          : constant Base_Split_State :=
-                     Get_Split_State ("../../data/diabetes.csv", Diabetes_Data,
+                     Get_Split_State ("../../data/ship.csv", Ship_Data,
                                       Train_Size, Test_Size, Shuffle => True,
                                       Reload => True);
    Classifier       : Python.Module;

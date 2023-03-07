@@ -3,7 +3,7 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package CSV_Data_Loader is
 
-   type Data_Kind is (Digits_Data, Iris_Data, Diabetes_Data);
+   type Data_Kind is (Digits_Data, Iris_Data, Diabetes_Data, Ship_Data);
 
    type Base_Split_State (Num_Train, Num_Test, Num_Features : Positive;
                           Y_Categorized : Boolean)
