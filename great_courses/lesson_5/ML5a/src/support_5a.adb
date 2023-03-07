@@ -1,11 +1,48 @@
 
+with Interfaces.C;
+
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Handling;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Python_API;
 with To_BMP;
+with Tuple_Builder;
 
 package body Support_5A is
+
+   procedure Call (M : Python.Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) is
+      use Interfaces.C;
+      use Python_API;
+      use Tuple_Builder;
+
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1      : PyObject;
+                              I1      : int) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      --        Routine_Name : constant String := "Python.Call U8_3D ";
+      F            : PyObject;
+      Row_Length   : constant int := int (A'Length (2));
+      A_Tuple      : PyObject;
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      F := Python.Get_Symbol (M, Function_Name);
+      A_Tuple := To_Tuple (A);
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("Oi"),
+                                 A_Tuple, Row_Length);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
 
    function Get_Pixels
      (Image                     : Unsigned_8_Array_3D;
@@ -46,7 +83,9 @@ package body Support_5A is
       Routine_Name    : constant String := "Support_5A.Get_Pixels ";
       File_Name_Upper : constant String := To_Upper (File_Name);
       File_Kind       : constant String :=
-                          File_Name_Upper (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
+                          File_Name_Upper
+                            (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
+--        Swap            : Interfaces.Unsigned_8;
    begin
       if File_Kind = ".PNG" then
          declare
@@ -61,6 +100,9 @@ package body Support_5A is
                   for pix in Clipped'Range (3) loop
                      Clipped (row, col, pix) := Initial (row, col, pix);
                   end loop;
+--                    Swap := Clipped (row, col, 2);
+--                    Clipped (row, col, 2) := Clipped (row, col, 3);
+--                    Clipped (row, col, 3) := Swap;
                end loop;
             end loop;
 

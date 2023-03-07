@@ -4,6 +4,7 @@ with Ada.Characters.Handling;
 with Ada.Characters.Latin_1;
 with Ada.Containers;
 with Ada.Strings.Fixed;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -153,80 +154,6 @@ package body Neural_Utilities is
    end Is_Integer;
 
    --  ---------------------------------------------------------------------------
-
-   function Load_CSV_Data (File_Name : String) return Unbounded_List is
-      Data_File : File_Type;
-      Data      : Unbounded_List;
-   begin
-      Open (Data_File, In_File, File_Name);
-      Data := Load_CSV_Data (Data_File);
-      Close (Data_File);
-
-      return Data;
-
-   end Load_CSV_Data;
-
-   --  -------------------------------------------------------------------------
-
-   function Load_CSV_Data (Data_File : File_Type) return Unbounded_List is
-      Data : Unbounded_List;
-   begin
-      while not End_Of_File (Data_File) loop
-         Data.Append (To_Unbounded_String (Get_Line (Data_File)));
-      end loop;
-
-      return Data;
-
-   end Load_CSV_Data;
-
-   --  -------------------------------------------------------------------------
-
-   function Load_Raw_CSV_Data (File_Name : String;
-                               Max_Lines : Positive := 20000)
-                               return Raw_Data_Vector is
-      Data_File : File_Type;
-      Data      : Raw_Data_Vector;
-   begin
-      Put_Line ("Loading " & File_Name & " CSV Data");
-      Open (Data_File, In_File, File_Name);
-      Data := Load_Raw_CSV_Data (Data_File, Max_Lines);
-      Close (Data_File);
-
-      return Data;
-
-   end Load_Raw_CSV_Data;
-
-   --  -------------------------------------------------------------------------
-
-   function Load_Raw_CSV_Data (Data_File : File_Type;
-                               Max_Lines : Positive := 20000)
-                               return Raw_Data_Vector is
-      use String_Package;
-      Data_Line : Unbounded_String;
-      CSV_Line  : String_List;
-      Curs      : String_Package.Cursor;
-      Num_Lines : Natural := 0;
-      Values    : Unbounded_List;
-      Data      : Raw_Data_Vector;
-   begin
-      while not End_Of_File (Data_File) and Num_Lines <= Max_Lines loop
-         Data_Line := To_Unbounded_String (Get_Line (Data_File));
-         Num_Lines := Num_Lines + 1;
-         CSV_Line := Split_String (To_String (Data_Line), ",");
-         Curs := CSV_Line.First;
-         Values.Clear;
-         while Has_Element (Curs) loop
-            Values.Append (Element (Curs));
-            Next (Curs);
-         end loop;
-         Data.Append (Values);
-      end loop;
-
-      return Data;
-
-   end Load_Raw_CSV_Data;
-
-   --  -------------------------------------------------------------------------
 
    function Number_Of_Features (Rows : Rows_Vector) return Class_Range is
       Data  : constant Row_Data := Rows.First_Element;
@@ -416,36 +343,6 @@ package body Neural_Utilities is
    end Print_Value_Record;
 
    --  ------------------------------------------------------------------------
-
-   --     function Prediction_String (Label_Counts : Predictions_List)
-   --                                 return String is
-   --        use Prediction_Data_Package;
-   --        Count_Cursor : Cursor := Label_Counts.First;
-   --        Prediction   : Prediction_Data;
-   --        Total        : Natural := 0;
-   --        Leaf_Data    : Unbounded_String := To_Unbounded_String
-   --          ("{'");
-   --     begin
-   --        while Has_Element (Count_Cursor) loop
-   --           Total := Total + Element (Count_Cursor).Num_Copies;
-   --           Next (Count_Cursor);
-   --        end loop;
-   --        Count_Cursor := Label_Counts.First;
-   --        while Has_Element (Count_Cursor) loop
-   --           Prediction := Element (Count_Cursor);
-   --           Leaf_Data := Leaf_Data & To_Unbounded_String
-   --             (To_String (Prediction.Label) & "': '" &
-   --                Integer'Image ((100 * Prediction.Num_Copies) / Total) &
-   --                "%'");
-   --           if Count_Cursor /= Label_Counts.Last then
-   --              Leaf_Data := Leaf_Data & ", ";
-   --           end if;
-   --           Next (Count_Cursor);
-   --        end loop;
-   --        return To_String (Leaf_Data) & "}";
-   --     end Prediction_String;
-
-   --  -------------------------------------------------------------------------
 
    procedure Print_Feature_Values (Message : String; Rows : Rows_Vector;
                                    Column  : Class_Range) is

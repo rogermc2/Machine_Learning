@@ -6,7 +6,7 @@ with ML_Types;
 with NL_Types;
 with Estimator;
 
-package Label is
+package Tree_Label is
 
    type Class_Type is (Class_Unique, Class_Label);
    subtype Param_Label is Unbounded_String;
@@ -41,4 +41,4 @@ package Label is
                        Y    : ML_Types.Value_Data_List)
                         return NL_Types.Natural_List;
 
-end Label;
+end Tree_Label;

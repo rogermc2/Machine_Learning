@@ -3,9 +3,9 @@ project Lesson_04BP_Neuron is
    type Operating_System_Type is
       ("high_sierra", "ventura");
    Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
-
    for Source_Dirs use ("src", "../../../python_c_api", "../../../neural_learning/common", "../../../common", "../../../neural_learning/test", "../../../neural_learning/neural_network", "../../../neural_learning/datasets", 
-      "../../../neural_learning/decision_tree_classifier/support", "../../../neural_learning/model_selection", "../../../neural_learning/utils");
+      "../../../neural_learning/model_selection", "../../../neural_learning/utils", "../../../tree_learning/utils", "../../../tree_learning/decision_tree_classifier/src", 
+      "../../../tree_learning/decision_tree_classifier/support");
    for Object_Dir use "obj";
    for Main use ("lesson_4bp_neuron.adb");
    for Exec_Dir use ".";
@@ -16,6 +16,7 @@ project Lesson_04BP_Neuron is
    end Compiler;
 
    package Linker is
+
       case Operating_System is
 
          when "high_sierra" =>

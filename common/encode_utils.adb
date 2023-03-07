@@ -4,12 +4,16 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Neural_Utilities;
 --  with Printing;
 
 package body Encode_Utils is
 
-   --     package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
-   --     package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
+   package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
+   function Encode_Check_Unknown
+     (Values : ML_Types.Value_Data_List; Uniques : ML_Types.Value_Data_List)
+      return ML_Types.Value_Data_List;
+   package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
 
    function Encode_Check_Unknown
      (Values : Integer_Array; Uniques : Integer_Array)
@@ -58,6 +62,53 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
 
+   function Encode (Values : ML_Types.Value_Data_List)
+                    return ML_Types.Value_Data_List is
+      Sorted_Values : ML_Types.Value_Data_List := Values;
+      Uniques       : ML_Types.Value_Data_List :=
+                        ML_Types.Value_Data_Package.Empty_Vector;
+   begin
+
+      ML_Types.Value_Data_Sorting.Sort (Sorted_Values);
+
+      --        Printing.Print_Value_Data_List
+      --          ("Encode_Utils.Encode Uniques", Uniques);
+      Uniques := Unique (Values);
+      return Uniques;
+
+   end Encode;
+
+   --  -------------------------------------------------------------------------
+   --  Values : values to encode.
+   --  Uniques : unique values in Values; Uniques needs to be sorted.
+   --  Check_Unknown : if True check Values for values that are not in Uniques
+   --  and raise an error.
+   function Encode (Values        : ML_Types.Value_Data_List;
+                    Uniques       : ML_Types.Value_Data_List;
+                    Check_Unknown : Boolean := True)
+                    return NL_Types.Natural_List is
+      Diff          : ML_Types.Value_Data_List;
+      Result        : NL_Types.Natural_List;
+   begin
+      Result := Map_To_Integer (Values, Uniques);
+      if Check_Unknown then
+         Diff := Encode_Check_Unknown (Values, Uniques);
+         if not Diff.Is_Empty then
+            New_Line;
+            Put ("Encode_Error: Encode_Utils.Encode Values contains ");
+            Put_Line ("previously unseen labels.");
+            --              Printing.Print_Value_Data_List ("Unique list", Uniques);
+            --              Printing.Print_Value_Data_List ("Unseen labels", Diff);
+            raise Encode_Error;
+         end if;
+      end if;
+
+      return Result;
+
+   end Encode;
+
+   --  -------------------------------------------------------------------------
+
    function Encode_Check_Unknown
      (Values : Integer_Array; Uniques : Integer_Array)
       return Integer_Array is
@@ -83,6 +134,30 @@ package body Encode_Utils is
    end Encode_Check_Unknown;
 
    --  -------------------------------------------------------------------------
+
+   function Encode_Check_Unknown
+     (Values : ML_Types.Value_Data_List; Uniques : ML_Types.Value_Data_List)
+      return ML_Types.Value_Data_List is
+      use ML_Types;
+      No_Inverse  : NL_Types.Natural_List :=
+                      NL_Types.Natural_Package.Empty_Vector;
+      Unique_Vals : constant Value_Data_List :=
+                      Encode_Utils.Unique (Values, No_Inverse);
+      aVal        : Value_Record;
+      Diff        : Value_Data_List;
+   begin
+      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
+         aVal := Unique_Vals.Element (index);
+         if not Uniques.Contains (aVal) then
+            Diff.Append (aVal);
+         end if;
+      end loop;
+
+      return Diff;
+   end Encode_Check_Unknown;
+
+   --  -------------------------------------------------------------------------
+
    --  Map each value based on its position in uniques.
    function Map_To_Integer (Values  : Integer_Array;
                             Uniques : Integer_Array)
@@ -104,6 +179,41 @@ package body Encode_Utils is
          Assert (Found, Routine_Name & "error, Value not found in Uniques" &
                    Integer'Image (aValue));
          Result (index) := aValue;
+      end loop;
+
+      return Result;
+
+   end Map_To_Integer;
+
+   --  -------------------------------------------------------------------------
+   --  Map each value based on its position in uniques.
+   function Map_To_Integer (Values  : ML_Types.Value_Data_List;
+                            Uniques : ML_Types.Value_Data_List)
+                            return NL_Types.Natural_List is
+      use ML_Types;
+      use Value_Data_Package;
+      Values_Curs  : Value_Data_Package.Cursor := Values.First;
+      Uniques_Curs : Value_Data_Package.Cursor := Uniques.First;
+      Result       : NL_Types.Natural_List;
+      aValue       : Value_Record;
+   begin
+      Result.Set_Length (Values.Length);
+      for index in Result.First_Index .. Result.Last_Index loop
+         Result (index) := 0;
+      end loop;
+
+      while Has_Element (Values_Curs) loop
+         aValue := Element (Values_Curs);
+         Uniques_Curs := Uniques.Find (aValue);
+         if Uniques_Curs = No_Element then
+            Put_Line ("Encode_Utils.Map_To_Integer error");
+            Neural_Utilities.Print_Value_Record
+              ("Value record not found in Uniques",
+               aValue);
+         else
+            Result (To_Index (Values_Curs)) := To_Index (Uniques_Curs);
+         end if;
+         Next (Values_Curs);
       end loop;
 
       return Result;
@@ -210,6 +320,31 @@ package body Encode_Utils is
       Sort (Uniq_List);
 
       return To_Boolean_Array (Uniq_List);
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : ML_Arrays_And_Matrices.Boolean_Array)
+                    return NL_Types.Natural_List is
+      use NL_Types.Natural_Package;
+      use NL_Types.Natural_Sorting;
+      Value       : Natural;
+      Uniq_List   : NL_Types.Natural_List;
+   begin
+      for index in Values'Range loop
+         if Values (index) then
+            Value := 1;
+         else
+            Value := 0;
+         end if;
+         if not Uniq_List.Contains (Value) then
+            Uniq_List.Append (Value);
+         end if;
+      end loop;
+
+      Sort (Uniq_List);
+      return Uniq_List;
 
    end Unique;
 
@@ -372,8 +507,8 @@ package body Encode_Utils is
    function Unique (Values : Integer_Matrix) return ML_Types.Integer_List is
       use Int_Sets;
       use ML_Types.Integer_Sorting;
---        Routine_Name    : constant String :=
---                            "Encode_Utils.Unique Integer_Matrix ";
+      --        Routine_Name    : constant String :=
+      --                            "Encode_Utils.Unique Integer_Matrix ";
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
@@ -449,6 +584,67 @@ package body Encode_Utils is
 
       Sort (Uniq_List);
 
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : ML_Arrays_And_Matrices.Integer_Array)
+                    return NL_Types.Natural_List is
+      use NL_Types.Natural_Package;
+      use NL_Types.Natural_Sorting;
+      Uniq_List   : NL_Types.Natural_List;
+   begin
+      for index in Values'Range loop
+         if not Uniq_List.Contains (Values (index)) then
+            Uniq_List.Append (Values (index));
+         end if;
+      end loop;
+
+      Sort (Uniq_List);
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : ML_Arrays_And_Matrices.Natural_Array)
+                    return NL_Types.Natural_List is
+      use NL_Types.Natural_Package;
+      use NL_Types.Natural_Sorting;
+      Uniq_List   : NL_Types.Natural_List;
+   begin
+      for index in Values'Range loop
+         if not Uniq_List.Contains (Values (index)) then
+            Uniq_List.Append (Values (index));
+         end if;
+      end loop;
+
+      Sort (Uniq_List);
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : NL_Types.Natural_List)
+                    return NL_Types.Natural_List is
+      use NL_Types.Natural_Package;
+      use NL_Types.Natural_Sorting;
+      Values_Curs : NL_Types.Natural_Package.Cursor := Values.First;
+      aValue      : Natural;
+      Uniq_List   : NL_Types.Natural_List;
+   begin
+      while Has_Element (Values_Curs) loop
+         aValue := Element (Values_Curs);
+         if not Uniq_List.Contains (aValue) then
+            Uniq_List.Append (aValue);
+         end if;
+         Next (Values_Curs);
+      end loop;
+
+      Sort (Uniq_List);
       return Uniq_List;
 
    end Unique;
@@ -569,6 +765,157 @@ package body Encode_Utils is
       end loop;
 
       Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : ML_Types.Value_Data_List)
+                    return ML_Types.Value_Data_List is
+      use ML_Types;
+      use Int_Sets;
+      use Value_Data_Package;
+      use Value_Data_Sorting;
+      Values_Curs       : Value_Data_Package.Cursor := Values.First;
+      aValue            : Value_Record;
+      Bool_Value        : Value_Record (Boolean_Type);
+      Float_Value       : Value_Record (Float_Type);
+      Int_Value         : Value_Record (Integer_Type);
+      UB_String_Value   : Value_Record (UB_String_Type);
+      Unique_Booleans   : Bool_Sets.Set;
+      Unique_Floats     : Float_Sets.Set;
+      Unique_Integers   : Int_Sets.Set;
+      Unique_UB_Strings : UB_String_Sets.Set;
+      Booleans_Curs     : Bool_Sets.Cursor;
+      Floats_Curs       : Float_Sets.Cursor;
+      Ints_Curs         : Int_Sets.Cursor;
+      UB_Strings_Curs   : UB_String_Sets.Cursor;
+      Uniq_List         : Value_Data_List;
+   begin
+      while Has_Element (Values_Curs) loop
+         aValue := Element (Values_Curs);
+         case aValue.Value_Kind is
+         when Boolean_Type =>
+            Unique_Booleans.Include (aValue.Boolean_Value);
+         when Float_Type =>
+            Unique_Floats.Include (aValue.Float_Value);
+         when Integer_Type =>
+            Unique_Integers.Include (aValue.Integer_Value);
+         when UB_String_Type =>
+            Unique_UB_Strings.Include (aValue.UB_String_Value);
+         end case;
+         Next (Values_Curs);
+      end loop;
+
+      Booleans_Curs := Unique_Booleans.First;
+      while Bool_Sets.Has_Element (Booleans_Curs) loop
+         Bool_Value.Boolean_Value := Bool_Sets.Element (Booleans_Curs);
+         Uniq_List.Append (Bool_Value);
+         Bool_Sets.Next (Booleans_Curs);
+      end loop;
+
+      Floats_Curs := Unique_Floats.First;
+      while Float_Sets.Has_Element (Floats_Curs) loop
+         Float_Value.Float_Value := Float_Sets.Element (Floats_Curs);
+         Uniq_List.Append (Float_Value);
+         Float_Sets.Next (Floats_Curs);
+      end loop;
+
+      Ints_Curs := Unique_Integers.First;
+      while Int_Sets.Has_Element (Ints_Curs) loop
+         Int_Value.Integer_Value := Int_Sets.Element (Ints_Curs);
+         Uniq_List.Append (Int_Value);
+         Int_Sets.Next (Ints_Curs);
+      end loop;
+
+      UB_Strings_Curs := Unique_UB_Strings.First;
+      while UB_String_Sets.Has_Element (UB_Strings_Curs) loop
+         UB_String_Value.UB_String_Value :=
+           UB_String_Sets.Element (UB_Strings_Curs);
+         Uniq_List.Append (UB_String_Value);
+         UB_String_Sets.Next (UB_Strings_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values         : ML_Types.Value_Data_List;
+                    Inverse        : out NL_Types.Natural_List)
+                    return ML_Types.Value_Data_List is
+      use ML_Types;
+      use Int_Sets;
+      use Value_Data_Package;
+      use Value_Data_Sorting;
+      Values_Curs       : Value_Data_Package.Cursor := Values.First;
+      aValue            : Value_Record;
+      Bool_Value        : Value_Record (Boolean_Type);
+      Float_Value       : Value_Record (Float_Type);
+      Int_Value         : Value_Record (Integer_Type);
+      UB_String_Value   : Value_Record (UB_String_Type);
+      Unique_Booleans   : Bool_Sets.Set;
+      Unique_Floats     : Float_Sets.Set;
+      Unique_Integers   : Int_Sets.Set;
+      Unique_UB_Strings : UB_String_Sets.Set;
+      Booleans_Curs     : Bool_Sets.Cursor;
+      Floats_Curs       : Float_Sets.Cursor;
+      Ints_Curs         : Int_Sets.Cursor;
+      UB_Strings_Curs   : UB_String_Sets.Cursor;
+      Uniq_List         : Value_Data_List;
+   begin
+      while Has_Element (Values_Curs) loop
+         aValue := Element (Values_Curs);
+         case aValue.Value_Kind is
+         when Boolean_Type =>
+            Unique_Booleans.Include (aValue.Boolean_Value);
+         when Float_Type =>
+            Unique_Floats.Include (aValue.Float_Value);
+         when Integer_Type =>
+            Unique_Integers.Include (aValue.Integer_Value);
+         when UB_String_Type =>
+            Unique_UB_Strings.Include (aValue.UB_String_Value);
+         end case;
+         Next (Values_Curs);
+      end loop;
+      New_Line;
+
+      Booleans_Curs := Unique_Booleans.First;
+      while Bool_Sets.Has_Element (Booleans_Curs) loop
+         Bool_Value.Boolean_Value := Bool_Sets.Element (Booleans_Curs);
+         Uniq_List.Append (Bool_Value);
+         Bool_Sets.Next (Booleans_Curs);
+      end loop;
+
+      Floats_Curs := Unique_Floats.First;
+      while Float_Sets.Has_Element (Floats_Curs) loop
+         Float_Value.Float_Value := Float_Sets.Element (Floats_Curs);
+         Uniq_List.Append (Float_Value);
+         Float_Sets.Next (Floats_Curs);
+      end loop;
+
+      Ints_Curs := Unique_Integers.First;
+      while Int_Sets.Has_Element (Ints_Curs) loop
+         Int_Value.Integer_Value := Int_Sets.Element (Ints_Curs);
+         Uniq_List.Append (Int_Value);
+         Int_Sets.Next (Ints_Curs);
+      end loop;
+
+      UB_Strings_Curs := Unique_UB_Strings.First;
+      while UB_String_Sets.Has_Element (UB_Strings_Curs) loop
+         UB_String_Value.UB_String_Value :=
+           UB_String_Sets.Element (UB_Strings_Curs);
+         Uniq_List.Append (UB_String_Value);
+         UB_String_Sets.Next (UB_Strings_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+      Inverse := Map_To_Integer (Values, Uniq_List);
 
       return Uniq_List;
 

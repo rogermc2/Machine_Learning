@@ -36,7 +36,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Classifier_Utilities;
 with Encode_Utils;
 
-package body Label is
+package body Tree_Label is
 
     --  -------------------------------------------------------------------------
     --  Fit fits label encoder
@@ -47,7 +47,7 @@ package body Label is
             Encoder.Uniques := Encode_Utils.Unique (Y);
         else
             raise Label_Error with
-              "Label.Fit called with label encoder instead of unique encode";
+              "Tree_Label.Fit called with label encoder instead of unique encode";
         end if;
     end Fit;
 
@@ -64,7 +64,7 @@ package body Label is
             Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
         else
             raise Label_Error with
-              "Label.Fit_Transform called with label encoder instead of unique encoder";
+              "Tree_Label.Fit_Transform called with label encoder instead of unique encoder";
         end if;
 
         return Encoded_Labels;
@@ -88,7 +88,7 @@ package body Label is
 
             Diff := Classifier_Utilities.Set_Diff (Labels, aRange);
             Assert (Diff.Is_Empty,
-                    "Label.Inverse_Transform Labels vector contains " &
+                    "Tree_Label.Inverse_Transform Labels vector contains " &
                       "previously unseen labels.");
 
             for index in 1 .. Positive (Labels.Length) loop
@@ -111,13 +111,14 @@ package body Label is
                 Labels := Encode_Utils.Encode (Y, Self.Uniques);
             else
                 raise Label_Error with
-                  "Label.Transform called with invalid encoder type.";
+                  "Tree_Label.Transform called with invalid encoder type.";
             end if;
         end if;
+
         return Labels;
 
     end Transform;
 
     --  -------------------------------------------------------------------------
 
-end Label;
+end Tree_Label;

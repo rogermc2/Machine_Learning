@@ -3,10 +3,10 @@ project ML6Q is
    type Operating_System_Type is
       ("high_sierra", "ventura");
    Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
-
    for Source_Dirs use ("src", "../../../common", "../../../neural_learning/common", "../../../neural_learning/base", "../../../neural_learning/neural_network", 
       "../../../neural_learning/decision_tree_classifier/support", "../../../neural_learning/utils", "../../../scipy/optimise", "../../../neural_learning/datasets", "../../../neural_learning/test", 
-      "../../../neural_learning/metrics", "../../../neural_learning/model_selection", "../../../python_c_api");
+      "../../../neural_learning/metrics", "../../../neural_learning/model_selection", "../../../python_c_api", "../../../tree_learning/decision_tree_classifier/src", 
+      "../../../tree_learning/decision_tree_classifier/support", "../../../tree_learning/utils");
    for Object_Dir use "obj";
    for Main use ("lesson_6q.adb");
    for Exec_Dir use ".";
@@ -15,7 +15,8 @@ project ML6Q is
    package Compiler is
       for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");
    end Compiler;
-package Linker is
+
+   package Linker is
 
       case Operating_System is
 

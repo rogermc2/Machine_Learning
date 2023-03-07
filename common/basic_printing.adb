@@ -53,6 +53,38 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Boolean_Array
+     (Name  : String; anArray : Boolean_Array;
+      Start : Positive := 1; Finish : Natural := 0) is
+      Last  : Positive;
+      Count : Positive := 1;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (anArray'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= anArray'First and then Finish <= anArray'Last then
+         for Index in Start .. Last loop
+            Put (Boolean'Image (anArray (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+      else
+         Put_Line
+           ("Print_Boolean_Array called with invalid start or finish index.");
+      end if;
+      New_Line;
+
+   end Print_Boolean_Array;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Byte_Array (Name  : String; anArray : Byte_Array;
                                Start : Positive := 1; Finish : Natural := 0) is
       Last  : Positive;
@@ -110,6 +142,48 @@ package body Basic_Printing is
       New_Line;
 
    end Print_Float_Array;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Float_List (Name : String; theList : NL_Types.Float_List) is
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put_Line (Name & ": ");
+      end if;
+
+      for Index in theList.First_Index .. theList.Last_Index loop
+         Put (Integer'Image (Index) & ": " &
+                Float'Image (theList.Element (Index)) & "   ");
+         Count := Count + 1;
+         if Count > 4 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Float_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Float_Lists_2D (Name  : String;
+                                   Data  : NL_Types.Float_List_2D;
+                                   Start : Positive := 1;
+                                   Last  : Positive := 10) is
+      Stop  : Integer := Last;
+   begin
+      if Stop > Integer (Data.Length) then
+         Stop := Integer (Data.Length);
+      end if;
+      Put_Line (Name & ": ");
+      for index in Start .. Stop loop
+         Print_Float_List ("List" & Integer'Image (index),
+                           Data.Element (index));
+      end loop;
+      New_Line;
+
+   end Print_Float_Lists_2D;
 
    --  ------------------------------------------------------------------------
 

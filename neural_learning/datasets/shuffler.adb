@@ -12,7 +12,7 @@ package body Shuffler is
 
    generic
       type Element_Type is private;
-      type Array_Type is array (Natural range <>) of Element_Type;
+      type Array_Type is array (Integer range <>) of Element_Type;
    procedure Generic_Shuffle (A : in out Array_Type);
 
    procedure Generic_Shuffle (A : in out Array_Type) is
@@ -32,8 +32,8 @@ package body Shuffler is
 
    --  -------------------------------------------------------------------------
 
-   procedure Shuffle_Integers is new Generic_Shuffle (Element_Type => Integer,
-                                                      Array_Type   => Integer_Array);
+   procedure Shuffle_Integers is new Generic_Shuffle
+     (Element_Type => Integer, Array_Type  => Integer_Array);
 
    --  -------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ package body Shuffler is
       type Element_Type2 is private;
       type Matrix_Type is array (Integer range <>, Integer range <>)
         of Element_Type1;
-      type Array_Type is array (Natural range <>) of Element_Type2;
+      type Array_Type is array (Integer range <>) of Element_Type2;
    procedure Generic_MA_Shuffle (A : in out Matrix_Type;
                                  B : in out Array_Type);
 
@@ -164,7 +164,7 @@ package body Shuffler is
       type Element_Type2 is private;
       type Matrix_Type is array (Integer range <>, Integer range <>)
         of Element_Type1;
-      type Array_Type is array (Natural range <>) of Element_Type2;
+      type Array_Type is array (Integer range <>) of Element_Type2;
    procedure Generic_MA_Column_Shuffle (A : in out Matrix_Type;
                                         B : in out Array_Type);
 

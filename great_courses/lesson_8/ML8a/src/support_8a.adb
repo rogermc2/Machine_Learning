@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 with ML_Types;
-with Neural_Utilities;
+with Neural_Loader;
 
 package body Support_8A is
 
@@ -25,12 +25,12 @@ package body Support_8A is
       Features     : Real_Float_List_2D;
       Labels       : ML_Types.Integer_List;
    begin
-      Raw_Data := Neural_Utilities.Load_CSV_Data (File_Name);
+      Raw_Data := Neural_Loader.Load_CSV_Data (File_Name);
       Put_Line (Routine_Name & File_Name & " loaded");
 
       for row in Raw_Data.First_Index .. Raw_Data.Last_Index loop
          Row_Words :=
-           Neural_Utilities.Split_String (To_String (Raw_Data (row)), ",");
+           Neural_Loader.Split_String (To_String (Raw_Data (row)), ",");
          Word_Cursor := Row_Words.First;
          while Has_Element (Word_Cursor) loop
             aWord := Element (Word_Cursor);

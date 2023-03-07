@@ -12,7 +12,7 @@ with Python_API;
 with Support_Iris; use Support_Iris;
 
 procedure ML8_Iris is
-   use CSV_Data_Loader; use CSV_Data_Loader;
+   use CSV_Data_Loader;
    Project_Name     : constant String := "ML8 Iris ";
    Train_Size       : constant Positive := 140;
    Test_Size        : constant Positive := 10;

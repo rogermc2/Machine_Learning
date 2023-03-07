@@ -950,7 +950,7 @@ package body Label is
       Classes_Array : constant Integer_Array := To_Integer_Array (Classes);
       Y_Array       : constant Integer_Array := To_Integer_Array (Y);
       package Label_Binarize_Int is new Generic_Label_Binarize_Array
-        (Index_Type => Natural, Class_Type => Integer,
+        (Index_Type => integer, Class_Type => Integer,
          Y_Array_Type  => Integer_Array ,
          Class_Array_Type => Integer_Array,
          Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
@@ -994,7 +994,7 @@ package body Label is
                         To_Integer_Array (Classes);
       package Label_Binarize_Integer_Array_List is new
         Generic_Label_Binarize_Array_List
-          (Index_Type         => Natural,
+          (Index_Type         => Integer,
            Class_Type         => Integer,
            Y_Array_Type       => Integer_Array,
            Array_List_Package => Integer_Array_Package,
@@ -1019,7 +1019,7 @@ package body Label is
       Classes_Array : constant Integer_Array :=
                         To_Integer_Array (Classes);
       package Label_Binarize_Integer is new Generic_Label_Binarize_Matrix
-        (Index_Type => Natural, Class_Type => Integer,
+        (Index_Type => Integer, Class_Type => Integer,
          Y_Matrix_Type => Integer_Matrix,
          Class_Array_Type => Integer_Array,
          Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");

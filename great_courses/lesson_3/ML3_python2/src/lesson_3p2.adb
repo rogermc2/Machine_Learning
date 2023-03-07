@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with ML_Types; use ML_Types;
 
 with Basic_Printing; use Basic_Printing;
-with Classifier_Utilities;
+with Classifier_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 
@@ -14,7 +14,7 @@ procedure Lesson_3P2 is
    use ML_Types.String_Package;
    Routine_Name  : constant String := "Lesson_3P2 ";
    Data          : constant Multi_Output_Data_Record :=
-                     Classifier_Utilities.Load_Data
+                     Classifier_Loader.Load_Data
                        ("../../data/diabetes.csv");
    --  feats
    Feature_Names : constant String_List := Data.Feature_Names;

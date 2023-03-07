@@ -21,17 +21,15 @@ package body ML is
      (Mask, Foreground : Unsigned_8_Array_3D; Background : Unsigned_8_Array_3D)
       return Unsigned_8_Array_3D is
       use Interfaces;
-      Routine_Name : constant String := "ML.Composite ";
+      --        Routine_Name : constant String := "ML.Composite ";
       Shift        : constant Positive := 157;
       Last_Row     : constant Positive :=
                        Integer'Min (Background'Length, Foreground'Length + Shift);
       Last_Col     : constant Positive :=
-                      Integer'Min (Background'Length (2), Foreground'Length (2));
+                       Integer'Min (Background'Length (2), Foreground'Length (2));
       FG_Row       : Integer;
       Result       : Unsigned_8_Array_3D := Background;
    begin
-      Print_Matrix_Dimensions (Routine_Name & "Mask", Mask);
-
       for row in 1 .. Last_Row loop
          for col in 1 .. Last_Col loop
             FG_Row := row - Shift;
