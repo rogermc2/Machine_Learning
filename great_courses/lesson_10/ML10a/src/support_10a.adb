@@ -124,48 +124,50 @@ package body Support_10A is
    --  -------------------------------------------------------------------------
 
    function Split_Data (Data : Data_Record) return Split_Data_Record is
-      type Data_List_Record is record
-         Features : Float_Array_List;
-         Labels   : ML_Types.Integer_List;
-      end record;
-
-      Data_Index : Natural := 0;
-      Mask       : Boolean_Array (1 .. Data.Num_Items);
-      Features   : Float_Array (1 .. Data.Num_Features);
-      Data_List  : Data_List_Record;
+      Mask         : Boolean_Array (1 .. Data.Num_Items);
+      Train_Length : Natural := 0;
+      Test_Length  : Natural := 0;
    begin
       for index in Mask'Range loop
          Mask (index) :=
-           Maths.Random_Integer (1, Data.Num_Items) <= MS_Size;
-      end loop;
-
-      for row in Data.Features'Range loop
-         if Mask (row) then
-            Data_Index := Data_Index + 1;
-            for col in Data.Features'Range (2) loop
-               Features (col) := Data.Features (row, col);
-            end loop;
-            Data_List.Features.Append (Features);
-            Data_List.Labels.Append (Data.Labels (row, 1));
+           Maths.Random_Integer (0, 1) = 1;
+         if Mask (index) then
+            Train_Length := Train_Length + 1;
+         else
+            Test_Length := Test_Length + 1;
          end if;
       end loop;
 
       declare
-         Features : Float_Array (1 .. Data.Num_Features);
-         Result   : Data_Record (Positive (Data_List.Features.Length),
-                                 Data.Num_Features);
+         Train_Data : Data_Record (Train_Length, Data.Num_Features);
+         Test_Data  : Data_Record (Test_Length, Data.Num_Features);
+         Train_Row  : Natural := 0;
+         Test_Row   : Natural := 0;
       begin
-         for row in 1 .. Data_List.Features.Length loop
-            Features := Data_List.Features (Integer (row));
-            for col in 1 .. Data.Num_Features loop
-               Result.Features (Integer (row), col) := Features (col);
-            end loop;
-
-            Result.Labels (Integer (row), 1) :=
-              Data_List.Labels (Integer (row));
+         for row in Mask'Range loop
+            if Mask (row) then
+               Train_Row := Train_Row + 1;
+               for col in 1 .. Data.Num_Features loop
+                  Train_Data.Features (Train_Row, col) :=
+                    Data.Features (row, col);
+               end loop;
+               Train_Data.Labels (Train_Row) := Data.Labels (row);
+            else
+               Test_Row := Test_Row + 1;
+            end if;
          end loop;
 
-         return Result;
+         declare
+            Split_Data : Split_Data_Record (Train_Length, Test_Length,
+                                            Data.Num_Features);
+         begin
+            Split_Data.Train_Features := Train_Data.Features;
+            Split_Data.Train_Labels := Train_Data.Labels;
+            Split_Data.Test_Features := Test_Data.Features;
+            Split_Data.Test_Labels := Test_Data.Labels;
+
+            return Split_Data;
+         end;
       end;
 
    end Split_Data;
