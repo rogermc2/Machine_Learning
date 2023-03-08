@@ -10,45 +10,44 @@ with Support_10A; use Support_10A;
 
 procedure Lesson_10A is
    Routine_Name     : constant String := "Lesson 10A ";
-   Data             : constant Data_Record := Get_Data ("../../data/ship.csv");
---     Num_Hidden       : constant Positive := 60;
+   Data             : constant Split_Data_Record :=
+                        Get_Split_Data ("../../data/ship.csv");
+   Num_Hidden       : constant Positive := 60;
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
---     Train_Error_List : Real_Float_List;
---     Test_Error_List  : Real_Float_List;
+   --     Train_Error_List : Real_Float_List;
+   --     Test_Error_List  : Real_Float_List;
 begin
    New_Line;
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_10a");
 
-   for degree in 0 .. 7 loop
-      Estimator := Python.Call (Classifier, "init_svc", degree);
---        Python_CLF.Call (Classifier, "fit", Estimator, Data.Train_X,
---                         Data.Train_Y);
+   Estimator := Python.Call (Classifier, "init_mlp", Num_Hidden);
+   --        Python_CLF.Call (Classifier, "fit", Estimator, Data.Train_X,
+   --                         Data.Train_Y);
 
---        declare
---           Train_Predictions : constant Real_Float_Vector :=
---                                 Python_CLF.Call (Classifier, "predict",
---                                                  Estimator, Data.Train_X);
---           Test_Predictions  : constant Real_Float_Vector :=
---                                 Python_CLF.Call (Classifier, "predict",
---                                                  Estimator, Data.Test_X);
---           Train_Error    : constant Float :=
---                                 Error (Train_Predictions, Data.Train_Y);
---           Test_Error     : constant Float :=
---                                 Error (Test_Predictions,  Data.Test_Y);
---        begin
---           Degrees.Append (degree);
---           Train_Error_List.Append (Train_Error);
---           Test_Error_List.Append (Test_Error);
---        end;
+   --        declare
+   --           Train_Predictions : constant Real_Float_Vector :=
+   --                                 Python_CLF.Call (Classifier, "predict",
+   --                                                  Estimator, Data.Train_X);
+   --           Test_Predictions  : constant Real_Float_Vector :=
+   --                                 Python_CLF.Call (Classifier, "predict",
+   --                                                  Estimator, Data.Test_X);
+   --           Train_Error    : constant Float :=
+   --                                 Error (Train_Predictions, Data.Train_Y);
+   --           Test_Error     : constant Float :=
+   --                                 Error (Test_Predictions,  Data.Test_Y);
+   --        begin
+   --           Degrees.Append (degree);
+   --           Train_Error_List.Append (Train_Error);
+   --           Test_Error_List.Append (Test_Error);
+   --        end;
 
-      Python_API.Py_DecRef (Estimator);
-   end loop;
+   Python_API.Py_DecRef (Estimator);
 
---     Python.Call (Classifier, "plot", Degrees, Train_Error_List,
---                  Test_Error_List);
+   --     Python.Call (Classifier, "plot", Degrees, Train_Error_List,
+   --                  Test_Error_List);
 
    Python.Close_Module (Classifier);
    Python.Finalize;

@@ -6,7 +6,6 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
---  with Ada.Numerics.Generic_Real_Arrays;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package ML_Types is

@@ -1,5 +1,6 @@
 
 with Ada.Strings;
+with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -79,16 +80,20 @@ package body Support_10A is
             Integer_Value.Integer_Value :=
               Integer'Value (To_String (Element (Word_Cursor)));
             Data.Features (row - 1, 1) := Integer_Value;
-            Next (Word_Cursor);              --  Name
+            Next (Word_Cursor);              --  First Name
+            Next (Word_Cursor);              --  Surname Name
             Next (Word_Cursor);              --  Sex
             Unbound_Value.UB_String_Value := Element (Word_Cursor);
             Data.Features (row - 1, 2) := Unbound_Value;
             Next (Word_Cursor);              --  Age
-            if To_String (Element (Word_Cursor))'Length = 0 then
+            aWord := Element (Word_Cursor);
+            if To_String (aWord)'Length = 0 then
                Integer_Value.Integer_Value := 50;
-            else
+            elsif Fixed.Index (To_String (aWord), ".") /= 0 then
                Integer_Value.Integer_Value :=
-                 Integer'Value (To_String (Element (Word_Cursor)));
+                 Integer (Float'Value (To_String (aWord)));
+            else
+               Integer_Value.Integer_Value := Integer'Value (To_String (aWord));
             end if;
             Data.Features (row - 1, 3) := Integer_Value;
             Next (Word_Cursor);              --  SibSp
@@ -106,7 +111,11 @@ package body Support_10A is
             Data.Features (row - 1, 6) := Float_Value;
             Next (Word_Cursor);              --  Cabin
             Next (Word_Cursor);              --  Embarked
-            Embarked := To_String (Element (Word_Cursor));
+            if To_String (Element (Word_Cursor))'Length /= 1 then
+               Embarked := " ";
+            else
+               Embarked := To_String (Element (Word_Cursor));
+            end if;
             Boolean_Value.Boolean_Value := Embarked = "S";
             Data.Features (row - 1, 7) := Boolean_Value;
             Boolean_Value.Boolean_Value := Embarked = "C";
@@ -123,7 +132,8 @@ package body Support_10A is
 
    --  -------------------------------------------------------------------------
 
-   function Split_Data (Data : Data_Record) return Split_Data_Record is
+   function Get_Split_Data (File_Name : String) return Split_Data_Record is
+      Data         : constant Data_Record := Get_Data (File_Name);
       Mask         : Boolean_Array (1 .. Data.Num_Items);
       Train_Length : Natural := 0;
       Test_Length  : Natural := 0;
@@ -170,7 +180,7 @@ package body Support_10A is
          end;
       end;
 
-   end Split_Data;
+   end Get_Split_Data;
 
    --  -------------------------------------------------------------------------
 

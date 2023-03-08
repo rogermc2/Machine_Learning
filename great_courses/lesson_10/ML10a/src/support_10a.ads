@@ -25,6 +25,6 @@ package Support_10A is
    function Error (Predictions : Real_Float_Vector;
                    Labels      : Integer_Matrix) return Float;
    pragma Inline (Error);
-   function Split_Data (Data : Data_Record) return Split_Data_Record;
+   function Get_Split_Data (File_Name : String) return Split_Data_Record;
 
 end Support_10A;

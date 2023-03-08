@@ -1,12 +1,16 @@
 import numpy as np
 
-from sklearn import svm
+from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import LogisticRegression
 
 import matplotlib
 from matplotlib import pyplot as plt
 
-def init_svc(degree):
-    return svm.SVC(gamma='scale',kernel='poly', degree=degree)
+def init_mlp(nhidden):
+    return MLPClassifier(hidden_layer_sizes=nhidden, max_iter = 50000)
+
+def init_logistic_regression():
+    return LogisticRegression(max_iter = 500)
 
 def fit (est, X, y):
     est.fit(X, np.ravel(y))
