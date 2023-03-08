@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 with Python_API;
---  with Python_CLF;
+with Python_CLF;
 with Support_10A; use Support_10A;
 
 procedure Lesson_10A is
@@ -24,8 +24,8 @@ begin
    Classifier := Python.Import_File ("lesson_10a");
 
    Estimator := Python.Call (Classifier, "init_mlp", Num_Hidden);
-   --        Python_CLF.Call (Classifier, "fit", Estimator, Data.Train_X,
-   --                         Data.Train_Y);
+   Python_CLF.Call (Classifier, "fit", Estimator, Data.Train_Features,
+                    Data.Train_Labels);
 
    --        declare
    --           Train_Predictions : constant Real_Float_Vector :=
