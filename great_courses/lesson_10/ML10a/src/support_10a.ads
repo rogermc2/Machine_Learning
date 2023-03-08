@@ -2,6 +2,8 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with Python;
+with Python_API;
 
 package Support_10A is
 
@@ -23,12 +25,12 @@ package Support_10A is
       Features      : Features_Array (1 .. Num_Items);
       Labels        : Integer_Array (1 .. Num_Items);
       Feature_Names : Unbounded_String_Array (1 .. 9) :=
-           (To_Unbounded_String ("Pclass"), To_Unbounded_String ("Sex"),
-            To_Unbounded_String ("Age"), To_Unbounded_String ("SibSp"),
-            To_Unbounded_String ("Parch"), To_Unbounded_String ("Fare"),
-            To_Unbounded_String ("Embarked S"),
-            To_Unbounded_String ("Embarked C"),
-            To_Unbounded_String ("Embarked Q"));
+                        (To_Unbounded_String ("Pclass"), To_Unbounded_String ("Sex"),
+                         To_Unbounded_String ("Age"), To_Unbounded_String ("SibSp"),
+                         To_Unbounded_String ("Parch"), To_Unbounded_String ("Fare"),
+                         To_Unbounded_String ("Embarked S"),
+                         To_Unbounded_String ("Embarked C"),
+                         To_Unbounded_String ("Embarked Q"));
    end record;
 
    type Split_Data_Record (Num_Train, Num_Test : Positive) is record
@@ -38,6 +40,9 @@ package Support_10A is
       Test_Labels    : Integer_Array (1 .. Num_Test);
    end record;
 
+   procedure Call (M   : Python.Module; Function_Name : String;
+                   CLF : Python_API.PyObject; A : Features_Array;
+                   B   : Integer_Array);
    function Get_Data (File_Name : String) return Data_Record;
    function Error (Predictions : Real_Float_Vector;
                    Labels      : Integer_Matrix) return Float;
