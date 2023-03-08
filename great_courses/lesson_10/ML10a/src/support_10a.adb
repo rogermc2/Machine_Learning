@@ -22,6 +22,63 @@ package body Support_10A is
 
    --  -------------------------------------------------------------------------
 
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : Python_API.PyObject; A : Features_Array)
+     return Real_Float_Vector is
+      use System;
+      use Interfaces.C;
+      use Python;
+      use Python_API;
+
+      function Py_BuildValue (Format : char_array; O1, O2 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      procedure Parse_Tuple (Tuple : PyObject;
+                             Vec   : in out Real_Float_Vector) is
+         T_Row : PyObject;
+      begin
+         Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
+                 "Parse_Tuple Real_Float_List Tuple Size" &
+                   int'Image (PyTuple_Size (Tuple))
+                 & " /= Vec Length" & Integer'Image (Vec'Length));
+
+         for row in 1 .. PyTuple_Size (Tuple) loop
+            T_Row := PyTuple_GetItem (Tuple, row - 1);
+            Vec (Integer (row)) :=
+              Float (PyLong_AsLong (PyTuple_GetItem (T_Row, 0)));
+         end loop;
+
+      end Parse_Tuple;
+
+      Routine_Name : constant String := "Support_10A.Call ";
+      F            : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Array_Tuple (A);
+      Py_Params    : PyObject;
+      Py_Result    : PyObject;
+      Result       : Real_Float_Vector (A'Range);
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Py_Params :=  Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
+      Py_Result := Call_Object (F, Py_Params);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Parse_Tuple (Py_Result, Result);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (Py_Params);
+      Py_DecRef (Py_Result);
+
+      return Result;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : Python_API.PyObject; A : Features_Array;
                    B   : Integer_Array) is
@@ -38,11 +95,12 @@ package body Support_10A is
       F            : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Array_Tuple (A);
       B_Tuple      : constant PyObject := Tuple_Builder.To_Tuple (B);
---        Features     : Features_Record;
       Py_Params    : PyObject;
       Py_Result    : PyObject;
    begin
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
+
       Py_Params :=  Py_BuildValue (To_C ("OOO"), CLF, A_Tuple, B_Tuple);
       Py_Result := Call_Object (F, Py_Params);
       if Py_Result = System.Null_Address then

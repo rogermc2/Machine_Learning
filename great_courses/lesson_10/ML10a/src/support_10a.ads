@@ -40,6 +40,9 @@ package Support_10A is
       Test_Labels    : Integer_Array (1 .. Num_Test);
    end record;
 
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : Python_API.PyObject; A : Features_Array)
+                  return Real_Float_Vector;
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : Python_API.PyObject; A : Features_Array;
                    B   : Integer_Array);
