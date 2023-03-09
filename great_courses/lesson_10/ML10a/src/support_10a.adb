@@ -1,8 +1,4 @@
 
-with System;
-
-with Interfaces.C;
-
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -12,108 +8,10 @@ with Maths;
 --  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Loader;
-with Tuple_Builder;
+with Python_10A;
+with Python_API;
 
 package body Support_10A is
-
-   function To_Array_Tuple (Data : Features_Array) return Python_API.PyObject;
-   function To_Features_Tuple (Data : Features_Record)
-                               return Python_API.PyObject;
-
-   --  -------------------------------------------------------------------------
-
-   function Call (M   : Python.Module; Function_Name : String;
-                  CLF : Python_API.PyObject; A : Features_Array)
-     return Integer_Array is
-      use System;
-      use Interfaces.C;
-      use Python;
-      use Python_API;
-
-      function Py_BuildValue (Format : char_array; O1, O2 : PyObject)
-                              return PyObject;
-      pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      procedure Parse_Tuple (Tuple : PyObject; Vec : in out Integer_Array) is
-      begin
-         Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
-                 "Parse_Tuple Real_Float_List Tuple Size" &
-                   int'Image (PyTuple_Size (Tuple))
-                 & " /= Vec Length" & Integer'Image (Vec'Length));
-
-         for index in 1 .. PyTuple_Size (Tuple) loop
-            Vec (Integer (index)) :=
-              Integer (PyInt_AsLong (PyTuple_GetItem (Tuple, index - 1)));
-         end loop;
-
-      end Parse_Tuple;
-
-      Routine_Name : constant String := "Support_10A.Call ";
-      F            : constant PyObject := Get_Symbol (M, Function_Name);
-      A_Tuple      : constant PyObject := To_Array_Tuple (A);
-      Py_Params    : PyObject;
-      Py_Result    : PyObject;
-      Result       : Integer_Array (A'Range);
-   begin
-      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
-      Py_Params :=  Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
-      Py_Result := Call_Object (F, Py_Params);
-      if Py_Result = System.Null_Address then
-         Put (Routine_Name & "Py error message: ");
-         PyErr_Print;
-      end if;
-
-      Parse_Tuple (Py_Result, Result);
-
-      Py_DecRef (F);
-      Py_DecRef (A_Tuple);
-      Py_DecRef (Py_Params);
-      Py_DecRef (Py_Result);
-
-      return Result;
-
-   end Call;
-
-   -- --------------------------------------------------------------------------
-
-   procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : Python_API.PyObject; A : Features_Array;
-                   B   : Integer_Array) is
-      use System;
-      use Interfaces.C;
-      use Python;
-      use Python_API;
-
-      function Py_BuildValue (Format : char_array; O1, O2, O3 : PyObject)
-                              return PyObject;
-      pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      Routine_Name : constant String := "Support_10A.Call ";
-      F            : constant PyObject := Get_Symbol (M, Function_Name);
-      A_Tuple      : constant PyObject := To_Array_Tuple (A);
-      B_Tuple      : constant PyObject := Tuple_Builder.To_Tuple (B);
-      Py_Params    : PyObject;
-      Py_Result    : PyObject;
-   begin
-      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
-      Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
-
-      Py_Params :=  Py_BuildValue (To_C ("OOO"), CLF, A_Tuple, B_Tuple);
-      Py_Result := Call_Object (F, Py_Params);
-      if Py_Result = System.Null_Address then
-         Put (Routine_Name & "Py error message: ");
-         PyErr_Print;
-      end if;
-
-      Py_DecRef (F);
-      Py_DecRef (A_Tuple);
-      Py_DecRef (B_Tuple);
-      Py_DecRef (Py_Params);
-      Py_DecRef (Py_Result);
-
-   end Call;
-
-   -- --------------------------------------------------------------------------
 
    function Error (Predictions : Real_Float_Vector;
                    Labels      : Integer_Matrix) return Float is
@@ -162,9 +60,9 @@ package body Support_10A is
             end loop;
 
             Word_Cursor := Row_Words.First;  --  PassengerId
-            Data.Labels (row - 1) :=
-              Integer'Value (To_String (Element (Word_Cursor)));
             Next (Word_Cursor);              --  Survived
+            Data.Survived (row - 1) :=
+              Integer'Value (To_String (Element (Word_Cursor)));
             Next (Word_Cursor);              --  Pclass
             Data.Features (row - 1).P_Class :=
               Integer'Value (To_String (Element (Word_Cursor)));
@@ -212,8 +110,7 @@ package body Support_10A is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Split_Data (File_Name : String) return Split_Data_Record is
-      Data         : constant Data_Record := Get_Data (File_Name);
+   function Get_Split_Data (Data : Data_Record) return Split_Data_Record is
       Mask         : Boolean_Array (1 .. Data.Num_Items);
       Train_Length : Natural := 0;
       Test_Length  : Natural := 0;
@@ -237,11 +134,11 @@ package body Support_10A is
             if Mask (row) then
                Train_Row := Train_Row + 1;
                Train_Data.Features (Train_Row) := Data.Features (row);
-               Train_Data.Labels (Train_Row) := Data.Labels (row);
+               Train_Data.Survived (Train_Row) := Data.Survived (row);
             else
                Test_Row := Test_Row + 1;
                Test_Data.Features (Test_Row) := Data.Features (row);
-               Test_Data.Labels (Test_Row) := Data.Labels (row);
+               Test_Data.Survived (Test_Row) := Data.Survived (row);
             end if;
          end loop;
 
@@ -249,9 +146,9 @@ package body Support_10A is
             Split_Data : Split_Data_Record (Train_Length, Test_Length);
          begin
             Split_Data.Train_Features := Train_Data.Features;
-            Split_Data.Train_Labels := Train_Data.Labels;
+            Split_Data.Train_Survived := Train_Data.Survived;
             Split_Data.Test_Features := Test_Data.Features;
-            Split_Data.Test_Labels := Test_Data.Labels;
+            Split_Data.Test_Survived := Test_Data.Survived;
 
             return Split_Data;
          end;
@@ -261,61 +158,31 @@ package body Support_10A is
 
    --  -------------------------------------------------------------------------
 
-   function To_Array_Tuple (Data : Features_Array)
-                            return Python_API.PyObject is
-      use Interfaces.C;
-      use Python_API;
---        Routine_Name : constant String := "Support_10A.To_Array_Tuple ";
-      Py_Row       : int := -1;
-      Result       : constant PyObject := PyTuple_New (int (Data'Length));
+   function Imp (Estimator : Python_API.PyObject; Data : Data_Record)
+                 return Float is
+      Features  : Features_Record;
+      R         : Natural;
+      As_Male   : Float;
+      As_Female : Float;
+      Result    : Float;
    begin
-      for row in Data'Range loop
-         Py_Row := Py_Row + 1;
-         PyTuple_SetItem (Result, Py_Row, To_Features_Tuple (Data (row)));
+      for v in Data.Features'Range loop
+         Features := Data.Features (v);
+         R := Features.Sex;
+         --    v[1] = 0
+         Features.Sex := 0;
+         --    asmale = clf.predict_proba([v])[0][1]
+         As_Male := Python_10A.Call (Classifier, "predict_proba",
+                                     Estimator, Features);
+         --    v[1] = 1
+         --    asfemale = clf.predict_proba([v])[0][1]
+         --    v[1] = real
+         --             imp += [ asfemale-asmale ]
       end loop;
 
       return Result;
 
-   end To_Array_Tuple;
-
-   --  -------------------------------------------------------------------------
-
-   function To_Features_Tuple (Data : Features_Record) return Python_API.PyObject is
-      use Interfaces.C;
-      use Python_API;
-      --        Routine_Name : constant String := "Support_10A.To_Features_Tuple ";
-      Result       : constant PyObject := PyTuple_New (9);
-      Embark       : long;
-   begin
-      PyTuple_SetItem (Result, 0, PyLong_FromLong (long (Data.P_Class)));
-      PyTuple_SetItem (Result, 1, PyLong_FromLong (long (Data.Sex)));
-      PyTuple_SetItem (Result, 2, PyFloat_FromDouble (double (Data.Age)));
-      PyTuple_SetItem (Result, 3, PyLong_FromLong (long (Data.Sib_Sp)));
-      PyTuple_SetItem (Result, 4, PyLong_FromLong (long (Data.Parch)));
-      PyTuple_SetItem (Result, 5, PyFloat_FromDouble (double (Data.Fare)));
-      if Data.Embark_S then
-         Embark := 1;
-      else
-         Embark := 0;
-      end if;
-      PyTuple_SetItem (Result, 6, PyBool_FromLong (Embark));
-
-      if Data.Embark_C then
-         Embark := 1;
-      else
-         Embark := 0;
-      end if;
-      PyTuple_SetItem (Result, 7, PyBool_FromLong (Embark));
-      if Data.Embark_Q then
-         Embark := 1;
-      else
-         Embark := 0;
-      end if;
-      PyTuple_SetItem (Result, 8, PyBool_FromLong (Embark));
-
-      return Result;
-
-   end To_Features_Tuple;
+   end Imp;
 
    --  -------------------------------------------------------------------------
 

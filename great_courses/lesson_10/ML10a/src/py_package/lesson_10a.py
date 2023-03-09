@@ -18,6 +18,9 @@ def fit (est, X, y):
 def predict (est, X):
     return tuple(est.predict(X))
 
+def predict_proba (est, X):
+    return tuple(est.predict_proba(X))
+
 def plot(degrees, trainerr, testerr):
     plt.scatter(degrees, trainerr)
     plt.plot(degrees, trainerr, label='training error')

@@ -4,14 +4,15 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
+with Python_10A;
 with Python_API;
 --  with Python_CLF;
 with Support_10A; use Support_10A;
 
 procedure Lesson_10A is
    Routine_Name     : constant String := "Lesson 10A ";
-   Data             : constant Split_Data_Record :=
-                        Get_Split_Data ("../../data/ship.csv");
+   Data             : constant Data_Record := Get_Data ("../../data/ship.csv");
+   S_Data           : constant Split_Data_Record := Get_Split_Data (Data);
    Num_Hidden       : constant Positive := 60;
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
@@ -24,12 +25,13 @@ begin
    Classifier := Python.Import_File ("lesson_10a");
 
    Estimator := Python.Call (Classifier, "init_mlp", Num_Hidden);
-   Call (Classifier, "fit", Estimator, Data.Train_Features, Data.Train_Labels);
+   Python_10A.Call (Classifier, "fit", Estimator, S_Data.Train_Features,
+                    S_Data.Train_Survived);
 
    declare
       Train_Predictions : constant Integer_Array :=
-                            Call (Classifier, "predict", Estimator,
-                                  Data.Train_Features);
+                            Python_10A.Call (Classifier, "predict", Estimator,
+                                             S_Data.Train_Features);
       --           Test_Predictions  : constant Real_Float_Vector :=
       --                                 Python_CLF.Call (Classifier, "predict",
       --                                                  Estimator, Data.Test_X);
