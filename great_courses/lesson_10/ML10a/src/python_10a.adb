@@ -43,7 +43,7 @@ package body Python_10A is
 
       end Parse_Tuple;
 
-      Routine_Name : constant String := "Support_10A.Call ";
+      Routine_Name : constant String := "Python_10A.Call ";
       F            : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Array_Tuple (A);
       Py_Params    : PyObject;
@@ -73,7 +73,7 @@ package body Python_10A is
 
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : Python_API.PyObject; A : Support_10A.Features_Record)
-                  return Real_Float_Vector is
+                  return Real_Float_Matrix is
       use System;
       use Interfaces.C;
       use Python;
@@ -83,23 +83,29 @@ package body Python_10A is
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      function Parse_Tuple (Tuple : PyObject) return Real_Float_Vector is
+      function Parse_Tuple (Tuple : PyObject) return Real_Float_Matrix is
       begin
          declare
-            Vec : Real_Float_Vector (1 .. Integer (PyTuple_Size (Tuple)));
+            Row_Tuple : PyObject;
+            Mat       : Real_Float_Matrix
+              (1 .. Integer (PyTuple_Size (Tuple)),
+               1 .. Integer (PyTuple_Size (PyTuple_GetItem (Tuple, 0))));
          begin
-            for index in Vec'Range loop
-               Vec (Integer (index)) :=
-                 Float (PyFloat_AsDouble (PyTuple_GetItem
-                        (Tuple, int (index - 1))));
+            for row in Mat'Range loop
+               Row_Tuple := PyTuple_GetItem (Tuple, int (row - 1));
+               for col in Mat'Range (2) loop
+                  Mat (row, col) :=
+                    Float (PyFloat_AsDouble (PyTuple_GetItem
+                           (Row_Tuple, int (col - 1))));
+               end loop;
             end loop;
 
-            return Vec;
+            return Mat;
          end;
 
       end Parse_Tuple;
 
-      Routine_Name : constant String := "Support_10A.Call ";
+      Routine_Name : constant String := "Python_10A.Call ";
       F            : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Features_Tuple (A);
       Py_Params    : PyObject;
@@ -118,7 +124,7 @@ package body Python_10A is
       Py_DecRef (Py_Params);
 
       declare
-         Result : constant Real_Float_Vector := Parse_Tuple (Py_Result);
+         Result : constant Real_Float_Matrix := Parse_Tuple (Py_Result);
       begin
          Py_DecRef (Py_Result);
          return Result;
@@ -140,7 +146,7 @@ package body Python_10A is
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      Routine_Name : constant String := "Support_10A.Call ";
+      Routine_Name : constant String := "Python_10A.Call ";
       F            : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Array_Tuple (A);
       B_Tuple      : constant PyObject := Tuple_Builder.To_Tuple (B);

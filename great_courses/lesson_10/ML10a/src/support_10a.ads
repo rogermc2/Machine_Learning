@@ -47,7 +47,7 @@ package Support_10A is
    function Error (Predictions, Labels : Integer_Array) return Float;
    pragma Inline (Error);
    function Imp (Classifier : Python.Module; Estimator : Python_API.PyObject;
-                 Data       : Data_Record) return Real_Float_Vector;
+                 Data       : Data_Record) return Float;
    function Get_Split_Data (Data : Data_Record) return Split_Data_Record;
 
 end Support_10A;

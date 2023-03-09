@@ -157,35 +157,39 @@ package body Support_10A is
    --  -------------------------------------------------------------------------
 
    function Imp (Classifier : Python.Module; Estimator : Python_API.PyObject;
-                 Data       : Data_Record) return Real_Float_Vector is
-      use Real_Float_Arrays;
+                 Data       : Data_Record) return Float is
+      --        use Real_Float_Arrays;
       Features  : Features_Record;
---        R         : Natural;
-      As_Male   : Real_Float_Vector (1 .. Data.Num_Items);
-      As_Female : Real_Float_Vector (1 .. Data.Num_Items);
-      Result    : Real_Float_Vector (1 .. Data.Num_Items);
+      Pred_Prob : Real_Float_Matrix (1 .. 1, 1 .. 2);
+      As_Male   : Float;
+      As_Female : Float;
+      Result    : Float := 0.0;
    begin
       for v in Data.Features'Range loop
          Features := Data.Features (v);
---           R := Features.Sex;
+         --           R := Features.Sex;
          --    v[1] = 0
          Features.Sex := 0;
          --    asmale = clf.predict_proba([v])[0][1]
-         As_Male := Python_10A.Call (Classifier, "predict_proba", Estimator,
-                                     Features);
+--           Print_Matrix_Dimensions ("predict_proba dimensions", Python_10A.Call (Classifier, "predict_proba", Estimator,
+--                                         Features));
+         Pred_Prob := Python_10A.Call (Classifier, "predict_proba", Estimator,
+                                       Features);
+         As_Male := Pred_Prob (1, 2);
          --    v[1] = 1
          Features.Sex := 1;
          --    asfemale = clf.predict_proba([v])[0][1]
-         As_Female := Python_10A.Call (Classifier, "predict_proba", Estimator,
-                                     Features);
+         Pred_Prob := Python_10A.Call (Classifier, "predict_proba", Estimator,
+                                       Features);
+         As_Female := Pred_Prob (1, 2);
          --    v[1] = real
---           Features.Sex := R;
+         --           Features.Sex := R;
          --             imp += [ asfemale-asmale ]
+--           Put_Line ("As_Male" & Float'Image (As_Male));
+         Result := Result + As_Female - As_Male;
       end loop;
 
-      Result := (As_Female - As_Male) / Float (Result'Length);
-
-      return Result;
+      return Result / Float (Data.Features'Length);
 
    end Imp;
 

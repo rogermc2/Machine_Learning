@@ -39,9 +39,9 @@ begin
 --          Test_Error      : constant Float := Error (Test_Predictions,  Data.Test_Y);
    begin
       Print_Integer_Array ("Test Predictions", Test_Predictions, 1, 20);
-      Print_Float_Vector ("Imp", Imp (Classifier, Estimator, Data));
-      Put_Line ("Test_Error: " &
-                  Float'Image (Error (Test_Predictions, S_Data.Test_Survived)));
+      Put_Line ("Imp: " & Float'Image (Imp (Classifier, Estimator, Data)));
+--        Put_Line ("Test_Error: " &
+--                    Float'Image (Error (Test_Predictions, S_Data.Test_Survived)));
       --           Degrees.Append (degree);
       --           Train_Error_List.Append (Train_Error);
       --           Test_Error_List.Append (Test_Error);

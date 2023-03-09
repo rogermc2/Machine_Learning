@@ -19,7 +19,8 @@ def predict (est, X):
     return tuple(est.predict(X))
 
 def predict_proba (est, X):
-    return tuple(est.predict_proba(X))
+    X_array = np.asarray(X).reshape(1, -1)
+    return tuple(map(tuple, est.predict_proba(X_array)))
 
 def plot(degrees, trainerr, testerr):
     plt.scatter(degrees, trainerr)
