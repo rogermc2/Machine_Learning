@@ -1,12 +1,11 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 with Python_10A;
 with Python_API;
---  with Python_CLF;
+with Python_CLF;
 with Support_10A; use Support_10A;
 
 procedure Lesson_10A is
@@ -16,8 +15,6 @@ procedure Lesson_10A is
    Num_Hidden       : constant Positive := 60;
    Classifier       : Python.Module;
    Estimator        : Python_API.PyObject;
-   --     Train_Error_List : Real_Float_List;
-   --     Test_Error_List  : Real_Float_List;
 begin
    New_Line;
    Python.Initialize;
@@ -57,9 +54,10 @@ begin
       Put_Line ("Test Error: " &
                   Float'Image (Error (Test_Predictions, S_Data.Test_Survived)));
    end;
-   --     Python.Call (Classifier, "plot", Degrees, Train_Error_List,
-   --                  Test_Error_List);
+   Put_Line ("Coefficients of the logistic regression model");
+   Python_CLF.Call (Classifier, "plot", Estimator);
 
+   Python_API.Py_DecRef (Estimator);
    Python.Close_Module (Classifier);
    Python.Finalize;
 

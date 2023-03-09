@@ -6,7 +6,6 @@ with Interfaces.C;
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
 with Tuple_Builder;
 
 package body Python_10A is

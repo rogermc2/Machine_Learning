@@ -1,11 +1,9 @@
 
---  with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Loader;
 with Python_10A;
@@ -167,25 +165,14 @@ package body Support_10A is
    begin
       for v in Data.Features'Range loop
          Features := Data.Features (v);
-         --           R := Features.Sex;
-         --    v[1] = 0
          Features.Sex := 0;
-         --    asmale = clf.predict_proba([v])[0][1]
---           Print_Matrix_Dimensions ("predict_proba dimensions", Python_10A.Call (Classifier, "predict_proba", Estimator,
---                                         Features));
          Pred_Prob := Python_10A.Call (Classifier, "predict_proba", Estimator,
                                        Features);
          As_Male := Pred_Prob (1, 2);
-         --    v[1] = 1
          Features.Sex := 1;
-         --    asfemale = clf.predict_proba([v])[0][1]
          Pred_Prob := Python_10A.Call (Classifier, "predict_proba", Estimator,
                                        Features);
          As_Female := Pred_Prob (1, 2);
-         --    v[1] = real
-         --           Features.Sex := R;
-         --             imp += [ asfemale-asmale ]
---           Put_Line ("As_Male" & Float'Image (As_Male));
          Result := Result + As_Female - As_Male;
       end loop;
 

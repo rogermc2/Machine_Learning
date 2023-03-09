@@ -22,13 +22,9 @@ def predict_proba (est, X):
     X_array = np.asarray(X).reshape(1, -1)
     return tuple(map(tuple, est.predict_proba(X_array)))
 
-def plot(degrees, trainerr, testerr):
-    plt.scatter(degrees, trainerr)
-    plt.plot(degrees, trainerr, label='training error')
-    plt.scatter(degrees, testerr)
-    plt.plot(degrees, testerr, label='test error')
-    plt.legend()
-    plt.title('Prediction error by polynomial kernel degree')
-    plt.xlabel('degree')
-    plt.ylabel('accuracy')
-    plt.show()
+def plot(clf):
+    feats = ['Pclass','Sex','Age','SibSp','Parch','Fare', 'Embarked S', 'Embarked C', 'Embarked Q']
+    print(feats)
+    for i in range(len(feats)):
+        print(feats[i], clf.coef_[0][i])
+
