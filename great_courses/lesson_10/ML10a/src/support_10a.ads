@@ -42,7 +42,7 @@ package Support_10A is
 
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : Python_API.PyObject; A : Features_Array)
-                  return Real_Float_Vector;
+                  return Integer_Array;
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : Python_API.PyObject; A : Features_Array;
                    B   : Integer_Array);

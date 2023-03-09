@@ -24,7 +24,7 @@ package body Support_10A is
 
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : Python_API.PyObject; A : Features_Array)
-     return Real_Float_Vector is
+     return Integer_Array is
       use System;
       use Interfaces.C;
       use Python;
@@ -34,19 +34,16 @@ package body Support_10A is
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      procedure Parse_Tuple (Tuple : PyObject;
-                             Vec   : in out Real_Float_Vector) is
-         T_Row : PyObject;
+      procedure Parse_Tuple (Tuple : PyObject; Vec : in out Integer_Array) is
       begin
          Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
                  "Parse_Tuple Real_Float_List Tuple Size" &
                    int'Image (PyTuple_Size (Tuple))
                  & " /= Vec Length" & Integer'Image (Vec'Length));
 
-         for row in 1 .. PyTuple_Size (Tuple) loop
-            T_Row := PyTuple_GetItem (Tuple, row - 1);
-            Vec (Integer (row)) :=
-              Float (PyLong_AsLong (PyTuple_GetItem (T_Row, 0)));
+         for index in 1 .. PyTuple_Size (Tuple) loop
+            Vec (Integer (index)) :=
+              Integer (PyInt_AsLong (PyTuple_GetItem (Tuple, index - 1)));
          end loop;
 
       end Parse_Tuple;
@@ -56,7 +53,7 @@ package body Support_10A is
       A_Tuple      : constant PyObject := To_Array_Tuple (A);
       Py_Params    : PyObject;
       Py_Result    : PyObject;
-      Result       : Real_Float_Vector (A'Range);
+      Result       : Integer_Array (A'Range);
    begin
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
       Py_Params :=  Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
@@ -222,8 +219,7 @@ package body Support_10A is
       Test_Length  : Natural := 0;
    begin
       for index in Mask'Range loop
-         Mask (index) :=
-           Maths.Random_Integer (0, 1) = 1;
+         Mask (index) := Maths.Random_Integer (0, 1) = 1;
          if Mask (index) then
             Train_Length := Train_Length + 1;
          else

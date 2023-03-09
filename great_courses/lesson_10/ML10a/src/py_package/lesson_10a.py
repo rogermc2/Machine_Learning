@@ -13,7 +13,7 @@ def init_logistic_regression():
     return LogisticRegression(max_iter = 500)
 
 def fit (est, X, y):
-    est.fit(X, np.ravel(y))
+    est.fit(X, y)
 
 def predict (est, X):
     return tuple(est.predict(X))

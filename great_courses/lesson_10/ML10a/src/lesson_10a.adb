@@ -27,7 +27,7 @@ begin
    Call (Classifier, "fit", Estimator, Data.Train_Features, Data.Train_Labels);
 
    declare
-      Train_Predictions : constant Real_Float_Vector :=
+      Train_Predictions : constant Integer_Array :=
                             Call (Classifier, "predict", Estimator,
                                   Data.Train_Features);
       --           Test_Predictions  : constant Real_Float_Vector :=
@@ -38,7 +38,7 @@ begin
       --           Test_Error     : constant Float :=
       --                                 Error (Test_Predictions,  Data.Test_Y);
    begin
-      Print_Float_Vector ("Train_Predictions", Train_Predictions, 1, 10);
+      Print_Integer_Array ("Train_Predictions", Train_Predictions, 1, 20);
       --           Degrees.Append (degree);
       --           Train_Error_List.Append (Train_Error);
       --           Test_Error_List.Append (Test_Error);
