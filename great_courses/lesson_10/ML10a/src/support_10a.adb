@@ -1,5 +1,5 @@
 
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -8,6 +8,7 @@ with Maths;
 --  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Loader;
+with Python;
 with Python_10A;
 with Python_API;
 
@@ -158,13 +159,13 @@ package body Support_10A is
 
    --  -------------------------------------------------------------------------
 
-   function Imp (Estimator : Python_API.PyObject; Data : Data_Record)
-                 return Float is
+   function Imp (Classifier : Python.Module; Estimator : Python_API.PyObject;
+                 Data       : Data_Record) return Real_Float_Vector is
       Features  : Features_Record;
       R         : Natural;
-      As_Male   : Float;
-      As_Female : Float;
-      Result    : Float;
+      As_Male   : Real_Float_Vector (1 .. Data.Num_Items);
+      As_Female : Real_Float_Vector (1 .. Data.Num_Items);
+      Result    : Real_Float_Vector (1 .. Data.Num_Items);
    begin
       for v in Data.Features'Range loop
          Features := Data.Features (v);
@@ -172,8 +173,8 @@ package body Support_10A is
          --    v[1] = 0
          Features.Sex := 0;
          --    asmale = clf.predict_proba([v])[0][1]
-         As_Male := Python_10A.Call (Classifier, "predict_proba",
-                                     Estimator, Features);
+         As_Male := Python_10A.Call (Classifier, "predict_proba", Estimator,
+                                     Features);
          --    v[1] = 1
          --    asfemale = clf.predict_proba([v])[0][1]
          --    v[1] = real

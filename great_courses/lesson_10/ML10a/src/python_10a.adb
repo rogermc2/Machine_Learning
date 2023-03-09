@@ -71,6 +71,63 @@ package body Python_10A is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : Python_API.PyObject; A : Support_10A.Features_Record)
+                  return Real_Float_Vector is
+      use System;
+      use Interfaces.C;
+      use Python;
+      use Python_API;
+
+      function Py_BuildValue (Format : char_array; O1, O2 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      function Parse_Tuple (Tuple : PyObject) return Real_Float_Vector is
+      begin
+         declare
+            Vec : Real_Float_Vector (1 .. Integer (PyTuple_Size (Tuple)));
+         begin
+            for index in Vec'Range loop
+               Vec (Integer (index)) :=
+                 Float (PyFloat_AsDouble (PyTuple_GetItem
+                        (Tuple, int (index - 1))));
+            end loop;
+
+            return Vec;
+         end;
+
+      end Parse_Tuple;
+
+      Routine_Name : constant String := "Support_10A.Call ";
+      F            : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Features_Tuple (A);
+      Py_Params    : PyObject;
+      Py_Result    : PyObject;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Py_Params :=  Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
+      Py_Result := Call_Object (F, Py_Params);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (Py_Params);
+
+      declare
+         Result : constant Real_Float_Vector := Parse_Tuple (Py_Result);
+      begin
+         Py_DecRef (Py_Result);
+         return Result;
+      end;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : Python_API.PyObject; A : Support_10A.Features_Array;
                    B   : Integer_Array) is

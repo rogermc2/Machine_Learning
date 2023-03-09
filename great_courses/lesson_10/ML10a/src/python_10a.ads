@@ -12,5 +12,8 @@ package Python_10A is
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : Python_API.PyObject; A : Support_10A.Features_Array;
                    B   : Integer_Array);
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : Python_API.PyObject; A : Support_10A.Features_Record)
+                  return Real_Float_Vector;
 
 end Python_10A;
