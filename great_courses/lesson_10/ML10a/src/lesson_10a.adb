@@ -29,18 +29,19 @@ begin
                     S_Data.Train_Survived);
 
    declare
-      Train_Predictions : constant Integer_Array :=
-                            Python_10A.Call (Classifier, "predict", Estimator,
-                                             S_Data.Train_Features);
-      --           Test_Predictions  : constant Real_Float_Vector :=
-      --                                 Python_CLF.Call (Classifier, "predict",
-      --                                                  Estimator, Data.Test_X);
+      --        Train_Predictions : constant Integer_Array :=
+      --                              Python_10A.Call (Classifier, "predict", Estimator,
+      --                                               S_Data.Train_Features);
+      Test_Predictions  : constant Integer_Array :=
+        Python_10A.Call (Classifier, "predict", Estimator, S_Data.Test_Features);
       --           Train_Error    : constant Float :=
       --                                 Error (Train_Predictions, Data.Train_Y);
-      --           Test_Error     : constant Float :=
-      --                                 Error (Test_Predictions,  Data.Test_Y);
+--          Test_Error      : constant Float := Error (Test_Predictions,  Data.Test_Y);
    begin
-      Print_Integer_Array ("Train_Predictions", Train_Predictions, 1, 20);
+      Print_Integer_Array ("Test Predictions", Test_Predictions, 1, 20);
+      Print_Float_Vector ("Imp", Imp (Classifier, Estimator, Data));
+      Put_Line ("Test_Error: " &
+                  Float'Image (Error (Test_Predictions, S_Data.Test_Survived)));
       --           Degrees.Append (degree);
       --           Train_Error_List.Append (Train_Error);
       --           Test_Error_List.Append (Test_Error);

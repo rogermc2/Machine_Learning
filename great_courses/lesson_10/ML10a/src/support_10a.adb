@@ -8,19 +8,16 @@ with Maths;
 --  with Basic_Printing; use Basic_Printing;
 with ML_Types;
 with Neural_Loader;
-with Python;
 with Python_10A;
-with Python_API;
 
 package body Support_10A is
 
-   function Error (Predictions : Real_Float_Vector;
-                   Labels      : Integer_Matrix) return Float is
+   function Error (Predictions, Labels : Integer_Array) return Float is
       --        Routine_Name : constant String := "Support_10A.Test_Score ";
       Incorrect    : Natural := 0;
    begin
       for index in Predictions'Range loop
-         if Integer (Predictions (index)) /= Labels (index, 1) then
+         if Predictions (index) /= Labels (index) then
             Incorrect := Incorrect + 1;
          end if;
       end loop;
@@ -161,25 +158,32 @@ package body Support_10A is
 
    function Imp (Classifier : Python.Module; Estimator : Python_API.PyObject;
                  Data       : Data_Record) return Real_Float_Vector is
+      use Real_Float_Arrays;
       Features  : Features_Record;
-      R         : Natural;
+--        R         : Natural;
       As_Male   : Real_Float_Vector (1 .. Data.Num_Items);
       As_Female : Real_Float_Vector (1 .. Data.Num_Items);
       Result    : Real_Float_Vector (1 .. Data.Num_Items);
    begin
       for v in Data.Features'Range loop
          Features := Data.Features (v);
-         R := Features.Sex;
+--           R := Features.Sex;
          --    v[1] = 0
          Features.Sex := 0;
          --    asmale = clf.predict_proba([v])[0][1]
          As_Male := Python_10A.Call (Classifier, "predict_proba", Estimator,
                                      Features);
          --    v[1] = 1
+         Features.Sex := 1;
          --    asfemale = clf.predict_proba([v])[0][1]
+         As_Female := Python_10A.Call (Classifier, "predict_proba", Estimator,
+                                     Features);
          --    v[1] = real
+--           Features.Sex := R;
          --             imp += [ asfemale-asmale ]
       end loop;
+
+      Result := (As_Female - As_Male) / Float (Result'Length);
 
       return Result;
 
