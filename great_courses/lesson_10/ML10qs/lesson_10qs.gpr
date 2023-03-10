@@ -26,5 +26,7 @@ project Lesson_10QS is
       end case;
    end Linker;
 
+   for Languages use ("Ada", "Fortran");
+
 end Lesson_10QS;
 
