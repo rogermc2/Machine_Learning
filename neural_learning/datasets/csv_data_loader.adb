@@ -4,11 +4,16 @@ with Ada.Directories;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with Load_Dataset;
 with Shuffler;
 
 package body CSV_Data_Loader is
+
+   type Digits_XY_Data (Num_Items, Num_Features : Positive) is record
+      X : Real_Float_Matrix (1 .. Num_Items, 1 .. Num_Features);
+      Y : Integer_Array (1 .. Num_Items);
+   end record;
 
    function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
                            Max_Lines : Positive := 20000)
@@ -25,7 +30,7 @@ package body CSV_Data_Loader is
 
    function Categorize (Labels : Integer_Array) return Binary_Matrix is
       Result : Binary_Matrix (Labels'Range, 0 .. 9) :=
-        (others => (others => 0));
+                 (others => (others => 0));
    begin
       for row in Labels'Range loop
          Result (row, Labels (row)) := 1;
@@ -33,6 +38,34 @@ package body CSV_Data_Loader is
       return Result;
 
    end Categorize;
+
+   --  -------------------------------------------------------------------------
+
+   function Fetch_Digits_Data (Name : String) return Digits_XY_Data is
+      use Real_Float_Arrays;
+      Routine_Name : constant String := "CSV_Data_Loader.Fetch_Digits_Data ";
+      Data_Record  : constant Load_Dataset.Digits_Data_Record :=
+                       Load_Data_Set (Name & ".csv");
+      Data         : Digits_XY_Data (Data_Record.Num_Samples,
+                                     Data_Record.Num_Features);
+   begin
+      Put_Line (Routine_Name);
+      Assert (Data_Record.Target'Length = Data_Record.Features'Length,
+              Routine_Name & "Target length" &
+                Integer'Image (Data_Record.Target'Length) &
+                " is different to Features length" &
+                Natural'Image (Positive (Data_Record.Features'Length)));
+
+      Print_Matrix_Dimensions (Routine_Name & "Data_Record.Features",
+                               Data_Record.Features);
+      Print_Integer_Matrix ("Features", Data_Record.Features, 1, 4);
+      Data.X := To_Real_Float_Matrix (Data_Record.Features) / 255.0;
+      Data.Y := Data_Record.Target;
+      Put_Line (Routine_Name & "done");
+
+      return Data;
+
+   end Fetch_Digits_Data;
 
    --  -------------------------------------------------------------------------
 
@@ -44,7 +77,7 @@ package body CSV_Data_Loader is
       use Ada.Streams;
       use Stream_IO;
       Routine_Name   : constant String :=
-        "CSV_Data_Loader.Get_Diabetes_Split_State ";
+                         "CSV_Data_Loader.Get_Diabetes_Split_State ";
       State_File     : constant String := File_Name & ".sta";
       Has_Data       : constant Boolean := Exists (State_File);
       Num_Features   : Positive;
@@ -72,11 +105,11 @@ package body CSV_Data_Loader is
          declare
             use Real_Float_Arrays;
             Data_Record  : constant Load_Dataset.Diabetes_Data_Record :=
-              Load_Dataset.Load_Diabetes (File_Name);
+                             Load_Dataset.Load_Diabetes (File_Name);
             X            : Real_Float_Matrix :=
-              To_Real_Float_Matrix (Data_Record.Features);
+                             To_Real_Float_Matrix (Data_Record.Features);
             Y            : Integer_Array :=
-              To_Integer_Array (Data_Record.Target);
+                             To_Integer_Array (Data_Record.Target);
             Train_Y      : Integer_Array (1 .. Train_Size);
             Test_Y       : Integer_Array (1 .. Test_Size);
             Data         : Base_Split_State (Train_Size, Test_Size,
@@ -120,7 +153,7 @@ package body CSV_Data_Loader is
       use Ada.Streams;
       use Stream_IO;
       Routine_Name   : constant String :=
-        "CSV_Data_Loader.Get_Digits_Split_State ";
+                         "CSV_Data_Loader.Get_Digits_Split_State ";
       State_File     : constant String := Dataset_Name & ".sta";
       Has_Data       : constant Boolean := Exists (State_File);
       Num_Features   : Positive;
@@ -146,47 +179,42 @@ package body CSV_Data_Loader is
       else
          Put_Line (Routine_Name & "fetching data");
          declare
-            use Real_Float_Arrays;
-            Data_Record  : constant Load_Dataset.Digits_Data_Record :=
-              Load_Data_Set (Dataset_Name & ".csv");
-            X            : Real_Float_Matrix := To_Real_Float_Matrix
-              (Data_Record.Features) / 255.0;
-            Y            : Integer_Array := Data_Record.Target;
-            Train_Y      : Integer_Array (1 .. Train_Size);
-            Test_Y       : Integer_Array (1 .. Test_Size);
-            Data         : Base_Split_State (Train_Size, Test_Size,
-                                             X'Length (2), Y_Categorized);
+            XY_Data : Digits_XY_Data := Fetch_Digits_Data (Dataset_Name);
+            Train_Y : Integer_Array (1 .. Train_Size);
+            Test_Y  : Integer_Array (1 .. Test_Size);
          begin
-            Put_Line (Routine_Name & "csv loaded");
-            Num_Features := X'Length (2);
-            Assert (Y'Length = X'Length, Routine_Name &
-                      "Y length" & Integer'Image (Y'Length) &
-                      " is different to X length" &
-                      Natural'Image (Positive (X'Length)));
+            Put_Line (Routine_Name & Dataset_Name & ".csv loaded");
+            declare
+               Data  : Base_Split_State (Train_Size, Test_Size,
+                                         XY_Data.Num_Features, Y_Categorized);
+            begin
+               Put_Line (Routine_Name & "Data initialized");
 
-            if Shuffle then
-               Put_Line (Routine_Name & "shuffling");
-               Shuffler.Shuffle (X, Y);
-            end if;
+               if Shuffle then
+                  Put_Line (Routine_Name & "shuffling");
+                  Shuffler.Shuffle (XY_Data.X, XY_Data.Y);
+               end if;
 
-            Put_Line (Routine_Name & "splitting data");
-            Train_Test_Split
-              (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
-               Train_X => Data.Train_X , Train_Y => Train_Y,
-               Test_X => Data.Test_X, Test_Y => Test_Y);
+               Put_Line (Routine_Name & "splitting data");
+               Train_Test_Split
+                 (X => XY_Data.X, Y => XY_Data.Y, Train_Size => Train_Size,
+                  Test_Size => Test_Size,
+                  Train_X => Data.Train_X , Train_Y => Train_Y,
+                  Test_X => Data.Test_X, Test_Y => Test_Y);
 
-            if Y_Categorized then
-               Data.Cat_Train_Y := Categorize (Train_Y);
-               for index in Test_Y'Range loop
-                  Data.Cat_Test_Y (index) := Float (Test_Y (index));
-               end loop;
-            else
-               Data.Train_Y := To_Integer_Matrix (Train_Y);
-               Data.Test_Y := To_Integer_Matrix (Test_Y);
-            end if;
+               if Y_Categorized then
+                  Data.Cat_Train_Y := Categorize (Train_Y);
+                  for index in Test_Y'Range loop
+                     Data.Cat_Test_Y (index) := Float (Test_Y (index));
+                  end loop;
+               else
+                  Data.Train_Y := To_Integer_Matrix (Train_Y);
+                  Data.Test_Y := To_Integer_Matrix (Test_Y);
+               end if;
 
-            Save_State (Dataset_Name, Data, Num_Features);
-            return Data;
+               Save_State (Dataset_Name, Data, Num_Features);
+               return Data;
+            end;
          end;
       end if;
 
@@ -202,7 +230,7 @@ package body CSV_Data_Loader is
       use Ada.Streams;
       use Stream_IO;
       Routine_Name   : constant String :=
-        "CSV_Data_Loader.Get_Iris_Split_State ";
+                         "CSV_Data_Loader.Get_Iris_Split_State ";
       State_File     : constant String := File_Name & ".sta";
       Has_Data       : constant Boolean := Exists (State_File);
       Num_Features   : Positive;
@@ -229,11 +257,11 @@ package body CSV_Data_Loader is
          declare
             use Real_Float_Arrays;
             Data_Record  : constant Load_Dataset.Iris_Data_Record :=
-              Load_Dataset.Load_Iris (File_Name);
+                             Load_Dataset.Load_Iris (File_Name);
             X            : Real_Float_Matrix :=
-              To_Real_Float_Matrix (Data_Record.Features);
+                             To_Real_Float_Matrix (Data_Record.Features);
             Y            : Integer_Array :=
-              To_Integer_Array (Data_Record.Target);
+                             To_Integer_Array (Data_Record.Target);
             Train_Y      : Integer_Array (1 .. Train_Size);
             Test_Y       : Integer_Array (1 .. Test_Size);
             Data         : Base_Split_State (Train_Size, Test_Size,
@@ -303,11 +331,11 @@ package body CSV_Data_Loader is
          declare
             use Real_Float_Arrays;
             Data_Record  : constant Load_Dataset.Diabetes_Data_Record :=
-              Load_Dataset.Load_Diabetes (File_Name);
+                             Load_Dataset.Load_Diabetes (File_Name);
             X            : Real_Float_Matrix :=
-              To_Real_Float_Matrix (Data_Record.Features);
+                             To_Real_Float_Matrix (Data_Record.Features);
             Y            : Integer_Array :=
-              To_Integer_Array (Data_Record.Target);
+                             To_Integer_Array (Data_Record.Target);
             Train_Y      : Integer_Array (1 .. Train_Size);
             Test_Y       : Integer_Array (1 .. Test_Size);
             Data         : Base_Split_State (Train_Size, Test_Size,
@@ -351,19 +379,19 @@ package body CSV_Data_Loader is
       Dummy_Data     : Base_Split_State (Train_Size, Test_Size, 1, True);
    begin
       case Data_Type is
-         when Diabetes_Data =>
-            return Get_Diabetes_Split_State (File_Name, Train_Size, Test_Size,
-                                             Shuffle, Reload);
+      when Diabetes_Data =>
+         return Get_Diabetes_Split_State (File_Name, Train_Size, Test_Size,
+                                          Shuffle, Reload);
 
-         when Digits_Data =>
-            return Get_Digits_Split_State (File_Name, Train_Size, Test_Size,
-                                           Y_Categorized, Shuffle, Reload);
-         when Iris_Data =>
-            return Get_Iris_Split_State (File_Name, Train_Size, Test_Size,
-                                         Shuffle, Reload);
-         when Ship_Data =>
-            return Get_Ship_Split_State (File_Name, Train_Size, Test_Size,
-                                         Shuffle, Reload);
+      when Digits_Data =>
+         return Get_Digits_Split_State (File_Name, Train_Size, Test_Size,
+                                        Y_Categorized, Shuffle, Reload);
+      when Iris_Data =>
+         return Get_Iris_Split_State (File_Name, Train_Size, Test_Size,
+                                      Shuffle, Reload);
+      when Ship_Data =>
+         return Get_Ship_Split_State (File_Name, Train_Size, Test_Size,
+                                      Shuffle, Reload);
       end case;
 
    end Get_Split_State;
@@ -374,8 +402,9 @@ package body CSV_Data_Loader is
                            Max_Lines : Positive := 20000)
                            return Load_Dataset.Digits_Data_Record is
       use Load_Dataset;
-      Data : constant Digits_Data_Record :=
-        Load_Digits (File_Name, Num_Classes, Max_Lines);
+      --        Routine_Name   : constant String := "CSV_Data_Loader.Load_Data_Set ";
+      Data           : constant Digits_Data_Record :=
+                         Load_Digits (File_Name, Num_Classes, Max_Lines);
    begin
       return Data;
 

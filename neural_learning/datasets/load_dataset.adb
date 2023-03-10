@@ -146,7 +146,7 @@ package body Load_Dataset is
                   Data.Features (row, col) := List_Row.Element (col);
                end loop;
             end loop;
-            Put_Line (File_Name & " features loaded");
+            Put_Line (Routine_Name & File_Name & " features loaded");
 
             for row in Digit_Values.First_Index .. Digit_Values.Last_Index loop
                Data.Target (row) :=

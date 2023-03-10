@@ -14,7 +14,8 @@ procedure Lesson_10QS is
    use Real_Float_Arrays;
    use Multilayer_Perceptron;
    Program_Name : constant String := "Lesson 10QS ";
-   Dataset_Name : constant String := "../../../neural_learning/datasets/mnist_784";
+   Dataset_Name : constant String :=
+                    "../../../neural_learning/datasets/mnist_784";
    Train_Size   : constant Positive := 5000;
    Test_Size    : constant Positive := 1000;
    Data         : constant Base_Split_State :=
@@ -32,7 +33,7 @@ begin
 --     for row in Test_Y'Range loop
 --        Test_Y (row, 1) := Integer (Data.Cat_Test_Y (row));
 --     end loop;
-
+   Print_Float_Matrix ("Train X", Train_X, 1, 4, 1, 10);
    Print_Matrix_Dimensions ("Train X", Train_X);
    Print_Matrix_Dimensions ("Train Y", Train_Y);
    Print_Matrix_Dimensions ("Test X", Test_X);
