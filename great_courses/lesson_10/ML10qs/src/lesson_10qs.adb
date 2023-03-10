@@ -8,7 +8,6 @@ with CSV_Data_Loader;
 with ML_Types;
 with Multilayer_Perceptron;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
---  with Test_Support; use Test_Support;
 
 procedure Lesson_10QS is
    use CSV_Data_Loader;
