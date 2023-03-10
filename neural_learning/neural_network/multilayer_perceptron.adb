@@ -42,13 +42,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Base;
---  with Data_Splitter;
+with Basic_Printing;
 with Multiclass_Utils;
 with Neural_Maths;
 with Optimise;
 with Opt_Minimise;
 with Shuffler;
-with Test_Support;
 with Utils;
 with Utils_Optimise;
 
@@ -67,8 +66,6 @@ package body Multilayer_Perceptron is
                         Y            : Binary_Matrix;
                         Gradients    : in out Parameters_List;
                         Activations  : in out Real_Matrix_List);
-   --  Deltas       : Real_Matrix_List;
-   --  Layer_Units  : Integer_List);
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Real_Float_Matrix;
                              Y            : Binary_Matrix;
@@ -460,8 +457,8 @@ package body Multilayer_Perceptron is
       --  L409
       if First_Pass then
          Initialize (Self, Layer_Units);
-         Test_Support.Print_Integer_List (Routine_Name & "L409 Layer_Units",
-                                          Layer_Units);
+         Basic_Printing.Print_Integer_List (Routine_Name & "L409 Layer_Units",
+                                            Layer_Units);
       end if;
 
       Activations.Append (X);

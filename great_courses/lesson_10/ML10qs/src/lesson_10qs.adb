@@ -1,51 +1,55 @@
 
-with Ada.Assertions; use Ada.Assertions;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with ML_Types; use ML_Types;
-
-with Basic_Printing; use Basic_Printing;
-with Classifier_Loader;
+with Base;
+with Base_Neural;
+with Basic_Printing; use  Basic_Printing;
+with CSV_Data_Loader;
+with ML_Types;
+with Multilayer_Perceptron;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with Python;
+--  with Test_Support; use Test_Support;
 
 procedure Lesson_10QS is
-   use ML_Types.String_Package;
-   Routine_Name  : constant String := "Lesson 10QS ";
-   Data          : constant Multi_Output_Data_Record :=
-                     Classifier_Loader.Load_Data
-                       ("../../data/diabetes.csv");
-   --  feats
-   Feature_Names : constant String_List := Data.Feature_Names;
-   --  dat
-   X_Data_List   : constant Value_Data_Lists_2D := Data.Feature_Values;
-   --  labs
-   Labels_List   : constant Value_Data_Lists_2D := Data.Label_Values;
-   Num_Samples   : constant Natural := Natural (X_Data_List.Length);
-   X_Data        : constant Integer_Matrix := To_Integer_Matrix (X_Data_List);
-   Labels        : constant Integer_Matrix := To_Integer_Matrix (Labels_List);
-   Names_Cursor  : String_Package.Cursor := Feature_Names.First;
-   Features      : ML_Types.Unbounded_List;
-   Classifier    : Python.Module;
+   use CSV_Data_Loader;
+   use Real_Float_Arrays;
+   use Multilayer_Perceptron;
+   Program_Name : constant String := "Lesson 10QS ";
+   Dataset_Name : constant String := "../../../neural_learning/datasets/mnist_784";
+   Train_Size   : constant Positive := 5000;
+   Test_Size    : constant Positive := 1000;
+   Data         : constant Base_Split_State :=
+     Get_Split_State (Dataset_Name, Digits_Data, Train_Size, Test_Size,
+                      Y_Categorized => False, Reload => True);
+   Train_X       : constant Real_Float_Matrix := Data.Train_X;
+   Train_Y       : constant Integer_Matrix := Data.Train_Y;
+   Test_X        : constant Real_Float_Matrix := Data.Test_X;
+   Test_Y        : constant Integer_Matrix := Data.Test_Y;
+   Layer_Sizes   : ML_Types.Integer_List;
+   Sample_Weight : Real_Float_Vector (1 .. 0);
+   MLP           : Multilayer_Perceptron.MLP_Classifier;
 begin
-   Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
-   Put_Line (Routine_Name & "Num_Samples:" & Integer'Image (Num_Samples));
-   while Has_Element (Names_Cursor) loop
-      Features.Append (Element (Names_Cursor));
-      Next (Names_Cursor);
-   end loop;
+   Put_Line (Program_Name & "no hidden layers");
+--     for row in Test_Y'Range loop
+--        Test_Y (row, 1) := Integer (Data.Cat_Test_Y (row));
+--     end loop;
 
-   Print_Integer_Matrix ("Features row 16", X_Data ,16, 16);
-   New_Line;
+   Print_Matrix_Dimensions ("Train X", Train_X);
+   Print_Matrix_Dimensions ("Train Y", Train_Y);
+   Print_Matrix_Dimensions ("Test X", Test_X);
+   Print_Matrix_Dimensions ("Test Y", Test_Y);
+   --  default Hidden_Layer_Sizes is empty list
+   MLP := C_Init (Layer_Sizes, Max_Iter => 10000,
+                  Activation => Base_Neural.Identity_Activation,
+                  Verbose => False, Shuffle => True);
 
-   Python.Initialize;
+   --  Fit function adjusts weights according to data values so that better
+   --  accuracy can be achieved
+   Fit (MLP, Train_X, Train_Y);
 
-   Classifier := Python.Import_File ("lesson_10qs");
-   Python.Call (Classifier, "classify", X_Data, Labels, Features);
-
-   Python.Close_Module (Classifier);
-   Python.Finalize;
+   Put_Line ("Score: " & Float'Image (Base.Score
+             (Self => MLP, X => Test_X, Y => Test_Y,
+              Sample_Weight => Sample_Weight)));
 
    Put_Line ("----------------------------------------------");
    New_Line;
