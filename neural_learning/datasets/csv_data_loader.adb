@@ -4,7 +4,7 @@ with Ada.Directories;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Load_Dataset;
 with Shuffler;
 
@@ -42,7 +42,6 @@ package body CSV_Data_Loader is
    --  -------------------------------------------------------------------------
 
    function Fetch_Digits_Data (Name : String) return Digits_XY_Data is
-      use Real_Float_Arrays;
       Routine_Name : constant String := "CSV_Data_Loader.Fetch_Digits_Data ";
       Data_Record  : constant Load_Dataset.Digits_Data_Record :=
                        Load_Data_Set (Name & ".csv");
@@ -56,12 +55,12 @@ package body CSV_Data_Loader is
                 " is different to Features length" &
                 Natural'Image (Positive (Data_Record.Features'Length)));
 
-      Print_Matrix_Dimensions (Routine_Name & "Data_Record.Features",
-                               Data_Record.Features);
-      Print_Integer_Matrix ("Features", Data_Record.Features, 1, 4);
-      Data.X := To_Real_Float_Matrix (Data_Record.Features) / 255.0;
+      for row in Data_Record.Features'Range loop
+         for col in Data_Record.Features'Range (2) loop
+            Data.X (row, col) := Float (Data_Record.Features  (row, col)) / 255.0;
+         end loop;
+      end loop;
       Data.Y := Data_Record.Target;
-      Put_Line (Routine_Name & "done");
 
       return Data;
 
