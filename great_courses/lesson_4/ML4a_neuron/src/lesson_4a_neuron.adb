@@ -20,7 +20,8 @@ procedure Lesson_4A_Neuron is
    Test_Size    : constant Positive := 1000;
    Data         : constant Base_Split_State :=
      Get_Split_State (Dataset_Name, Digits_Data, Train_Size, Test_Size,
-                      Y_Categorized => False, Reload => True);
+                      Y_Categorized => False, Normalize => True,
+                      Reload => False);
    Train_X       : constant Real_Float_Matrix := Data.Train_X;
    Train_Y       : constant Integer_Matrix := Data.Train_Y;
    Test_X        : constant Real_Float_Matrix := Data.Test_X;
@@ -30,18 +31,18 @@ procedure Lesson_4A_Neuron is
    MLP           : Multilayer_Perceptron.MLP_Classifier;
 begin
    Put_Line (Program_Name & "no hidden layers");
---     for row in Test_Y'Range loop
---        Test_Y (row, 1) := Integer (Data.Cat_Test_Y (row));
---     end loop;
 
    Print_Matrix_Dimensions ("Train X", Train_X);
    Print_Matrix_Dimensions ("Train Y", Train_Y);
    Print_Matrix_Dimensions ("Test X", Test_X);
    Print_Matrix_Dimensions ("Test Y", Test_Y);
    --  default Hidden_Layer_Sizes is empty list
-   MLP := C_Init (Layer_Sizes, Max_Iter => 10000,
+   MLP := C_Init (Layer_Sizes,Max_Iter => 1000,
+--                    Max_Iter => 10000,
                   Activation => Base_Neural.Identity_Activation,
                   Verbose => False, Shuffle => True);
+
+   Put_Line ("MLP initialized ");
 
    --  Fit function adjusts weights according to data values so that better
    --  accuracy can be achieved

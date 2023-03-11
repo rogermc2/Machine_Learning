@@ -92,11 +92,15 @@ package body Stochastic_Optimizers is
    procedure Iteration_Ends (Self      : in out SGD_Optimizer;
                              Time_Step : Integer) is
       use Ada.Numerics.Elementary_Functions;
+      Routine_Name : constant String := "Stochastic_Optimizers.Iteration_Ends ";
    begin
+      Put_Line (Routine_Name);
       if Self.LR_Schedule = Invscaling_LR_Schedule then
          Self.Learning_Rate := Self.Initial_Learning_Rate /
            (Float(Time_Step + 1) ** Self.Power_T);
       end if;
+      Put_Line (Routine_Name & "done");
+
    end Iteration_Ends;
 
    --  ------------------------------------------------------------------------

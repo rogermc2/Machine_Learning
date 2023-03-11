@@ -487,8 +487,8 @@ package body Multilayer_Perceptron is
                   X           : Real_Float_Matrix;
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
-      --        Routine_Name        : constant String :=
-      --                                "Multilayer_Perceptron.Fit Integer Y ";
+      Routine_Name        : constant String :=
+                               "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features        : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes  : constant ML_Types.Integer_List :=
                               Self.Parameters.Hidden_Layer_Sizes;
@@ -521,6 +521,7 @@ package body Multilayer_Perceptron is
       --  L409
       if First_Pass then
          Initialize (Self, Layer_Units);
+         Put_Line (Routine_Name & "First_Pass initalised");
       end if;
 
       Activations.Clear;
@@ -530,10 +531,12 @@ package body Multilayer_Perceptron is
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
+         Put_Line (Routine_Name & "Fit_Stochastic");
          Fit_Stochastic (Self, X, Y_Bin, Self.Attributes.Params, Incremental);
 
          --  L444
       elsif Self.Parameters.Solver = Lbfgs_Solver then
+         Put_Line (Routine_Name & "Fit_Lbfgs");
          Fit_Lbfgs (Self, X, Y_Bin, Self.Attributes.Params, Activations);
       end if;
 
@@ -656,8 +659,15 @@ package body Multilayer_Perceptron is
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
 
       --  L628
+      Put_Line (Routine_Name & "Maximum iterations: " &
+                  Integer'Image (Self.Parameters.Max_Iter));
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
+         if not Self.Parameters.Verbose and then
+           Self.Parameters.Max_Iter > 50 and then
+           Iter mod Self.Parameters.Max_Iter / 50 = 0 then
+            Put ("*");
+         end if;
          --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
          --  Batch_Iter := 0;  Batch_Iter NOT USED
@@ -683,6 +693,7 @@ package body Multilayer_Perceptron is
          --  L669 Update no_improvement_count based on training loss or
          --       validation score according to early_stopping
          Update_No_Improvement_Count (Self, Early_Stopping, X, Y);
+
          --  for learning rate that needs to be updated at iteration end;
          if Self.Attributes.Optimizer.Kind = Optimizer_SGD then
             Iteration_Ends (Self.Attributes.Optimizer.SGD, Self.Attributes.T);
@@ -722,8 +733,10 @@ package body Multilayer_Perceptron is
             New_Line;
          end if;
       end loop;
+      New_Line;
 
-      Put_Line (Routine_Name & "Iteration" &Integer'Image (Self.Attributes.N_Iter) &
+      Put_Line (Routine_Name & "Iteration" &
+                  Integer'Image (Self.Attributes.N_Iter) &
                   ", loss = " & Float'Image (Self.Attributes.Loss));
 
       --  L711
@@ -1072,9 +1085,9 @@ package body Multilayer_Perceptron is
    begin
       for row in PM'Range loop
          for col in PM'Range (2) loop
-            Assert (PM (row, col) >= 0.0, Routine_Name & Msg & "Matrix" &
-                      Integer'Image (row) & "," & Integer'Image (col) & " = " &
-                      Float'Image (PM (row, col)));
+            Assert (PM (row, col) >= 0.0, Routine_Name & Msg & ", Matrix (" &
+                      Integer'Image (row) & "," & Integer'Image (col) &
+                      ") = " & Float'Image (PM (row, col)));
             Sum (row) := Sum (row) + PM (row, col);
          end loop;
       end loop;

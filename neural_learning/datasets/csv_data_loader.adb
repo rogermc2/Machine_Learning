@@ -18,8 +18,7 @@ package body CSV_Data_Loader is
    function Load_Data_Set (File_Name : String; Num_Classes : Natural := 10;
                            Max_Lines : Positive := 20000)
                            return Load_Dataset.Digits_Data_Record;
-   procedure Save_State (Dataset_Name : String; State : Base_Split_State;
-                         Num_Features : Positive);
+   procedure Save_State (Dataset_Name : String; State : Base_Split_State);
    procedure Train_Test_Split
      (X          : Real_Float_Matrix; Y : Integer_Array;
       Train_Size : Natural; Test_Size  : Natural;
@@ -66,7 +65,7 @@ package body CSV_Data_Loader is
       else
          for row in Data_Record.Features'Range loop
             for col in Data_Record.Features'Range (2) loop
-               Data.X (row, col) := Float (Data_Record.Features  (row, col));
+               Data.X (row, col) := Float (Data_Record.Features (row, col));
             end loop;
          end loop;
       end if;
@@ -143,7 +142,7 @@ package body CSV_Data_Loader is
             Data.Train_Y := To_Integer_Matrix (Train_Y);
             Data.Test_Y := To_Integer_Matrix (Test_Y);
 
-            Save_State (File_Name, Data, Num_Features);
+            Save_State (File_Name, Data);
             return Data;
          end;
       end if;
@@ -153,8 +152,9 @@ package body CSV_Data_Loader is
    --  -------------------------------------------------------------------------
 
    function Get_Digits_Split_State
-     (Dataset_Name                              : String; Train_Size, Test_Size : Positive;
-      Y_Categorized, Shuffle, Normalize, Reload : Boolean := True)
+     (Dataset_Name            : String; Train_Size, Test_Size : Positive;
+      Y_Categorized, Shuffle,
+      Normalize, Reload       : Boolean := True)
       return Base_Split_State is
       use Ada.Directories;
       use Ada.Streams;
@@ -218,7 +218,7 @@ package body CSV_Data_Loader is
                   Data.Test_Y := To_Integer_Matrix (Test_Y);
                end if;
 
-               Save_State (Dataset_Name, Data, Num_Features);
+               Save_State (Dataset_Name, Data);
                return Data;
             end;
          end;
@@ -292,7 +292,7 @@ package body CSV_Data_Loader is
             Data.Train_Y := To_Integer_Matrix (Train_Y);
             Data.Test_Y := To_Integer_Matrix (Test_Y);
 
-            Save_State (File_Name, Data, Num_Features);
+            Save_State (File_Name, Data);
             return Data;
          end;
       end if;
@@ -366,7 +366,7 @@ package body CSV_Data_Loader is
             Data.Train_Y := To_Integer_Matrix (Train_Y);
             Data.Test_Y := To_Integer_Matrix (Test_Y);
 
-            Save_State (File_Name, Data, Num_Features);
+            Save_State (File_Name, Data);
             return Data;
          end;
       end if;
@@ -378,8 +378,8 @@ package body CSV_Data_Loader is
    function Get_Split_State
      (File_Name              : String; Data_Type : Data_Kind;
       Train_Size             : Positive; Test_Size : Positive;
-      Y_Categorized, Shuffle : Boolean := False; Reload : Boolean := True)
-      return Base_Split_State is
+      Y_Categorized, Shuffle : Boolean := False;
+      Normalize, Reload      : Boolean := True) return Base_Split_State is
       --        Routine_Name   : constant String := "CSV_Data_Loader.Get_Split_State ";
       Dummy_Data     : Base_Split_State (Train_Size, Test_Size, 1, True);
    begin
@@ -389,8 +389,10 @@ package body CSV_Data_Loader is
                                           Shuffle, Reload);
 
       when Digits_Data =>
-         return Get_Digits_Split_State (File_Name, Train_Size, Test_Size,
-                                        Y_Categorized, Shuffle, Reload);
+         return Get_Digits_Split_State
+           (File_Name, Train_Size, Test_Size, Y_Categorized, Shuffle,
+            Normalize, Reload);
+
       when Iris_Data =>
          return Get_Iris_Split_State (File_Name, Train_Size, Test_Size,
                                       Shuffle, Reload);
@@ -417,8 +419,7 @@ package body CSV_Data_Loader is
 
    --  -------------------------------------------------------------------------
 
-   procedure Save_State (Dataset_Name : String; State : Base_Split_State;
-                         Num_Features : Positive) is
+   procedure Save_State (Dataset_Name : String; State : Base_Split_State) is
       use Ada.Streams;
       use Stream_IO;
       --        Routine_Name : constant String := "CSV_Data_Loader.Save_State ";
@@ -428,7 +429,7 @@ package body CSV_Data_Loader is
    begin
       Create (File_ID, Out_File, State_File);
       aStream := Stream (File_ID);
-      Positive'Write (aStream, Num_Features);
+      Positive'Write (aStream, State.Num_Features);
       Base_Split_State'Write (aStream, State);
       Close (File_ID);
 
