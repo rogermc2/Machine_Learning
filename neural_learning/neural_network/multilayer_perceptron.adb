@@ -664,6 +664,7 @@ package body Multilayer_Perceptron is
            Iter mod Self.Parameters.Max_Iter / 50 = 0 then
             Put ("*");
          end if;
+
          --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
          --  Batch_Iter := 0;  Batch_Iter NOT USED
