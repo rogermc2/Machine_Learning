@@ -414,8 +414,7 @@ package body Multilayer_Perceptron is
       --  L194
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
-      --        Test_Support.Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
-      --                                         New_Gradients.Intercept_Grads, 1, 2);
+
       return New_Gradients;
 
    end  Compute_Loss_Gradient;
@@ -487,8 +486,8 @@ package body Multilayer_Perceptron is
                   X           : Real_Float_Matrix;
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
-      Routine_Name        : constant String :=
-                               "Multilayer_Perceptron.Fit Integer Y ";
+--        Routine_Name        : constant String :=
+--                                 "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features        : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes  : constant ML_Types.Integer_List :=
                               Self.Parameters.Hidden_Layer_Sizes;
@@ -521,7 +520,6 @@ package body Multilayer_Perceptron is
       --  L409
       if First_Pass then
          Initialize (Self, Layer_Units);
-         Put_Line (Routine_Name & "First_Pass initalised");
       end if;
 
       Activations.Clear;
@@ -531,12 +529,10 @@ package body Multilayer_Perceptron is
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
-         Put_Line (Routine_Name & "Fit_Stochastic");
          Fit_Stochastic (Self, X, Y_Bin, Self.Attributes.Params, Incremental);
 
          --  L444
       elsif Self.Parameters.Solver = Lbfgs_Solver then
-         Put_Line (Routine_Name & "Fit_Lbfgs");
          Fit_Lbfgs (Self, X, Y_Bin, Self.Attributes.Params, Activations);
       end if;
 
