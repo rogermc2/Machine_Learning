@@ -41,25 +41,35 @@ package body CSV_Data_Loader is
 
    --  -------------------------------------------------------------------------
 
-   function Fetch_Digits_Data (Name : String) return Digits_XY_Data is
+   function Fetch_Digits_Data (Name : String; Normalize : Boolean := True)
+                               return Digits_XY_Data is
       Routine_Name : constant String := "CSV_Data_Loader.Fetch_Digits_Data ";
       Data_Record  : constant Load_Dataset.Digits_Data_Record :=
                        Load_Data_Set (Name & ".csv");
       Data         : Digits_XY_Data (Data_Record.Num_Samples,
                                      Data_Record.Num_Features);
    begin
-      Put_Line (Routine_Name);
       Assert (Data_Record.Target'Length = Data_Record.Features'Length,
               Routine_Name & "Target length" &
                 Integer'Image (Data_Record.Target'Length) &
                 " is different to Features length" &
                 Natural'Image (Positive (Data_Record.Features'Length)));
 
-      for row in Data_Record.Features'Range loop
-         for col in Data_Record.Features'Range (2) loop
-            Data.X (row, col) := Float (Data_Record.Features  (row, col)) / 255.0;
+      --  To_Real_Float_Matrix and / 255.0 stall
+      if Normalize then
+         for row in Data_Record.Features'Range loop
+            for col in Data_Record.Features'Range (2) loop
+               Data.X (row, col) :=
+                 Float (Data_Record.Features  (row, col)) / 255.0;
+            end loop;
          end loop;
-      end loop;
+      else
+         for row in Data_Record.Features'Range loop
+            for col in Data_Record.Features'Range (2) loop
+               Data.X (row, col) := Float (Data_Record.Features  (row, col));
+            end loop;
+         end loop;
+      end if;
       Data.Y := Data_Record.Target;
 
       return Data;
@@ -69,9 +79,8 @@ package body CSV_Data_Loader is
    --  -------------------------------------------------------------------------
 
    function Get_Diabetes_Split_State
-     (File_Name  : String; Train_Size, Test_Size : Positive;
-      Shuffle    : Boolean := True; Reload : Boolean := False)
-      return Base_Split_State is
+     (File_Name       : String; Train_Size, Test_Size : Positive;
+      Shuffle, Reload : Boolean := True) return Base_Split_State is
       use Ada.Directories;
       use Ada.Streams;
       use Stream_IO;
@@ -144,9 +153,8 @@ package body CSV_Data_Loader is
    --  -------------------------------------------------------------------------
 
    function Get_Digits_Split_State
-     (Dataset_Name  : String; Train_Size, Test_Size : Positive;
-      Y_Categorized : Boolean := True; Shuffle : Boolean := True;
-      Reload        : Boolean := False)
+     (Dataset_Name                              : String; Train_Size, Test_Size : Positive;
+      Y_Categorized, Shuffle, Normalize, Reload : Boolean := True)
       return Base_Split_State is
       use Ada.Directories;
       use Ada.Streams;
@@ -178,7 +186,8 @@ package body CSV_Data_Loader is
       else
          Put_Line (Routine_Name & "fetching data");
          declare
-            XY_Data : Digits_XY_Data := Fetch_Digits_Data (Dataset_Name);
+            XY_Data : Digits_XY_Data :=
+                        Fetch_Digits_Data (Dataset_Name, Normalize);
             Train_Y : Integer_Array (1 .. Train_Size);
             Test_Y  : Integer_Array (1 .. Test_Size);
          begin
@@ -187,8 +196,6 @@ package body CSV_Data_Loader is
                Data  : Base_Split_State (Train_Size, Test_Size,
                                          XY_Data.Num_Features, Y_Categorized);
             begin
-               Put_Line (Routine_Name & "Data initialized");
-
                if Shuffle then
                   Put_Line (Routine_Name & "shuffling");
                   Shuffler.Shuffle (XY_Data.X, XY_Data.Y);
@@ -222,9 +229,8 @@ package body CSV_Data_Loader is
    --  -------------------------------------------------------------------------
 
    function Get_Iris_Split_State
-     (File_Name  : String; Train_Size, Test_Size : Positive;
-      Shuffle    : Boolean := True; Reload : Boolean := False)
-      return Base_Split_State is
+     (File_Name       : String; Train_Size, Test_Size : Positive;
+      Shuffle, Reload : Boolean := True) return Base_Split_State is
       use Ada.Directories;
       use Ada.Streams;
       use Stream_IO;
@@ -296,8 +302,8 @@ package body CSV_Data_Loader is
    --  -------------------------------------------------------------------------
 
    function Get_Ship_Split_State
-     (File_Name  : String; Train_Size, Test_Size : Positive;
-      Shuffle    : Boolean := True; Reload : Boolean := False)
+     (File_Name       : String; Train_Size, Test_Size : Positive;
+      Shuffle, Reload : Boolean := True)
       return Base_Split_State is
       use Ada.Directories;
       use Ada.Streams;
@@ -370,9 +376,9 @@ package body CSV_Data_Loader is
    --  -------------------------------------------------------------------------
 
    function Get_Split_State
-     (File_Name                      : String; Data_Type : Data_Kind;
-      Train_Size                     : Positive; Test_Size : Positive;
-      Y_Categorized, Shuffle, Reload : Boolean := False)
+     (File_Name              : String; Data_Type : Data_Kind;
+      Train_Size             : Positive; Test_Size : Positive;
+      Y_Categorized, Shuffle : Boolean := False; Reload : Boolean := True)
       return Base_Split_State is
       --        Routine_Name   : constant String := "CSV_Data_Loader.Get_Split_State ";
       Dummy_Data     : Base_Split_State (Train_Size, Test_Size, 1, True);
