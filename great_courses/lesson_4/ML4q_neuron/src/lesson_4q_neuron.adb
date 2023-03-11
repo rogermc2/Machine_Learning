@@ -20,7 +20,7 @@ procedure Lesson_4Q_Neuron is
    Train_Size         : constant Positive := 5000;
    Data               : constant Base_Split_State := Get_Split_State
      (Dataset_Name, Digits_Data, Train_Size, Test_Size,
-      Y_Categorized => False, Reload => True);
+      Y_Categorized => False, Normalize => True, Reload => True);
    Train_X            : constant Real_Float_Matrix := Data.Train_X;
    Train_Y            : constant Integer_Matrix := Data.Train_Y;
    Test_X             : constant Real_Float_Matrix := Data.Test_X;
@@ -44,9 +44,9 @@ begin
       --  The Fit function adjusts weights according to data values so
       --  that better accuracy can be achieved
       Fit (aClassifier, Train_X, Train_Y);
-      Put_Line (Integer'Image (index * 10) & " Score: " &
-                  Float'Image
-                  (Base.Score (Self => aClassifier, X => Test_X, Y => Test_Y)));
+      Put_Line ("Hidden layers:" & Integer'Image (index * 10) & " Score: " &
+                  Float'Image (Base.Score (Self => aClassifier,
+                                           X => Test_X, Y => Test_Y)));
    end loop;
 
    Put_Line ("----------------------------------------------");

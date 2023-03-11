@@ -732,7 +732,7 @@ package body Multilayer_Perceptron is
       end loop;
       New_Line;
 
-      Put_Line (Routine_Name & "Iteration" &
+      Put_Line (Routine_Name & "Iterations" &
                   Integer'Image (Self.Attributes.N_Iter) &
                   ", loss = " & Float'Image (Self.Attributes.Loss));
 
