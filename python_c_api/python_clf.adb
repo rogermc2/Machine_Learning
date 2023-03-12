@@ -411,7 +411,6 @@ package body Python_CLF is
    procedure Call
      (M   : Python.Module; Function_Name : String;
       CLF : PyObject; A : Real_Float_Matrix; B : Integer_Matrix) is
-      use Interfaces.C;
       use Python;
 
       function Py_BuildValue (Format     : Interfaces.C.char_array;
@@ -439,8 +438,6 @@ package body Python_CLF is
       if PyResult = System.Null_Address then
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
-      elsif PyInt_AsLong (PyResult) = -1 then
-         Put_Line ("Error: " & Routine_Name & "returned -1");
       end if;
 
       Py_DecRef (PyFunc);
