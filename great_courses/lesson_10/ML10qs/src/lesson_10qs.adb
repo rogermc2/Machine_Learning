@@ -20,7 +20,7 @@ procedure Lesson_10QS is
    Data          : constant Base_Split_State :=
                      Get_Split_State (Dataset_Name, Digits_Data, Train_Size, Test_Size,
                                       Y_Categorized => False, Normalize => False,
-                                      Reload => False);
+                                      Reload => True);
    Train_X       : constant Real_Float_Matrix := Data.Train_X;
    Train_Y       : constant Integer_Matrix := Data.Train_Y;
    Test_X        : constant Real_Float_Matrix := Data.Test_X;
@@ -39,12 +39,27 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_10qs");
 
-   Put_Line ("Multi-layer Perceptron");
    Estimator := Python.Call (Classifier, "init_mlp");
    Python_CLF.Call (Classifier, "fit", Estimator, Train_X, Train_Y);
 
    Score := Python_CLF.Call (Classifier, "score", Estimator, Test_X, Test_Y);
-   Put_Line ("Score: " & Float'Image (Score));
+   Put_Line ("Multi-layer perceptron score: " & Float'Image (Score));
+
+   Python_API.Py_DecRef (Estimator);
+
+   Estimator := Python.Call (Classifier, "init_logistic_regression");
+   Python_CLF.Call (Classifier, "fit", Estimator, Train_X, Train_Y);
+
+   Score := Python_CLF.Call (Classifier, "score", Estimator, Test_X, Test_Y);
+   Put_Line ("Logistic regression score: " & Float'Image (Score));
+
+   Python_API.Py_DecRef (Estimator);
+
+   Estimator := Python.Call (Classifier, "init_MultinomialNB");
+   Python_CLF.Call (Classifier, "fit", Estimator, Train_X, Train_Y);
+
+   Score := Python_CLF.Call (Classifier, "score", Estimator, Test_X, Test_Y);
+   Put_Line ("Naive Bayes score: " & Float'Image (Score));
 
    Python_API.Py_DecRef (Estimator);
 

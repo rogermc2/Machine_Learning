@@ -11,7 +11,7 @@ def init_mlp():
     return MLPClassifier(hidden_layer_sizes=[], activation='identity', max_iter = 10000)
 
 def init_logistic_regression():
-    return LogisticRegression(max_iter = 500)
+    return LogisticRegression(max_iter = 10000)
 
 def init_MultinomialNB():
     return MultinomialNB()
