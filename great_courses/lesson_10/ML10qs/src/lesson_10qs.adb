@@ -43,19 +43,6 @@ begin
    Estimator := Python.Call (Classifier, "init_mlp");
    Python_CLF.Call (Classifier, "fit", Estimator, Train_X, Train_Y);
 
-   declare
-      Train_Predictions : constant Real_Float_Vector :=
-                            Python_CLF.Call (Classifier, "predict",
-                                             Estimator, Data.Train_X);
-      Test_Predictions  : constant Real_Float_Vector :=
-                            Python_CLF.Call (Classifier, "predict",
-                                             Estimator, Data.Test_X);
-   begin
-      Print_Integer_Matrix ("Train_Y", Data.Train_Y, 1, 6);
-      Print_Float_Vector ("Train_Predictions", Train_Predictions, 1, 6);
-      Print_Integer_Matrix ("Test_Y", Data.Test_Y, 1, 6);
-      Print_Float_Vector ("Test_Predictions", Test_Predictions, 1, 6);
-   end;
    Score := Python_CLF.Call (Classifier, "score", Estimator, Test_X, Test_Y);
    Put_Line ("Score: " & Float'Image (Score));
 
