@@ -43,7 +43,7 @@ begin
 
    --  Fit function adjusts weights according to data values so that better
    --  accuracy can be achieved
---     Fit (MLP, Train_X, Train_Y);
+   Fit (MLP, Train_X, Train_Y);
 --
 --     Put_Line ("Score: " & Float'Image (Base.Score
 --               (Self => MLP, X => Test_X, Y => Test_Y,

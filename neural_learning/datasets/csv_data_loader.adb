@@ -54,7 +54,7 @@ package body CSV_Data_Loader is
                 " is different to Features length" &
                 Natural'Image (Positive (Data_Record.Features'Length)));
 
-      --  To_Real_Float_Matrix and / 255.0 stall
+      --  To_Real_Float_Matrix and / 255.0 stalls
       if Normalize then
          for row in Data_Record.Features'Range loop
             for col in Data_Record.Features'Range (2) loop

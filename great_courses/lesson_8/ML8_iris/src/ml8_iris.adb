@@ -26,8 +26,6 @@ begin
    Print_Matrix_Dimensions ("Data.Train_X", Data.Train_X);
    Print_Matrix_Dimensions ("Data.Train_Y", Data.Train_Y);
 
-   Print_Integer_Matrix ("Data.Test_Y", Data.Test_Y);
-
    Python.Initialize;
    Classifier := Python.Import_File ("ml8_iris");
 
@@ -43,12 +41,8 @@ begin
                       Float (Test_Score (Predictions, Data.Test_Y)) /
                       Float (Data.Test_Y'Length);
    begin
-      Print_Float_Vector ("Predictions", Predictions);
-      Print_Integer_Matrix ("Data.Test_Y", Data.Test_Y);
       New_Line;
       Put_Line ("Accuracy: " & Float'Image (Accuracy));
-      --     Python_CLF.Call (Classifier, "print_program", Genetic_Estimator);
-      --     Python.Call (Classifier, "plot_prediction", X, Y, X_Lots, Predictions);
    end;
    Python.Finalize;
 
