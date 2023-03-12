@@ -22,13 +22,5 @@ def fit (est, X, y):
 def predict (est, X):
     return tuple(est.predict(X))
 
-def predict_proba (est, X):
-    X_array = np.asarray(X).reshape(1, -1)
-    return tuple(map(tuple, est.predict_proba(X_array)))
-
-def plot(clf):
-    feats = ['Pclass','Sex','Age','SibSp','Parch','Fare', 'Embarked S', 'Embarked C', 'Embarked Q']
-    print(feats)
-    for i in range(len(feats)):
-        print(feats[i], clf.coef_[0][i])
-
+def score (est, X, y):
+    return est.score(X, np.ravel(y))

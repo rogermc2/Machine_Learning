@@ -411,6 +411,7 @@ package body Python_CLF is
    procedure Call
      (M   : Python.Module; Function_Name : String;
       CLF : PyObject; A : Real_Float_Matrix; B : Integer_Matrix) is
+      use Interfaces.C;
       use Python;
 
       function Py_BuildValue (Format     : Interfaces.C.char_array;
@@ -438,6 +439,8 @@ package body Python_CLF is
       if PyResult = System.Null_Address then
          Put (Routine_Name & "Py error message: ");
          PyErr_Print;
+      elsif PyInt_AsLong (PyResult) = -1 then
+         Put_Line ("Error: " & Routine_Name & "returned -1");
       end if;
 
       Py_DecRef (PyFunc);
@@ -445,6 +448,53 @@ package body Python_CLF is
       Py_DecRef (B_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Call (M   : Python.Module; Function_Name : String;
+                   CLF : PyObject; A : Real_Float_Matrix;
+                   B   : Integer_Matrix) return Float is
+      Routine_Name : constant String := "Python_Clf.Call FIM float ";
+
+      procedure Parse_Tuple (Tuple : PyObject;
+                             Value : out Float) is
+         use Interfaces.C;
+      begin
+         Value := Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, 0)));
+      end Parse_Tuple;
+
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
+                              O1, T1, T2 : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : Float;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
+
+      PyResult := Python.Call_Object (F, PyParams);
+
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Parse_Tuple (PyResult, Result);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Result;
 
    end Call;
 
