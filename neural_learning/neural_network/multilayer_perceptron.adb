@@ -42,13 +42,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Base;
---  with Data_Splitter;
+with Basic_Printing;
 with Multiclass_Utils;
 with Neural_Maths;
 with Optimise;
 with Opt_Minimise;
 with Shuffler;
-with Test_Support;
 with Utils;
 with Utils_Optimise;
 
@@ -67,8 +66,6 @@ package body Multilayer_Perceptron is
                         Y            : Binary_Matrix;
                         Gradients    : in out Parameters_List;
                         Activations  : in out Real_Matrix_List);
-   --  Deltas       : Real_Matrix_List;
-   --  Layer_Units  : Integer_List);
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Real_Float_Matrix;
                              Y            : Binary_Matrix;
@@ -417,8 +414,7 @@ package body Multilayer_Perceptron is
       --  L194
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
-      --        Test_Support.Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
-      --                                         New_Gradients.Intercept_Grads, 1, 2);
+
       return New_Gradients;
 
    end  Compute_Loss_Gradient;
@@ -460,8 +456,8 @@ package body Multilayer_Perceptron is
       --  L409
       if First_Pass then
          Initialize (Self, Layer_Units);
-         Test_Support.Print_Integer_List (Routine_Name & "L409 Layer_Units",
-                                          Layer_Units);
+         Basic_Printing.Print_Integer_List (Routine_Name & "L409 Layer_Units",
+                                            Layer_Units);
       end if;
 
       Activations.Append (X);
@@ -490,8 +486,8 @@ package body Multilayer_Perceptron is
                   X           : Real_Float_Matrix;
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
-      --        Routine_Name        : constant String :=
-      --                                "Multilayer_Perceptron.Fit Integer Y ";
+--        Routine_Name        : constant String :=
+--                                 "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features        : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes  : constant ML_Types.Integer_List :=
                               Self.Parameters.Hidden_Layer_Sizes;
@@ -659,8 +655,16 @@ package body Multilayer_Perceptron is
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
 
       --  L628
+      Put_Line (Routine_Name & "Maximum iterations: " &
+                  Integer'Image (Self.Parameters.Max_Iter));
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
+         if not Self.Parameters.Verbose and then
+           Self.Parameters.Max_Iter > 50 and then
+           Iter mod Self.Parameters.Max_Iter / 50 = 0 then
+            Put ("*");
+         end if;
+
          --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
          --  Batch_Iter := 0;  Batch_Iter NOT USED
@@ -686,6 +690,7 @@ package body Multilayer_Perceptron is
          --  L669 Update no_improvement_count based on training loss or
          --       validation score according to early_stopping
          Update_No_Improvement_Count (Self, Early_Stopping, X, Y);
+
          --  for learning rate that needs to be updated at iteration end;
          if Self.Attributes.Optimizer.Kind = Optimizer_SGD then
             Iteration_Ends (Self.Attributes.Optimizer.SGD, Self.Attributes.T);
@@ -725,8 +730,10 @@ package body Multilayer_Perceptron is
             New_Line;
          end if;
       end loop;
+      New_Line;
 
-      Put_Line (Routine_Name & "Iteration" &Integer'Image (Self.Attributes.N_Iter) &
+      Put_Line (Routine_Name & "Iterations" &
+                  Integer'Image (Self.Attributes.N_Iter) &
                   ", loss = " & Float'Image (Self.Attributes.Loss));
 
       --  L711
@@ -1075,9 +1082,9 @@ package body Multilayer_Perceptron is
    begin
       for row in PM'Range loop
          for col in PM'Range (2) loop
-            Assert (PM (row, col) >= 0.0, Routine_Name & Msg & "Matrix" &
-                      Integer'Image (row) & "," & Integer'Image (col) & " = " &
-                      Float'Image (PM (row, col)));
+            Assert (PM (row, col) >= 0.0, Routine_Name & Msg & ", Matrix (" &
+                      Integer'Image (row) & "," & Integer'Image (col) &
+                      ") = " & Float'Image (PM (row, col)));
             Sum (row) := Sum (row) + PM (row, col);
          end loop;
       end loop;

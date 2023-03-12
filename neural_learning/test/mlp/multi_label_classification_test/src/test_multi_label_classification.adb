@@ -7,8 +7,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Base;
 with Base_Neural;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_Types;
 with Printing;
 with Samples_Generator; use Samples_Generator;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
@@ -24,8 +24,8 @@ procedure Test_Multi_Label_Classification is
    --  N_Labels:   2;
    Test_X              : constant Real_Float_Matrix := Test_Classification.X;
    Test_Y              : constant Binary_Matrix := Test_Classification.Y;
-   Classes             : NL_Types.Integer_List;
-   Layer_Sizes         : NL_Types.Integer_List;
+   Classes             : ML_Types.Integer_List;
+   Layer_Sizes         : ML_Types.Integer_List;
    aClassifier         : MLP_Classifier;
    Score               : Float;
 begin

@@ -30,7 +30,7 @@ procedure Lesson_6Q is
    Data           : constant Base_Split_State :=
                       Get_Split_State (Data_File_Name, Digits_Data, Train_Size,
                                        Test_Size, Y_Categorized => False,
-                                       Reload => True);
+                                       Normalize => True, Reload => True);
    Train_X        : constant Real_Float_Matrix := Data.Train_X;
    Train_Y        : constant Integer_Array := To_Integer_Array (Data.Train_Y);
    Test_X         : constant Real_Float_Matrix := Data.Test_X;

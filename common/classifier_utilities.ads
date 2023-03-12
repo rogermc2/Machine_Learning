@@ -1,9 +1,7 @@
 
-with Base_Decision_Tree;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with NL_Types;
-with Tree;
 with Weights;
 
 package Classifier_Utilities is
@@ -24,8 +22,6 @@ package Classifier_Utilities is
                        return NL_Types.Natural_List;
    procedure Clear (anArray : in out ML_Types.Value_Data_Array);
    function Compare_Float_Lists (L, R : NL_Types.Float_List) return Boolean;
-   function Count_Samples (aClassifier : Base_Decision_Tree.Classifier)
-                            return Natural;
    function Dot (L : Weights.Weight_List; R : NL_Types.Natural_List)
                  return Float;
    function Get_Column (List_2D      : NL_Types.Float_List_2D;
@@ -72,8 +68,6 @@ package Classifier_Utilities is
                        return ML_Types.Value_Data_List;
    function Sum_Cols (aList : Weights.Weight_Lists_3D)
                        return Weights.Weight_List;
-   function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
-                            return Tree.Tree_Cursor;
    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
                                    return Integer_Array;
    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;

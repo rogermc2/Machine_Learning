@@ -1,10 +1,6 @@
 --  Based on scikit-learn/sklearn/base.py
 
---  with Ada.Text_IO; use Ada.Text_IO;
-
 with Classification_Metrics;
---  with Printing;
---  with Test_Support;
 
 package body Base is
 

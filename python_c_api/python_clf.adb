@@ -365,7 +365,7 @@ package body Python_CLF is
 
    function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
                   A : Real_Float_Matrix) return Boolean_Array is
---        Routine_Name : constant String := "Python_Clf.Call FM ";
+      --        Routine_Name : constant String := "Python_Clf.Call FM ";
       procedure Parse_Tuple (Tuple : PyObject;
                              Vec   : in out Boolean_Array) is
          use Interfaces.C;
@@ -377,7 +377,7 @@ package body Python_CLF is
                  & " /= Vec Length" & Integer'Image (Vec'Length));
          for row in 1 .. PyTuple_Size (Tuple) loop
             T_Row := PyTuple_GetItem (Tuple, row - 1);
-               Vec (Integer (row)) := PyObject_IsTrue (T_Row) /= 0;
+            Vec (Integer (row)) := PyObject_IsTrue (T_Row) /= 0;
          end loop;
       end Parse_Tuple;
 
@@ -450,6 +450,46 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject; A : Real_Float_Matrix;
+                  B   : Integer_Matrix) return Float is
+      Routine_Name : constant String := "Python_Clf.Call FIM float ";
+
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
+                              O1, T1, T2 : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : Float;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
+
+      PyResult := Python.Call_Object (F, PyParams);
+
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Result := Float (PyFloat_AsDouble (PyResult));
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Result;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    procedure Call
      (M   : Python.Module; Function_Name : String;
       CLF : PyObject; A : Real_Float_Matrix; B : Real_Float_Vector) is
@@ -494,7 +534,7 @@ package body Python_CLF is
 
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_List)
-                  return Real_Float_Vector is
+                     return Real_Float_Vector is
       use Interfaces.C;
       use Python;
       Routine_Name : constant String :=
@@ -552,7 +592,7 @@ package body Python_CLF is
 
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_Matrix)
-                  return Real_Float_Vector is
+                     return Real_Float_Vector is
       use Interfaces.C;
       use Python;
       Routine_Name : constant String :=
@@ -744,11 +784,11 @@ package body Python_CLF is
 
    function Call (M : Python.Module; Function_Name : String;
                   A : Real_Float_Matrix; B : Integer_Array)
-                  return PyObject is
+                     return PyObject is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; T1, T2 : PyObject)
-                              return PyObject;
+                                 return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
@@ -772,7 +812,7 @@ package body Python_CLF is
    -- --------------------------------------------------------------------------
 
    function Get_Attribute (CLF : PyObject; Attribute : String)
-                           return PyObject is
+                              return PyObject is
       use Interfaces.C;
       Routine_Name : constant String :=
                        "Python_CLF.Get_Attribute Real_Float_Matrix ";

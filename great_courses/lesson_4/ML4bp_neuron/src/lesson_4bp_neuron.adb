@@ -16,7 +16,7 @@ procedure Lesson_4BP_Neuron is
    Test_Size    : constant Positive := 1000;
    Data         : constant Base_Split_State := Get_Split_State
      (Dataset_Name, Digits_Data, Train_Size, Test_Size,
-      Y_Categorized => False, Reload => True);
+      Y_Categorized => False, Normalize => True, Reload => True);
    Train_X      : constant Real_Float_Matrix := Data.Train_X;
    Train_Y      : constant Integer_Matrix := Data.Train_Y;
    Test_X       : constant Real_Float_Matrix := Data.Test_X;

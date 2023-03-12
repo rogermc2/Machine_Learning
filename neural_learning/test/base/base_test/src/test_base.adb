@@ -2,11 +2,9 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Neural; use Base_Neural;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
---  with Test_Support;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 procedure Test_Base is
---      use Maths.Float_Math_Functions;
 
     Routine_Name  : constant String := "Test_Base ";
     Y_True        : constant Real_Float_Matrix (1 .. 3, 1 .. 1) :=
