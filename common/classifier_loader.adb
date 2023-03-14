@@ -31,7 +31,7 @@ package body Classifier_Loader is
       Put_Line (Routine_Name & "splitting " & File_Name);
 
       Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
-      Put_Line (Routine_Name & File_Name & " split");
+      Put_Line (Routine_Name & File_Name & " features/labels split");
 
       return Output_Data;
 
