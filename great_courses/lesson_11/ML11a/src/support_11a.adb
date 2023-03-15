@@ -7,6 +7,8 @@ with Basic_Printing; use  Basic_Printing;
 
 package body Support_11A is
 
+   function Compute_Diff_Vector (Data, Centres : Real_Float_Matrix)
+                                 return Real_Float_Vector;
    function Compute_Means
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive)
       return Real_Float_Matrix;
@@ -19,24 +21,21 @@ package body Support_11A is
    function Assign_Data (Data, Centres : Real_Float_Matrix;
                          Centre_Ids    : out Integer_Array) return Float is
       Routine_Name : constant String := "Support_11A.Assign_Data ";
-      C_Length     : Positive := Centres'Length;
-      Diff_3D      : array (Centres'Range, 1 .. 1, Centres'Range (2)) of Float;
-      --        Diff         : array (Centres'Range, Data'Range, Data'Range (2))
-      --          of Float := (others => (others => (others => 0.0)));
+      Diffs        : Real_Float_Vector (Data'Range);
+      Centre_Diffs : Real_Float_Matrix (Centres'Range, Data'Range);
       Result       : Float := 0.0;
    begin
       Put_Line (Routine_Name);
-
       --  subtract the set of centers from each data point
-      for d_row in Data'Range loop
-         for c_row in 1 .. C_Length loop
-            for col in Data'Range (2) loop
-               Diff_3D (c_row, d_row, col) :=
-                 (Data (d_row, col) - Centres (c_row, col)) ** 2;
-            end loop;
+      for row in Centre_Diffs'Range loop
+         Diffs := Compute_Diff_Vector (Data, Centres);
+         for col in Centre_Diffs'Range (2) loop
+            Centre_Diffs (row, col) := Diffs (col);
          end loop;
       end loop;
 
+      --  sum the squared differences
+      --  res2 = np.add.reduce(res**2,2)
       --        for d3 in Centres'Range loop
       --           for row in Data'Range loop
       --              for col in Data'Range (2) loop
@@ -60,6 +59,26 @@ package body Support_11A is
       return Result;
 
    end Assign_Data;
+
+   --  ------------------------------------------------------------------------
+
+   function Compute_Diff_Vector (Data, Centres : Real_Float_Matrix)
+                                 return Real_Float_Vector is
+      C_Length : constant Positive := Centres'Length;
+      Diffs    : Real_Float_Vector (Data'Range);
+   begin
+      --  subtract the set of centers from each data point
+      for d_row in Data'Range loop
+         for c_row in 1 .. C_Length loop
+            for col in Data'Range (2) loop
+               Diffs (d_row) := (Data (d_row, col) - Centres (c_row, col)) ** 2;
+            end loop;
+         end loop;
+      end loop;
+
+      return Diffs;
+
+   end Compute_Diff_Vector;
 
    --  ------------------------------------------------------------------------
    --  kmeans
