@@ -12,49 +12,51 @@ package body Support_11A is
    function Compute_Means
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive)
       return Real_Float_Matrix;
-   function Loss (Values : Real_Float_Matrix; Min_Indices : out Integer_Array)
-                  return Float;
+   function Loss (Values : Real_Float_Vector) return Float;
    function Means (Data : Float_Array_List) return Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
 
+   function Arg_Min (Values   : Real_Float_Matrix;
+                     Min_Vals : out Real_Float_Vector) return Integer_Array is
+      Min_Indices  : Integer_Array (Values'Range);
+   begin
+      for row in Values'Range loop
+         Min_Vals (row) := Values (row, 1);
+         Min_Indices (row) := 1;
+         for col in 2 .. Values'Length (2) loop
+            if Values (row, col) < Min_Vals (row) then
+               Min_Vals (row) := Values (row, col);
+               Min_Indices (row) := col;
+            end if;
+         end loop;
+      end loop;
+
+      return Min_Indices;
+
+   end Arg_Min;
+
+   --  -------------------------------------------------------------------------
+
    function Assign_Data (Data, Centres : Real_Float_Matrix;
                          Centre_Ids    : out Integer_Array) return Float is
       Routine_Name : constant String := "Support_11A.Assign_Data ";
-      Diffs        : Real_Float_Vector (Data'Range);
+      Values       : Real_Float_Vector (Data'Range);
       Centre_Diffs : Real_Float_Matrix (Centres'Range, Data'Range);
       Result       : Float := 0.0;
    begin
       Put_Line (Routine_Name);
       --  subtract the set of centers from each data point
       for row in Centre_Diffs'Range loop
-         Diffs := Compute_Diff_Vector (Data, Centres);
+         Values := Compute_Diff_Vector (Data, Centres);
          for col in Centre_Diffs'Range (2) loop
-            Centre_Diffs (row, col) := Diffs (col);
+            Centre_Diffs (row, col) := Values (col);
          end loop;
       end loop;
 
-      --  sum the squared differences
-      --  res2 = np.add.reduce(res**2,2)
-      --        for d3 in Centres'Range loop
-      --           for row in Data'Range loop
-      --              for col in Data'Range (2) loop
-      --                 Diff (col) := Data (row, col) - Centres (d3, col);
-      --                 Diff (col) := Diff (col) ** 2;
-      --                 Centres (d3, col) := Diff (col);
-      --              end loop;
-      --           end loop;
-      --        end loop;
-
-      --        for d3 in Diff2'Range loop
-      --           for row in Total'Range loop
-      --              for col in Total'Range (2) loop
-      --                 Total (row, col) := Total (row, col) + Diff2  (d3, row, col);
-      --              end loop;
-      --           end loop;
-      --        end loop;
-
-      --        Result := Loss (Total, Centre_Ids);
+      --  assign each data point to its closest center
+      Centre_Ids := Arg_Min (Centre_Diffs, Values);
+      Result := Loss (Values);
       Put_Line (Routine_Name & "Result" & Float'Image (Result));
       return Result;
 
@@ -162,23 +164,12 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
 
-   function Loss (Values : Real_Float_Matrix; Min_Indices : out Integer_Array)
-                  return Float is
-      Min_Values   : Real_Float_Vector (Values'Range (2)) :=
-                       (others => Float'Safe_Large);
-      Result       : Float := 0.0;
+   function Loss (Values : Real_Float_Vector) return Float is
+      Result : Float := 0.0;
    begin
-      for row in Values'Range loop
-         for col in Values'Range (2) loop
-            if Values (row, col) < Min_Values (col) then
-               Min_Values (col) := Values (row, col);
-               Min_Indices (col) := row;
-            end if;
-         end loop;
-      end loop;
 
-      for index in Min_Values'Range loop
-         Result := Result + Min_Values (index);
+      for index in Values'Range loop
+         Result := Result + Values (index);
       end loop;
 
       return Result;
