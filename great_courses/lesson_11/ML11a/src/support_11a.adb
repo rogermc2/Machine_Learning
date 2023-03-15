@@ -7,8 +7,9 @@ with Basic_Printing; use  Basic_Printing;
 
 package body Support_11A is
 
-   function Compute_Diff_Vector (Data, Centres : Real_Float_Matrix)
-                                 return Real_Float_Vector;
+   function Compute_Diff_Vector
+     (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
+      return Real_Float_Matrix;
    function Compute_Means
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive)
       return Real_Float_Matrix;
@@ -37,32 +38,35 @@ package body Support_11A is
    end Arg_Min;
 
    --  -------------------------------------------------------------------------
-
+   --  Assign_Data takes the data and the centers for each cluster and
+   --  assigns each datapoint in data to the closest of the centers, centerids.
    function Assign_Data (Data, Centres : Real_Float_Matrix;
                          Centre_Ids    : out Integer_Array) return Float is
       Routine_Name : constant String := "Support_11A.Assign_Data ";
-      Values       : Real_Float_Vector (Data'Range);
-      Centre_Diffs : Real_Float_Matrix (Centres'Range, Data'Range);
+      Values       : Real_Float_Matrix (Data'Range, Data'Range (2));
+--        Centre_Diffs : Integer_Array (Data'Range);
+      Min_Vals     : Real_Float_Vector (Data'Range);
       Result       : Float := 0.0;
    begin
       Put_Line (Routine_Name);
       --  subtract the set of centers from each data point
-      for row in Centre_Diffs'Range loop
-         Values := Compute_Diff_Vector (Data, Centres);
-         for col in Centre_Diffs'Range (2) loop
-            Centre_Diffs (row, col) := Values (col);
-            if Centre_Diffs (row, col) > 0.0 then
-               Put_Line (Routine_Name & "Centre_Diffs > 0.0" &
-                           Integer'Image (row) & Integer'Image (col));
+      --  For each centre, Compute_Diff_Vector finds the difference between each
+      --  value and the corresponding data value
+      for row in Centres'Range loop
+         Values := Compute_Diff_Vector (Data, Centres, row);
+         for col in Centres'Range (2) loop
+            Centre_Ids := Arg_Min (Values, Min_Vals);
+            if Min_Vals (col) > 0.0 then
+               Put_Line (Routine_Name & "Min_Vals > 0.0" & Integer'Image (col));
             end if;
          end loop;
       end loop;
-      Print_Float_Matrix (Routine_Name & "Centre_Diffs", Centre_Diffs,
-                          1, 4, 130, 140);
+--        Print_Float_Matrix (Routine_Name & "Centre_Diffs", Centre_Diffs,
+--                            1, 4, 130, 140);
 
       --  assign each data point to its closest center
-      Centre_Ids := Arg_Min (Centre_Diffs, Values);
-      Result := Loss (Values);
+--        Centre_Ids := Arg_Min (Centre_Diffs, Values);
+      Result := Loss (Min_Vals);
       Put_Line (Routine_Name & "Result" & Float'Image (Result));
       return Result;
 
@@ -70,20 +74,18 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
 
-   function Compute_Diff_Vector (Data, Centres : Real_Float_Matrix)
-                                 return Real_Float_Vector is
+   function Compute_Diff_Vector
+     (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
+      return Real_Float_Matrix is
       Routine_Name: constant String := "Support_11A.Compute_Diff_Vector ";
-      C_Length : constant Positive := Centres'Length;
-      Diffs    : Real_Float_Vector (Data'Range);
+      Diffs    : Real_Float_Matrix (Data'Range, Data'Range (2));
    begin
-      Print_Float_Matrix (Routine_Name & "Centres", Centres,
-                          1, 3, 130, 140);
+      Print_Float_Matrix (Routine_Name & "Data", Data, 1, 1, 130, 140);
+      Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 1, 130, 140);
       --  subtract the set of centers from each data point
       for d_row in Data'Range loop
-         for c_row in 1 .. C_Length loop
-            for col in Data'Range (2) loop
-               Diffs (d_row) := (Data (d_row, col) - Centres (c_row, col)) ** 2;
-            end loop;
+         for col in Data'Range (2) loop
+            Diffs (d_row, col) := (Data (d_row, col) - Centres (Centre_Row, col)) ** 2;
          end loop;
       end loop;
 
@@ -97,11 +99,11 @@ package body Support_11A is
                            Curr_Loss : out Float) return Real_Float_Matrix is
       Routine_Name: constant String := "Support_11A.Cluster_Means ";
       Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
-                      (others => (others => 0.0));
+        (others => (others => 0.0));
       Centre_Ids  : Integer_Array (Centres'Range);
       Prev_Loss   : Float := 0.0;
    begin
-      Print_Float_Matrix (Routine_Name & "Data", Data, 21, 22, 130, 140);
+      --        Print_Float_Matrix (Routine_Name & "Data", Data, 21, 22, 130, 140);
       for cluster in 1 .. K loop
          for col in Centres'Range (2) loop
             Centres (cluster, col) :=
@@ -109,8 +111,8 @@ package body Support_11A is
          end loop;
       end loop;
       Print_Matrix_Dimensions (Routine_Name & "Centres", Centres);
-      Print_Float_Matrix (Routine_Name & "Centres", Centres,
-                          1, 3, 130, 140);
+      --        Print_Float_Matrix (Routine_Name & "Centres", Centres,
+      --                            1, 3, 120, 140);
 
       Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss loop
@@ -132,7 +134,7 @@ package body Support_11A is
                            return Real_Float_Matrix is
       Routine_Name: constant String := "Support_11A.Compute_Means ";
       Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
-                      (others => (others => 0.0));
+        (others => (others => 0.0));
       aCol        : Float_Array (Data'Range (2));
       Cols        : Float_Array_List;  --  data points assigned to a cluster
    begin
