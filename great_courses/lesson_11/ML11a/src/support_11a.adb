@@ -51,8 +51,14 @@ package body Support_11A is
          Values := Compute_Diff_Vector (Data, Centres);
          for col in Centre_Diffs'Range (2) loop
             Centre_Diffs (row, col) := Values (col);
+            if Centre_Diffs (row, col) > 0.0 then
+               Put_Line (Routine_Name & "Centre_Diffs > 0.0" &
+                           Integer'Image (row) & Integer'Image (col));
+            end if;
          end loop;
       end loop;
+      Print_Float_Matrix (Routine_Name & "Centre_Diffs", Centre_Diffs,
+                          1, 4, 130, 140);
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Centre_Diffs, Values);
@@ -66,9 +72,12 @@ package body Support_11A is
 
    function Compute_Diff_Vector (Data, Centres : Real_Float_Matrix)
                                  return Real_Float_Vector is
+      Routine_Name: constant String := "Support_11A.Compute_Diff_Vector ";
       C_Length : constant Positive := Centres'Length;
       Diffs    : Real_Float_Vector (Data'Range);
    begin
+      Print_Float_Matrix (Routine_Name & "Centres", Centres,
+                          1, 3, 130, 140);
       --  subtract the set of centers from each data point
       for d_row in Data'Range loop
          for c_row in 1 .. C_Length loop
@@ -92,15 +101,16 @@ package body Support_11A is
       Centre_Ids  : Integer_Array (Centres'Range);
       Prev_Loss   : Float := 0.0;
    begin
-      Put_Line (Routine_Name);
+      Print_Float_Matrix (Routine_Name & "Data", Data, 21, 22, 130, 140);
       for cluster in 1 .. K loop
          for col in Centres'Range (2) loop
             Centres (cluster, col) :=
               Data (Maths.Random_Integer (1, Data'Length), col);
          end loop;
       end loop;
-      Put_Line (Routine_Name & "Centres loaded");
       Print_Matrix_Dimensions (Routine_Name & "Centres", Centres);
+      Print_Float_Matrix (Routine_Name & "Centres", Centres,
+                          1, 3, 130, 140);
 
       Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss loop
