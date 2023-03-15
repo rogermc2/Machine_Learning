@@ -1,5 +1,9 @@
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Maths;
+
+with Basic_Printing; use  Basic_Printing;
 
 package body Support_11A is
 
@@ -14,29 +18,46 @@ package body Support_11A is
 
    function Assign_Data (Data, Centres : Real_Float_Matrix;
                          Centre_Ids    : out Integer_Array) return Float is
-      Diff     : array (Centres'Range, Data'Range, Data'Range (2)) of Float;
-      Diff2    : array (Centres'Range, Data'Range, Data'Range (2)) of Float;
-      Total    : Real_Float_Matrix (Centres'Range, Data'Range) :=
-                   (others => (others => 0.0));
+      Routine_Name : constant String := "Support_11A.Assign_Data ";
+      C_Length     : Positive := Centres'Length;
+      Diff_3D      : array (Centres'Range, 1 .. 1, Centres'Range (2)) of Float;
+      --        Diff         : array (Centres'Range, Data'Range, Data'Range (2))
+      --          of Float := (others => (others => (others => 0.0)));
+      Result       : Float := 0.0;
    begin
-      for d3 in Diff'Range loop
-         for row in Data'Range loop
+      Put_Line (Routine_Name);
+
+      --  subtract the set of centers from each data point
+      for d_row in Data'Range loop
+         for c_row in 1 .. C_Length loop
             for col in Data'Range (2) loop
-               Diff (d3, row, col) := Data (row, col) - Centres (d3, col);
-               Diff2 (d3, row, col) := Diff (d3, row, col) ** 2;
+               Diff_3D (c_row, d_row, col) :=
+                 (Data (d_row, col) - Centres (c_row, col)) ** 2;
             end loop;
          end loop;
       end loop;
 
-      for d3 in Diff2'Range loop
-         for row in Total'Range loop
-            for col in Total'Range (2) loop
-               Total (row, col) := Total (row, col) + Diff2  (d3, row, col);
-            end loop;
-         end loop;
-      end loop;
+      --        for d3 in Centres'Range loop
+      --           for row in Data'Range loop
+      --              for col in Data'Range (2) loop
+      --                 Diff (col) := Data (row, col) - Centres (d3, col);
+      --                 Diff (col) := Diff (col) ** 2;
+      --                 Centres (d3, col) := Diff (col);
+      --              end loop;
+      --           end loop;
+      --        end loop;
 
-      return Loss (Total, Centre_Ids);
+      --        for d3 in Diff2'Range loop
+      --           for row in Total'Range loop
+      --              for col in Total'Range (2) loop
+      --                 Total (row, col) := Total (row, col) + Diff2  (d3, row, col);
+      --              end loop;
+      --           end loop;
+      --        end loop;
+
+      --        Result := Loss (Total, Centre_Ids);
+      Put_Line (Routine_Name & "Result" & Float'Image (Result));
+      return Result;
 
    end Assign_Data;
 
@@ -44,22 +65,28 @@ package body Support_11A is
    --  kmeans
    function Cluster_Means (Data      : Real_Float_Matrix; K : Positive;
                            Curr_Loss : out Float) return Real_Float_Matrix is
-      Centres    : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
-                     (others => (others => 0.0));
-      Centre_Ids : Integer_Array (Centres'Range);
-      Prev_Loss  : Float := 0.0;
+      Routine_Name: constant String := "Support_11A.Cluster_Means ";
+      Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
+                      (others => (others => 0.0));
+      Centre_Ids  : Integer_Array (Centres'Range);
+      Prev_Loss   : Float := 0.0;
    begin
-      Curr_Loss := 1.0;
+      Put_Line (Routine_Name);
       for cluster in 1 .. K loop
          for col in Centres'Range (2) loop
             Centres (cluster, col) :=
               Data (Maths.Random_Integer (1, Data'Length), col);
          end loop;
       end loop;
+      Put_Line (Routine_Name & "Centres loaded");
+      Print_Matrix_Dimensions (Routine_Name & "Centres", Centres);
 
+      Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss loop
          Prev_Loss := Curr_Loss;
+         Put_Line (Routine_Name & "Prev_Loss" & Float'Image (Prev_Loss));
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
+         Put_Line (Routine_Name & "Curr_Loss" & Float'Image (Curr_Loss));
          Centres := Compute_Means (Data, Centre_Ids, K);
       end loop;
 
@@ -72,11 +99,13 @@ package body Support_11A is
    function Compute_Means (Data       : Real_Float_Matrix;
                            Centre_Ids : Integer_Array; K : Positive)
                            return Real_Float_Matrix is
-      Centres    : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
-                     (others => (others => 0.0));
-      aCol       : Float_Array (Data'Range (2));
-      Cols       : Float_Array_List;  --  data points assigned to a cluster
+      Routine_Name: constant String := "Support_11A.Compute_Means ";
+      Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
+                      (others => (others => 0.0));
+      aCol        : Float_Array (Data'Range (2));
+      Cols        : Float_Array_List;  --  data points assigned to a cluster
    begin
+      Put_Line (Routine_Name);
       for index in 1 .. K loop
          Cols.Clear;
          for row in Data'Range loop
@@ -87,7 +116,7 @@ package body Support_11A is
                Cols.Append (aCol);
             end if;
          end loop;
-
+         Put_Line (Routine_Name & "Cols loaded");
          if Cols.Is_Empty then
             for row in Centres'Range loop
                for col in Centres'Range (2) loop

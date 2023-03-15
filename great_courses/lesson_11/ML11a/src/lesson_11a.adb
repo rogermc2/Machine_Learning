@@ -20,7 +20,7 @@ procedure Lesson_11A is
    Data            : constant Base_Split_State :=
                        Get_Split_State (Dataset_Name, Digits_Data, Train_Size,
                                         Test_Size, Y_Categorized => False,
-                                        Normalize => False, Reload => True);
+                                        Normalize => False, Reload => False);
    Train_X         : constant Real_Float_Matrix := Data.Train_X;
    Train_Y         : constant Integer_Matrix := Data.Train_Y;
    Test_X          : constant Real_Float_Matrix := Data.Test_X;
@@ -40,17 +40,17 @@ begin
    Print_Matrix_Dimensions ("Test X", Test_X);
    Print_Matrix_Dimensions ("Test Y", Test_Y);
 
-   for rep in 1 .. 8 loop
-      Centres := Cluster_Means (Train_X, Num_Clusters, Loss);
-      if Loss < Best_Loss then
-         Best_Centres := Centres;
-         Best_Loss := Loss;
-      end if;
-      --  Assign testing points to discovered clusters
-      Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
-
-      --  Use the labeled examples to label the clusters
-   end loop;
+--     for rep in 1 .. 8 loop
+--        Centres := Cluster_Means (Train_X, Num_Clusters, Loss);
+--        if Loss < Best_Loss then
+--           Best_Centres := Centres;
+--           Best_Loss := Loss;
+--        end if;
+--        --  Assign testing points to discovered clusters
+--        Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
+--
+--        --  Use the labeled examples to label the clusters
+--     end loop;
 
    Put_Line ("----------------------------------------------");
 

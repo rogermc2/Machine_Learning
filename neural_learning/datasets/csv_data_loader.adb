@@ -4,7 +4,7 @@ with Ada.Directories;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Load_Dataset;
 with Shuffler;
 
@@ -427,12 +427,12 @@ package body CSV_Data_Loader is
       File_ID      : Stream_IO.File_Type;
       aStream      : Stream_Access;
    begin
-      Put_Line (Routine_Name);
       Create (File_ID, Out_File, State_File);
       aStream := Stream (File_ID);
       Positive'Write (aStream, State.Num_Features);
       Base_Split_State'Write (aStream, State);
       Close (File_ID);
+      Put_Line (Routine_Name & State_File & " written.");
 
    end Save_State;
 
