@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use  Basic_Printing;
+--  with Basic_Printing; use  Basic_Printing;
 
 package body Support_11A is
 
@@ -13,39 +13,45 @@ package body Support_11A is
    function Compute_IDs (Data, Centres : Real_Float_Matrix;
                          Centre_Row    : Positive) return Integer_Array;
    function Compute_Means
-     (Data : Real_Float_Matrix; Centre_Ids : Integer_Matrix; K : Positive)
+     (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive)
       return Real_Float_Matrix;
-   function Loss (Values : Real_Float_Vector) return Float;
+--     function Loss (Values : Real_Float_Vector) return Float;
    function Means (Data : Float_Array_List) return Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
 
-   --     function Arg_Min (Values   : Real_Float_Matrix;
-   --                       Min_Vals : out Real_Float_Vector) return Integer_Array is
-   --        Min_Indices  : Integer_Array (Values'Range);
-   --     begin
-   --        for row in Values'Range loop
-   --           Min_Vals (row) := Values (row, 1);
-   --           Min_Indices (row) := 1;
-   --           for col in 2 .. Values'Length (2) loop
-   --              if Values (row, col) < Min_Vals (row) then
-   --                 Min_Vals (row) := Values (row, col);
-   --                 Min_Indices (row) := col;
-   --              end if;
-   --           end loop;
-   --        end loop;
-   --
-   --        return Min_Indices;
-   --
-   --     end Arg_Min;
+   function Arg_Min (Data     : Real_Float_Matrix; IDs : Integer_Matrix;
+                     Min_Vals : out Real_Float_Vector) return Integer_Array is
+      Min_Indices  : Integer_Array (Data'Range);
+   begin
+      for index in Min_Vals'Range loop
+         Min_Vals (index) := Float'Safe_Last;
+      end loop;
+
+      for row in IDs'Range loop
+         for id_col in IDs'Range (2) loop
+            for col in Data'Range (2) loop
+               if Data (IDs (row, id_col), col) < Min_Vals (row) then
+                  Min_Vals (row) := Data (IDs (row, id_col), col);
+                  Min_Indices (row) := IDs (row, id_col);
+               end if;
+            end loop;
+         end loop;
+      end loop;
+
+      return Min_Indices;
+
+   end Arg_Min;
 
    --  -------------------------------------------------------------------------
    --  Assign_Data takes the data and the centers for each cluster and
    --  assigns each datapoint in data to the closest of the centers, centerids.
    function Assign_Data (Data, Centres : Real_Float_Matrix;
-                         Centre_Ids    : out Integer_Matrix) return Float is
+                         Centre_Ids    : out Integer_Array) return Float is
       Routine_Name : constant String := "Support_11A.Assign_Data ";
-      IDs          : Integer_Array (Data'Range);
+      ID_Array     : Integer_Array (Data'Range);
+      IDs          : Integer_Matrix (Centres'Range, Centres'Range (2));
+      Min_Vals     : Real_Float_Vector (Data'Range);
       Result       : Float := 0.0;
    begin
       Put_Line (Routine_Name);
@@ -55,18 +61,18 @@ package body Support_11A is
       --  value centre (n, p)
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
-      for row in Centre_Ids'Range loop
-         IDs := Compute_IDs (Data, Centres, row);
-         for col in Centre_Ids'Range (2) loop
-            Centre_Ids (row, col) := IDs (col);
+      for row in IDs'Range loop
+         ID_Array := Compute_IDs (Data, Centres, row);
+         for col in IDs'Range (2) loop
+            IDs (row, col) := ID_Array (col);
          end loop;
       end loop;
       --        Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 100, 106);
       --        Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 100, 106);
 
       --  assign each data point to its closest center
-      --        Centre_Ids := Arg_Min (Centre_Diffs, Values);
---        Result := Loss (Min_Vals);
+      Centre_Ids := Arg_Min (Data, IDs, Min_Vals);
+      --        Result := Loss (Min_Vals);
       --        Put_Line (Routine_Name & "Result" & Float'Image (Result));
       return Result;
 
@@ -135,7 +141,7 @@ package body Support_11A is
       Routine_Name: constant String := "Support_11A.Cluster_Means ";
       Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
                       (others => (others => 0.0));
-      Centre_Ids  : Integer_Matrix (Centres'Range, Centres'Range (2));
+      Centre_Ids  : Integer_Array (Centres'Range (2));
       Prev_Loss   : Float := 0.0;
    begin
       --        Print_Float_Matrix (Routine_Name & "Data", Data, 100, 100 , 1, 6);
@@ -166,7 +172,7 @@ package body Support_11A is
    --  ------------------------------------------------------------------------
 
    function Compute_Means (Data       : Real_Float_Matrix;
-                           Centre_Ids : Integer_Matrix; K : Positive)
+                           Centre_Ids : Integer_Array; K : Positive)
                            return Real_Float_Matrix is
       Routine_Name: constant String := "Support_11A.Compute_Means ";
       Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
@@ -179,12 +185,12 @@ package body Support_11A is
          Cols.Clear;
          for row in Data'Range loop
             null;
---              if Centre_Ids (row) = index then
---                 for col in Data'Range (2) loop
---                    aCol (col) := Data (row, col);
---                 end loop;
---                 Cols.Append (aCol);
---              end if;
+            --              if Centre_Ids (row) = index then
+            --                 for col in Data'Range (2) loop
+            --                    aCol (col) := Data (row, col);
+            --                 end loop;
+            --                 Cols.Append (aCol);
+            --              end if;
          end loop;
 
          if Cols.Is_Empty then
@@ -213,17 +219,17 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
 
-   function Loss (Values : Real_Float_Vector) return Float is
-      Result : Float := 0.0;
-   begin
-
-      for index in Values'Range loop
-         Result := Result + Values (index);
-      end loop;
-
-      return Result;
-
-   end Loss;
+--     function Loss (Values : Real_Float_Vector) return Float is
+--        Result : Float := 0.0;
+--     begin
+--
+--        for index in Values'Range loop
+--           Result := Result + Values (index);
+--        end loop;
+--
+--        return Result;
+--
+--     end Loss;
 
    --  -------------------------------------------------------------------------
 
