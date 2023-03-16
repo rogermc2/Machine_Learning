@@ -34,7 +34,7 @@ procedure Lesson_11A is
    Test_Center_IDs : Integer_Array (Train_X'Range);
 begin
    Put_Line (Program_Name);
-   Print_Float_Matrix ("Train X", Train_X, 21, 21, 120, 140);
+
    Print_Matrix_Dimensions ("Train X", Train_X);
    Print_Matrix_Dimensions ("Train Y", Train_Y);
    Print_Matrix_Dimensions ("Test X", Test_X);
