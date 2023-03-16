@@ -22,6 +22,8 @@ package body Support_11A is
 
    function Arg_Min (Data     : Real_Float_Matrix; IDs : Integer_Matrix;
                      Min_Vals : out Real_Float_Vector) return Integer_Array is
+      Data_Row     : Real_Float_Vector (Data'Range (2));
+      Data_Index   : Positive;
       Min_Indices  : Integer_Array (Data'Range);
    begin
       for index in Min_Vals'Range loop
@@ -30,11 +32,14 @@ package body Support_11A is
 
       for row in IDs'Range loop
          for id_col in IDs'Range (2) loop
+            --  Get data
             for col in Data'Range (2) loop
-               if Data (IDs (row, id_col), col) < Min_Vals (row) then
-                  Min_Vals (row) := Data (IDs (row, id_col), col);
-                  Min_Indices (row) := IDs (row, id_col);
-               end if;
+               Data_Index := IDs (row, id_col);
+               Data_Row (col) := Data (Data_Index, col);
+--                 if Data (IDs (row, id_col), col) < Min_Vals (row) then
+--                    Min_Vals (row) := Data (IDs (row, id_col), col);
+--                    Min_Indices (row) := IDs (row, id_col);
+--                 end if;
             end loop;
          end loop;
       end loop;
