@@ -31,7 +31,7 @@ procedure Lesson_11A is
    Best_Centres    : Real_Float_Matrix := Cluster_Means (Train_X, Num_Clusters,
                                                          Best_Loss);
    Centres         : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
-   Test_Center_IDs : Integer_Array (1 .. Num_Clusters);
+   Test_Center_IDs : Integer_Array (Train_X'Range);
 begin
    Put_Line (Program_Name);
    Print_Float_Matrix ("Train X", Train_X, 21, 21, 120, 140);
