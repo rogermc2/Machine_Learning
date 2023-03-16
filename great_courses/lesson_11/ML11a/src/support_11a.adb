@@ -18,24 +18,24 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
 
---     function Arg_Min (Values   : Real_Float_Matrix;
---                       Min_Vals : out Real_Float_Vector) return Integer_Array is
---        Min_Indices  : Integer_Array (Values'Range);
---     begin
---        for row in Values'Range loop
---           Min_Vals (row) := Values (row, 1);
---           Min_Indices (row) := 1;
---           for col in 2 .. Values'Length (2) loop
---              if Values (row, col) < Min_Vals (row) then
---                 Min_Vals (row) := Values (row, col);
---                 Min_Indices (row) := col;
---              end if;
---           end loop;
---        end loop;
---
---        return Min_Indices;
---
---     end Arg_Min;
+   --     function Arg_Min (Values   : Real_Float_Matrix;
+   --                       Min_Vals : out Real_Float_Vector) return Integer_Array is
+   --        Min_Indices  : Integer_Array (Values'Range);
+   --     begin
+   --        for row in Values'Range loop
+   --           Min_Vals (row) := Values (row, 1);
+   --           Min_Indices (row) := 1;
+   --           for col in 2 .. Values'Length (2) loop
+   --              if Values (row, col) < Min_Vals (row) then
+   --                 Min_Vals (row) := Values (row, col);
+   --                 Min_Indices (row) := col;
+   --              end if;
+   --           end loop;
+   --        end loop;
+   --
+   --        return Min_Indices;
+   --
+   --     end Arg_Min;
 
    --  -------------------------------------------------------------------------
    --  Assign_Data takes the data and the centers for each cluster and
@@ -60,13 +60,18 @@ package body Support_11A is
          Diffs := Compute_Diff_Vector (Data, Centres, row);
          for col in Centres'Range (2) loop
             if Diffs (col) < Min_Vals (col) then
-              Min_Vals (col) := Diffs (col);
-              Centre_Ids (col) := col;
+               if col = 100 or col = 120  then
+                  Put_Line (Routine_Name & "row, col, Diffs < Min_Vals: "
+                            & Integer'Image (row) & Integer'Image (col)  &
+                              ",  " & Float'Image (Diffs (col)));
+               end if;
+               Min_Vals (col) := Diffs (col);
+               Centre_Ids (col) := col;
             end if;
          end loop;
       end loop;
-      Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 120, 126);
-      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 120, 126);
+      Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 100, 106);
+      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 100, 106);
 
       --  assign each data point to its closest center
       --        Centre_Ids := Arg_Min (Centre_Diffs, Values);
@@ -83,12 +88,12 @@ package body Support_11A is
    function Compute_Diff_Vector
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
       return Real_Float_Vector is
---        Routine_Name: constant String := "Support_11A.Compute_Diff_Vector ";
+      --        Routine_Name: constant String := "Support_11A.Compute_Diff_Vector ";
       Res_N       : Real_Float_Matrix (Data'Range, Data'Range (2));
       Result      : Real_Float_Vector (Data'Range);
    begin
---        Print_Float_Matrix (Routine_Name & "Data", Data, 1, 1, 130, 140);
---        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 1, 130, 140);
+      --        Print_Float_Matrix (Routine_Name & "Data", Data, 1, 1, 130, 140);
+      --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 1, 130, 140);
       --  subtract the set of centers from each data point
       for m in Res_N'Range loop
          for p in Res_N'Range (2) loop
@@ -118,7 +123,8 @@ package body Support_11A is
       Centre_Ids  : Integer_Array (Data'Range);
       Prev_Loss   : Float := 0.0;
    begin
-      --        Print_Float_Matrix (Routine_Name & "Data", Data, 21, 22, 130, 140);
+      Print_Float_Matrix (Routine_Name & "Data", Data, 100, 100 , 1, 6);
+      Print_Float_Matrix (Routine_Name & "Data", Data, 120, 120 , 1, 6);
       for cluster in 1 .. K loop
          for col in Centres'Range (2) loop
             Centres (cluster, col) :=
@@ -164,7 +170,7 @@ package body Support_11A is
                Cols.Append (aCol);
             end if;
          end loop;
-         Put_Line (Routine_Name & "Cols loaded");
+
          if Cols.Is_Empty then
             for row in Centres'Range loop
                for col in Centres'Range (2) loop
