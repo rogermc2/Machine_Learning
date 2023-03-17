@@ -22,21 +22,36 @@ package body Support_11A is
 
    function Arg_Min (Data     : Real_Float_Matrix; IDs : Integer_Matrix;
                      Min_Vals : out Real_Float_Vector) return Integer_Array is
-      --        Data_Row     : Real_Float_Vector (Data'Range (2));
-      --        Data_Index   : Positive;
-      Min_Indices  : Integer_Array (Data'Range);
+      Routine_Name : constant String := "Support_11A.Arg_Min ";
+      Data_Row     : Real_Float_Vector (Data'Range (2));
+      Data_Index   : Positive;
+      Min_Indices  : Integer_Array (Data'Range) := (others => 0);
    begin
       for index in Min_Vals'Range loop
          Min_Vals (index) := Float'Safe_Last;
       end loop;
 
+      Print_Matrix_Dimensions (Routine_Name & "IDs", IDs);
       for row in IDs'Range loop
          for id_col in IDs'Range (2) loop
             --  Get data
             for col in Data'Range (2) loop
-               --                 Data_Index := IDs (row, id_col);
-               --                 Data_Row (col) := Data (Data_Index, col);
-               if Data (IDs (row, id_col), col) < Min_Vals (row) then
+               Data_Index := IDs (row, id_col);
+               Data_Row (col) := Data (Data_Index, col);
+            end loop;
+            if row < 2 and id_col < 2 then
+               Put_Line (Routine_Name & "Data_Index" &
+                           Integer'Image (Data_Index));
+               Print_Float_Vector (Routine_Name & "Data_Row",
+                                   Data_Row, 154, 160);
+            end if;
+
+            for col in Data'Range (2) loop
+               --                 if Data (IDs (row, id_col), col) < Min_Vals (row) then
+               if Data_Row (col) < Min_Vals (row) then
+                  Put_Line (Routine_Name &
+                              "Data_Row (col) < Min_Vals (row), IDs row, col:" &
+                              Integer'Image (row) & Integer'Image (id_col));
                   Min_Vals (row) := Data (IDs (row, id_col), col);
                   Min_Indices (row) := IDs (row, id_col);
                end if;
@@ -73,9 +88,10 @@ package body Support_11A is
          end loop;
       end loop;
 
+      --        Print_Integer_Matrix (Routine_Name & "Res_IDs", Res_IDs);
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Data, Res_IDs, Min_Vals);
-      --        Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 100, 106);
+      Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 10, 15);
       Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 10, 15);
       Result := Loss (Min_Vals);
       Put_Line (Routine_Name & "Loss" & Float'Image (Result));
