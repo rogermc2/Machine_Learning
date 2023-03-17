@@ -7,9 +7,6 @@ with Basic_Printing; use  Basic_Printing;
 
 package body Support_11A is
 
-   function Compute_Diff_Vector
-     (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
-      return Real_Float_Vector;
    --     function Compute_IDs (Data, Centres : Real_Float_Matrix;
    --                           Centre_Row    : Positive) return Integer_Array;
    function Compute_Means
@@ -17,6 +14,38 @@ package body Support_11A is
       return Real_Float_Matrix;
    function Loss (Values : Real_Float_Vector) return Float;
    function Means (Data : Float_Array_List) return Real_Float_Vector;
+
+   --  ------------------------------------------------------------------------
+   --  Add_Reduce_Differences (Data, Centres, n) finds the difference  between
+   --  each data value (m, p) and the corresponding centre value (n, p)
+   --  Res_N (m, p) is Data (m, p) - Centres (n, p)
+   function Add_Reduce_Differences
+     (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
+   return Real_Float_Vector is
+      --        Routine_Name: constant String := "Support_11A.Add_Reduce_Differences ";
+      Res_N       : Real_Float_Matrix (Data'Range, Data'Range (2));
+      Result      : Real_Float_Vector (Data'Range);
+   begin
+      --        Print_Float_Matrix (Routine_Name & "Data", Data, 1, 1, 130, 140);
+      --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 1, 130, 140);
+      --  subtract the set of centers from each data point
+      for m in Res_N'Range loop
+         for p in Res_N'Range (2) loop
+            Res_N (m, p) := (Data (m, p) - Centres (Centre_Row, p)) ** 2;
+         end loop;
+      end loop;
+
+      --  add.reduce(res**2,2)
+      for row in Result'Range loop
+         Result (1) := Res_N (row, 1);
+         for col in 2 .. Res_N'Length (2) loop
+            Result (row) := Result (row) + Res_N (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Add_Reduce_Differences;
 
    --  ------------------------------------------------------------------------
 
@@ -42,7 +71,7 @@ package body Support_11A is
          end loop;
       end loop;
 
-      Print_Integer_Array (Routine_Name & "Min_Indices", Min_Indices, 1, 8);
+      Print_Integer_Array (Routine_Name & "Min_Indices 1 - 8", Min_Indices, 1, 8);
       return Min_Indices;
 
    end Arg_Min;
@@ -62,14 +91,15 @@ package body Support_11A is
    begin
       Put_Line (Routine_Name);
       --  subtract the set of centers from each data point
-      --  For each centre c (n), Compute_Diff_Vector finds the difference
+      --  For each centre c (n), Add_Reduce_Differences finds the difference
       --  between each data value data (m, p) and the corresponding centre
-      --  value centre (n, p)
+      --  value centre (n, p), squares each value then adds the values of each
+      --  row together.
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
       for row in Res2'Range loop
          --           Res_ID_Array := Compute_IDs (Data, Centres, row);
-         Res_Array := Compute_Diff_Vector (Data, Centres, row);
+         Res_Array := Add_Reduce_Differences (Data, Centres, row);
          for col in Res2'Range (2) loop
             Res2 (row, col) := Res_Array (col);
          end loop;
@@ -82,45 +112,13 @@ package body Support_11A is
       Put_Line (Routine_Name & "Res2 length" &
                            Integer'Image (Res2'Length));
       Centre_Ids := Arg_Min (Res2, Min_Vals);
-      Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 10, 15);
+      Print_Integer_Array (Routine_Name & "Centre_Ids 10 - 15", Centre_Ids, 10, 15);
       --        Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 10, 15);
       Result := Loss (Min_Vals);
-      Put_Line (Routine_Name & "Loss" & Float'Image (Result));
+--        Put_Line (Routine_Name & "Loss" & Float'Image (Result));
       return Result;
 
    end Assign_Data;
-
-   --  ------------------------------------------------------------------------
-   --  Compute_Diff_Vector (Data, Centres, n) finds the difference  between
-   --  each data value (m, p) and the corresponding centre value (n, p)
-   --  Res_N (m, p) is Data (m, p) - Centres (n, p)
-   function Compute_Diff_Vector
-     (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
-   return Real_Float_Vector is
-      --        Routine_Name: constant String := "Support_11A.Compute_Diff_Vector ";
-      Res_N       : Real_Float_Matrix (Data'Range, Data'Range (2));
-      Result      : Real_Float_Vector (Data'Range);
-   begin
-      --        Print_Float_Matrix (Routine_Name & "Data", Data, 1, 1, 130, 140);
-      --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 1, 130, 140);
-      --  subtract the set of centers from each data point
-      for m in Res_N'Range loop
-         for p in Res_N'Range (2) loop
-            Res_N (m, p) := (Data (m, p) - Centres (Centre_Row, p)) ** 2;
-         end loop;
-      end loop;
-
-      --  add.reduce(res**2,2)
-      for row in Result'Range loop
-         Result (1) := Res_N (row, 1);
-         for col in 2 .. Res_N'Length (2) loop
-            Result (row) := Result (row) + Res_N (row, col);
-         end loop;
-      end loop;
-
-      return Result;
-
-   end Compute_Diff_Vector;
 
    --  ------------------------------------------------------------------------
 
@@ -153,6 +151,7 @@ package body Support_11A is
                       (others => (others => 0.0));
       Centre_Ids  : Integer_Array (Data'Range);
       Prev_Loss   : Float := 0.0;
+      Count       : Natural := 0;
    begin
       --        Print_Float_Matrix (Routine_Name & "Data", Data, 100, 100 , 1, 6);
       --        Print_Float_Matrix (Routine_Name & "Data", Data, 120, 120 , 1, 6);
@@ -167,13 +166,14 @@ package body Support_11A is
       --                            1, 3, 120, 140);
 
       Curr_Loss := 1.0;
---        while Prev_Loss /= Curr_Loss loop
---           Prev_Loss := Curr_Loss;
---           Put_Line (Routine_Name & "Prev_Loss" & Float'Image (Prev_Loss));
+      while Prev_Loss /= Curr_Loss and Count < 4 loop
+         Count := Count + 1;
+         Prev_Loss := Curr_Loss;
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
---           --           Put_Line (Routine_Name & "Curr_Loss" & Float'Image (Curr_Loss));
+         Put_Line (Routine_Name & "Prev_Loss" & Float'Image (Prev_Loss));
+         Put_Line (Routine_Name & "Curr_Loss" & Float'Image (Curr_Loss));
          Centres := Compute_Means (Data, Centre_Ids, K);
---        end loop;
+      end loop;
       Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 1, 10);
 
       return Centres;
