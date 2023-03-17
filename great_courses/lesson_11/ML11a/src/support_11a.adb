@@ -10,8 +10,8 @@ package body Support_11A is
    function Compute_Diff_Vector
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
       return Real_Float_Vector;
-   function Compute_IDs (Data, Centres : Real_Float_Matrix;
-                         Centre_Row    : Positive) return Integer_Array;
+   --     function Compute_IDs (Data, Centres : Real_Float_Matrix;
+   --                           Centre_Row    : Positive) return Integer_Array;
    function Compute_Means
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive)
       return Real_Float_Matrix;
@@ -20,46 +20,29 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
 
-   function Arg_Min (Data     : Real_Float_Matrix; IDs : Integer_Matrix;
+   function Arg_Min (Res2     : Real_Float_Matrix;
                      Min_Vals : out Real_Float_Vector) return Integer_Array is
       Routine_Name : constant String := "Support_11A.Arg_Min ";
-      Data_Row     : Real_Float_Vector (Data'Range (2));
-      Data_Index   : Positive;
-      Min_Indices  : Integer_Array (Data'Range) := (others => 0);
+      Min_Indices  : Integer_Array (Res2'Range (2)) := (others => 0);
    begin
       for index in Min_Vals'Range loop
          Min_Vals (index) := Float'Safe_Last;
       end loop;
 
-      Print_Matrix_Dimensions (Routine_Name & "IDs", IDs);
-      for row in IDs'Range loop
-         for id_col in IDs'Range (2) loop
-            --  Get data
-            for col in Data'Range (2) loop
-               Data_Index := IDs (row, id_col);
-               Data_Row (col) := Data (Data_Index, col);
-            end loop;
-            if row < 2 and id_col < 2 then
-               Put_Line (Routine_Name & "Data_Index" &
-                           Integer'Image (Data_Index));
-               Print_Float_Vector (Routine_Name & "Data_Row",
-                                   Data_Row, 154, 160);
+      Print_Matrix_Dimensions (Routine_Name & "Res2", Res2);
+      for row in Res2'Range loop
+         for col in Res2'Range (2) loop
+            if Res2 (row, col) < Min_Vals (col) then
+               Min_Vals (col) := Res2 (row, col);
+               Min_Indices (col) := col;
+               --                    Put_Line (Routine_Name &
+               --                                "Data_Row (col) < Min_Vals (row), IDs row, col:" &
+               --                                Integer'Image (row) & Integer'Image (id_col));
             end if;
-
-            for col in Data'Range (2) loop
-               --                 if Data (IDs (row, id_col), col) < Min_Vals (row) then
-               if Data_Row (col) < Min_Vals (row) then
-                  Put_Line (Routine_Name &
-                              "Data_Row (col) < Min_Vals (row), IDs row, col:" &
-                              Integer'Image (row) & Integer'Image (id_col));
-                  Min_Vals (row) := Data (IDs (row, id_col), col);
-                  Min_Indices (row) := IDs (row, id_col);
-               end if;
-            end loop;
          end loop;
       end loop;
 
-      Print_Integer_Array (Routine_Name & "Min_Indices", Min_Indices, 1, 10);
+      Print_Integer_Array (Routine_Name & "Min_Indices", Min_Indices, 1, 8);
       return Min_Indices;
 
    end Arg_Min;
@@ -70,8 +53,10 @@ package body Support_11A is
    function Assign_Data (Data, Centres : Real_Float_Matrix;
                          Centre_Ids    : out Integer_Array) return Float is
       Routine_Name : constant String := "Support_11A.Assign_Data ";
-      Res_ID_Array : Integer_Array (Data'Range);
-      Res_IDs      : Integer_Matrix (Centres'Range, Data'Range);
+      --        Res_ID_Array : Integer_Array (Data'Range);
+      --        Res_IDs      : Integer_Matrix (Centres'Range, Data'Range);
+      Res_Array    : Real_Float_Vector (Data'Range);
+      Res2         : Real_Float_Matrix (Centres'Range, Data'Range);
       Min_Vals     : Real_Float_Vector (Data'Range);
       Result       : Float := 0.0;
    begin
@@ -82,18 +67,23 @@ package body Support_11A is
       --  value centre (n, p)
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
-      for row in Res_IDs'Range loop
-         Res_ID_Array := Compute_IDs (Data, Centres, row);
-         for col in Res_IDs'Range (2) loop
-            Res_IDs (row, col) := Res_ID_Array (col);
+      for row in Res2'Range loop
+         --           Res_ID_Array := Compute_IDs (Data, Centres, row);
+         Res_Array := Compute_Diff_Vector (Data, Centres, row);
+         for col in Res2'Range (2) loop
+            Res2 (row, col) := Res_Array (col);
          end loop;
       end loop;
 
       --        Print_Integer_Matrix (Routine_Name & "Res_IDs", Res_IDs);
       --  assign each data point to its closest center
-      Centre_Ids := Arg_Min (Data, Res_IDs, Min_Vals);
+      Put_Line (Routine_Name & "Centre_Ids length" &
+                           Integer'Image (Centre_Ids'Length));
+      Put_Line (Routine_Name & "Res2 length" &
+                           Integer'Image (Res2'Length));
+      Centre_Ids := Arg_Min (Res2, Min_Vals);
       Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 10, 15);
---        Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 10, 15);
+      --        Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 10, 15);
       Result := Loss (Min_Vals);
       Put_Line (Routine_Name & "Loss" & Float'Image (Result));
       return Result;
@@ -106,7 +96,7 @@ package body Support_11A is
    --  Res_N (m, p) is Data (m, p) - Centres (n, p)
    function Compute_Diff_Vector
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
-      return Real_Float_Vector is
+   return Real_Float_Vector is
       --        Routine_Name: constant String := "Support_11A.Compute_Diff_Vector ";
       Res_N       : Real_Float_Matrix (Data'Range, Data'Range (2));
       Result      : Real_Float_Vector (Data'Range);
@@ -134,25 +124,25 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
 
-   function Compute_IDs (Data, Centres : Real_Float_Matrix;
-                         Centre_Row    : Positive) return Integer_Array is
-      --        Routine_Name: constant String := "Support_11A.Compute_IDs ";
-      Diffs        : Real_Float_Vector (Data'Range);
-      Min_Vals     : Real_Float_Vector (Data'Range) :=
-                       (others => Float'Safe_Last);
-      IDs          : Integer_Array (Data'Range) := (others => 0);
-   begin
-      Diffs := Compute_Diff_Vector (Data, Centres, Centre_Row);
-      for col in Diffs'Range loop
-         if Diffs (col) < Min_Vals (col) then
-            Min_Vals (col) := Diffs (col);
-            IDs (col) := col;
-         end if;
-      end loop;
-
-      return IDs;
-
-   end Compute_IDs;
+   --     function Compute_IDs (Data, Centres : Real_Float_Matrix;
+   --                           Centre_Row    : Positive) return Integer_Array is
+   --        --        Routine_Name: constant String := "Support_11A.Compute_IDs ";
+   --        Diffs        : Real_Float_Vector (Data'Range);
+   --        Min_Vals     : Real_Float_Vector (Data'Range) :=
+   --                         (others => Float'Safe_Last);
+   --        IDs          : Integer_Array (Data'Range) := (others => 0);
+   --     begin
+   --        Diffs := Compute_Diff_Vector (Data, Centres, Centre_Row);
+   --        for col in Diffs'Range loop
+   --           if Diffs (col) < Min_Vals (col) then
+   --              Min_Vals (col) := Diffs (col);
+   --              IDs (col) := col;
+   --           end if;
+   --        end loop;
+   --
+   --        return IDs;
+   --
+   --     end Compute_IDs;
 
    --  ------------------------------------------------------------------------
    --  kmeans
@@ -177,13 +167,13 @@ package body Support_11A is
       --                            1, 3, 120, 140);
 
       Curr_Loss := 1.0;
-      while Prev_Loss /= Curr_Loss loop
-         Prev_Loss := Curr_Loss;
-         Put_Line (Routine_Name & "Prev_Loss" & Float'Image (Prev_Loss));
+--        while Prev_Loss /= Curr_Loss loop
+--           Prev_Loss := Curr_Loss;
+--           Put_Line (Routine_Name & "Prev_Loss" & Float'Image (Prev_Loss));
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
-         --           Put_Line (Routine_Name & "Curr_Loss" & Float'Image (Curr_Loss));
+--           --           Put_Line (Routine_Name & "Curr_Loss" & Float'Image (Curr_Loss));
          Centres := Compute_Means (Data, Centre_Ids, K);
-      end loop;
+--        end loop;
       Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 1, 10);
 
       return Centres;
@@ -194,7 +184,7 @@ package body Support_11A is
 
    function Compute_Means (Data       : Real_Float_Matrix;
                            Centre_Ids : Integer_Array; K : Positive)
-                           return Real_Float_Matrix is
+                        return Real_Float_Matrix is
       Routine_Name : constant String := "Support_11A.Compute_Means ";
       Centres      : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
                        (others => (others => 0.0));
