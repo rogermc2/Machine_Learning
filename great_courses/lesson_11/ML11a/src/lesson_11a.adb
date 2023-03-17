@@ -16,7 +16,7 @@ procedure Lesson_11A is
    Train_Size      : constant Positive := 4700;
    Test_Size       : constant Positive := 2300;
    Num_Labelled    : constant Positive := 20;
-   Num_Clusters    : constant Positive := 10;  --  k
+   Num_Clusters    : constant Positive := 3;  --  k 10
    Data            : constant Base_Split_State :=
                        Get_Split_State (Dataset_Name, Digits_Data, Train_Size,
                                         Test_Size, Y_Categorized => False,

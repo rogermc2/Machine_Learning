@@ -59,6 +59,7 @@ package body Support_11A is
          end loop;
       end loop;
 
+      Print_Integer_Array (Routine_Name & "Min_Indices", Min_Indices, 1, 10);
       return Min_Indices;
 
    end Arg_Min;
@@ -92,7 +93,7 @@ package body Support_11A is
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Data, Res_IDs, Min_Vals);
       Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 10, 15);
-      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 10, 15);
+--        Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 10, 15);
       Result := Loss (Min_Vals);
       Put_Line (Routine_Name & "Loss" & Float'Image (Result));
       return Result;
@@ -183,6 +184,7 @@ package body Support_11A is
          --           Put_Line (Routine_Name & "Curr_Loss" & Float'Image (Curr_Loss));
          Centres := Compute_Means (Data, Centre_Ids, K);
       end loop;
+      Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids, 1, 10);
 
       return Centres;
 
