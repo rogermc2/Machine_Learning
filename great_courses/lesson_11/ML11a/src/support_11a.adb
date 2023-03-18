@@ -87,7 +87,6 @@ package body Support_11A is
       Min_Vals     : Real_Float_Vector (Data'Range);
       Result       : Float := 0.0;
    begin
-      Put_Line (Routine_Name);
       --  subtract the set of centers from each data point
       --  For each centre c (n), Add_Reduce_Differences finds the difference
       --  between each data value data (m, p) and the corresponding centre
@@ -103,7 +102,6 @@ package body Support_11A is
          end loop;
       end loop;
 
-      --        Print_Integer_Matrix (Routine_Name & "Res_IDs", Res_IDs);
       --  assign each data point to its closest center
       Put_Line (Routine_Name & "Centre_Ids length" &
                            Integer'Image (Centre_Ids'Length));
@@ -115,7 +113,6 @@ package body Support_11A is
       Print_Float_Vector (Routine_Name & "Min_Vals",
                           Min_Vals, 10, 15);
       Result := Loss (Min_Vals);
---        Put_Line (Routine_Name & "Loss" & Float'Image (Result));
       return Result;
 
    end Assign_Data;
@@ -153,17 +150,12 @@ package body Support_11A is
       Prev_Loss   : Float := 0.0;
       Count       : Natural := 0;
    begin
-      --        Print_Float_Matrix (Routine_Name & "Data", Data, 100, 100 , 1, 6);
-      --        Print_Float_Matrix (Routine_Name & "Data", Data, 120, 120 , 1, 6);
       for cluster in 1 .. K loop
          for col in Centres'Range (2) loop
             Centres (cluster, col) :=
               Data (Maths.Random_Integer (1, Data'Length), col);
          end loop;
       end loop;
-      --        Print_Matrix_Dimensions (Routine_Name & "Centres", Centres);
-      --        Print_Float_Matrix (Routine_Name & "Centres", Centres,
-      --                            1, 3, 120, 140);
 
       Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss and Count < 4 loop
