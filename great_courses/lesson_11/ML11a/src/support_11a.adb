@@ -101,6 +101,7 @@ package body Support_11A is
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
+      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 127, 134);
 
       for index in Min_Vals'Range loop
          Result := Result + Min_Vals (index);
