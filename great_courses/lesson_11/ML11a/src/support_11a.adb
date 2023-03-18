@@ -64,14 +64,12 @@ package body Support_11A is
             if Res2 (row, col) < Min_Vals (col) then
                Min_Vals (col) := Res2 (row, col);
                Min_Indices (col) := col;
-               --                    Put_Line (Routine_Name &
-               --                                "Data_Row (col) < Min_Vals (row), IDs row, col:" &
-               --                                Integer'Image (row) & Integer'Image (id_col));
             end if;
          end loop;
       end loop;
 
-      Print_Integer_Array (Routine_Name & "Min_Indices 1 - 8", Min_Indices, 1, 8);
+      Print_Integer_Array (Routine_Name & "Min_Indices 1 - 8",
+                           Min_Indices, 1, 8);
       return Min_Indices;
 
    end Arg_Min;
@@ -85,7 +83,7 @@ package body Support_11A is
       --        Res_ID_Array : Integer_Array (Data'Range);
       --        Res_IDs      : Integer_Matrix (Centres'Range, Data'Range);
       Res_Array    : Real_Float_Vector (Data'Range);
-      Res2         : Real_Float_Matrix (Centres'Range, Data'Range);
+      Res2_Diffs   : Real_Float_Matrix (Centres'Range, Data'Range);
       Min_Vals     : Real_Float_Vector (Data'Range);
       Result       : Float := 0.0;
    begin
@@ -97,11 +95,11 @@ package body Support_11A is
       --  row together.
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
-      for row in Res2'Range loop
+      for row in Res2_Diffs'Range loop
          --           Res_ID_Array := Compute_IDs (Data, Centres, row);
          Res_Array := Add_Reduce_Differences (Data, Centres, row);
-         for col in Res2'Range (2) loop
-            Res2 (row, col) := Res_Array (col);
+         for col in Res2_Diffs'Range (2) loop
+            Res2_Diffs (row, col) := Res_Array (col);
          end loop;
       end loop;
 
@@ -109,11 +107,13 @@ package body Support_11A is
       --  assign each data point to its closest center
       Put_Line (Routine_Name & "Centre_Ids length" &
                            Integer'Image (Centre_Ids'Length));
-      Put_Line (Routine_Name & "Res2 length" &
-                           Integer'Image (Res2'Length));
-      Centre_Ids := Arg_Min (Res2, Min_Vals);
-      Print_Integer_Array (Routine_Name & "Centre_Ids 10 - 15", Centre_Ids, 10, 15);
-      --        Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 10, 15);
+      Put_Line (Routine_Name & "Res2_Diffs length" &
+                           Integer'Image (Res2_Diffs'Length));
+      Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
+      Print_Integer_Array (Routine_Name & "Centre_Ids 10 - 15",
+                           Centre_Ids, 10, 15);
+      Print_Float_Vector (Routine_Name & "Min_Vals",
+                          Min_Vals, 10, 15);
       Result := Loss (Min_Vals);
 --        Put_Line (Routine_Name & "Loss" & Float'Image (Result));
       return Result;
