@@ -113,7 +113,6 @@ package ML_Arrays_And_Matrices is
      (Positive, Integer_Matrix);
    subtype Integer_Matrix_List is Integer_Matrix_List_Package.Vector;
 
-   use Real_Float_Arrays;
    package Real_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
      (Positive, Real_Float_Matrix);
    subtype Real_Matrix_List is Real_Matrix_List_Package.Vector;

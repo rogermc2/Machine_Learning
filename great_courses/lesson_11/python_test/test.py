@@ -71,6 +71,8 @@ X_train = np.asarray([[21,161,160,185,252,252,253,193,128,29],
 	[0,0,94,253,252,180,0,0,0,0]])
 Y_train = np.asarray([ 0, 2, 7, 1, 8, 6, 4, 1, 6 , 3])
 n=len(X_train)
+print ("n", n)
+print ("Y", len(X_train))
 
 
 nlabeled = 20
