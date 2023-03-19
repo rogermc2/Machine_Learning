@@ -8,8 +8,8 @@ with Basic_Printing; use  Basic_Printing;
 package body Support_11A is
 
    function Compute_Means
-     (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive)
-      return Real_Float_Matrix;
+     (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
+      Test : Boolean := False) return Real_Float_Matrix;
    function Means (Data : Float_Array_List) return Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
@@ -18,7 +18,7 @@ package body Support_11A is
    --  Res_N (m, p) is Data (m, p) - Centres (n, p)
    function Add_Reduce_Differences
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
-   return Real_Float_Vector is
+      return Real_Float_Vector is
       --        Routine_Name: constant String := "Support_11A.Add_Reduce_Differences ";
       Res_N       : Real_Float_Matrix (Data'Range, Data'Range (2));
       Result      : Real_Float_Vector (Data'Range);
@@ -48,14 +48,14 @@ package body Support_11A is
 
    function Arg_Min (Res2     : Real_Float_Matrix;
                      Min_Vals : out Real_Float_Vector) return Integer_Array is
---        Routine_Name : constant String := "Support_11A.Arg_Min ";
+      --        Routine_Name : constant String := "Support_11A.Arg_Min ";
       Min_Indices  : Integer_Array (Res2'Range (2)) := (others => 0);
    begin
       for index in Min_Vals'Range loop
          Min_Vals (index) := Float'Safe_Last;
       end loop;
 
---        Print_Matrix_Dimensions (Routine_Name & "Res2", Res2);
+      --        Print_Matrix_Dimensions (Routine_Name & "Res2", Res2);
       for row in Res2'Range loop
          for col in Res2'Range (2) loop
             if Res2 (row, col) < Min_Vals (col) then
@@ -65,8 +65,8 @@ package body Support_11A is
          end loop;
       end loop;
 
---        Print_Integer_Array (Routine_Name & "Min_Indices 1 - 8",
---                             Min_Indices, 1, 8);
+      --        Print_Integer_Array (Routine_Name & "Min_Indices 1 - 8",
+      --                             Min_Indices, 1, 8);
       return Min_Indices;
 
    end Arg_Min;
@@ -89,7 +89,7 @@ package body Support_11A is
       --  row together.
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
-      Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 1, 7);
+      Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 7, 10);
       for row in Res2_Diffs'Range loop
          Res_Array := Add_Reduce_Differences (Data, Centres, row);
          for col in Res2_Diffs'Range (2) loop
@@ -97,23 +97,25 @@ package body Support_11A is
          end loop;
       end loop;
       Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs,
-                          1, 3, 1, 7);
+                          1, 3, 7, 10);
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
-      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 1, 7);
+      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 7, 10);
 
       for index in Min_Vals'Range loop
          Result := Result + Min_Vals (index);
       end loop;
+      Put_Line (Routine_Name & "Loss: " & Float'Image (Result));
       return Result;
 
    end Assign_Data;
 
    --  ------------------------------------------------------------------------
    --  kmeans
-   function Cluster_Means (Data      : Real_Float_Matrix; K : Positive;
-                           Curr_Loss : out Float) return Real_Float_Matrix is
+   function Cluster_Means
+     (Data : Real_Float_Matrix; K : Positive; Curr_Loss : out Float;
+      Test : Boolean := False) return Real_Float_Matrix is
       Routine_Name: constant String := "Support_11A.Cluster_Means ";
       Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
                       (others => (others => 0.0));
@@ -133,8 +135,8 @@ package body Support_11A is
          Count := Count + 1;
          Prev_Loss := Curr_Loss;
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
-         Put_Line (Routine_Name & "Curr_Loss" & Float'Image (Curr_Loss));
-         Centres := Compute_Means (Data, Centre_Ids, K);
+         Put_Line (Routine_Name & "Curr_Loss: " & Float'Image (Curr_Loss));
+         Centres := Compute_Means (Data, Centre_Ids, K, Test);
       end loop;
       New_Line;
 
@@ -144,10 +146,10 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
 
-   function Compute_Means (Data       : Real_Float_Matrix;
-                           Centre_Ids : Integer_Array; K : Positive)
-                        return Real_Float_Matrix is
---        Routine_Name : constant String := "Support_11A.Compute_Means ";
+   function Compute_Means
+     (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
+      Test : Boolean := False) return Real_Float_Matrix is
+      --        Routine_Name : constant String := "Support_11A.Compute_Means ";
       Centres      : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
                        (others => (others => 0.0));
       aCol         : Float_Array (Data'Range (2));
@@ -166,12 +168,20 @@ package body Support_11A is
          end loop;
 
          if Cols.Is_Empty then
-            for row in Centres'Range loop
-               for col in Centres'Range (2) loop
-                  Centres (cluster, col) :=
-                    Data (Maths.Random_Integer (1, Data'Length), col);
+            if Test then
+               for row in Centres'Range loop
+                  for col in Centres'Range (2) loop
+                     Centres (cluster, col) := Data (row, col);
+                  end loop;
                end loop;
-            end loop;
+            else
+               for row in Centres'Range loop
+                  for col in Centres'Range (2) loop
+                     Centres (cluster, col) :=
+                       Data (Maths.Random_Integer (1, Data'Length), col);
+                  end loop;
+               end loop;
+            end if;
          else
             declare
                Mean_Values : constant Real_Float_Vector := Means (Cols);

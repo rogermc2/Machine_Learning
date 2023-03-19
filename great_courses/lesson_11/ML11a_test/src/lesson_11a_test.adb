@@ -9,8 +9,9 @@ with Support_11A; use Support_11A;
 procedure Lesson_11A_Test is
    use Real_Float_Arrays;
    Program_Name    : constant String := "Lesson 11A Test ";
-   Train_Size      : constant Positive := 10;
-   Num_Clusters    : constant Positive := 10;  --  k 10
+   Test            : constant Boolean := True;
+   Train_Size      : constant Positive := 12;
+   Num_Clusters    : constant Positive := 8;  --  k 10
    Train_X         : constant Real_Float_Matrix (1 .. Train_Size,  1 .. 10) :=
                        ((21.0, 161.0, 160.0, 185.0, 252.0, 252.0, 253.0, 193.0, 128.0, 29.0),
                         (0.0, 0.0, 0.0, 0.0, 188.0, 247.0, 65.0, 0.0, 0.0, 0.0),
@@ -21,9 +22,11 @@ procedure Lesson_11A_Test is
                         (0.0, 1.0, 12.0, 128.0, 227.0, 253.0, 0.0, 0.0, 0.0, 0.0),
                         (0.0, 5.0, 32.0, 115.0, 239.0, 254.0, 0.0, 0.0, 0.0, 0.0),
                         (0.0, 0.0, 140.0, 253.0, 252.0, 252.0, 0.0, 0.0, 0.0, 0.0),
-                        (0.0, 0.0, 94.0, 253.0, 252.0, 180.0, 0.0, 0.0, 0.0, 0.0));
+                        (0.0, 0.0, 94.0, 253.0, 252.0, 180.0, 0.0, 0.0, 0.0, 0.0),
+                        (0.0, 20.0, 243.0, 141.0, 59.0, 13.0, 0.0, 0.0, 0.0, 0.0),
+                        (0.0, 0.0, 13.0, 172.0, 204.0, 21.0, 0.0, 0.0, 0.0, 0.0));
 --     Train_Y         : constant Integer_Array (1 .. Train_Size) :=
---                         (0, 2, 7, 1, 8, 6, 4, 1, 6 , 3);
+--                         (0, 2, 7, 1, 8, 6, 4, 1, 6 , 3, 2, 5);
 --     Test_X          : constant Real_Float_Matrix := Data.Test_X;
 --     Test_Y          : constant Integer_Matrix := Data.Test_Y;
    Loss            : Float;
@@ -37,8 +40,8 @@ begin
    Put_Line (Program_Name);
 
    --     for rep in 1 .. 8 loop
-      for rep in 1 .. 3 loop
-         Centres := Cluster_Means (Train_X,  Num_Clusters,  Loss);
+      for rep in 1 .. 8 loop
+         Centres := Cluster_Means (Train_X,  Num_Clusters,  Loss, Test);
          if Loss < Best_Loss then
             Best_Centres := Centres;
             Best_Loss := Loss;
