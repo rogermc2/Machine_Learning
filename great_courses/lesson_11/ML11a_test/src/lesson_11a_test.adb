@@ -32,25 +32,26 @@ procedure Lesson_11A_Test is
    Loss            : Float;
    Best_Loss       : Float;
    Best_Centres    : Real_Float_Matrix :=
-                       Cluster_Means (Train_X,  Num_Clusters,  Best_Loss);
+                       Cluster_Means (Train_X,  Num_Clusters, Best_Loss);
    Centres         : Real_Float_Matrix (1 .. Num_Clusters,
                                         Train_X'Range (2));
 --     Test_Center_IDs : Integer_Array (Test_X'Range);
 begin
-   Put_Line (Program_Name);
+   Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
+   Print_Float_Matrix (Program_Name & "Best_Centres", Best_Centres);
 
    --     for rep in 1 .. 8 loop
-      for rep in 1 .. 8 loop
-         Centres := Cluster_Means (Train_X,  Num_Clusters,  Loss, Test);
-         if Loss < Best_Loss then
-            Best_Centres := Centres;
-            Best_Loss := Loss;
-         end if;
+--        for rep in 1 .. 8 loop
+--           Centres := Cluster_Means (Train_X,  Num_Clusters,  Loss, Test);
+--           if Loss < Best_Loss then
+--              Best_Centres := Centres;
+--              Best_Loss := Loss;
+--           end if;
       --  Assign testing points to discovered clusters
 --           Loss := Assign_Data (Test_X,  Best_Centres,  Test_Center_IDs);
 
       --  Use the labeled examples to label the clusters
-      end loop;
+--        end loop;
 
    Put_Line ("----------------------------------------------");
 

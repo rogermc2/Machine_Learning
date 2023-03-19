@@ -19,12 +19,10 @@ package body Support_11A is
    function Add_Reduce_Differences
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
       return Real_Float_Vector is
-      --        Routine_Name: constant String := "Support_11A.Add_Reduce_Differences ";
+--        Routine_Name: constant String := "Support_11A.Add_Reduce_Differences ";
       Res_N       : Real_Float_Matrix (Data'Range, Data'Range (2));
-      Result      : Real_Float_Vector (Data'Range);
+      Result      : Real_Float_Vector (Data'Range) := (others => 0.0);
    begin
-      --        Print_Float_Matrix (Routine_Name & "Data", Data, 1, 1, 130, 140);
-      --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 1, 130, 140);
       --  subtract the set of centers from each data point
       for m in Res_N'Range loop
          for p in Res_N'Range (2) loop
@@ -39,6 +37,7 @@ package body Support_11A is
             Result (row) := Result (row) + Res_N (row, col);
          end loop;
       end loop;
+--        Print_Float_Vector (Routine_Name & "Result", Result);
 
       return Result;
 
@@ -96,12 +95,11 @@ package body Support_11A is
             Res2_Diffs (row, col) := Res_Array (col);
          end loop;
       end loop;
-      Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs,
-                          1, 3, 7, 10);
+      Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs, 1, 3, 1, 8);
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
-      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 7, 10);
+      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 1, 8);
 
       for index in Min_Vals'Range loop
          Result := Result + Min_Vals (index);
