@@ -89,7 +89,7 @@ package body Support_11A is
       --  row together.
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
-      Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 127, 134);
+      Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 1, 7);
       for row in Res2_Diffs'Range loop
          Res_Array := Add_Reduce_Differences (Data, Centres, row);
          for col in Res2_Diffs'Range (2) loop
@@ -97,11 +97,11 @@ package body Support_11A is
          end loop;
       end loop;
       Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs,
-                          1, 3, 127, 134);
+                          1, 3, 1, 7);
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
-      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 127, 134);
+      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals, 1, 7);
 
       for index in Min_Vals'Range loop
          Result := Result + Min_Vals (index);

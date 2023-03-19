@@ -22,14 +22,17 @@ procedure Lesson_11A_Test is
                         (0.0, 5.0, 32.0, 115.0, 239.0, 254.0, 0.0, 0.0, 0.0, 0.0),
                         (0.0, 0.0, 140.0, 253.0, 252.0, 252.0, 0.0, 0.0, 0.0, 0.0),
                         (0.0, 0.0, 94.0, 253.0, 252.0, 180.0, 0.0, 0.0, 0.0, 0.0));
-   Train_Y         : constant Integer_Array (1 .. Train_Size) :=
-                       (0, 2, 7, 1, 8, 6, 4, 1, 6 , 3);
+--     Train_Y         : constant Integer_Array (1 .. Train_Size) :=
+--                         (0, 2, 7, 1, 8, 6, 4, 1, 6 , 3);
+--     Test_X          : constant Real_Float_Matrix := Data.Test_X;
+--     Test_Y          : constant Integer_Matrix := Data.Test_Y;
    Loss            : Float;
    Best_Loss       : Float;
    Best_Centres    : Real_Float_Matrix :=
                        Cluster_Means (Train_X,  Num_Clusters,  Best_Loss);
    Centres         : Real_Float_Matrix (1 .. Num_Clusters,
                                         Train_X'Range (2));
+--     Test_Center_IDs : Integer_Array (Test_X'Range);
 begin
    Put_Line (Program_Name);
 
@@ -41,7 +44,7 @@ begin
             Best_Loss := Loss;
          end if;
       --  Assign testing points to discovered clusters
-         Loss := Assign_Data (Test_X,  Best_Centres,  Test_Center_IDs);
+--           Loss := Assign_Data (Test_X,  Best_Centres,  Test_Center_IDs);
 
       --  Use the labeled examples to label the clusters
       end loop;
