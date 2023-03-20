@@ -38,7 +38,7 @@ procedure Lesson_11A_Test is
 --     Test_Center_IDs : Integer_Array (Test_X'Range);
 begin
    Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
-   Print_Float_Matrix (Program_Name & "Best_Centres", Best_Centres);
+--     Print_Float_Matrix (Program_Name & "Best_Centres", Best_Centres);
 
    --     for rep in 1 .. 8 loop
 --        for rep in 1 .. 8 loop

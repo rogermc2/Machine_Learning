@@ -19,7 +19,7 @@ package body Support_11A is
    function Add_Reduce_Differences
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
       return Real_Float_Vector is
---        Routine_Name: constant String := "Support_11A.Add_Reduce_Differences ";
+      --        Routine_Name: constant String := "Support_11A.Add_Reduce_Differences ";
       Res_N       : Real_Float_Matrix (Data'Range, Data'Range (2));
       Result      : Real_Float_Vector (Data'Range) := (others => 0.0);
    begin
@@ -37,7 +37,7 @@ package body Support_11A is
             Result (row) := Result (row) + Res_N (row, col);
          end loop;
       end loop;
---        Print_Float_Vector (Routine_Name & "Result", Result);
+      --        Print_Float_Vector (Routine_Name & "Result", Result);
 
       return Result;
 
@@ -88,7 +88,7 @@ package body Support_11A is
       --  row together.
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
-      Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 7, 10);
+--        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 7, 10);
       for row in Res2_Diffs'Range loop
          Res_Array := Add_Reduce_Differences (Data, Centres, row);
          for col in Res2_Diffs'Range (2) loop
@@ -122,10 +122,16 @@ package body Support_11A is
       Count       : Natural := 0;
    begin
       for cluster in 1 .. K loop
-         for col in Centres'Range (2) loop
-            Centres (cluster, col) :=
-              Data (Maths.Random_Integer (1, Data'Length), col);
-         end loop;
+         if Test then
+            for col in Centres'Range (2) loop
+               Centres (cluster, col) := Data (cluster, col);
+            end loop;
+         else
+            for col in Centres'Range (2) loop
+               Centres (cluster, col) :=
+                 Data (Maths.Random_Integer (1, Data'Length), col);
+            end loop;
+         end if;
       end loop;
 
       Curr_Loss := 1.0;
