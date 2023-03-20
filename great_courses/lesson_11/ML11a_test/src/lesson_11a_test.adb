@@ -32,7 +32,7 @@ procedure Lesson_11A_Test is
    Loss            : Float;
    Best_Loss       : Float;
    Best_Centres    : Real_Float_Matrix :=
-                       Cluster_Means (Train_X,  Num_Clusters, Best_Loss);
+                       Cluster_Means (Train_X,  Num_Clusters, Best_Loss, Test);
    Centres         : Real_Float_Matrix (1 .. Num_Clusters,
                                         Train_X'Range (2));
 --     Test_Center_IDs : Integer_Array (Test_X'Range);

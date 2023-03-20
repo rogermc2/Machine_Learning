@@ -14,7 +14,7 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
    --  Add_Reduce_Differences (Data, Centres, n) finds the difference  between
-   --  each data value (m, p) and the corresponding centre value (n, p)
+   --  each data value Data (m, p) and the corresponding centre value (n, p)
    --  Res_N (m, p) is Data (m, p) - Centres (n, p)
    function Add_Reduce_Differences
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
@@ -24,8 +24,8 @@ package body Support_11A is
       Result      : Real_Float_Vector (Data'Range) := (others => 0.0);
    begin
       --  subtract the set of centers from each data point
-      for m in Res_N'Range loop
-         for p in Res_N'Range (2) loop
+      for m in Data'Range loop
+         for p in Data'Range (2) loop
             Res_N (m, p) := (Data (m, p) - Centres (Centre_Row, p)) ** 2;
          end loop;
       end loop;
@@ -89,7 +89,7 @@ package body Support_11A is
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
 --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 7, 10);
-      for row in Res2_Diffs'Range loop
+      for row in Centres'Range loop
          Res_Array := Add_Reduce_Differences (Data, Centres, row);
          for col in Res2_Diffs'Range (2) loop
             Res2_Diffs (row, col) := Res_Array (col);
@@ -137,7 +137,10 @@ package body Support_11A is
       Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss and Count < 4 loop
          Count := Count + 1;
+         Put_Line (Routine_Name & "Count: " & Integer'Image (Count));
          Prev_Loss := Curr_Loss;
+--           Print_Float_Matrix (Routine_Name & "Data: ", Data, 1,3, 1,4);
+--           Print_Float_Matrix (Routine_Name & "Centres: ", Centres, 1,3, 1,4);
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
          Put_Line (Routine_Name & "Curr_Loss: " & Float'Image (Curr_Loss));
          Centres := Compute_Means (Data, Centre_Ids, K, Test);
