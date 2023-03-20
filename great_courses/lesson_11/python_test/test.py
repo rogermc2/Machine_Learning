@@ -18,8 +18,8 @@ def assign_data(data,centers):
   # sum the squared differences
   res2 = np.add.reduce(res**2,2)
   print ("res2", res2[:2][:4])
-  res2diff = np.min,0,res2
-  print ("res2diff", res2[:2][:4])
+  res2diff = np.apply_along_axis(np.min,0,res2)
+  print ("res2diff", res2diff)
   # assign each data point to its closest center
   centerids = np.apply_along_axis(np.argmin,0,res2)
   loss = sum(np.apply_along_axis(np.min,0,res2))
