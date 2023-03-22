@@ -17,9 +17,9 @@ def assign_data(data,centers):
   res = np.reshape(data,(1,n,d))-np.reshape(centers,(k,1,d))
   # sum the squared differences
   res2 = np.add.reduce(res**2,2)
-  print ("res2", res2[:2][:4])
+  # print ("res2", res2[:2][:4])
   res2diff = np.apply_along_axis(np.min,0,res2)
-  print ("res2diff", res2diff)
+  print ("min vals", res2diff)
   # assign each data point to its closest center
   centerids = np.apply_along_axis(np.argmin,0,res2)
   loss = sum(np.apply_along_axis(np.min,0,res2))
@@ -40,6 +40,7 @@ def compute_means(data, centerids, k):
       centers[i] = data[i]
       # centers[i] = data[random.randint(0,n-1)]
     else:
+      print ("cols shape: ", cols.shape)
       centers[i] = cols.mean(0)
   return(centers)
 
@@ -82,5 +83,5 @@ k = 8
 
 bestcenters, bestloss = kmeans(X_train, k)
 
-print ("bestcenters ", bestcenters)
+# print ("bestcenters ", bestcenters)
 print ("bestloss ", bestloss)

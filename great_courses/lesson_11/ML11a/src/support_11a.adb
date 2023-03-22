@@ -19,7 +19,7 @@ package body Support_11A is
    function Add_Reduce_Differences
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
       return Real_Float_Vector is
-      Routine_Name : constant String := "Support_11A.Add_Reduce_Differences ";
+--        Routine_Name : constant String := "Support_11A.Add_Reduce_Differences ";
       Res_N2       : Real_Float_Matrix (Data'Range, Data'Range (2));
       Result       : Real_Float_Vector (Data'Range) := (others => 0.0);
    begin
@@ -36,7 +36,7 @@ package body Support_11A is
             Result (row) := Result (row) + Res_N2 (row, col);
          end loop;
       end loop;
-      --        Print_Float_Vector (Routine_Name & "Result", Result);
+      --        Print_Float_Vector (Routine_Name & "sum Res_N2", Result);
 
       return Result;
 
@@ -78,7 +78,7 @@ package body Support_11A is
       Res_Array    : Real_Float_Vector (Data'Range);
       Res2_Diffs   : Real_Float_Matrix (Centres'Range, Data'Range);
       Min_Vals     : Real_Float_Vector (Data'Range);
-      Result       : Float := 0.0;
+      Loss         : Float := 0.0;
    begin
       --  subtract the set of centers from each data point
       --  For each centre c (n), Add_Reduce_Differences finds the difference
@@ -90,6 +90,9 @@ package body Support_11A is
 --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 7, 10);
       for row in Centres'Range loop
          Res_Array := Add_Reduce_Differences (Data, Centres, row);
+--           if row < 3 then
+--              Print_Float_Vector (Routine_Name & "Res_Array", Res_Array, 1, 8);
+--           end if;
          for col in Res2_Diffs'Range (2) loop
             Res2_Diffs (row, col) := Res_Array (col);
          end loop;
@@ -101,10 +104,10 @@ package body Support_11A is
       Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals);
 
       for index in Min_Vals'Range loop
-         Result := Result + Min_Vals (index);
+         Loss := Loss + Min_Vals (index);
       end loop;
-      Put_Line (Routine_Name & "Loss: " & Float'Image (Result));
-      return Result;
+--        Put_Line (Routine_Name & "Loss: " & Float'Image (Result));
+      return Loss;
 
    end Assign_Data;
 
@@ -120,6 +123,7 @@ package body Support_11A is
       Prev_Loss   : Float := 0.0;
       Count       : Natural := 0;
    begin
+      --  kmeans
       for cluster in 1 .. K loop
          if Test then
             for col in Centres'Range (2) loop
@@ -155,15 +159,17 @@ package body Support_11A is
    function Compute_Means
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
       Test : Boolean := False) return Real_Float_Matrix is
-      --        Routine_Name : constant String := "Support_11A.Compute_Means ";
+      Routine_Name : constant String := "Support_11A.Compute_Means ";
       Centres      : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
                        (others => (others => 0.0));
       aCol         : Float_Array (Data'Range (2));
       Cols         : Float_Array_List;  --  data points assigned to a cluster
    begin
       for cluster in 1 .. K loop               --  i
+         --  Gather the data points assigned to cluster i
+         --  cols = np.array([data[j] for j in range(n) if centerids[j] == i])
          Cols.Clear;
-         for row in Data'Range loop            --  j
+         for row in Centre_Ids'Range loop            --  j
             if Centre_Ids (row) = cluster then
                --  Get data for Data row (cluster)
                for col in Data'Range (2) loop
@@ -188,18 +194,21 @@ package body Support_11A is
                   end loop;
                end loop;
             end if;
-         else
+         else  --  Cols not Empty
             declare
-               Mean_Values : constant Real_Float_Vector := Means (Cols);
+               Mean_Col_Values : constant Real_Float_Vector := Means (Cols);
             begin
+               Put_Line (Routine_Name & "Cols length" &
+                           Integer'Image (Integer (Cols.Length)));
                for row in Centres'Range loop
                   for col in Centres'Range (2) loop
-                     Centres (cluster, col) := Mean_Values (col);
+                     Centres (cluster, col) := Mean_Col_Values (col);
                   end loop;
                end loop;
+               Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
             end;
          end if;
-      end loop;
+      end loop; --  for clusters
 
       return Centres;
 
