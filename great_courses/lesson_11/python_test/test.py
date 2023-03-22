@@ -40,8 +40,9 @@ def compute_means(data, centerids, k):
       centers[i] = data[i]
       # centers[i] = data[random.randint(0,n-1)]
     else:
-      print ("cols shape: ", cols.shape)
+      # print ("cols shape: ", cols.shape)
       centers[i] = cols.mean(0)
+  # print ("compute_means centers", centers)
   return(centers)
 
 def kmeans(data, k):

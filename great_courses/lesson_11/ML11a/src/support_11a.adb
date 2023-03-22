@@ -97,7 +97,7 @@ package body Support_11A is
             Res2_Diffs (row, col) := Res_Array (col);
          end loop;
       end loop;
-      Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs, 1, 3, 1, 8);
+--        Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs, 1, 3, 1, 8);
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
@@ -138,10 +138,11 @@ package body Support_11A is
       end loop;
 
       Curr_Loss := 1.0;
-      while Prev_Loss /= Curr_Loss and Count < 4 loop
+      while Prev_Loss /= Curr_Loss loop
          Count := Count + 1;
          Put_Line (Routine_Name & "Count: " & Integer'Image (Count));
          Prev_Loss := Curr_Loss;
+         Put_Line (Routine_Name & "Prev_Loss: " & Float'Image (Prev_Loss));
 --           Print_Float_Matrix (Routine_Name & "Data: ", Data, 1,3, 1,4);
 --           Print_Float_Matrix (Routine_Name & "Centres: ", Centres, 1,3, 1,4);
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
@@ -159,7 +160,7 @@ package body Support_11A is
    function Compute_Means
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
       Test : Boolean := False) return Real_Float_Matrix is
-      Routine_Name : constant String := "Support_11A.Compute_Means ";
+--        Routine_Name : constant String := "Support_11A.Compute_Means ";
       Centres      : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
                        (others => (others => 0.0));
       aCol         : Float_Array (Data'Range (2));
@@ -198,17 +199,17 @@ package body Support_11A is
             declare
                Mean_Col_Values : constant Real_Float_Vector := Means (Cols);
             begin
-               Put_Line (Routine_Name & "Cols length" &
-                           Integer'Image (Integer (Cols.Length)));
+--                 Put_Line (Routine_Name & "Cols length" &
+--                             Integer'Image (Integer (Cols.Length)));
                for row in Centres'Range loop
                   for col in Centres'Range (2) loop
                      Centres (cluster, col) := Mean_Col_Values (col);
                   end loop;
                end loop;
-               Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
             end;
          end if;
       end loop; --  for clusters
+--        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
 
       return Centres;
 
