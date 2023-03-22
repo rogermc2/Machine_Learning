@@ -10,6 +10,9 @@ package body Support_11A is
    function Compute_Means
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
       Test : Boolean := False) return Real_Float_Matrix;
+   procedure Initialize_Centres
+     (Data    : Real_Float_Matrix; Num_Clusters : Positive;
+      Centres : out Real_Float_Matrix; Test : Boolean);
    function Means (Data : Float_Array_List) return Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
@@ -19,7 +22,7 @@ package body Support_11A is
    function Add_Reduce_Differences
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
       return Real_Float_Vector is
---        Routine_Name : constant String := "Support_11A.Add_Reduce_Differences ";
+      --        Routine_Name : constant String := "Support_11A.Add_Reduce_Differences ";
       Res_N2       : Real_Float_Matrix (Data'Range, Data'Range (2));
       Result       : Real_Float_Vector (Data'Range) := (others => 0.0);
    begin
@@ -87,17 +90,17 @@ package body Support_11A is
       --  row together.
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
---        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 7, 10);
+      --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 7, 10);
       for row in Centres'Range loop
          Res_Array := Add_Reduce_Differences (Data, Centres, row);
---           if row < 3 then
---              Print_Float_Vector (Routine_Name & "Res_Array", Res_Array, 1, 8);
---           end if;
+         --           if row < 3 then
+         --              Print_Float_Vector (Routine_Name & "Res_Array", Res_Array, 1, 8);
+         --           end if;
          for col in Res2_Diffs'Range (2) loop
             Res2_Diffs (row, col) := Res_Array (col);
          end loop;
       end loop;
---        Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs, 1, 3, 1, 8);
+      --        Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs, 1, 3, 1, 8);
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
@@ -106,7 +109,7 @@ package body Support_11A is
       for index in Min_Vals'Range loop
          Loss := Loss + Min_Vals (index);
       end loop;
---        Put_Line (Routine_Name & "Loss: " & Float'Image (Result));
+      --        Put_Line (Routine_Name & "Loss: " & Float'Image (Result));
       return Loss;
 
    end Assign_Data;
@@ -124,18 +127,7 @@ package body Support_11A is
       Count       : Natural := 0;
    begin
       --  kmeans
-      for cluster in 1 .. K loop
-         if Test then
-            for col in Centres'Range (2) loop
-               Centres (cluster, col) := Data (cluster, col);
-            end loop;
-         else
-            for col in Centres'Range (2) loop
-               Centres (cluster, col) :=
-                 Data (Maths.Random_Integer (1, Data'Length), col);
-            end loop;
-         end if;
-      end loop;
+      Initialize_Centres (Data, K, Centres, Test);
 
       Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss loop
@@ -143,8 +135,8 @@ package body Support_11A is
          Put_Line (Routine_Name & "Count: " & Integer'Image (Count));
          Prev_Loss := Curr_Loss;
          Put_Line (Routine_Name & "Prev_Loss: " & Float'Image (Prev_Loss));
---           Print_Float_Matrix (Routine_Name & "Data: ", Data, 1,3, 1,4);
---           Print_Float_Matrix (Routine_Name & "Centres: ", Centres, 1,3, 1,4);
+         --           Print_Float_Matrix (Routine_Name & "Data: ", Data, 1,3, 1,4);
+         --           Print_Float_Matrix (Routine_Name & "Centres: ", Centres, 1,3, 1,4);
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
          Put_Line (Routine_Name & "Curr_Loss: " & Float'Image (Curr_Loss));
          Centres := Compute_Means (Data, Centre_Ids, K, Test);
@@ -160,7 +152,7 @@ package body Support_11A is
    function Compute_Means
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
       Test : Boolean := False) return Real_Float_Matrix is
---        Routine_Name : constant String := "Support_11A.Compute_Means ";
+      --        Routine_Name : constant String := "Support_11A.Compute_Means ";
       Centres      : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
                        (others => (others => 0.0));
       aCol         : Float_Array (Data'Range (2));
@@ -199,8 +191,8 @@ package body Support_11A is
             declare
                Mean_Col_Values : constant Real_Float_Vector := Means (Cols);
             begin
---                 Put_Line (Routine_Name & "Cols length" &
---                             Integer'Image (Integer (Cols.Length)));
+               --                 Put_Line (Routine_Name & "Cols length" &
+               --                             Integer'Image (Integer (Cols.Length)));
                for row in Centres'Range loop
                   for col in Centres'Range (2) loop
                      Centres (cluster, col) := Mean_Col_Values (col);
@@ -209,11 +201,32 @@ package body Support_11A is
             end;
          end if;
       end loop; --  for clusters
---        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
+      --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
 
       return Centres;
 
    end Compute_Means;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Initialize_Centres
+     (Data    : Real_Float_Matrix; Num_Clusters : Positive;
+      Centres : out Real_Float_Matrix; Test : Boolean) is
+   begin
+      for cluster in 1 .. Num_Clusters loop
+         if Test then
+            for col in Centres'Range (2) loop
+               Centres (cluster, col) := Data (cluster, col);
+            end loop;
+         else
+            for col in Centres'Range (2) loop
+               Centres (cluster, col) :=
+                 Data (Maths.Random_Integer (1, Data'Length), col);
+            end loop;
+         end if;
+      end loop;
+
+   end Initialize_Centres;
 
    --  ------------------------------------------------------------------------
 
