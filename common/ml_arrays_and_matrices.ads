@@ -109,6 +109,10 @@ package ML_Arrays_And_Matrices is
      Ada.Containers.Vectors (Positive, Real_Float_List);
    subtype Real_Float_List_2D is Real_Float_Package_2D.Vector;
 
+   package Float_Vector_Package is new
+     Ada.Containers.Indefinite_Vectors (Positive, Real_Float_Vector);
+   subtype Float_Vector_List is Float_Vector_Package.Vector;
+
    package Integer_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
      (Positive, Integer_Matrix);
    subtype Integer_Matrix_List is Integer_Matrix_List_Package.Vector;
