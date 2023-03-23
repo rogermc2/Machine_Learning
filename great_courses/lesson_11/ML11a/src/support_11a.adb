@@ -13,7 +13,7 @@ package body Support_11A is
    procedure Initialize_Centres
      (Data    : Real_Float_Matrix; Num_Clusters : Positive;
       Centres : out Real_Float_Matrix; Test : Boolean);
-   function Means (Data : Float_Array_List) return Real_Float_Vector;
+   function Means (Data : Float_Vector_List) return Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
    --  Add_Reduce_Differences (Data, Centres, n) finds the difference  between
@@ -166,10 +166,10 @@ package body Support_11A is
          for row in Centre_Ids'Range loop            --  j
             if Centre_Ids (row) = cluster then
                --  Get data for Data row (cluster)
-               aCol := Get_Row (Data, col);
-               for col in Data'Range (2) loop
-                  aCol (col) := Data (row, col);
-               end loop;
+               aCol := Get_Row (Data, Integer (col));
+--                 for col in Data'Range (2) loop
+--                    aCol (col) := Data (row, col);
+--                 end loop;
                Cols.Append (aCol);
             end if;
          end loop;
@@ -232,9 +232,9 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
 
-   function Means (Data : Float_Array_List) return Real_Float_Vector is
+   function Means (Data : Float_Vector_List) return Real_Float_Vector is
       use Real_Float_Arrays;
-      aRow   : Float_Array (Data.Element (1)'Range);
+      aRow   : Real_Float_Vector (Data.Element (1)'Range);
       Result : Real_Float_Vector (Data.Element (1)'Range) := (others => 0.0);
    begin
       for row in Data.First_Index .. Data.Last_Index loop
