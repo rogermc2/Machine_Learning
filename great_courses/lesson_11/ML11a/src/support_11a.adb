@@ -153,10 +153,9 @@ package body Support_11A is
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
       Test : Boolean := False) return Real_Float_Matrix is
       use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Support_11A.Compute_Means ";
+      Routine_Name : constant String := "Support_11A.Compute_Means ";
       Centres      : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
                        (others => (others => 0.0));
-      aCol         : Real_Float_Vector (Data'Range (2));
       Cols         : Float_Vector_List;  --  data points assigned to a cluster
    begin
       for cluster in 1 .. K loop               --  i
@@ -166,11 +165,7 @@ package body Support_11A is
          for row in Centre_Ids'Range loop            --  j
             if Centre_Ids (row) = cluster then
                --  Get data for Data row (cluster)
-               aCol := Get_Row (Data, Integer (col));
---                 for col in Data'Range (2) loop
---                    aCol (col) := Data (row, col);
---                 end loop;
-               Cols.Append (aCol);
+               Cols.Append (Get_Row (Data, Centre_Ids (row)));
             end if;
          end loop;
 
@@ -193,8 +188,6 @@ package body Support_11A is
             declare
                Mean_Col_Values : constant Real_Float_Vector := Means (Cols);
             begin
-               --                 Put_Line (Routine_Name & "Cols length" &
-               --                             Integer'Image (Integer (Cols.Length)));
                for row in Centres'Range loop
                   for col in Centres'Range (2) loop
                      Centres (cluster, col) := Mean_Col_Values (col);
@@ -203,7 +196,7 @@ package body Support_11A is
             end;
          end if;
       end loop; --  for clusters
-      --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
+      Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
 
       return Centres;
 
