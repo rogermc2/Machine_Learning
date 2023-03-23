@@ -136,10 +136,11 @@ package body Support_11A is
          Prev_Loss := Curr_Loss;
          Put_Line (Routine_Name & "Prev_Loss: " & Float'Image (Prev_Loss));
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
+         Print_Integer_Array (Routine_Name & "Centre_Ids: ", Centre_Ids, 1,8);
          Put_Line (Routine_Name & "Curr_Loss: " & Float'Image (Curr_Loss));
-         Print_Float_Matrix (Routine_Name & "Centres: ", Centres, 1,3, 1,4);
          Centres := Compute_Means (Data, Centre_Ids, K, Test);
-         Print_Float_Matrix (Routine_Name & "updated Centres: ", Centres, 1,3, 1,4);
+--           Print_Float_Matrix (Routine_Name & "updated Centres: ", Centres, 1,3, 1,8);
+
       end loop;
       New_Line;
 
@@ -153,7 +154,7 @@ package body Support_11A is
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
       Test : Boolean := False) return Real_Float_Matrix is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Support_11A.Compute_Means ";
+--        Routine_Name : constant String := "Support_11A.Compute_Means ";
       Centres      : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
                        (others => (others => 0.0));
       Cols         : Float_Vector_List;  --  data points assigned to a cluster
@@ -196,7 +197,6 @@ package body Support_11A is
             end;
          end if;
       end loop; --  for clusters
-      Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
 
       return Centres;
 
