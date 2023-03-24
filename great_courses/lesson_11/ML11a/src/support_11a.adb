@@ -100,7 +100,7 @@ package body Support_11A is
             Res2_Diffs (row, col) := Res_Array (col);
          end loop;
       end loop;
-      --        Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs, 1, 3, 1, 8);
+      Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs, 1, 3, 1, 8);
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
