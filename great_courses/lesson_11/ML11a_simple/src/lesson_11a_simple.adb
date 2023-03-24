@@ -6,9 +6,9 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 with Support_11A; use Support_11A;
 
-procedure Lesson_11A_Test2 is
+procedure Lesson_11A_Simple is
    use Real_Float_Arrays;
-   Program_Name    : constant String := "Lesson 11A Test2 ";
+   Program_Name    : constant String := "Lesson 11A Simple ";
    Test            : constant Boolean := True;
    Train_Size      : constant Positive := 5;
    Num_Clusters    : constant Positive := 3;
@@ -51,4 +51,4 @@ begin
    Put_Line (Program_Name & "finished.");
    New_Line;
 
-end Lesson_11A_Test2;
+end Lesson_11A_Simple;
