@@ -22,7 +22,7 @@ package body Support_11A is
    function Add_Reduce_Differences
      (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
       return Real_Float_Vector is
-      --        Routine_Name : constant String := "Support_11A.Add_Reduce_Differences ";
+      --  Routine_Name : constant String := "Support_11A.Add_Reduce_Differences ";
       Res_N2       : Real_Float_Matrix (Data'Range, Data'Range (2));
       Result       : Real_Float_Vector (Data'Range) := (others => 0.0);
    begin
