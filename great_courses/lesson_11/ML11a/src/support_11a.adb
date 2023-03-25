@@ -90,7 +90,7 @@ package body Support_11A is
       --  row together.
       --  res (n, m) is data (m) - centre (n)
       --  res_n (m, p) is Data (m, p) - Centres (n, p)
-      --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3, 7, 10);
+--        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
       for row in Centres'Range loop
          Res_Array := Add_Reduce_Differences (Data, Centres, row);
          --           if row < 3 then
@@ -104,7 +104,8 @@ package body Support_11A is
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
-      Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals);
+--        Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals);
+--        Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids);
 
       for index in Min_Vals'Range loop
          Loss := Loss + Min_Vals (index);
@@ -134,12 +135,12 @@ package body Support_11A is
          Count := Count + 1;
          Put_Line (Routine_Name & "Count: " & Integer'Image (Count));
          Prev_Loss := Curr_Loss;
-         Put_Line (Routine_Name & "Prev_Loss: " & Float'Image (Prev_Loss));
+--           Put_Line (Routine_Name & "Prev_Loss: " & Float'Image (Prev_Loss));
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
          Print_Integer_Array (Routine_Name & "Centre_Ids: ", Centre_Ids, 1,8);
          Put_Line (Routine_Name & "Curr_Loss: " & Float'Image (Curr_Loss));
          Centres := Compute_Means (Data, Centre_Ids, K, Test);
---           Print_Float_Matrix (Routine_Name & "updated Centres: ", Centres, 1,3, 1,8);
+--           Print_Float_Matrix (Routine_Name & "updated Centres", Centres);
 
       end loop;
       New_Line;

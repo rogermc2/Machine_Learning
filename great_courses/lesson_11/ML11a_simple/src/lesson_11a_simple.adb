@@ -7,7 +7,7 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Support_11A; use Support_11A;
 
 procedure Lesson_11A_Simple is
-   use Real_Float_Arrays;
+--     use Real_Float_Arrays;
    Program_Name    : constant String := "Lesson 11A Simple ";
    Test            : constant Boolean := True;
    Train_Size      : constant Positive := 5;
@@ -22,16 +22,14 @@ procedure Lesson_11A_Simple is
 --                         (0, 2);
 --     Test_X          : constant Real_Float_Matrix := Data.Test_X;
 --     Test_Y          : constant Integer_Matrix := Data.Test_Y;
-   Loss            : Float;
+--     Loss            : Float;
    Best_Loss       : Float;
-   Best_Centres    : Real_Float_Matrix :=
+   Best_Centres    : constant Real_Float_Matrix :=
                        Cluster_Means (Train_X,  Num_Clusters, Best_Loss, Test);
-   Centres         : Real_Float_Matrix (1 .. Num_Clusters,
-                                        Train_X'Range (2));
 --     Test_Center_IDs : Integer_Array (Test_X'Range);
 begin
    Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
---     Print_Float_Matrix (Program_Name & "Best_Centres", Best_Centres);
+   Print_Float_Matrix (Program_Name & "Best_Centres", Best_Centres);
 
    --     for rep in 1 .. 8 loop
 --        for rep in 1 .. 8 loop
