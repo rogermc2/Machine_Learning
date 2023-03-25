@@ -19,7 +19,7 @@ def assign_data(data,centers):
   res2 = np.add.reduce(res**2,2)
   # print ("res2", res2[:2][:4])
   res2diff = np.apply_along_axis(np.min,0,res2)
-  print ("min vals", res2diff)
+  # print ("min vals", res2diff)
   # assign each data point to its closest center
   centerids = np.apply_along_axis(np.argmin,0,res2)
   loss = sum(np.apply_along_axis(np.min,0,res2))
@@ -55,7 +55,7 @@ def kmeans(data, k):
   loss = 1
   while oldloss != loss:
     oldloss = loss
-    print ("kmeans loss: ", loss)
+    # print ("kmeans loss: ", loss)
     centerids, loss = assign_data(data,centers)
     centers = compute_means(data, centerids, k)
   return(centers, loss)
@@ -84,5 +84,5 @@ k = 8
 
 bestcenters, bestloss = kmeans(X_train, k)
 
-# print ("bestcenters ", bestcenters)
+print ("bestcenters ", bestcenters)
 print ("bestloss ", bestloss)
