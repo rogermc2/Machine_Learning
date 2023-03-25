@@ -31,7 +31,6 @@ begin
    Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
    Print_Float_Matrix (Program_Name & "Best_Centres", Best_Centres);
 
-   --     for rep in 1 .. 8 loop
 --        for rep in 1 .. 8 loop
 --           Centres := Cluster_Means (Train_X,  Num_Clusters,  Loss, Test);
 --           if Loss < Best_Loss then

@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use  Basic_Printing;
+--  with Basic_Printing; use  Basic_Printing;
 
 package body Support_11A is
 
@@ -39,7 +39,6 @@ package body Support_11A is
             Result (row) := Result (row) + Res_N2 (row, col);
          end loop;
       end loop;
-      --        Print_Float_Vector (Routine_Name & "sum Res_N2", Result);
 
       return Result;
 
@@ -49,12 +48,11 @@ package body Support_11A is
 
    function Arg_Min (Res2     : Real_Float_Matrix;
                      Min_Vals : out Real_Float_Vector) return Integer_Array is
-      Routine_Name : constant String := "Support_11A.Arg_Min ";
+--        Routine_Name : constant String := "Support_11A.Arg_Min ";
       Min_Indices  : Integer_Array (Res2'Range (2)) := (others => 0);
       Min_Val      : Float;
       Min_Row      : Positive;
    begin
-      Print_Float_Matrix (Routine_Name & "Res2", Res2);
       for col in Res2'Range (2) loop
          Min_Val := Float'Safe_Last;
          for row in Res2'Range loop
@@ -67,8 +65,6 @@ package body Support_11A is
          Min_Indices (col) := Min_Row;
       end loop;
 
-      --        Print_Integer_Array (Routine_Name & "Min_Indices 1 - 8",
-      --                             Min_Indices, 1, 8);
       return Min_Indices;
 
    end Arg_Min;
@@ -78,7 +74,7 @@ package body Support_11A is
    --  assigns each datapoint in data to the closest of the centers, centerids.
    function Assign_Data (Data, Centres : Real_Float_Matrix;
                          Centre_Ids    : out Integer_Array) return Float is
-      Routine_Name : constant String := "Support_11A.Assign_Data ";
+--        Routine_Name : constant String := "Support_11A.Assign_Data ";
       Res_Array    : Real_Float_Vector (Data'Range);
       Res2_Diffs   : Real_Float_Matrix (Centres'Range, Data'Range);
       Min_Vals     : Real_Float_Vector (Data'Range);
@@ -94,24 +90,18 @@ package body Support_11A is
       --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
       for row in Centres'Range loop
          Res_Array := Add_Reduce_Differences (Data, Centres, row);
-         --           if row < 3 then
-         --              Print_Float_Vector (Routine_Name & "Res_Array", Res_Array, 1, 8);
-         --           end if;
          for col in Res2_Diffs'Range (2) loop
             Res2_Diffs (row, col) := Res_Array (col);
          end loop;
       end loop;
---        Print_Float_Matrix (Routine_Name & "Res2_Diffs", Res2_Diffs);
 
       --  assign each data point to its closest center
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
-      --        Print_Float_Vector (Routine_Name & "Min_Vals", Min_Vals);
-      Print_Integer_Array (Routine_Name & "Centre_Ids", Centre_Ids);
 
       for index in Min_Vals'Range loop
          Loss := Loss + Min_Vals (index);
       end loop;
-      --        Put_Line (Routine_Name & "Loss: " & Float'Image (Result));
+
       return Loss;
 
    end Assign_Data;
@@ -121,28 +111,22 @@ package body Support_11A is
    function Cluster_Means
      (Data : Real_Float_Matrix; K : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix is
-      Routine_Name: constant String := "Support_11A.Cluster_Means ";
+--        Routine_Name: constant String := "Support_11A.Cluster_Means ";
       Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
         (others => (others => 0.0));
       Centre_Ids  : Integer_Array (Data'Range);
       Prev_Loss   : Float := 0.0;
-      Count       : Natural := 0;
+--        Count       : Natural := 0;
    begin
       --  kmeans
       Initialize_Centres (Data, K, Centres, Test);
 
       Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss loop
-         Count := Count + 1;
-         Put_Line (Routine_Name & "Count: " & Integer'Image (Count));
+--           Count := Count + 1;
          Prev_Loss := Curr_Loss;
-         --           Put_Line (Routine_Name & "Prev_Loss: " & Float'Image (Prev_Loss));
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
-         --           Print_Integer_Array (Routine_Name & "Centre_Ids: ", Centre_Ids);
-         Put_Line (Routine_Name & "Curr_Loss: " & Float'Image (Curr_Loss));
          Centres := Compute_Means (Data, Centre_Ids, K, Test);
-         --           Print_Float_Matrix (Routine_Name & "updated Centres", Centres);
-
       end loop;
       New_Line;
 
@@ -165,10 +149,10 @@ package body Support_11A is
          --  Gather the data points assigned to cluster i
          --  cols = np.array([data[j] for j in range(n) if centerids[j] == i])
          Cols.Clear;
-         for row in Centre_Ids'Range loop            --  j
-            if Centre_Ids (row) = cluster then
+         for index in Centre_Ids'Range loop            --  j
+            if Centre_Ids (index) = cluster then
                --  Get data for Data row (cluster)
-               Cols.Append (Get_Row (Data, Centre_Ids (row)));
+               Cols.Append (Get_Row (Data, index));
             end if;
          end loop;
 

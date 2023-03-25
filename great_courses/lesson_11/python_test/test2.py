@@ -16,7 +16,7 @@ def assign_data(data,centers):
   # print("assign_data centers", centers)
   # first, subtract the set of centers from each data point
   res = np.reshape(data,(1,n,d))-np.reshape(centers,(k,1,d))
-  print ("assign_data res", res)
+  # print ("assign_data res", res)
   # sum the squared differences
   res2 = np.add.reduce(res**2,2)
   # print ("res2", res2)
@@ -26,7 +26,7 @@ def assign_data(data,centers):
   centerids = np.apply_along_axis(np.argmin,0,res2)
   # print ("centerids", centerids)
   loss = sum(np.apply_along_axis(np.min,0,res2))
-  print ("assign_data loss", loss)
+  # print ("assign_data loss", loss)
   return(centerids, loss)
 
 def compute_means(data, centerids, k):
@@ -59,10 +59,10 @@ def kmeans(data, k):
   loss = 1
   while oldloss != loss:
     oldloss = loss
-    print ("kmeans loss: ", loss)
+    # print ("kmeans loss: ", loss)
+    # print("kmeans centers", centers)
     centerids, loss = assign_data(data,centers)
     centers = compute_means(data, centerids, k)
-    # print("updated centers", centers)
   return(centers, loss)
 
 X_train = np.asarray([[1,2],
@@ -81,5 +81,5 @@ k = 3
 
 bestcenters, bestloss = kmeans(X_train, k)
 
-# print ("bestcenters ", bestcenters)
+print ("bestcenters ", bestcenters)
 print ("bestloss ", bestloss)
