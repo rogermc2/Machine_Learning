@@ -1,5 +1,5 @@
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -128,7 +128,6 @@ package body Support_11A is
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
          Centres := Compute_Means (Data, Centre_Ids, K, Test);
       end loop;
-      New_Line;
 
       return Centres;
 
