@@ -22,13 +22,13 @@ procedure Lesson_11A is
                                          Test_Size, Y_Categorized => False,
                                          Normalize => False, Reload => False);
    Train_X          : constant Real_Float_Matrix := Data.Train_X;
---     Train_Y          : constant Integer_Matrix := Data.Train_Y;
+   Train_Y          : constant Integer_Matrix := Data.Train_Y;
    Test_X           : constant Real_Float_Matrix := Data.Test_X;
 --     Test_Y           : constant Integer_Matrix := Data.Test_Y;
    X_Labelled       : constant Real_Float_Matrix :=
                         Slice (Train_X, 1, Num_Labelled);
---     Labels           : constant Integer_Matrix :=
---                          Slice (Train_Y, 1, Num_Labelled);
+   Labels           : constant Integer_Matrix :=
+                        Slice (Train_Y, 1, Num_Labelled);
    Loss             : Float;
    Best_Loss        : Float;
    Best_Centres     : Real_Float_Matrix := Cluster_Means (Train_X, Num_Clusters,
@@ -36,6 +36,7 @@ procedure Lesson_11A is
    Centres          : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
    Train_Center_IDs : Integer_Array (Test_X'Range);
    Test_Center_IDs  : Integer_Array (Train_X'Range);
+   Cluster_Labels   : Integer_Array (1 .. Labels'Length (2) * Num_Clusters);
 begin
    Put_Line (Program_Name);
 
@@ -62,6 +63,12 @@ begin
       --  Use the labeled examples to label the clusters
       Loss := Assign_Data (X_Labelled, Best_Centres, Train_Center_IDs);
       Put_Line (Program_Name & "Labelled Loss: " & Float'Image (Loss));
+
+      for I1 in Labels'Range (2) loop
+         for I2 in 1 .. Num_Clusters loop
+            Cluster_Labels ((I1 - 1) * Labels'Length (2) + I2) := Labels (1, I1);
+         end loop;
+      end loop;
 
    end loop;
 
