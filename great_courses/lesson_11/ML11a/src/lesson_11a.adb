@@ -56,10 +56,10 @@ begin
                   ": " & Float'Image (Best_Loss));
       --  Assign testing points to discovered clusters
       Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
+      Put_Line (Program_Name & "Test Loss: " & Float'Image (Loss));
 
       --  Use the labeled examples to label the clusters
    end loop;
-   Put_Line (Program_Name & "Final Loss: " & Float'Image (Loss));
 
    Put_Line ("----------------------------------------------");
 
