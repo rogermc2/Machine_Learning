@@ -10,55 +10,59 @@ with Support_11A; use Support_11A;
 procedure Lesson_11A is
    use CSV_Data_Loader;
    use Real_Float_Arrays;
-   Program_Name    : constant String := "Lesson 11A ";
-   Dataset_Name    : constant String :=
-     "../../../neural_learning/datasets/mnist_784";
-   Train_Size      : constant Positive := 4700;
-   Test_Size       : constant Positive := 2300;
-   --     Num_Labelled    : constant Positive := 20;
-   Num_Clusters    : constant Positive := 10;  --  k 10
-   Data            : constant Base_Split_State :=
-     Get_Split_State (Dataset_Name, Digits_Data, Train_Size,
-                      Test_Size, Y_Categorized => False,
-                      Normalize => False, Reload => False);
-   Train_X         : constant Real_Float_Matrix := Data.Train_X;
-   Train_Y         : constant Integer_Matrix := Data.Train_Y;
-   Test_X          : constant Real_Float_Matrix := Data.Test_X;
-   Test_Y          : constant Integer_Matrix := Data.Test_Y;
-   --     Train_Labelled  : Real_Float_Matrix (1 .. Num_Labelled, Train_X'Range (2));
-   Loss            : Float;
-   Best_Loss       : Float;
-   Best_Centres    : Real_Float_Matrix := Cluster_Means (Train_X, Num_Clusters,
-                                                         Best_Loss);
-   Centres         : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
-   Test_Center_IDs : Integer_Array (Test_X'Range);
+   Program_Name     : constant String := "Lesson 11A ";
+   Dataset_Name     : constant String :=
+                        "../../../neural_learning/datasets/mnist_784";
+   Train_Size       : constant Positive := 4700;
+   Test_Size        : constant Positive := 2300;
+   Num_Labelled     : constant Positive := 20;
+   Num_Clusters     : constant Positive := 10;  --  k 10
+   Data             : constant Base_Split_State :=
+                        Get_Split_State (Dataset_Name, Digits_Data, Train_Size,
+                                         Test_Size, Y_Categorized => False,
+                                         Normalize => False, Reload => False);
+   Train_X          : constant Real_Float_Matrix := Data.Train_X;
+--     Train_Y          : constant Integer_Matrix := Data.Train_Y;
+   Test_X           : constant Real_Float_Matrix := Data.Test_X;
+--     Test_Y           : constant Integer_Matrix := Data.Test_Y;
+   X_Labelled       : constant Real_Float_Matrix :=
+                        Slice (Train_X, 1, Num_Labelled);
+--     Labels           : constant Integer_Matrix :=
+--                          Slice (Train_Y, 1, Num_Labelled);
+   Loss             : Float;
+   Best_Loss        : Float;
+   Best_Centres     : Real_Float_Matrix := Cluster_Means (Train_X, Num_Clusters,
+                                                          Best_Loss);
+   Centres          : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
+   Train_Center_IDs : Integer_Array (Test_X'Range);
+   Test_Center_IDs  : Integer_Array (Train_X'Range);
 begin
    Put_Line (Program_Name);
 
    Print_Matrix_Dimensions ("Train X", Train_X);
-   Print_Matrix_Dimensions ("Train Y", Train_Y);
    Print_Matrix_Dimensions ("Test X", Test_X);
-   Print_Matrix_Dimensions ("Test Y", Test_Y);
-   Print_Integer_Matrix ("Train Y", Train_Y, 121, 132);
+
+--     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
-   for rep in 1 .. 8 loop
-      --     for rep in 1 .. 3 loop
+   --     for rep in 1 .. 8 loop
+   for rep in 1 .. 3 loop
+      Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Centres := Cluster_Means (Train_X, Num_Clusters, Loss);
       if Loss < Best_Loss then
          Best_Centres := Centres;
          Best_Loss := Loss;
       end if;
 
-      --        Print_Float_Matrix (Program_Name & "Best_Centres", Best_Centres,
-      --                            1, 3, 70, 76);
-      Put_Line (Program_Name & "Rep, Best_Loss: " & Integer'Image (rep) &
-                  ": " & Float'Image (Best_Loss));
-      --  Assign testing points to discovered clusters
+      Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
+      --  Assign test points to discovered clusters
       Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
       Put_Line (Program_Name & "Test Loss: " & Float'Image (Loss));
 
       --  Use the labeled examples to label the clusters
+      Loss := Assign_Data (X_Labelled, Best_Centres, Train_Center_IDs);
+      Put_Line (Program_Name & "Labelled Loss: " & Float'Image (Loss));
+
    end loop;
 
    Put_Line ("----------------------------------------------");

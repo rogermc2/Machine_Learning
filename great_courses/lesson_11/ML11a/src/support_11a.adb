@@ -49,7 +49,7 @@ package body Support_11A is
    function Arg_Min (Res2     : Real_Float_Matrix;
                      Min_Vals : out Real_Float_Vector) return Integer_Array is
 --        Routine_Name : constant String := "Support_11A.Arg_Min ";
-      Min_Indices  : Integer_Array (Res2'Range (2)) := (others => 0);
+      Min_Indices  : Integer_Array (Min_Vals'Range) := (others => 0);
       Min_Val      : Float;
       Min_Row      : Positive;
    begin
@@ -77,7 +77,7 @@ package body Support_11A is
 --        Routine_Name : constant String := "Support_11A.Assign_Data ";
       Res_Array    : Real_Float_Vector (Data'Range);
       Res2_Diffs   : Real_Float_Matrix (Centres'Range, Data'Range);
-      Min_Vals     : Real_Float_Vector (Data'Range);
+      Min_Vals     : Real_Float_Vector (Centre_Ids'Range);
       Loss         : Float := 0.0;
    begin
       --  subtract the set of centers from each data point
