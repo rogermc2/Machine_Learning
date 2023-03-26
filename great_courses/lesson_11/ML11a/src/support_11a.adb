@@ -48,7 +48,7 @@ package body Support_11A is
 
    function Arg_Min (Res2     : Real_Float_Matrix;
                      Min_Vals : out Real_Float_Vector) return Integer_Array is
---        Routine_Name : constant String := "Support_11A.Arg_Min ";
+      --        Routine_Name : constant String := "Support_11A.Arg_Min ";
       Min_Indices  : Integer_Array (Min_Vals'Range) := (others => 0);
       Min_Val      : Float;
       Min_Row      : Positive;
@@ -74,7 +74,7 @@ package body Support_11A is
    --  assigns each datapoint in data to the closest of the centers, centerids.
    function Assign_Data (Data, Centres : Real_Float_Matrix;
                          Centre_Ids    : out Integer_Array) return Float is
---        Routine_Name : constant String := "Support_11A.Assign_Data ";
+      --        Routine_Name : constant String := "Support_11A.Assign_Data ";
       Res_Array    : Real_Float_Vector (Data'Range);
       Res2_Diffs   : Real_Float_Matrix (Centres'Range, Data'Range);
       Min_Vals     : Real_Float_Vector (Centre_Ids'Range);
@@ -111,19 +111,17 @@ package body Support_11A is
    function Cluster_Means
      (Data : Real_Float_Matrix; K : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix is
---        Routine_Name: constant String := "Support_11A.Cluster_Means ";
+      --        Routine_Name: constant String := "Support_11A.Cluster_Means ";
       Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
-        (others => (others => 0.0));
+                      (others => (others => 0.0));
       Centre_Ids  : Integer_Array (Data'Range);
       Prev_Loss   : Float := 0.0;
---        Count       : Natural := 0;
    begin
       --  kmeans
       Initialize_Centres (Data, K, Centres, Test);
 
       Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss loop
---           Count := Count + 1;
          Prev_Loss := Curr_Loss;
          Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
          Centres := Compute_Means (Data, Centre_Ids, K, Test);
@@ -141,7 +139,7 @@ package body Support_11A is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Support_11A.Compute_Means ";
       Centres      : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
-        (others => (others => 0.0));
+                       (others => (others => 0.0));
       Cols         : Float_Vector_List;  --  data points assigned to a cluster
    begin
       for cluster in 1 .. K loop               --  i
@@ -225,6 +223,47 @@ package body Support_11A is
       return Result / Float (Data.Length);
 
    end Means;
+
+   --  -------------------------------------------------------------------------
+
+   function Stat_Mode (A : Integer_Array) return Integer is
+      --      a - array of integers
+      --      n - length of the array
+      Min         : Integer := Integer'Last;
+      Max         : Integer := Integer'First;
+      Int_Range   : Integer;
+      Mode_Offset : Natural := 0;
+   begin
+      for index in A'Range loop
+         if A (index) < Min then
+            Min := A (index);
+         end if;
+
+         if A (index) > Max then
+            Max := A (index);
+         end if;
+      end loop;
+
+      Int_Range := Max - Min + 1;
+      declare
+         Counters    : Integer_Array (0 .. Int_Range - 1) := (others => 0);
+         Offset      : Natural;
+      begin
+         for index in A'Range loop
+            Offset := A (index) - Min;
+            Counters (Offset) := Counters (Offset) + 1;
+         end loop;
+
+         for Index in 1 .. Int_Range - 1 loop
+            if Counters (Index) > Counters (Mode_Offset) then
+               Mode_Offset := Index;
+            end if;
+         end loop;
+      end;
+
+      return Min + Mode_Offset;
+
+   end Stat_Mode;
 
    --  -------------------------------------------------------------------------
 

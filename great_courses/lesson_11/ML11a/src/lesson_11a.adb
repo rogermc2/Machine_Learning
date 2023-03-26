@@ -36,17 +36,22 @@ procedure Lesson_11A is
    Centres          : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
    Train_Center_IDs : Integer_Array (Test_X'Range);
    Test_Center_IDs  : Integer_Array (Train_X'Range);
+<<<<<<< Updated upstream
    Cluster_Labels   : Integer_Array (1 .. Labels'Length (2) * Num_Clusters);
+=======
+   Cluster_Mode     : Integer;
+>>>>>>> Stashed changes
 begin
    Put_Line (Program_Name);
 
    Print_Matrix_Dimensions ("Train X", Train_X);
    Print_Matrix_Dimensions ("Test X", Test_X);
+   Print_Matrix_Dimensions ("Labels", Labels);
 
 --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
-   --     for rep in 1 .. 8 loop
+--     for rep in 1 .. 8 loop
    for rep in 1 .. 3 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Centres := Cluster_Means (Train_X, Num_Clusters, Loss);
@@ -64,11 +69,18 @@ begin
       Loss := Assign_Data (X_Labelled, Best_Centres, Train_Center_IDs);
       Put_Line (Program_Name & "Labelled Loss: " & Float'Image (Loss));
 
+<<<<<<< Updated upstream
       for I1 in Labels'Range (2) loop
          for I2 in 1 .. Num_Clusters loop
             Cluster_Labels ((I1 - 1) * Labels'Length (2) + I2) := Labels (1, I1);
          end loop;
       end loop;
+=======
+--        for index in 1 .. Num_Clusters loop
+--           Cluster_Mode := Stat_Mode (Labels (1, Train_Center_IDs (index));
+--
+--        end loop;
+>>>>>>> Stashed changes
 
    end loop;
 

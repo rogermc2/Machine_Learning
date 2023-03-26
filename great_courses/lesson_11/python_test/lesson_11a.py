@@ -74,8 +74,23 @@ ans = []
 k = 10
 bestcenters, bestloss = kmeans(X_train, k)
 print ("Initial best loss: ", bestloss)
-for rep in range(9):
+for rep in range(2):
   centers, loss = kmeans(X_train, k)
   if loss < bestloss:
     bestcenters, bestloss = centers, loss
   print ("best loss: ", bestloss)
+
+  # Use the labeled examples to label the clusters
+  train_centerids, loss = assign_data(X_train[:nlabeled], bestcenters)
+  labs = y_train[:nlabeled]
+  print ("labs", labs.shape)
+  clust_labs = np.repeat(labs[0],k)
+  print ("clust_labs init", clust_labs)
+
+  for i in range(k):
+    mode = stats.mode(labs[train_centerids == i]).mode
+    print ("mode", mode)
+    if len(mode) > 0:
+      clust_labs[i] = mode[0]
+      print ("clust_labs[i]", clust_labs[i])
+    print ("clust_labs", clust_labs)
