@@ -12,15 +12,15 @@ procedure Lesson_11A is
    use Real_Float_Arrays;
    Program_Name    : constant String := "Lesson 11A ";
    Dataset_Name    : constant String :=
-                       "../../../neural_learning/datasets/mnist_784";
+     "../../../neural_learning/datasets/mnist_784";
    Train_Size      : constant Positive := 4700;
    Test_Size       : constant Positive := 2300;
    --     Num_Labelled    : constant Positive := 20;
    Num_Clusters    : constant Positive := 10;  --  k 10
    Data            : constant Base_Split_State :=
-                       Get_Split_State (Dataset_Name, Digits_Data, Train_Size,
-                                        Test_Size, Y_Categorized => False,
-                                        Normalize => False, Reload => False);
+     Get_Split_State (Dataset_Name, Digits_Data, Train_Size,
+                      Test_Size, Y_Categorized => False,
+                      Normalize => False, Reload => False);
    Train_X         : constant Real_Float_Matrix := Data.Train_X;
    Train_Y         : constant Integer_Matrix := Data.Train_Y;
    Test_X          : constant Real_Float_Matrix := Data.Test_X;
@@ -55,10 +55,11 @@ begin
       Put_Line (Program_Name & "Rep, Best_Loss: " & Integer'Image (rep) &
                   ": " & Float'Image (Best_Loss));
       --  Assign testing points to discovered clusters
---        Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
+      Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
 
       --  Use the labeled examples to label the clusters
    end loop;
+   Put_Line (Program_Name & "Final Loss: " & Float'Image (Loss));
 
    Put_Line ("----------------------------------------------");
 
