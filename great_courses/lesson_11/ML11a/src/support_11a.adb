@@ -226,7 +226,7 @@ package body Support_11A is
 
    --  -------------------------------------------------------------------------
 
-   function Stat_Mode (A : Integer_Array) return Integer is
+   function Cluster_Mode (A : Integer_Array) return Integer is
       --      a - array of integers
       --      n - length of the array
       Min         : Integer := Integer'Last;
@@ -263,7 +263,7 @@ package body Support_11A is
 
       return Min + Mode_Offset;
 
-   end Stat_Mode;
+   end Cluster_Mode;
 
    --  -------------------------------------------------------------------------
 
