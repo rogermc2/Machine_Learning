@@ -226,15 +226,13 @@ package body Support_11A is
 
    --  -------------------------------------------------------------------------
 
-   function Cluster_Mode (A : Integer_Array) return Integer is
-      --      a - array of integers
-      --      n - length of the array
+   function Cluster_Mode (A : ML_Types.Integer_List) return Integer is
       Min         : Integer := Integer'Last;
       Max         : Integer := Integer'First;
       Int_Range   : Integer;
       Mode_Offset : Natural := 0;
    begin
-      for index in A'Range loop
+      for index in 1 .. Integer (A.Length) loop
          if A (index) < Min then
             Min := A (index);
          end if;
@@ -249,7 +247,7 @@ package body Support_11A is
          Counters    : Integer_Array (0 .. Int_Range - 1) := (others => 0);
          Offset      : Natural;
       begin
-         for index in A'Range loop
+         for index in 1 .. Integer (A.Length) loop
             Offset := A (index) - Min;
             Counters (Offset) := Counters (Offset) + 1;
          end loop;

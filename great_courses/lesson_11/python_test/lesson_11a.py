@@ -82,6 +82,7 @@ for rep in range(2):
 
   # Use the labeled examples to label the clusters
   train_centerids, loss = assign_data(X_train[:nlabeled], bestcenters)
+  print ("train_centerids", train_centerids.shape)
   labs = y_train[:nlabeled]
   print ("labs", labs.shape)
   clust_labs = np.repeat(labs[0],k)
@@ -90,6 +91,9 @@ for rep in range(2):
   for i in range(k):
     mode = stats.mode(labs[train_centerids == i]).mode
     print ("mode", mode)
+    print ("train_centerids", train_centerids)
+    print ("train_centerids == i", i, train_centerids == i)
+    print ("labs[train_centerids == i]", labs[train_centerids == i])
     if len(mode) > 0:
       clust_labs[i] = mode[0]
       print ("clust_labs[i]", clust_labs[i])

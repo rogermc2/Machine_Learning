@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Basic_Printing; use  Basic_Printing;
 with CSV_Data_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_Types;
 
 with Support_11A; use Support_11A;
 
@@ -29,6 +30,7 @@ procedure Lesson_11A is
                         Slice (Train_X, 1, Num_Labelled);
    Labels           : constant Integer_Matrix :=
                         Slice (Train_Y, 1, Num_Labelled);
+   Labels_List      : ML_Types.Integer_List;
    Loss             : Float;
    Best_Loss        : Float;
    Best_Centres     : Real_Float_Matrix := Cluster_Means (Train_X, Num_Clusters,
@@ -48,7 +50,7 @@ begin
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
 --     for rep in 1 .. 8 loop
-   for rep in 1 .. 3 loop
+   for rep in 1 .. 1 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Centres := Cluster_Means (Train_X, Num_Clusters, Loss);
       if Loss < Best_Loss then
@@ -65,10 +67,16 @@ begin
       Loss := Assign_Data (X_Labelled, Best_Centres, Train_Center_IDs);
       Put_Line (Program_Name & "Labelled Loss: " & Float'Image (Loss));
 
---        for index in 1 .. Num_Clusters loop
---           Mode := Cluster_Mode (Labels (1, Train_Center_IDs (index));
---
---        end loop;
+      for index in 1 .. Num_Clusters loop
+         for lab_index in Train_Center_IDs'Range loop
+            if Train_Center_IDs (lab_index) = index then
+               Labels_List.Append (Labels (lab_index, 1));
+            end if;
+         end loop;
+         Mode := Cluster_Mode (Labels_List);
+         Put_Line (Program_Name & "Mode: " & Integer'Image (Mode));
+
+      end loop;
 
    end loop;
 

@@ -1,5 +1,6 @@
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_Types;
 
 package Support_11A is
 
@@ -8,6 +9,6 @@ package Support_11A is
    function Cluster_Means
      (Data : Real_Float_Matrix; K : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix;
-   function Cluster_Mode (A : Integer_Array) return Integer;
+   function Cluster_Mode (A : ML_Types.Integer_List) return Integer;
 
 end Support_11A;
