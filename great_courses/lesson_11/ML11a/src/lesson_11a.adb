@@ -52,8 +52,8 @@ begin
    --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
---     for rep in 1 .. 8 loop
-   for rep in 1 .. 1 loop
+   for rep in 1 .. 8 loop
+--     for rep in 1 .. 1 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Centres := Cluster_Means (Train_X, Num_Clusters, Loss);
       if Loss < Best_Loss then
@@ -75,7 +75,6 @@ begin
    for cluster in 1 .. Num_Clusters loop
       Cluster_Labels (cluster) := Labels (1, 1);
    end loop;
-   Print_Integer_Array (Program_Name & "Cluster_Labels init", Cluster_Labels);
 
    for cluster in 1 .. Num_Clusters loop
       Labels_List.Clear;

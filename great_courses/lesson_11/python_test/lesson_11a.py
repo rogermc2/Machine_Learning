@@ -96,7 +96,7 @@ for i in range(k):
   # print ("labs[train_centerids == i]", labs[train_centerids == i])
   if len(mode) > 0:
     clust_labs[i] = mode[0]
-  # print ("clust_labs", clust_labs)
+print ("clust_labs", clust_labs)
 ans = ans + [(k,sum(clust_labs[test_centerids] == y_test)/len(y_test))]
 print ("y_test length", len (y_test))
 print ("ans length", len (ans))
