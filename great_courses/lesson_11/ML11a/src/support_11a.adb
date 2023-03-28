@@ -227,6 +227,7 @@ package body Support_11A is
    --  -------------------------------------------------------------------------
 
    function Cluster_Mode (A : ML_Types.Integer_List) return Integer is
+      Routine_Name : constant String := "Support_11A.Cluster_Mode ";
       Min         : Integer := Integer'Last;
       Max         : Integer := Integer'First;
       Int_Range   : Integer;
@@ -241,6 +242,8 @@ package body Support_11A is
             Max := A (index);
          end if;
       end loop;
+--        Put_Line (Routine_Name & "Max, Min: " & Integer'Image (Max) & " " &
+--                    Integer'Image (Min));
 
       Int_Range := Max - Min + 1;
       declare

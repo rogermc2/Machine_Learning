@@ -80,21 +80,19 @@ for rep in range(2):
     bestcenters, bestloss = centers, loss
   print ("best loss: ", bestloss)
 
-  # Use the labeled examples to label the clusters
-  train_centerids, loss = assign_data(X_train[:nlabeled], bestcenters)
-  print ("train_centerids", train_centerids.shape)
-  labs = y_train[:nlabeled]
-  print ("labs", labs.shape)
-  clust_labs = np.repeat(labs[0],k)
-  print ("clust_labs init", clust_labs)
+# Use the labeled examples to label the clusters
+train_centerids, loss = assign_data(X_train[:nlabeled], bestcenters)
+labs = y_train[:nlabeled]
+print ("labs", labs.shape)
+clust_labs = np.repeat(labs[0],k)
+print ("clust_labs init", clust_labs)
+print ("train_centerids", train_centerids)
 
-  for i in range(k):
-    mode = stats.mode(labs[train_centerids == i]).mode
-    print ("mode", mode)
-    print ("train_centerids", train_centerids)
-    print ("train_centerids == i", i, train_centerids == i)
-    print ("labs[train_centerids == i]", labs[train_centerids == i])
-    if len(mode) > 0:
-      clust_labs[i] = mode[0]
-      print ("clust_labs[i]", clust_labs[i])
-    print ("clust_labs", clust_labs)
+for i in range(k):
+  mode = stats.mode(labs[train_centerids == i]).mode
+  print ("mode", mode)
+  # print ("train_centerids == i", i, train_centerids == i)
+  # print ("labs[train_centerids == i]", labs[train_centerids == i])
+  if len(mode) > 0:
+    clust_labs[i] = mode[0]
+  print ("clust_labs", clust_labs)

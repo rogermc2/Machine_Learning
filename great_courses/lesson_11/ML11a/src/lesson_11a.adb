@@ -25,7 +25,7 @@ procedure Lesson_11A is
    Train_X          : constant Real_Float_Matrix := Data.Train_X;
    Train_Y          : constant Integer_Matrix := Data.Train_Y;
    Test_X           : constant Real_Float_Matrix := Data.Test_X;
---     Test_Y           : constant Integer_Matrix := Data.Test_Y;
+   --     Test_Y           : constant Integer_Matrix := Data.Test_Y;
    X_Labelled       : constant Real_Float_Matrix :=
                         Slice (Train_X, 1, Num_Labelled);
    Labels           : constant Integer_Matrix :=
@@ -36,9 +36,10 @@ procedure Lesson_11A is
    Best_Centres     : Real_Float_Matrix := Cluster_Means (Train_X, Num_Clusters,
                                                           Best_Loss);
    Centres          : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
-   Train_Center_IDs : Integer_Array (Test_X'Range);
+   Train_Center_IDs : Integer_Array (1 .. Num_Labelled);
    Test_Center_IDs  : Integer_Array (Train_X'Range);
    Mode             : Integer;
+   Cluster_Labels   : Integer_Array (1 .. Num_Clusters);
 begin
    Put_Line (Program_Name);
 
@@ -46,39 +47,51 @@ begin
    Print_Matrix_Dimensions ("Test X", Test_X);
    Print_Matrix_Dimensions ("Labels", Labels);
 
---     Print_Integer_Matrix ("Labels", Labels);
+   --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
---     for rep in 1 .. 8 loop
-   for rep in 1 .. 1 loop
+   for rep in 1 .. 8 loop
+      --     for rep in 1 .. 3 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Centres := Cluster_Means (Train_X, Num_Clusters, Loss);
       if Loss < Best_Loss then
          Best_Centres := Centres;
          Best_Loss := Loss;
       end if;
+   end loop;
 
-      Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
-      --  Assign test points to discovered clusters
-      Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
-      Put_Line (Program_Name & "Test Loss: " & Float'Image (Loss));
+   Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
+   --  Assign test points to discovered clusters
+   Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
+   Put_Line (Program_Name & "Test Loss: " & Float'Image (Loss));
 
-      --  Use the labeled examples to label the clusters
-      Loss := Assign_Data (X_Labelled, Best_Centres, Train_Center_IDs);
-      Put_Line (Program_Name & "Labelled Loss: " & Float'Image (Loss));
+   --  Use the labeled examples to label the clusters
+   Loss := Assign_Data (X_Labelled, Best_Centres, Train_Center_IDs);
+   Put_Line (Program_Name & "Labelled Loss: " & Float'Image (Loss));
 
-      for index in 1 .. Num_Clusters loop
-         for lab_index in Train_Center_IDs'Range loop
-            if Train_Center_IDs (lab_index) = index then
-               Labels_List.Append (Labels (lab_index, 1));
-            end if;
-         end loop;
-         Mode := Cluster_Mode (Labels_List);
-         Put_Line (Program_Name & "Mode: " & Integer'Image (Mode));
+   Print_Integer_Array ("Train_Center_IDs", Train_Center_IDs);
+   for cluster in 1 .. Num_Clusters loop
+      Cluster_Labels (cluster) := Labels (1, 1);
+   end loop;
+   Print_Integer_Array (Program_Name & "Cluster_Labels init", Cluster_Labels);
 
+   for cluster in 1 .. Num_Clusters loop
+      Labels_List.Clear;
+      for lab_index in Train_Center_IDs'Range loop
+         if Train_Center_IDs (lab_index) = cluster then
+            Labels_List.Append (Labels (lab_index, 1));
+         end if;
       end loop;
 
+      if not Labels_List.Is_Empty then
+         Mode := Cluster_Mode (Labels_List);
+         --           Put_Line (Program_Name & "Mode: " & Integer'Image (Mode));
+         Cluster_Labels (cluster) := Mode;
+      end if;
+
    end loop;
+
+   Print_Integer_Array (Program_Name & "Cluster_Labels", Cluster_Labels);
 
    Put_Line ("----------------------------------------------");
 
