@@ -55,15 +55,23 @@ begin
    for rep in 1 .. 8 loop
 --     for rep in 1 .. 1 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
+
+      --  Cluster_Means categorizes the mnist digits based on their appearance.
       Centres := Cluster_Means (Train_X, Num_Clusters, Loss);
       if Loss < Best_Loss then
          Best_Centres := Centres;
          Best_Loss := Loss;
       end if;
+      Print_Float_Matrix (Program_Name & "Cluster Centres",
+                          Centres, 1, Num_Clusters, 230, 236);
    end loop;
 
    Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
    --  Assign test points to discovered clusters
+   --  Centerids is an array with one integer for each datapoint that indicates
+   --  which of the centers is closest.
+   --  The current loss is the minimum squared distance summed over all data
+   --  points
    Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
    Put_Line (Program_Name & "Test Loss: " & Float'Image (Loss));
 

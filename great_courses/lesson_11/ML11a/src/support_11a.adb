@@ -108,6 +108,7 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
    --  kmeans
+   --  Cluster_Means categorizes the data based on their appearance.
    function Cluster_Means
      (Data : Real_Float_Matrix; K : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix is
@@ -118,6 +119,7 @@ package body Support_11A is
       Prev_Loss   : Float := 0.0;
    begin
       --  kmeans
+      --  initialize  k cluster centers by selecting random data points.
       Initialize_Centres (Data, K, Centres, Test);
 
       Curr_Loss := 1.0;
@@ -145,6 +147,7 @@ package body Support_11A is
       for cluster in 1 .. K loop               --  i
          --  Gather the data points assigned to cluster i
          --  cols = np.array([data[j] for j in range(n) if centerids[j] == i])
+         --  Cols is an array of all points having the current center id.
          Cols.Clear;
          for index in Centre_Ids'Range loop            --  j
             if Centre_Ids (index) = cluster then
@@ -154,6 +157,8 @@ package body Support_11A is
          end loop;
 
          if Cols.Is_Empty then
+            --  Cols is empty, which means that the cluster center is out of
+            --  the action and we should pick a different location for it.
             if Test then
                for row in Centres'Range loop
                   for col in Centres'Range (2) loop
@@ -161,6 +166,8 @@ package body Support_11A is
                   end loop;
                end loop;
             else
+               --  choose one of the data points at random to be the new
+               --  location of this cluster centre.
                for row in Centres'Range loop
                   for col in Centres'Range (2) loop
                      Centres (cluster, col) :=
@@ -168,7 +175,10 @@ package body Support_11A is
                   end loop;
                end loop;
             end if;
-         else  --  Cols not Empty
+         else
+            --  Cols is not empty meaning that there are data points close to
+            --  the cluster center so move that center to the mean position of the
+            --  closest points.
             declare
                Mean_Col_Values : constant Real_Float_Vector := Means (Cols);
             begin
