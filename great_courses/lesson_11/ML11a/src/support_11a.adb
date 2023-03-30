@@ -1,4 +1,5 @@
 
+--  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -356,10 +357,14 @@ package body Support_11A is
       Labels_IDs : Integer_Array; Index : Natural)
       return Real_Float_Matrix is
       use NL_Types;
-      Label  : Natural;
-      Items  : Float_List;
-      Result : Float_List_2D;
+--        Routine_Name : constant String := "Support_11A.Select_Items 1 ";
+      Label        : Natural;
+      Items        : Float_List;
+      Result       : Float_List_2D;
    begin
+--        Assert (Index <= Labels_IDs'Length, Routine_Name & "Index" &
+--                  Integer'Image (Index) & " is greater than Labels_IDs length" &
+--                  Integer'Image (Labels_IDs'Length));
       for lab_index in Labels_IDs'Range loop
          Label := Labels (Labels_IDs (lab_index));
          if Label = Index then

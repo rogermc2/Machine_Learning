@@ -48,7 +48,7 @@ procedure Lesson_11A is
                                                           Best_Loss);
    Centres          : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
    Train_Center_IDs : Integer_Array (1 .. Num_Labelled);
-   Test_Center_IDs  : Integer_Array (Train_X'Range);
+   Test_Center_IDs  : Integer_Array (Test_X'Range);
    Cluster_Labels   : Integer_Array (1 .. Num_Clusters);
    Ans              : Real_Float_List;
    Classifier       : Python.Module;
