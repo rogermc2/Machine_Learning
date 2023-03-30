@@ -4,9 +4,11 @@
 with Maths;
 
 --  with Basic_Printing; use  Basic_Printing;
+with ML_Types;
 
 package body Support_11A is
 
+   function Cluster_Mode (A : ML_Types.Integer_List) return Integer;
    function Compute_Means
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
       Test : Boolean := False) return Real_Float_Matrix;
@@ -70,8 +72,7 @@ package body Support_11A is
    end Arg_Min;
 
    --  -------------------------------------------------------------------------
-   --  Assign_Data takes the data and the centers for each cluster and
-   --  assigns each datapoint in data to the closest of the centers, centerids.
+   --  Assign_Data assigns each datapoint in data to the closest cluster center.
    function Assign_Data (Data, Centres : Real_Float_Matrix;
                          Centre_Ids    : out Integer_Array) return Float is
       --        Routine_Name : constant String := "Support_11A.Assign_Data ";
@@ -109,6 +110,20 @@ package body Support_11A is
    --  ------------------------------------------------------------------------
    --  kmeans
    --  Cluster_Means categorizes the data based on their appearance.
+   --  This optimizer starts with center locations and assignments of data to
+   --  the centers.
+   --  It then alternates between two steps.
+   --  Both steps are simple are guaranteed to decrease the loss whenever they
+   --  produce any change at all.
+   --  The first step, Assign_Data, reassigns the data points to centers.
+   --  Specifically, each data point is assigned to its closest center.
+   --  The second step, Compute_Means, recomputes the centers for each cluster.
+   --  Specifically, each center is moved to the mean position of the
+   --  data points that it is assigned to.
+   --  Either the center is already assigned to the mean of its associated
+   --  data points, in which case its at a local minimum of the loss function
+   --  or some center is moved.
+   --  Such a move decreases the loss the most over all center relocations.
    function Cluster_Means
      (Data : Real_Float_Matrix; K : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix is
@@ -236,8 +251,39 @@ package body Support_11A is
 
    --  -------------------------------------------------------------------------
 
+   function Compute_Cluster_Labels
+     (Labels       : Integer_Matrix; Center_IDs : Integer_Array;
+      Num_Clusters : Positive) return Integer_Array is
+      C_Labels    : Integer_Array (1 .. Num_Clusters);
+      Labels_List : ML_Types.Integer_List;
+   begin
+      for cluster in 1 .. Num_Clusters loop
+         C_Labels (cluster) := Labels (1, 1);
+      end loop;
+
+      for cluster in 1 .. Num_Clusters loop
+         Labels_List.Clear;
+         for lab_index in Center_IDs'Range loop
+            if Center_IDs (lab_index) = cluster then
+               Labels_List.Append (Labels (lab_index, 1));
+            end if;
+         end loop;
+
+         if not Labels_List.Is_Empty then
+            --  use mode of label item as cluster label
+            C_Labels (cluster) := Cluster_Mode (Labels_List);
+         end if;
+
+      end loop;
+
+      return C_Labels;
+
+   end Compute_Cluster_Labels;
+
+   --  -------------------------------------------------------------------------
+
    function Cluster_Mode (A : ML_Types.Integer_List) return Integer is
-      Routine_Name : constant String := "Support_11A.Cluster_Mode ";
+      --        Routine_Name : constant String := "Support_11A.Cluster_Mode ";
       Min         : Integer := Integer'Last;
       Max         : Integer := Integer'First;
       Int_Range   : Integer;
@@ -252,8 +298,8 @@ package body Support_11A is
             Max := A (index);
          end if;
       end loop;
---        Put_Line (Routine_Name & "Max, Min: " & Integer'Image (Max) & " " &
---                    Integer'Image (Min));
+      --        Put_Line (Routine_Name & "Max, Min: " & Integer'Image (Max) & " " &
+      --                    Integer'Image (Min));
 
       Int_Range := Max - Min + 1;
       declare

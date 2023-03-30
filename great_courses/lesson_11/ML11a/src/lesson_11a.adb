@@ -8,6 +8,15 @@ with ML_Types;
 
 with Support_11A; use Support_11A;
 
+--  This algorithm is given a set of points along with the ability to compute
+--  distances between any pair of points.
+--  The desired number of clusters (k) is specified.
+--  Next, the algorithm searches for a set of k centers and an assignment of
+--  data points to these centers.
+--  The goal is to minimize the total squared distance between data points and
+--  their respective centers.
+--  The assignment to centers defines the clustering.
+
 procedure Lesson_11A is
    use CSV_Data_Loader;
    use Real_Float_Arrays;
@@ -16,8 +25,8 @@ procedure Lesson_11A is
                         "../../../neural_learning/datasets/mnist_784";
    Train_Size       : constant Positive := 4700;
    Test_Size        : constant Positive := 2300;
-   Num_Labelled     : constant Positive := 20;
-   Num_Clusters     : constant Positive := 10;  --  k 10
+   Num_Labelled     : constant Positive := 20;   --  20
+   Num_Clusters     : constant Positive := 10;   --  k 10
    Data             : constant Base_Split_State :=
                         Get_Split_State (Dataset_Name, Digits_Data, Train_Size,
                                          Test_Size, Y_Categorized => False,
@@ -33,12 +42,14 @@ procedure Lesson_11A is
    Labels_List      : ML_Types.Integer_List;
    Loss             : Float;
    Best_Loss        : Float;
+   --  Unsupervised learning
+   --  Best_Centres are Num_Clusters data points, each data point (digit)
+   --  representing a data point at the location of a cluster
    Best_Centres     : Real_Float_Matrix := Cluster_Means (Train_X, Num_Clusters,
                                                           Best_Loss);
    Centres          : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
    Train_Center_IDs : Integer_Array (1 .. Num_Labelled);
    Test_Center_IDs  : Integer_Array (Train_X'Range);
-   Mode             : Integer;
    Sum              : Integer;
    Cluster_Labels   : Integer_Array (1 .. Num_Clusters);
    Ans              : Real_Float_List;
@@ -48,12 +59,13 @@ begin
    Print_Matrix_Dimensions ("Train X", Train_X);
    Print_Matrix_Dimensions ("Test X", Test_X);
    Print_Matrix_Dimensions ("Labels", Labels);
+   Put_Line (Program_Name & "Num_Clusters:" & Integer'Image (Num_Clusters));
 
    --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
-   for rep in 1 .. 8 loop
---     for rep in 1 .. 1 loop
+--     for rep in 1 .. 8 loop
+   for rep in 1 .. 3 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
 
       --  Cluster_Means categorizes the mnist digits based on their appearance.
@@ -71,7 +83,11 @@ begin
    --  Centerids is an array with one integer for each datapoint that indicates
    --  which of the centers is closest.
    --  The current loss is the minimum squared distance summed over all data
-   --  points
+   --  points.
+   --  The representational space consists of k centers and an assignment of
+   --  data points to these centers.
+   --  A loss function is defined as the total squared distances between the
+   --  points and their respective centers.
    Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
    Put_Line (Program_Name & "Test Loss: " & Float'Image (Loss));
 
@@ -80,25 +96,10 @@ begin
    Put_Line (Program_Name & "Labelled Loss: " & Float'Image (Loss));
 
    Print_Integer_Array ("Train_Center_IDs", Train_Center_IDs);
-   for cluster in 1 .. Num_Clusters loop
-      Cluster_Labels (cluster) := Labels (1, 1);
-   end loop;
 
-   for cluster in 1 .. Num_Clusters loop
-      Labels_List.Clear;
-      for lab_index in Train_Center_IDs'Range loop
-         if Train_Center_IDs (lab_index) = cluster then
-            Labels_List.Append (Labels (lab_index, 1));
-         end if;
-      end loop;
-
-      if not Labels_List.Is_Empty then
-         Mode := Cluster_Mode (Labels_List);
-         --           Put_Line (Program_Name & "Mode: " & Integer'Image (Mode));
-         Cluster_Labels (cluster) := Mode;
-      end if;
-
-   end loop;
+   --  Cluster_Labels are generated from the modes of Labels
+   Cluster_Labels := Compute_Cluster_Labels
+     (Labels, Train_Center_IDs, Num_Clusters);
 
    Print_Integer_Array (Program_Name & "Cluster_Labels", Cluster_Labels);
 
