@@ -16,6 +16,8 @@ package Support_11A is
    function Compute_Cluster_Labels
      (Labels       : Integer_Matrix; Center_IDs : Integer_Array;
       Num_Clusters : Positive) return Integer_Array;
+   function Compute_Labelled
+     (Train_Y, Test_Y : Integer_Matrix; IDs : Integer_Array) return Float;
    function Select_Items (Data       : Real_Float_Matrix;
                           Labels,
                           Labels_IDs : Integer_Array; Index : Natural)

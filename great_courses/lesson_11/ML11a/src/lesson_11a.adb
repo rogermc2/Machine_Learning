@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Basic_Printing; use  Basic_Printing;
 with CSV_Data_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with Python;
+--  with Python;
 
 with Support_11A; use Support_11A;
 
@@ -49,9 +49,10 @@ procedure Lesson_11A is
    Centres          : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
    Train_Center_IDs : Integer_Array (1 .. Num_Labelled);
    Test_Center_IDs  : Integer_Array (Test_X'Range);
+   Label_IDs        : Integer_Array (1 .. Num_Labelled);
    Cluster_Labels   : Integer_Array (1 .. Num_Clusters);
    Ans              : Real_Float_List;
-   Classifier       : Python.Module;
+--     Classifier       : Python.Module;
 begin
    Put_Line (Program_Name);
 
@@ -105,18 +106,22 @@ begin
 
    Print_Real_Float_List (Program_Name & "Ans", Ans);
 
-   Python.Initialize;
+--     Python.Initialize;
 
-   Classifier := Python.Import_File ("lesson_11a");
+--     Classifier := Python.Import_File ("lesson_11a");
 
-   Print_Float_Matrix ("Select_Items 1", Select_Items (Test_X, Cluster_Labels,
-                       Test_Center_IDs, 1), 1, 2, 1, 7);
-   Python.Call (Classifier, "plot", Select_Items (Test_X, Cluster_Labels,
-                Test_Center_IDs, 1), Select_Items (Test_X, Cluster_Labels,
-                Test_Center_IDs, 2));
+--     Print_Float_Matrix ("Select_Items 1", Select_Items (Test_X, Cluster_Labels,
+--                         Test_Center_IDs, 1), 1, 2, 1, 7);
+--     Python.Call (Classifier, "plot", Select_Items (Test_X, Cluster_Labels,
+--                  Test_Center_IDs, 1), Select_Items (Test_X, Cluster_Labels,
+--                  Test_Center_IDs, 2));
+--
+--     Python.Close_Module (Classifier);
+--     Python.Finalize;
 
-   Python.Close_Module (Classifier);
-   Python.Finalize;
+   Loss := Assign_Data (Test_X, X_Labelled, Label_IDs);
+   Put_Line ((Program_Name & "Labelled: " &
+               Float'Image (Compute_Labelled (Train_Y, Test_Y, Label_IDs))));
 
    Put_Line ("----------------------------------------------");
 

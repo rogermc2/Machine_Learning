@@ -325,6 +325,35 @@ package body Support_11A is
 
    --  -------------------------------------------------------------------------
 
+   function Compute_Labelled
+     (Train_Y, Test_Y : Integer_Matrix; IDs : Integer_Array) return Float is
+      Test_Row    : Natural := 0;
+      Found       : Boolean;
+      Sum         : Natural := 0;
+   begin
+      for row in Train_Y'Range loop
+         for ID in IDs'Range loop
+            if IDs (ID) = row then
+               Test_Row := Test_Row + 1;
+               Found := True;
+               for col in Train_Y'Range (2) loop
+                  Found := Found and
+                    Test_Y (Test_Row, col) = Train_Y (row, col);
+               end loop;
+
+               if Found then
+                  Sum := Sum + 1;
+               end if;
+            end if;
+         end loop;
+      end loop;
+
+      return Float (Sum) / Float (Test_Y'Length);
+
+   end Compute_Labelled;
+
+   --  -------------------------------------------------------------------------
+
    function Compute_Cluster_Labels
      (Labels       : Integer_Matrix; Center_IDs : Integer_Array;
       Num_Clusters : Positive) return Integer_Array is
@@ -355,16 +384,16 @@ package body Support_11A is
      (Data       : Real_Float_Matrix;
       Labels,
       Labels_IDs : Integer_Array; Index : Natural)
-      return Real_Float_Matrix is
+         return Real_Float_Matrix is
       use NL_Types;
---        Routine_Name : constant String := "Support_11A.Select_Items 1 ";
+      --        Routine_Name : constant String := "Support_11A.Select_Items 1 ";
       Label        : Natural;
       Items        : Float_List;
       Result       : Float_List_2D;
    begin
---        Assert (Index <= Labels_IDs'Length, Routine_Name & "Index" &
---                  Integer'Image (Index) & " is greater than Labels_IDs length" &
---                  Integer'Image (Labels_IDs'Length));
+      --        Assert (Index <= Labels_IDs'Length, Routine_Name & "Index" &
+      --                  Integer'Image (Index) & " is greater than Labels_IDs length" &
+      --                  Integer'Image (Labels_IDs'Length));
       for lab_index in Labels_IDs'Range loop
          Label := Labels (Labels_IDs (lab_index));
          if Label = Index then
