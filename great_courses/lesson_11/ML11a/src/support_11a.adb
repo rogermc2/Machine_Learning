@@ -16,6 +16,8 @@ package body Support_11A is
      (Data    : Real_Float_Matrix; Num_Clusters : Positive;
       Centres : out Real_Float_Matrix; Test : Boolean);
    function Means (Data : Float_Vector_List) return Real_Float_Vector;
+   function Select_Items (Data  : Integer_Matrix;  Center_IDs : Integer_Array;
+                          Index : Natural) return ML_Types.Integer_List;
 
    --  ------------------------------------------------------------------------
    --  Add_Reduce_Differences (Data, Centres, n) finds the difference  between
@@ -335,13 +337,13 @@ package body Support_11A is
       end loop;
 
       for cluster in 1 .. Num_Clusters loop
-         Labels_List.Clear;
-         for lab_index in Center_IDs'Range loop
-            if Center_IDs (lab_index) = cluster then
-               Labels_List.Append (Labels (lab_index, 1));
-            end if;
-         end loop;
-
+         --           Labels_List.Clear;
+         --           for lab_index in Center_IDs'Range loop
+         --              if Center_IDs (lab_index) = cluster then
+         --                 Labels_List.Append (Labels (lab_index, 1));
+         --              end if;
+         --           end loop;
+         Labels_List := Select_Items (Labels, Center_IDs, cluster);
          if not Labels_List.Is_Empty then
             --  use mode of label item as cluster label
             C_Labels (cluster) := Cluster_Mode (Labels_List);
@@ -352,6 +354,22 @@ package body Support_11A is
       return C_Labels;
 
    end Compute_Cluster_Labels;
+
+   --  -------------------------------------------------------------------------
+
+   function Select_Items (Data  : Integer_Matrix; Center_IDs : Integer_Array;
+                          Index : Natural) return ML_Types.Integer_List is
+      Items : ML_Types.Integer_List;
+   begin
+      for lab_index in Center_IDs'Range loop
+         if Center_IDs (lab_index) = Index then
+            Items.Append (Data (lab_index, 1));
+         end if;
+      end loop;
+
+      return Items;
+
+   end Select_Items;
 
    --  -------------------------------------------------------------------------
 

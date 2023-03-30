@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Basic_Printing; use  Basic_Printing;
 with CSV_Data_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with Python;
 
 with Support_11A; use Support_11A;
 
@@ -50,6 +51,7 @@ procedure Lesson_11A is
    Test_Center_IDs  : Integer_Array (Train_X'Range);
    Cluster_Labels   : Integer_Array (1 .. Num_Clusters);
    Ans              : Real_Float_List;
+   Classifier       : Python.Module;
 begin
    Put_Line (Program_Name);
 
@@ -71,8 +73,8 @@ begin
          Best_Centres := Centres;
          Best_Loss := Loss;
       end if;
-      Print_Float_Matrix (Program_Name & "Cluster Centres",
-                          Centres, 1, Num_Clusters, 230, 236);
+--        Print_Float_Matrix (Program_Name & "Cluster Centres",
+--                            Centres, 1, Num_Clusters, 230, 236);
    end loop;
 
    Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
@@ -102,6 +104,15 @@ begin
    Ans := Compute_Ans (Test_Y, Test_Center_IDs, Cluster_Labels, Num_Clusters);
 
    Print_Real_Float_List (Program_Name & "Ans", Ans);
+
+   Python.Initialize;
+
+   Classifier := Python.Import_File ("lesson_11a");
+
+   Python.Call (Classifier, "plot");
+
+   Python.Close_Module (Classifier);
+   Python.Finalize;
 
    Put_Line ("----------------------------------------------");
 
