@@ -4,6 +4,7 @@
 with Maths;
 
 --  with Basic_Printing; use  Basic_Printing;
+with NL_Types;
 
 package body Support_11A is
 
@@ -334,13 +335,8 @@ package body Support_11A is
       end loop;
 
       for cluster in 1 .. Num_Clusters loop
-         --           Labels_List.Clear;
-         --           for lab_index in Center_IDs'Range loop
-         --              if Center_IDs (lab_index) = cluster then
-         --                 Labels_List.Append (Labels (lab_index, 1));
-         --              end if;
-         --           end loop;
          Labels_List := Select_Items (Labels, Center_IDs, cluster);
+
          if not Labels_List.Is_Empty then
             --  use mode of label item as cluster label
             C_Labels (cluster) := Cluster_Mode (Labels_List);
@@ -354,17 +350,25 @@ package body Support_11A is
 
    --  -------------------------------------------------------------------------
 
-   function Select_Items (Data  : Integer_Array; Center_IDs : Integer_Array;
-                          Index : Natural) return ML_Types.Integer_List is
-      Items : ML_Types.Integer_List;
+   function Select_Items
+     (Data       : Real_Float_Matrix;
+      Labels,
+      Labels_IDs : Integer_Array; Index : Natural)
+      return Real_Float_Matrix is
+      use NL_Types;
+      Label  : Natural;
+      Items  : Float_List;
+      Result : Float_List_2D;
    begin
-      for lab_index in Center_IDs'Range loop
-         if Center_IDs (lab_index) = Index then
-            Items.Append (Data (lab_index));
+      for lab_index in Labels_IDs'Range loop
+         Label := Labels (Labels_IDs (lab_index));
+         if Label = Index then
+            Items.Append (Data (lab_index, 1));
          end if;
       end loop;
+      Result.Append (Items);
 
-      return Items;
+      return To_Real_Float_Matrix (Result);
 
    end Select_Items;
 

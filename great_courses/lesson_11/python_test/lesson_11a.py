@@ -74,7 +74,7 @@ ans = []
 k = 10
 bestcenters, bestloss = kmeans(X_train, k)
 print ("Initial best loss: ", bestloss)
-for rep in range(2):
+for rep in range(1):
   centers, loss = kmeans(X_train, k)
   if loss < bestloss:
     bestcenters, bestloss = centers, loss
@@ -98,6 +98,5 @@ for i in range(k):
     clust_labs[i] = mode[0]
 print ("clust_labs", clust_labs)
 ans = ans + [(k,sum(clust_labs[test_centerids] == y_test)/len(y_test))]
-print ("y_test length", len (y_test))
 print ("ans length", len (ans))
-print ("ans", ans)
+print ("clust_labs[test_centerids] == 0,0", clust_labs[test_centerids] == 0,0)

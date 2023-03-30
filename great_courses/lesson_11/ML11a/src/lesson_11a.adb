@@ -64,7 +64,7 @@ begin
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
 --     for rep in 1 .. 8 loop
-   for rep in 1 .. 3 loop
+   for rep in 1 .. 1 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
 
       --  Cluster_Means categorizes the mnist digits based on their appearance.
@@ -109,9 +109,9 @@ begin
 
    Classifier := Python.Import_File ("lesson_11a");
 
-   Python.Call (Classifier, "plot", Select_Items (Cluster_Labels,
-                Test_Center_IDs, 0), Select_Items (Cluster_Labels,
-                Test_Center_IDs, 1));
+   Python.Call (Classifier, "plot", Select_Items (Test_X, Cluster_Labels,
+                Test_Center_IDs, 1), Select_Items (Test_X, Cluster_Labels,
+                Test_Center_IDs, 2));
 
    Python.Close_Module (Classifier);
    Python.Finalize;
