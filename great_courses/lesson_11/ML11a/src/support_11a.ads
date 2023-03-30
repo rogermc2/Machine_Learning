@@ -1,5 +1,6 @@
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_Types;
 
 package Support_11A is
 
@@ -15,5 +16,9 @@ package Support_11A is
    function Compute_Cluster_Labels
      (Labels       : Integer_Matrix; Center_IDs : Integer_Array;
       Num_Clusters : Positive) return Integer_Array;
+   function Select_Items (Data  : Integer_Array;  Center_IDs : Integer_Array;
+                          Index : Natural) return ML_Types.Integer_List;
+   function Select_Items (Data  : Integer_Matrix;  Center_IDs : Integer_Array;
+                          Index : Natural) return ML_Types.Integer_List;
 
 end Support_11A;

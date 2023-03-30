@@ -109,7 +109,9 @@ begin
 
    Classifier := Python.Import_File ("lesson_11a");
 
-   Python.Call (Classifier, "plot");
+   Python.Call (Classifier, "plot", Select_Items (Cluster_Labels,
+                Test_Center_IDs, 0), Select_Items (Cluster_Labels,
+                Test_Center_IDs, 1));
 
    Python.Close_Module (Classifier);
    Python.Finalize;
