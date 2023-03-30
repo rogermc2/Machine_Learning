@@ -380,13 +380,12 @@ package body Support_11A is
 
    --  -------------------------------------------------------------------------
 
-   function Select_Items
-     (Data       : Real_Float_Matrix;
-      Labels,
-      Labels_IDs : Integer_Array; Index : Natural)
-         return Real_Float_Matrix is
+   function Get_Cluster
+     (Data               : Real_Float_Matrix;
+      Labels, Labels_IDs : Integer_Array; Index : Natural)
+      return Real_Float_Matrix is
       use NL_Types;
-      --        Routine_Name : constant String := "Support_11A.Select_Items 1 ";
+      --        Routine_Name : constant String := "Support_11A.Get_Cluster ";
       Label        : Natural;
       Items        : Float_List;
       Result       : Float_List_2D;
@@ -404,7 +403,7 @@ package body Support_11A is
 
       return To_Real_Float_Matrix (Result);
 
-   end Select_Items;
+   end Get_Cluster;
 
    --  -------------------------------------------------------------------------
 
