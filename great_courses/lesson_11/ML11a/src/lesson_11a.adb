@@ -109,6 +109,8 @@ begin
 
    Classifier := Python.Import_File ("lesson_11a");
 
+   Print_Float_Matrix ("Select_Items 1", Select_Items (Test_X, Cluster_Labels,
+                       Test_Center_IDs, 1), 1, 2, 1, 7);
    Python.Call (Classifier, "plot", Select_Items (Test_X, Cluster_Labels,
                 Test_Center_IDs, 1), Select_Items (Test_X, Cluster_Labels,
                 Test_Center_IDs, 2));
