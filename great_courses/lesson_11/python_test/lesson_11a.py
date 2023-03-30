@@ -7,6 +7,7 @@ from scipy import stats
 import math
 from functools import reduce
 import random
+from matplotlib import pyplot as plt
 
 def assign_data(data,centers):
   n = len(data)
@@ -99,4 +100,8 @@ for i in range(k):
 print ("clust_labs", clust_labs)
 ans = ans + [(k,sum(clust_labs[test_centerids] == y_test)/len(y_test))]
 print ("ans length", len (ans))
-print ("clust_labs[test_centerids] == 0,0", clust_labs[test_centerids] == 0,0)
+# print ("clust_labs[test_centerids] == 0", clust_labs[test_centerids] == 0,0)
+
+plt.plot(X_test[clust_labs[test_centerids] == 0,0],X_test[clust_labs[test_centerids] == 0,1],'o',color='r')
+plt.plot(X_test[clust_labs[test_centerids] == 1,0],X_test[clust_labs[test_centerids] == 1,1],'o',color='b')
+plt.show()
