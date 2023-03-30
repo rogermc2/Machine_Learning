@@ -4,7 +4,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Basic_Printing; use  Basic_Printing;
 with CSV_Data_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with ML_Types;
 
 with Support_11A; use Support_11A;
 
@@ -39,7 +38,6 @@ procedure Lesson_11A is
                         Slice (Train_X, 1, Num_Labelled);
    Labels           : constant Integer_Matrix :=
                         Slice (Train_Y, 1, Num_Labelled);
-   Labels_List      : ML_Types.Integer_List;
    Loss             : Float;
    Best_Loss        : Float;
    --  Unsupervised learning
@@ -50,7 +48,6 @@ procedure Lesson_11A is
    Centres          : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
    Train_Center_IDs : Integer_Array (1 .. Num_Labelled);
    Test_Center_IDs  : Integer_Array (Train_X'Range);
-   Sum              : Integer;
    Cluster_Labels   : Integer_Array (1 .. Num_Clusters);
    Ans              : Real_Float_List;
 begin
@@ -102,23 +99,8 @@ begin
      (Labels, Train_Center_IDs, Num_Clusters);
 
    Print_Integer_Array (Program_Name & "Cluster_Labels", Cluster_Labels);
+   Ans := Compute_Ans (Test_Y, Test_Center_IDs, Cluster_Labels, Num_Clusters);
 
-   for cluster in 1 .. Num_Clusters loop
-      Labels_List.Clear;
-      for lab_index in Test_Center_IDs'Range loop
-         if Test_Center_IDs (lab_index) = Test_Y (cluster, 1) then
-            Labels_List.Append (Cluster_Labels (cluster));
-         end if;
-      end loop;
-
-      if not Labels_List.Is_Empty then
-         Sum := 0;
-         for index in Labels_List.First_Index .. Labels_List.Last_Index loop
-            Sum := Sum + Labels_List (index);
-         end loop;
-         Ans.Append (Float (Sum) / Float (Test_Y'Length));
-      end if;
-   end loop;
    Print_Real_Float_List (Program_Name & "Ans", Ans);
 
    Put_Line ("----------------------------------------------");

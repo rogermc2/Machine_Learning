@@ -251,37 +251,6 @@ package body Support_11A is
 
    --  -------------------------------------------------------------------------
 
-   function Compute_Cluster_Labels
-     (Labels       : Integer_Matrix; Center_IDs : Integer_Array;
-      Num_Clusters : Positive) return Integer_Array is
-      C_Labels    : Integer_Array (1 .. Num_Clusters);
-      Labels_List : ML_Types.Integer_List;
-   begin
-      for cluster in 1 .. Num_Clusters loop
-         C_Labels (cluster) := Labels (1, 1);
-      end loop;
-
-      for cluster in 1 .. Num_Clusters loop
-         Labels_List.Clear;
-         for lab_index in Center_IDs'Range loop
-            if Center_IDs (lab_index) = cluster then
-               Labels_List.Append (Labels (lab_index, 1));
-            end if;
-         end loop;
-
-         if not Labels_List.Is_Empty then
-            --  use mode of label item as cluster label
-            C_Labels (cluster) := Cluster_Mode (Labels_List);
-         end if;
-
-      end loop;
-
-      return C_Labels;
-
-   end Compute_Cluster_Labels;
-
-   --  -------------------------------------------------------------------------
-
    function Cluster_Mode (A : ML_Types.Integer_List) return Integer is
       --        Routine_Name : constant String := "Support_11A.Cluster_Mode ";
       Min         : Integer := Integer'Last;
@@ -321,6 +290,68 @@ package body Support_11A is
       return Min + Mode_Offset;
 
    end Cluster_Mode;
+
+   --  -------------------------------------------------------------------------
+
+   function Compute_Ans
+     (Labels         : Integer_Matrix; Center_IDs : Integer_Array;
+      Cluster_Labels : Integer_Array; Num_Clusters : Positive)
+      return Real_Float_List is
+      Ans         : Real_Float_List;
+      Labels_List : ML_Types.Integer_List;
+      Sum         : Integer;
+   begin
+      for cluster in 1 .. Num_Clusters loop
+         Labels_List.Clear;
+         for lab_index in Center_IDs'Range loop
+            if Center_IDs (lab_index) = Labels (cluster, 1) then
+               Labels_List.Append (Cluster_Labels (cluster));
+            end if;
+         end loop;
+
+         if not Labels_List.Is_Empty then
+            Sum := 0;
+            for index in Labels_List.First_Index .. Labels_List.Last_Index loop
+               Sum := Sum + Labels_List (index);
+            end loop;
+            Ans.Append (Float (Sum) / Float (Labels'Length));
+         end if;
+      end loop;
+
+      return Ans;
+
+   end Compute_Ans;
+
+   --  -------------------------------------------------------------------------
+
+   function Compute_Cluster_Labels
+     (Labels       : Integer_Matrix; Center_IDs : Integer_Array;
+      Num_Clusters : Positive) return Integer_Array is
+      C_Labels    : Integer_Array (1 .. Num_Clusters);
+      Labels_List : ML_Types.Integer_List;
+   begin
+      for cluster in 1 .. Num_Clusters loop
+         C_Labels (cluster) := Labels (1, 1);
+      end loop;
+
+      for cluster in 1 .. Num_Clusters loop
+         Labels_List.Clear;
+         for lab_index in Center_IDs'Range loop
+            if Center_IDs (lab_index) = cluster then
+               Labels_List.Append (Labels (lab_index, 1));
+            end if;
+         end loop;
+
+         if not Labels_List.Is_Empty then
+            --  use mode of label item as cluster label
+            C_Labels (cluster) := Cluster_Mode (Labels_List);
+         end if;
+
+      end loop;
+
+      return C_Labels;
+
+   end Compute_Cluster_Labels;
 
    --  -------------------------------------------------------------------------
 
