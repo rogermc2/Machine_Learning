@@ -113,8 +113,8 @@ begin
 --                                 Get_Cluster (Test_X, Test_Center_IDs, index));
 --     end loop;
 
-   Print_Float_Matrix
-     ("Get_Cluster", Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 5), 1, 2, 210, 216);
+   Print_Integer_List
+     ("Get_Cluster", Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 5));
    Python.Call (Classifier, "plot", Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 5),
                 Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 6));
 

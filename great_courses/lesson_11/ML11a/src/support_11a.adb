@@ -5,7 +5,6 @@
 with Maths;
 
 --  with Basic_Printing; use  Basic_Printing;
-with NL_Types;
 
 package body Support_11A is
 
@@ -409,22 +408,11 @@ package body Support_11A is
      (Data            : Real_Float_Matrix;
       Cluster_Labels,
       Center_IDs      : Integer_Array; Cluster_ID : Natural)
-      return Real_Float_Matrix is
-      use NL_Types;
+      return ML_Types.Integer_List is
       --        Routine_Name : constant String := "Support_11A.Get_Cluster ";
       Cluster_IDs  : ML_Types.Integer_List;
-      Items        : Float_List;
-      Result       : Float_List_2D;
+      Items        : ML_Types.Integer_List;
    begin
-      --        Assert (Index <= Labels_IDs'Length, Routine_Name & "Index" &
-      --                  Integer'Image (Index) & " is greater than Labels_IDs length" &
-      --                  Integer'Image (Labels_IDs'Length));
---        for index in Cluster_Labels'Range loop
---           if Cluster_Labels (index) = Cluster_ID then
---              Cluster_IDs.Append (Center_IDs (Cluster_Labels (index)));
---           end if;
---        end loop;
-
       for index in Center_IDs'Range loop
          if Center_IDs (index) = Cluster_ID then
             Cluster_IDs.Append (Center_IDs (index));
@@ -433,11 +421,11 @@ package body Support_11A is
 
       for row in Data'Range loop
          if Cluster_IDs.Contains (row) then
-            Items.Insert (Cluster_Labels (row));
+            Items.Append (Cluster_Labels (row));
          end if;
       end loop;
 
-      return To_Real_Float_Matrix (Result);
+      return Items;
 
    end Get_Cluster;
 
