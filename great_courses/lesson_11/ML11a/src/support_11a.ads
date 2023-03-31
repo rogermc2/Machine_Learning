@@ -4,8 +4,9 @@ with ML_Types;
 
 package Support_11A is
 
-   function Assign_Data (Data, Centres : Real_Float_Matrix;
-                         Centre_Ids    : out Integer_Array) return Float;
+   function Assign_Data_To_Clusters
+     (Data, Cluster_Centres : Real_Float_Matrix; Centre_Ids : out Integer_Array)
+      return Float;
    function Cluster_Means
      (Data : Real_Float_Matrix; Num_Clusters : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix;
@@ -22,7 +23,7 @@ package Support_11A is
      (Data         : Real_Float_Matrix; Num_Clusters : Positive;
       Best_Centres : in out Real_Float_Matrix; Best_Loss : in out Float);
    function Get_Cluster (Data               : Real_Float_Matrix;
-                         Cluster_Labels,
+--                           Cluster_Labels,
                          Center_IDs         : Integer_Array;
                          Cluster_ID         : Natural)
                          return Real_Float_Matrix;

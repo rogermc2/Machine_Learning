@@ -72,31 +72,35 @@ package body Support_11A is
    end Arg_Min;
 
    --  -------------------------------------------------------------------------
-   --  Assign_Data assigns each datapoint in data to the closest cluster center.
-   function Assign_Data (Data, Centres : Real_Float_Matrix;
-                         Centre_Ids    : out Integer_Array) return Float is
-      --        Routine_Name : constant String := "Support_11A.Assign_Data ";
+   --  Assign_Data_To_Clusters assigns each datapoint in data to the closest
+   --  cluster center.
+   function Assign_Data_To_Clusters
+     (Data, Cluster_Centres : Real_Float_Matrix; Centre_Ids : out Integer_Array)
+      return Float is
+      --        Routine_Name : constant String := "Support_11A.Assign_Data_To_Clusters ";
       Res_Array    : Real_Float_Vector (Data'Range);
-      Res2_Diffs   : Real_Float_Matrix (Centres'Range, Data'Range);
+      Res2_Diffs   : Real_Float_Matrix (Cluster_Centres'Range, Data'Range);
       Min_Vals     : Real_Float_Vector (Centre_Ids'Range);
       Loss         : Float := 0.0;
    begin
-      --  subtract the set of centers from each data point
+      --  Subtract the set of cluster centers from each data point.
       --  For each centre c (n), Add_Reduce_Differences finds the difference
       --  between each data value data (m, p) and the corresponding centre
       --  value centre (n, p), squares each value then adds the values of each
       --  row together.
       --  res (n, m) is data (m) - centre (n)
-      --  res_n (m, p) is Data (m, p) - Centres (n, p)
-      --        Print_Float_Matrix (Routine_Name & "Centres", Centres, 1, 3);
-      for row in Centres'Range loop
-         Res_Array := Add_Reduce_Differences (Data, Centres, row);
+      --  res_n (m, p) is Data (m, p) - Cluster_Centres (n, p)
+      --        Print_Float_Matrix (Routine_Name & "Cluster_Centres", Cluster_Centres, 1, 3);
+      for row in Cluster_Centres'Range loop
+         Res_Array := Add_Reduce_Differences (Data, Cluster_Centres, row);
          for col in Res2_Diffs'Range (2) loop
             Res2_Diffs (row, col) := Res_Array (col);
          end loop;
       end loop;
 
       --  assign each data point to its closest center
+      --  Centre_Ids is an array that associates each sample with its closest
+      --  cluster centre
       Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
 
       for index in Min_Vals'Range loop
@@ -105,7 +109,7 @@ package body Support_11A is
 
       return Loss;
 
-   end Assign_Data;
+   end Assign_Data_To_Clusters;
 
    --  ------------------------------------------------------------------------
    --  kmeans
@@ -127,7 +131,7 @@ package body Support_11A is
    function Cluster_Means
      (Data : Real_Float_Matrix; Num_Clusters : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix is
---        Routine_Name    : constant String := "Support_11A.Cluster_Means ";
+      --        Routine_Name    : constant String := "Support_11A.Cluster_Means ";
       Cluster_Centres : Real_Float_Matrix (1 .. Num_Clusters, Data'Range (2));
       Centre_Ids      : Integer_Array (Data'Range);
       Prev_Loss       : Float := 0.0;
@@ -141,8 +145,10 @@ package body Support_11A is
       Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss loop
          Prev_Loss := Curr_Loss;
-         Curr_Loss := Assign_Data (Data, Cluster_Centres, Centre_Ids);
-         Cluster_Centres := Compute_Means (Data, Centre_Ids, Num_Clusters, Test);
+         Curr_Loss :=
+           Assign_Data_To_Clusters (Data, Cluster_Centres, Centre_Ids);
+         Cluster_Centres :=
+           Compute_Means (Data, Centre_Ids, Num_Clusters, Test);
       end loop;
 
       return Cluster_Centres;
@@ -398,10 +404,10 @@ package body Support_11A is
    end Means;
 
    --  -------------------------------------------------------------------------
-
+   --  Centre_Ids associate each sample with its closest cluster centre
    function Get_Cluster
      (Data            : Real_Float_Matrix;
-      Cluster_Labels,
+--        Cluster_Labels,
       Center_IDs      : Integer_Array; Cluster_ID : Natural)
       return Real_Float_Matrix is
       use NL_Types;
@@ -413,16 +419,24 @@ package body Support_11A is
       --        Assert (Index <= Labels_IDs'Length, Routine_Name & "Index" &
       --                  Integer'Image (Index) & " is greater than Labels_IDs length" &
       --                  Integer'Image (Labels_IDs'Length));
-      for index in Cluster_Labels'Range loop
-         if Cluster_Labels (index) = Cluster_ID then
-            Cluster_IDs.Append (Center_IDs (Cluster_Labels (index)));
+--        for index in Cluster_Labels'Range loop
+--           if Cluster_Labels (index) = Cluster_ID then
+--              Cluster_IDs.Append (Center_IDs (Cluster_Labels (index)));
+--           end if;
+--        end loop;
+
+      for index in Center_IDs'Range loop
+         if Center_IDs (index) = Cluster_ID then
+            Cluster_IDs.Append (Center_IDs (index));
          end if;
       end loop;
 
       for index in Cluster_IDs.First_Index .. Cluster_IDs.Last_Index loop
-         Items.Append (Data (Cluster_IDs (index), 1));
+         for col in Data'Range (2) loop
+            Items.Append (Data (Cluster_IDs (index), col));
+         end loop;
+         Result.Append (Items);
       end loop;
-      Result.Append (Items);
 
       return To_Real_Float_Matrix (Result);
 

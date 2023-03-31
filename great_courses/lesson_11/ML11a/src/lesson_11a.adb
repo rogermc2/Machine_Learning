@@ -46,7 +46,8 @@ procedure Lesson_11A is
    --  the location of the centre of a cluster
    Best_Centres     : Real_Float_Matrix :=
                         Cluster_Means (Train_X, Num_Clusters, Best_Loss);
-   Train_Center_IDs : Integer_Array (1 .. Num_Labelled);
+   --  Centre_Ids associate each sample with its closest cluster centre
+   Train_Center_IDs : Integer_Array (Train_X'Range);
    Test_Center_IDs  : Integer_Array (Test_X'Range);
    Cluster_Labels   : Integer_Array (1 .. Num_Clusters);
    Ans              : Real_Float_List;
@@ -60,10 +61,10 @@ begin
 
    --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
---     Print_Float_Matrix (Program_Name & "Initial Best_Centres",
---                         Best_Centres, 1, Num_Clusters, 210, 216);
+   --     Print_Float_Matrix (Program_Name & "Initial Best_Centres",
+   --                         Best_Centres, 1, Num_Clusters, 210, 216);
 
---     for rep in 1 .. 8 loop
+   --     for rep in 1 .. 8 loop
    for rep in 1 .. 1 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Get_Best_Centres (Train_X, Num_Clusters, Best_Centres, Best_Loss);
@@ -82,14 +83,14 @@ begin
    --  data points to these centers.
    --  A loss function is defined as the total squared distances between the
    --  points and their respective centers.
-   Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
+   Loss := Assign_Data_To_Clusters (Test_X, Best_Centres, Test_Center_IDs);
    Put_Line (Program_Name & "Test_Center_IDs length: " &
                Integer'Image (Test_Center_IDs'Length));
    Print_Integer_Array ("Test_Center_IDs", Test_Center_IDs, 1, 20);
    Put_Line (Program_Name & "Test Loss: " & Float'Image (Loss));
 
    --  Use the labeled examples to label the clusters
-   Loss := Assign_Data (X_Labelled, Best_Centres, Train_Center_IDs);
+   Loss := Assign_Data_To_Clusters (X_Labelled, Best_Centres, Train_Center_IDs);
    Put_Line (Program_Name & "Labelled Loss: " & Float'Image (Loss));
 
    Print_Integer_Array ("Train_Center_IDs", Train_Center_IDs);
@@ -107,18 +108,22 @@ begin
 
    Classifier := Python.Import_File ("lesson_11a");
 
-   Print_Float_Matrix ("Get_Cluster", Get_Cluster (Test_X, Cluster_Labels,
-                       Test_Center_IDs, 1), 1, 2, 1, 7);
-   Python.Call (Classifier, "plot", Get_Cluster (Test_X, Cluster_Labels,
-                Test_Center_IDs, 1), Get_Cluster (Test_X, Cluster_Labels,
-                Test_Center_IDs, 2));
+--     for index in 1 .. Num_Clusters loop
+--        Print_Matrix_Dimensions ("Cluster" & Integer'Image (index),
+--                                 Get_Cluster (Test_X, Test_Center_IDs, index));
+--     end loop;
+
+   Print_Float_Matrix
+     ("Get_Cluster", Get_Cluster (Test_X, Test_Center_IDs, 5), 1, 2, 210, 216);
+   Python.Call (Classifier, "plot", Get_Cluster (Test_X, Test_Center_IDs, 5),
+                Get_Cluster (Test_X, Test_Center_IDs, 6));
 
    Python.Close_Module (Classifier);
    Python.Finalize;
 
---     Loss := Assign_Data (Test_X, X_Labelled, Label_IDs);
---     Put_Line ((Program_Name & "Labelled: " &
---                 Float'Image (Compute_Labelled (Train_Y, Test_Y, Label_IDs))));
+   --     Loss := Assign_Data (Test_X, X_Labelled, Label_IDs);
+   --     Put_Line ((Program_Name & "Labelled: " &
+   --                 Float'Image (Compute_Labelled (Train_Y, Test_Y, Label_IDs))));
 
    Put_Line ("----------------------------------------------");
 
