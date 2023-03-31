@@ -381,23 +381,27 @@ package body Support_11A is
    --  -------------------------------------------------------------------------
 
    function Get_Cluster
-     (Data               : Real_Float_Matrix;
-      Labels, Labels_IDs : Integer_Array; Index : Natural)
+     (Data            : Real_Float_Matrix;
+      Cluster_Labels,
+      Center_IDs      : Integer_Array; Cluster_ID : Natural)
       return Real_Float_Matrix is
       use NL_Types;
       --        Routine_Name : constant String := "Support_11A.Get_Cluster ";
-      Label        : Natural;
+      Cluster_IDs  : ML_Types.Integer_List;
       Items        : Float_List;
       Result       : Float_List_2D;
    begin
       --        Assert (Index <= Labels_IDs'Length, Routine_Name & "Index" &
       --                  Integer'Image (Index) & " is greater than Labels_IDs length" &
       --                  Integer'Image (Labels_IDs'Length));
-      for lab_index in Labels_IDs'Range loop
-         Label := Labels (Labels_IDs (lab_index));
-         if Label = Index then
-            Items.Append (Data (lab_index, 1));
+      for index in Cluster_Labels'Range loop
+         if Cluster_Labels (index) = Cluster_ID then
+            Cluster_IDs.Append (Center_IDs (Cluster_Labels (index)));
          end if;
+      end loop;
+
+      for index in Cluster_IDs.First_Index .. Cluster_IDs.Last_Index loop
+            Items.Append (Data (Cluster_IDs (index), 1));
       end loop;
       Result.Append (Items);
 
