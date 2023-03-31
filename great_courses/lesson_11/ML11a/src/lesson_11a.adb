@@ -57,7 +57,6 @@ begin
    Print_Matrix_Dimensions ("Train X", Train_X);
    Print_Matrix_Dimensions ("Test X", Test_X);
    Print_Matrix_Dimensions ("Labels", Labels);
-   Put_Line (Program_Name & "Num_Clusters:" & Integer'Image (Num_Clusters));
 
    --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
@@ -69,7 +68,8 @@ begin
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Get_Best_Centres (Train_X, Num_Clusters, Best_Centres, Best_Loss);
    end loop;
-
+   --  Best_Centres are Num_Clusters data points, each data point representing
+   --  the location of the centre of a cluster
    Print_Float_Matrix (Program_Name & "Final Best_Centres",
                        Best_Centres, 1, Num_Clusters, 210, 216);
    Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
@@ -83,6 +83,9 @@ begin
    --  A loss function is defined as the total squared distances between the
    --  points and their respective centers.
    Loss := Assign_Data (Test_X, Best_Centres, Test_Center_IDs);
+   Put_Line (Program_Name & "Test_Center_IDs length: " &
+               Integer'Image (Test_Center_IDs'Length));
+   Print_Integer_Array ("Test_Center_IDs", Test_Center_IDs, 1, 20);
    Put_Line (Program_Name & "Test Loss: " & Float'Image (Loss));
 
    --  Use the labeled examples to label the clusters
