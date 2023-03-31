@@ -114,9 +114,9 @@ begin
 --     end loop;
 
    Print_Integer_List
-     ("Get_Cluster", Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 5));
-   Python.Call (Classifier, "plot", Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 5),
-                Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 6));
+     ("Get_Cluster", Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 1));
+   Python.Call (Classifier, "plot", Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 1),
+                Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 2));
 
    Python.Close_Module (Classifier);
    Python.Finalize;
