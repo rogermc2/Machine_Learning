@@ -18,6 +18,9 @@ package Support_11A is
       Num_Clusters : Positive) return Integer_Array;
    function Compute_Labelled
      (Train_Y, Test_Y : Integer_Matrix; IDs : Integer_Array) return Float;
+   procedure Get_Best_Centres
+     (Data         : Real_Float_Matrix; Num_Clusters : Positive;
+      Best_Centres : in out Real_Float_Matrix; Best_Loss : in out Float);
    function Get_Cluster (Data               : Real_Float_Matrix;
                          Cluster_Labels,
                          Center_IDs         : Integer_Array;

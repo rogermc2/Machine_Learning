@@ -42,14 +42,12 @@ procedure Lesson_11A is
    Loss             : Float;
    Best_Loss        : Float;
    --  Unsupervised learning
-   --  Best_Centres are Num_Clusters data points, each data point (digit)
-   --  representing a data point at the location of a cluster
-   Best_Centres     : Real_Float_Matrix := Cluster_Means (Train_X, Num_Clusters,
-                                                          Best_Loss);
-   Centres          : Real_Float_Matrix (1 .. Num_Clusters, Train_X'Range (2));
+   --  Best_Centres are Num_Clusters data points, each data point representing
+   --  the location of the centre of a cluster
+   Best_Centres     : Real_Float_Matrix :=
+                        Cluster_Means (Train_X, Num_Clusters, Best_Loss);
    Train_Center_IDs : Integer_Array (1 .. Num_Labelled);
    Test_Center_IDs  : Integer_Array (Test_X'Range);
---     Label_IDs        : Integer_Array (1 .. Num_Labelled);
    Cluster_Labels   : Integer_Array (1 .. Num_Clusters);
    Ans              : Real_Float_List;
    Classifier       : Python.Module;
@@ -63,21 +61,17 @@ begin
 
    --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
+--     Print_Float_Matrix (Program_Name & "Initial Best_Centres",
+--                         Best_Centres, 1, Num_Clusters, 210, 216);
 
 --     for rep in 1 .. 8 loop
    for rep in 1 .. 1 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
-
-      --  Cluster_Means categorizes the mnist digits based on their appearance.
-      Centres := Cluster_Means (Train_X, Num_Clusters, Loss);
-      if Loss < Best_Loss then
-         Best_Centres := Centres;
-         Best_Loss := Loss;
-      end if;
---        Print_Float_Matrix (Program_Name & "Cluster Centres",
---                            Centres, 1, Num_Clusters, 230, 236);
+      Get_Best_Centres (Train_X, Num_Clusters, Best_Centres, Best_Loss);
    end loop;
 
+   Print_Float_Matrix (Program_Name & "Final Best_Centres",
+                       Best_Centres, 1, Num_Clusters, 210, 216);
    Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
    --  Assign test points to discovered clusters
    --  Centerids is an array with one integer for each datapoint that indicates
@@ -110,8 +104,8 @@ begin
 
    Classifier := Python.Import_File ("lesson_11a");
 
---     Print_Float_Matrix ("Get_Cluster 1", Get_Cluster (Test_X, Cluster_Labels,
---                         Test_Center_IDs, 1), 1, 2, 1, 7);
+   Print_Float_Matrix ("Get_Cluster", Get_Cluster (Test_X, Cluster_Labels,
+                       Test_Center_IDs, 1), 1, 2, 1, 7);
    Python.Call (Classifier, "plot", Get_Cluster (Test_X, Cluster_Labels,
                 Test_Center_IDs, 1), Get_Cluster (Test_X, Cluster_Labels,
                 Test_Center_IDs, 2));
