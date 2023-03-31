@@ -14,8 +14,7 @@ package body Support_11A is
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
       Test : Boolean := False) return Real_Float_Matrix;
    procedure Initialize_Centres
-     (Data    : Real_Float_Matrix; Num_Clusters : Positive;
-      Centres : out Real_Float_Matrix; Test : Boolean);
+     (Data    : Real_Float_Matrix; Centres : out Real_Float_Matrix; Test : Boolean);
    function Means (Data : Float_Vector_List) return Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
@@ -110,7 +109,7 @@ package body Support_11A is
 
    --  ------------------------------------------------------------------------
    --  kmeans
-   --  Cluster_Means categorizes the data based on their appearance.
+   --  Cluster_Means categorizes the data based on appearance.
    --  This optimizer starts with center locations and assignments of data to
    --  the centers.
    --  It then alternates between two steps.
@@ -126,28 +125,27 @@ package body Support_11A is
    --  or some center is moved.
    --  Such a move decreases the loss the most over all center relocations.
    function Cluster_Means
-     (Data : Real_Float_Matrix; K : Positive; Curr_Loss : out Float;
+     (Data : Real_Float_Matrix; Num_Clusters : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix is
-      --        Routine_Name: constant String := "Support_11A.Cluster_Means ";
-      Centres     : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
-                      (others => (others => 0.0));
-      Centre_Ids  : Integer_Array (Data'Range);
-      Prev_Loss   : Float := 0.0;
+--        Routine_Name    : constant String := "Support_11A.Cluster_Means ";
+      Cluster_Centres : Real_Float_Matrix (1 .. Num_Clusters, Data'Range (2));
+      Centre_Ids      : Integer_Array (Data'Range);
+      Prev_Loss       : Float := 0.0;
    begin
       --  kmeans
-      --  Centres is an array of Num_Cluster data points, each data point
-      --  representing the location of the centre of a cluster
-      --  initialize  k cluster centers by selecting random data points.
-      Initialize_Centres (Data, K, Centres, Test);
+      --  Cluster_Centres is an array of Num_Cluster data points.
+      --  Each data point represents the location of the centre of a cluster
+      --  Initialize  the cluster centers by selecting random data points.
+      Initialize_Centres (Data, Cluster_Centres, Test);
 
       Curr_Loss := 1.0;
       while Prev_Loss /= Curr_Loss loop
          Prev_Loss := Curr_Loss;
-         Curr_Loss := Assign_Data (Data, Centres, Centre_Ids);
-         Centres := Compute_Means (Data, Centre_Ids, K, Test);
+         Curr_Loss := Assign_Data (Data, Cluster_Centres, Centre_Ids);
+         Cluster_Centres := Compute_Means (Data, Centre_Ids, Num_Clusters, Test);
       end loop;
 
-      return Centres;
+      return Cluster_Centres;
 
    end Cluster_Means;
 
@@ -363,10 +361,10 @@ package body Support_11A is
    --  ------------------------------------------------------------------------
 
    procedure Initialize_Centres
-     (Data    : Real_Float_Matrix; Num_Clusters : Positive;
-      Centres : out Real_Float_Matrix; Test : Boolean) is
+     (Data : Real_Float_Matrix; Centres : out Real_Float_Matrix;
+      Test : Boolean) is
    begin
-      for cluster in 1 .. Num_Clusters loop
+      for cluster in Centres'Range loop
          if Test then
             for col in Centres'Range (2) loop
                Centres (cluster, col) := Data (cluster, col);

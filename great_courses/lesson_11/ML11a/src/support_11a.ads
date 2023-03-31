@@ -7,7 +7,7 @@ package Support_11A is
    function Assign_Data (Data, Centres : Real_Float_Matrix;
                          Centre_Ids    : out Integer_Array) return Float;
    function Cluster_Means
-     (Data : Real_Float_Matrix; K : Positive; Curr_Loss : out Float;
+     (Data : Real_Float_Matrix; Num_Clusters : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix;
    function Compute_Ans
      (Labels         : Integer_Matrix; Center_IDs : Integer_Array;
