@@ -407,7 +407,7 @@ package body Support_11A is
    --  Centre_Ids associate each sample with its closest cluster centre
    function Get_Cluster
      (Data            : Real_Float_Matrix;
---        Cluster_Labels,
+      Cluster_Labels,
       Center_IDs      : Integer_Array; Cluster_ID : Natural)
       return Real_Float_Matrix is
       use NL_Types;
@@ -431,11 +431,10 @@ package body Support_11A is
          end if;
       end loop;
 
-      for index in Cluster_IDs.First_Index .. Cluster_IDs.Last_Index loop
-         for col in Data'Range (2) loop
-            Items.Append (Data (Cluster_IDs (index), col));
-         end loop;
-         Result.Append (Items);
+      for row in Data'Range loop
+         if Cluster_IDs.Contains (row) then
+            Items.Insert (Cluster_Labels (row));
+         end if;
       end loop;
 
       return To_Real_Float_Matrix (Result);

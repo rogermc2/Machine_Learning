@@ -23,7 +23,7 @@ package Support_11A is
      (Data         : Real_Float_Matrix; Num_Clusters : Positive;
       Best_Centres : in out Real_Float_Matrix; Best_Loss : in out Float);
    function Get_Cluster (Data               : Real_Float_Matrix;
---                           Cluster_Labels,
+                         Cluster_Labels,
                          Center_IDs         : Integer_Array;
                          Cluster_ID         : Natural)
                          return Real_Float_Matrix;
