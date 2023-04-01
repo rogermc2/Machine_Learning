@@ -413,7 +413,8 @@ package body Support_11A is
       Data_IDs     : ML_Types.Integer_List;
       Data_ID      : Positive;
       Label        : Natural;
-      Items        : Real_Float_List;
+      Item         : Real_Float_Vector (Data'Range (2));
+      Items        : Float_Vector_List;
    begin
       --  Centre_Ids associates each sample (row) of Data with its closest
       --  cluster centre
@@ -436,7 +437,8 @@ package body Support_11A is
       Assert (not Data_IDs.Is_Empty, Routine_Name & "Data_IDs list is empty");
 
       for index in Data_IDs.First_Index .. Data_IDs.Last_Index loop
-         Items.Append (Data (index, 1));
+         Item := Get_Row (Data, Data_IDs (index));
+         Items.Append (Item);
       end loop;
 --        Print_Integer_List (Routine_Name & "Items", Items);
 
