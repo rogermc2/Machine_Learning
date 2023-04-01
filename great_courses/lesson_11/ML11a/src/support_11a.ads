@@ -26,7 +26,7 @@ package Support_11A is
                                 Cluster_Labels,
                                 Center_IDs         : Integer_Array;
                                 Cluster_ID         : Natural)
-                                return ML_Types.Integer_List;
+                                return Real_Float_Matrix;
    function Select_Items (Data  : Integer_Matrix;  Center_IDs : Integer_Array;
                           Index : Natural) return ML_Types.Integer_List;
 

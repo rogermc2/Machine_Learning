@@ -1,4 +1,5 @@
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -407,32 +408,39 @@ package body Support_11A is
      (Data            : Real_Float_Matrix;
       Cluster_Labels,
       Center_IDs      : Integer_Array; Cluster_ID : Natural)
-      return ML_Types.Integer_List is
+      return Real_Float_Matrix is
       Routine_Name : constant String := "Support_11A.Get_Cluster_Labels ";
       Data_IDs     : ML_Types.Integer_List;
-      --        Data_ID      : Positive;
-      Items        : ML_Types.Integer_List;
+      Data_ID      : Positive;
+      Label        : Natural;
+      Items        : Real_Float_List;
    begin
       --  Centre_Ids associates each sample (row) of Data with its closest
       --  cluster centre
       Put_Line (Routine_Name & "Center_IDs length" &
                   Integer'Image (Center_IDs'Length));
       Print_Integer_Array (Routine_Name & "Center_IDs", Center_IDs, 1, 30);
+      Put_Line (Routine_Name & "Cluster_Labels length" &
+                  Integer'Image (Cluster_Labels'Length));
 
       for sample in Center_IDs'Range loop
-         if Center_IDs (sample) = Cluster_ID and then
-           not Data_IDs.Contains (sample) then
-            Data_IDs.Append (sample);
+         Data_ID := Center_IDs (sample);
+         Put_Line (Routine_Name & "Data_ID" & Integer'Image (Data_ID));
+         Label := Cluster_Labels (Data_ID);
+         if Label = Cluster_ID and then
+           not Data_IDs.Contains (Data_ID) then
+            Data_IDs.Append (Data_ID);
          end if;
       end loop;
       Print_Integer_List (Routine_Name & "Data_IDs", Data_IDs);
+      Assert (not Data_IDs.Is_Empty, Routine_Name & "Data_IDs list is empty");
 
       for index in Data_IDs.First_Index .. Data_IDs.Last_Index loop
-         Items.Append (Cluster_Labels (Data_IDs (index)));
+         Items.Append (Data (index, 1));
       end loop;
-      Print_Integer_List (Routine_Name & "Items", Items);
+--        Print_Integer_List (Routine_Name & "Items", Items);
 
-      return Items;
+      return To_Real_Float_Matrix (Items);
 
    end Get_Cluster_Labels;
 

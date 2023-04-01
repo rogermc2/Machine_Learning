@@ -194,31 +194,35 @@ package body Basic_Printing is
       Last     : Positive;
       Col_Last : Positive;
    begin
-      if Finish > 0 and then Finish < aMatrix'Length then
-         Last := Finish;
+      if aMatrix'Length < 1 then
+         Put_Line ("The matrix " & Name & " has zero length.");
       else
-         Last := Integer (aMatrix'Length);
-      end if;
+         if Finish > 0 and then Finish < aMatrix'Length then
+            Last := Finish;
+         else
+            Last := Integer (aMatrix'Length);
+         end if;
 
-      if Col_Finish > 0 and then Col_Finish < aMatrix'Length (2) then
-         Col_Last := Col_Finish;
-      else
-         Col_Last := Integer (aMatrix'Length (2));
-      end if;
+         if Col_Finish > 0 and then Col_Finish < aMatrix'Length (2) then
+            Col_Last := Col_Finish;
+         else
+            Col_Last := Integer (aMatrix'Length (2));
+         end if;
 
-      Put_Line (Name & ": ");
-      if Start >= aMatrix'First and Col_Start >= aMatrix'First (2) then
-         for row in Start .. Last loop
-            for col in Col_Start .. Col_Last loop
-               Put (Float'Image (aMatrix (row, col)) & "  ");
+         Put_Line (Name & ": ");
+         if Start >= aMatrix'First and Col_Start >= aMatrix'First (2) then
+            for row in Start .. Last loop
+               for col in Col_Start .. Col_Last loop
+                  Put (Float'Image (aMatrix (row, col)) & "  ");
+               end loop;
+               New_Line;
             end loop;
-            New_Line;
-         end loop;
 
-      else
-         Put_Line ("Print_Float_Matrix called with invalid start index.");
+         else
+            Put_Line ("Print_Float_Matrix called with invalid start index.");
+         end if;
+         New_Line;
       end if;
-      New_Line;
 
    end Print_Float_Matrix;
 
@@ -311,9 +315,9 @@ package body Basic_Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Float_Vector_List
-     (Name  : String; aList : Float_Vector_List;
+     (Name       : String; aList : Float_Vector_List;
       List_Start : Positive := 1; List_Finish : Natural := 0;
-      Start : Positive := 1; Finish : Natural := 0) is
+      Start      : Positive := 1; Finish : Natural := 0) is
       List_Last  : Positive;
    begin
       Put_Line (Name);
@@ -325,7 +329,7 @@ package body Basic_Printing is
 
       for index in List_Start .. List_Last loop
          Print_Float_Vector ("" & Integer'Image (index),
-                              aList (index), Start, Finish);
+                             aList (index), Start, Finish);
       end loop;
 
    end Print_Float_Vector_List;
@@ -364,9 +368,9 @@ package body Basic_Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_Array_List
-     (Name  : String; aList : Integer_Array_List;
+     (Name       : String; aList : Integer_Array_List;
       List_Start : Positive := 1; List_Finish : Natural := 0;
-      Start : Positive := 1; Finish : Natural := 0) is
+      Start      : Positive := 1; Finish : Natural := 0) is
       List_Last  : Positive;
    begin
       Put_Line (Name);
@@ -391,22 +395,26 @@ package body Basic_Printing is
       Last  : Positive;
       Count : Integer := 1;
    begin
-      if Finish > 0 then
-         Last := Finish;
+      if aList.Is_Empty then
+         Put_Line (Name & " list is empty.");
       else
-         Last := Integer (aList.Length);
-      end if;
-
-      Put_Line (Name & ": ");
-      for Index in Start .. Last loop
-         Put (Integer'Image (aList (Index)) & "  ");
-         Count := Count + 1;
-         if Count > 10 then
-            New_Line;
-            Count := 1;
+         if Finish > 0 then
+            Last := Finish;
+         else
+            Last := Integer (aList.Length);
          end if;
-      end loop;
-      New_Line;
+
+         Put_Line (Name & ": ");
+         for Index in Start .. Last loop
+            Put (Integer'Image (aList (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+         New_Line;
+      end if;
 
    end Print_Integer_List;
 
@@ -655,8 +663,8 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_String_Map (Name : String; aMap : ML_Types.String_Map;
-                                Start : Natural := 0; Finish : Natural := 0) is
+   procedure Print_String_Map (Name  : String; aMap : ML_Types.String_Map;
+                               Start : Natural := 0; Finish : Natural := 0) is
       use ML_Types.String_Map_Package;
       Curs  : Cursor := aMap.First;
       Last  : Natural;
