@@ -114,12 +114,12 @@ begin
 --     end loop;
 
    Print_Float_Matrix ("Get_Cluster_Labels", Get_Cluster_Labels
-                       (Test_X, Cluster_Labels, Test_Center_IDs, 8));
+                       (Test_X, Cluster_Labels, Test_Center_IDs, 1));
    Python.Call (Classifier, "plot",
                 Get_Cluster_Labels (Test_X, Cluster_Labels,
-                  Test_Center_IDs, 8),
+                  Test_Center_IDs, 1),
                 Get_Cluster_Labels (Test_X, Cluster_Labels,
-                  Test_Center_IDs, 4));
+                  Test_Center_IDs, 2));
 
    Python.Close_Module (Classifier);
    Python.Finalize;

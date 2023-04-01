@@ -428,7 +428,9 @@ package body Support_11A is
          Data_ID := Center_IDs (sample);
          Put_Line (Routine_Name & "Data_ID" & Integer'Image (Data_ID));
          Label := Cluster_Labels (Data_ID);
-         if Label = Cluster_ID and then
+         Put_Line (Routine_Name & "Label, Cluster_ID" & Integer'Image (Label) &
+                     Integer'Image (Cluster_ID));
+         if Label - 1 = Cluster_ID and then
            not Data_IDs.Contains (Data_ID) then
             Data_IDs.Append (Data_ID);
          end if;
@@ -440,7 +442,7 @@ package body Support_11A is
          Item := Get_Row (Data, Data_IDs (index));
          Items.Append (Item);
       end loop;
---        Print_Integer_List (Routine_Name & "Items", Items);
+--        Print_Float_Vector_List (Routine_Name & "Items", Items);
 
       return To_Real_Float_Matrix (Items);
 
