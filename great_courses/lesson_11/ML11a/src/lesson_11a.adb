@@ -47,7 +47,7 @@ procedure Lesson_11A is
    Best_Centres     : Real_Float_Matrix :=
                         Cluster_Means (Train_X, Num_Clusters, Best_Loss);
    --  Centre_Ids associate each sample with its closest cluster centre
-   Train_Center_IDs : Integer_Array (Train_X'Range);
+   Train_Center_IDs : Integer_Array (1 .. Num_Labelled);
    Test_Center_IDs  : Integer_Array (Test_X'Range);
    Cluster_Labels   : Integer_Array (1 .. Num_Clusters);
    Ans              : Real_Float_List;
@@ -113,10 +113,13 @@ begin
 --                                 Get_Cluster (Test_X, Test_Center_IDs, index));
 --     end loop;
 
-   Print_Integer_List
-     ("Get_Cluster", Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 1));
-   Python.Call (Classifier, "plot", Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 1),
-                Get_Cluster (Test_X, Cluster_Labels, Test_Center_IDs, 2));
+   Print_Integer_List ("Get_Cluster_Labels", Get_Cluster_Labels
+                       (Test_X, Cluster_Labels, Test_Center_IDs, 8));
+   Python.Call (Classifier, "plot",
+                Get_Cluster_Labels (Test_X, Cluster_Labels,
+                  Test_Center_IDs, 8),
+                Get_Cluster_Labels (Test_X, Cluster_Labels,
+                  Test_Center_IDs, 4));
 
    Python.Close_Module (Classifier);
    Python.Finalize;

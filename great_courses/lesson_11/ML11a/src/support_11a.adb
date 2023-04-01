@@ -1,10 +1,9 @@
 
---  with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use  Basic_Printing;
+with Basic_Printing; use  Basic_Printing;
 
 package body Support_11A is
 
@@ -404,30 +403,38 @@ package body Support_11A is
 
    --  -------------------------------------------------------------------------
    --  Centre_Ids associate each sample with its closest cluster centre
-   function Get_Cluster
+   function Get_Cluster_Labels
      (Data            : Real_Float_Matrix;
       Cluster_Labels,
       Center_IDs      : Integer_Array; Cluster_ID : Natural)
       return ML_Types.Integer_List is
-      --        Routine_Name : constant String := "Support_11A.Get_Cluster ";
-      Cluster_IDs  : ML_Types.Integer_List;
+      Routine_Name : constant String := "Support_11A.Get_Cluster_Labels ";
+      Data_IDs     : ML_Types.Integer_List;
+      --        Data_ID      : Positive;
       Items        : ML_Types.Integer_List;
    begin
-      for index in Center_IDs'Range loop
-         if Center_IDs (index) = Cluster_ID then
-            Cluster_IDs.Append (Center_IDs (index));
-         end if;
-      end loop;
+      --  Centre_Ids associates each sample (row) of Data with its closest
+      --  cluster centre
+      Put_Line (Routine_Name & "Center_IDs length" &
+                  Integer'Image (Center_IDs'Length));
+      Print_Integer_Array (Routine_Name & "Center_IDs", Center_IDs, 1, 30);
 
-      for row in Data'Range loop
-         if Cluster_IDs.Contains (row) then
-            Items.Append (Cluster_Labels (row));
+      for sample in Center_IDs'Range loop
+         if Center_IDs (sample) = Cluster_ID and then
+           not Data_IDs.Contains (sample) then
+            Data_IDs.Append (sample);
          end if;
       end loop;
+      Print_Integer_List (Routine_Name & "Data_IDs", Data_IDs);
+
+      for index in Data_IDs.First_Index .. Data_IDs.Last_Index loop
+         Items.Append (Cluster_Labels (Data_IDs (index)));
+      end loop;
+      Print_Integer_List (Routine_Name & "Items", Items);
 
       return Items;
 
-   end Get_Cluster;
+   end Get_Cluster_Labels;
 
    --  -------------------------------------------------------------------------
 

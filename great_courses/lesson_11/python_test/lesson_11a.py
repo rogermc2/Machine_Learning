@@ -88,7 +88,9 @@ labs = y_train[:nlabeled]
 # print ("labs", labs.shape)
 clust_labs = np.repeat(labs[0],k)
 # print ("clust_labs init", clust_labs)
-# print ("train_centerids", train_centerids)
+print ("train_centerids", train_centerids.shape)
+print ("test_centerids", test_centerids.shape)
+print ("test_centerids", test_centerids)
 
 for i in range(k):
   mode = stats.mode(labs[train_centerids == i]).mode
@@ -99,7 +101,7 @@ for i in range(k):
     clust_labs[i] = mode[0]
 print ("clust_labs", clust_labs)
 ans = ans + [(k,sum(clust_labs[test_centerids] == y_test)/len(y_test))]
-print ("ans length", len (ans))
+# print ("ans length", len (ans))
 # print ("clust_labs[test_centerids] == 0", clust_labs[test_centerids] == 0,0)
 
 # plt.plot(X_test[clust_labs[test_centerids] == 0,0],X_test[clust_labs[test_centerids] == 0,1],'o',color='r')
@@ -107,11 +109,11 @@ print ("ans length", len (ans))
 # plt.show()
 labids, loss = assign_data(X_test, X_train[:nlabeled])
 print(nlabeled, sum(y_train[labids] == y_test)/len(y_test))
-tt_comp = y_train[labids] == y_test
-print("labids", len(labids))
-print("tt comp", tt_comp)
-print("tt comp", tt_comp.shape)
-print("y_test", y_test.shape)
-ttsum=sum(y_train[labids] == y_test)
-print("ttsum", ttsum)
+# tt_comp = y_train[labids] == y_test
+# print("labids", len(labids))
+# print("tt comp", tt_comp)
+# print("tt comp", tt_comp.shape)
+# print("y_test", y_test.shape)
+# ttsum=sum(y_train[labids] == y_test)
+# print("ttsum", ttsum)
 
