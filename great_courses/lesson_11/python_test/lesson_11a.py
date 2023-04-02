@@ -99,10 +99,13 @@ for i in range(k):
   # print ("labs[train_centerids == i]", labs[train_centerids == i])
   if len(mode) > 0:
     clust_labs[i] = mode[0]
-print ("clust_labs", clust_labs)
+# print ("clust_labs", clust_labs)
 ans = ans + [(k,sum(clust_labs[test_centerids] == y_test)/len(y_test))]
 # print ("ans length", len (ans))
-# print ("clust_labs[test_centerids] == 0", clust_labs[test_centerids] == 0,0)
+print ("test_centerids", test_centerids)
+print ("clust_labs", clust_labs)
+print ("clust_labs[test_centerids]", clust_labs[test_centerids])
+print ("clust_labs[test_centerids] == 0", clust_labs[test_centerids] == 0,0)
 
 # plt.plot(X_test[clust_labs[test_centerids] == 0,0],X_test[clust_labs[test_centerids] == 0,1],'o',color='r')
 # plt.plot(X_test[clust_labs[test_centerids] == 1,0],X_test[clust_labs[test_centerids] == 1,1],'o',color='b')

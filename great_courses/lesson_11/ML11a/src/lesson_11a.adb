@@ -113,13 +113,13 @@ begin
 --                                 Get_Cluster (Test_X, Test_Center_IDs, index));
 --     end loop;
 
-   Print_Float_Matrix ("Get_Cluster_Labels", Get_Cluster_Labels
-                       (Test_X, Cluster_Labels, Test_Center_IDs, 1));
+   Print_Float_Matrix ("Get_Cluster_Data", Get_Cluster_Data
+                       (Test_X, Cluster_Labels, Test_Center_IDs, 1), 1, 2, 1, 4);
+   Print_Matrix_Dimensions ("Get_Cluster_Data", Get_Cluster_Data (Test_X,
+                            Cluster_Labels, Test_Center_IDs, 1));
    Python.Call (Classifier, "plot",
-                Get_Cluster_Labels (Test_X, Cluster_Labels,
-                  Test_Center_IDs, 1),
-                Get_Cluster_Labels (Test_X, Cluster_Labels,
-                  Test_Center_IDs, 2));
+                Get_Cluster_Data (Test_X, Cluster_Labels, Test_Center_IDs, 1),
+                Get_Cluster_Data (Test_X, Cluster_Labels, Test_Center_IDs, 2));
 
    Python.Close_Module (Classifier);
    Python.Finalize;
