@@ -8,7 +8,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with Python_API; use Python_API;
 with Tuple_Builder; use Tuple_Builder;
 
@@ -564,7 +564,7 @@ package body Python is
          T_Row : PyObject;
       begin
          Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
-                 "Parse_Tuple Real_Float_List Tuple Size" &
+                 "Python.Parse_Tuple Real_Float_List Tuple Size" &
                    int'Image (PyTuple_Size (Tuple))
                  & " /= Vec Length" & Integer'Image (Vec'Length));
          for row in 1 .. PyTuple_Size (Tuple) loop
@@ -604,7 +604,9 @@ package body Python is
 
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Matrix) is
-
+      Routine_Name : constant String :=
+                       "Python.Parse_Tuple Real_Float_Matrix * 2";
+      
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -615,6 +617,10 @@ package body Python is
       PyParams : PyObject;
       PyResult : PyObject;
    begin
+      Print_Matrix_Dimensions (Routine_Name & "A", A);
+      Print_Matrix_Dimensions (Routine_Name & "B", B);
+      Assert (A'Length > 0, Routine_Name & "matrix A is empty");
+      Assert (B'Length > 0, Routine_Name & "matrix B is empty");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
 

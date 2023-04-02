@@ -1,6 +1,6 @@
 
-with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Assertions; use Ada.Assertions;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -426,19 +426,21 @@ package body Support_11A is
          Data_ID := Center_IDs (sample);
          Label := Cluster_Labels (Data_ID);
 
-         if Label - 1 = Cluster_ID and then
+         if Label + 1 = Cluster_ID and then
            not Selected_IDs.Contains (sample) then
             Selected_IDs.Append (sample);
          end if;
       end loop;
 
-      Assert (not Selected_IDs.Is_Empty,
-              Routine_Name & "Selected_IDs list is empty");
-
-      for index in Selected_IDs.First_Index .. Selected_IDs.Last_Index loop
-         Selected_Row := Get_Row (Data, Selected_IDs (index));
-         Selected_Data.Append (Selected_Row);
-      end loop;
+      if Selected_IDs.Is_Empty then
+         Put_Line (Routine_Name & "Selected_IDs list for cluster" &
+                     Integer'Image (Cluster_ID) & " is empty.");
+      else
+         for index in Selected_IDs.First_Index .. Selected_IDs.Last_Index loop
+            Selected_Row := Get_Row (Data, Selected_IDs (index));
+            Selected_Data.Append (Selected_Row);
+         end loop;
+      end if;
 
       return To_Real_Float_Matrix (Selected_Data);
 

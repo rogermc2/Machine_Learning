@@ -108,24 +108,38 @@ begin
 
    Classifier := Python.Import_File ("lesson_11a");
 
---     for index in 1 .. Num_Clusters loop
---        Print_Matrix_Dimensions ("Cluster" & Integer'Image (index),
---                                 Get_Cluster (Test_X, Test_Center_IDs, index));
---     end loop;
+   for index in 1 .. Num_Clusters loop
+      Put_Line ("Cluster" & Integer'Image (index));
+      Print_Matrix_Dimensions ("", Get_Cluster_Data (Test_X, Cluster_Labels,
+                               Test_Center_IDs, index));
+   end loop;
 
-   Print_Float_Matrix ("Get_Cluster_Data 1", Get_Cluster_Data
-                       (Test_X, Cluster_Labels, Test_Center_IDs, 1),
-                       100, 102, 203, 210);
-   Print_Float_Matrix ("Get_Cluster_Data 2", Get_Cluster_Data
-                       (Test_X, Cluster_Labels, Test_Center_IDs, 2),
-                       100, 102, 203, 210);
-   Print_Matrix_Dimensions ("Get_Cluster_Data 1", Get_Cluster_Data (Test_X,
-                            Cluster_Labels, Test_Center_IDs, 1));
-   Print_Matrix_Dimensions ("Get_Cluster_Data 2", Get_Cluster_Data (Test_X,
-                            Cluster_Labels, Test_Center_IDs, 2));
-   Python.Call (Classifier, "plot",
-                Get_Cluster_Data (Test_X, Cluster_Labels, Test_Center_IDs, 1),
-                Get_Cluster_Data (Test_X, Cluster_Labels, Test_Center_IDs, 2));
+   --     Print_Float_Matrix ("Get_Cluster_Data 7", Get_Cluster_Data
+   --                         (Test_X, Cluster_Labels, Test_Center_IDs, 7),
+   --                         100, 102, 203, 210);
+   --     Print_Float_Matrix ("Get_Cluster_Data 7", Get_Cluster_Data
+   --                         (Test_X, Cluster_Labels, Test_Center_IDs, 8),
+   --                         100, 102, 203, 210);
+   Print_Matrix_Dimensions ("Get_Cluster_Data 7", Get_Cluster_Data (Test_X,
+                            Cluster_Labels, Test_Center_IDs, 7));
+   Print_Matrix_Dimensions ("Get_Cluster_Data 8", Get_Cluster_Data (Test_X,
+                            Cluster_Labels, Test_Center_IDs, 8));
+   declare
+      Cluster_Data_1 : constant Real_Float_Matrix :=
+                         Get_Cluster_Data (Test_X, Cluster_Labels,
+                                           Test_Center_IDs, 7);
+      Cluster_Data_2 : constant Real_Float_Matrix :=
+                         Get_Cluster_Data (Test_X, Cluster_Labels,
+                                           Test_Center_IDs, 8);
+   begin
+      if Cluster_Data_1'Length = 0 then
+         Put_Line (Program_Name & "Cluster_Data_1 is empty.");
+      elsif Cluster_Data_2'Length = 0 then
+         Put_Line (Program_Name & "Cluster_Data_2 is empty.");
+      else
+         Python.Call (Classifier, "plot", Cluster_Data_1, Cluster_Data_2);
+      end if;
+   end;
 
    Python.Close_Module (Classifier);
    Python.Finalize;
