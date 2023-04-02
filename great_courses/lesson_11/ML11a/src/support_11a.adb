@@ -427,8 +427,8 @@ package body Support_11A is
          Label := Cluster_Labels (Data_ID);
 
          if Label - 1 = Cluster_ID and then
-           not Selected_IDs.Contains (Data_ID) then
-            Selected_IDs.Append (Data_ID);
+           not Selected_IDs.Contains (sample) then
+            Selected_IDs.Append (sample);
          end if;
       end loop;
 
