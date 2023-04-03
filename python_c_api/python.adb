@@ -8,7 +8,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Python_API; use Python_API;
 with Tuple_Builder; use Tuple_Builder;
 
@@ -617,8 +617,6 @@ package body Python is
       PyParams : PyObject;
       PyResult : PyObject;
    begin
-      Print_Matrix_Dimensions (Routine_Name & "A", A);
-      Print_Matrix_Dimensions (Routine_Name & "B", B);
       Assert (A'Length > 0, Routine_Name & "matrix A is empty");
       Assert (B'Length > 0, Routine_Name & "matrix B is empty");
       PyParams :=

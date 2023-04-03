@@ -426,6 +426,14 @@ package body Support_11A is
          Data_ID := Center_IDs (sample);
          Label := Cluster_Labels (Data_ID);
 
+--           if Label + 1 = Cluster_ID then
+--              Put_Line (Routine_Name & "Cluster_ID found, sample row" &
+--                          Integer'Image (sample));
+--              if not Selected_IDs.Contains (sample) then
+--                 Put_Line (Routine_Name & "adding sample to Selected_IDs");
+--                 Selected_IDs.Append (sample);
+--              end if;
+--           end if;
          if Label + 1 = Cluster_ID and then
            not Selected_IDs.Contains (sample) then
             Selected_IDs.Append (sample);
@@ -436,15 +444,16 @@ package body Support_11A is
          Put_Line (Routine_Name & "Selected_IDs list for cluster" &
                      Integer'Image (Cluster_ID) & " is empty.");
       else
+         Print_Integer_List (Routine_Name & "Selected_IDs", Selected_IDs);
          for index in Selected_IDs.First_Index .. Selected_IDs.Last_Index loop
             Selected_Row := Get_Row (Data, Selected_IDs (index));
 --              Selected_Cols (1) := Selected_Row (Col_1);
 --              Selected_Cols (2) := Selected_Row (Col_2);
+            Selected_Data.Append (Selected_Row);
          end loop;
-         Selected_Data.Append (Selected_Row);
       end if;
-      Print_Float_Matrix (Routine_Name & "Selected_Data" ,
-                          To_Real_Float_Matrix (Selected_Data), 1, 2, 120, 126);
+--        Print_Matrix_Dimensions (Routine_Name & "Selected_Data",
+--                                 To_Real_Float_Matrix (Selected_Data));
 
       return To_Real_Float_Matrix (Selected_Data);
 
