@@ -39,6 +39,8 @@ procedure Lesson_11A is
                         Slice (Train_X, 1, Num_Labelled);
    Labels           : constant Integer_Matrix :=
                         Slice (Train_Y, 1, Num_Labelled);
+   Plot_Col_1       : constant Positive := 216;
+   Plot_Col_2       : constant Positive := 217;
    Loss             : Float;
    Best_Loss        : Float;
    --  Unsupervised learning
@@ -112,23 +114,24 @@ begin
                                Test_Center_IDs, index, 1, 2));
    end loop;
 
-   --     Print_Float_Matrix ("Get_Plot_Data 7", Get_Plot_Data
-   --                         (Test_X, Cluster_Labels, Test_Center_IDs, 7),
-   --                         100, 102, 203, 210);
-   --     Print_Float_Matrix ("Get_Plot_Data 7", Get_Plot_Data
-   --                         (Test_X, Cluster_Labels, Test_Center_IDs, 8),
-   --                         100, 102, 203, 210);
+   Print_Float_Matrix ("Get_Plot_Data 1", Get_Plot_Data (Test_X,
+                       Cluster_Labels, Test_Center_IDs, 1,
+                       Plot_Col_1, Plot_Col_2));
    Print_Matrix_Dimensions ("Get_Plot_Data 1", Get_Plot_Data (Test_X,
-                            Cluster_Labels, Test_Center_IDs, 1, 120, 121));
+                            Cluster_Labels, Test_Center_IDs, 1,
+                       Plot_Col_1, Plot_Col_2));
    Print_Matrix_Dimensions ("Get_Plot_Data 2", Get_Plot_Data (Test_X,
-                            Cluster_Labels, Test_Center_IDs, 2, 120, 121));
+                            Cluster_Labels, Test_Center_IDs, 2,
+                       Plot_Col_1, Plot_Col_2));
    declare
       Cluster_Data_1 : constant Real_Float_Matrix :=
                          Get_Plot_Data (Test_X, Cluster_Labels,
-                                        Test_Center_IDs, 1, 120, 121);
+                                        Test_Center_IDs, 1, Plot_Col_1,
+                                        Plot_Col_2);
       Cluster_Data_2 : constant Real_Float_Matrix :=
                          Get_Plot_Data (Test_X, Cluster_Labels,
-                                        Test_Center_IDs, 2, 120, 121);
+                                        Test_Center_IDs, 2, Plot_Col_1,
+                                        Plot_Col_2);
    begin
       if Cluster_Data_1'Length = 0 then
          Put_Line (Program_Name & "Cluster_Data_1 is empty.");

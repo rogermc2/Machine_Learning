@@ -444,16 +444,25 @@ package body Support_11A is
          Put_Line (Routine_Name & "Selected_IDs list for cluster" &
                      Integer'Image (Cluster_ID) & " is empty.");
       else
-         Print_Integer_List (Routine_Name & "Selected_IDs", Selected_IDs);
          for index in Selected_IDs.First_Index .. Selected_IDs.Last_Index loop
             Selected_Row := Get_Row (Data, Selected_IDs (index));
---              Selected_Cols (1) := Selected_Row (Col_1);
---              Selected_Cols (2) := Selected_Row (Col_2);
-            Selected_Data.Append (Selected_Row);
+            Selected_Cols (1) := Selected_Row (Col_1);
+            Selected_Cols (2) := Selected_Row (Col_2);
+--              if Selected_Row (Col_1) > 0.0 then
+--                 Put_Line (Routine_Name & "Row, Selected_Row (Col_1): " &
+--                             Integer'Image (Selected_IDs (index)) & "   " &
+--                             Float'Image (Selected_Row (Col_1)));
+--              end if;
+--              if Selected_Row (Col_2) > 0.0 then
+--                 Put_Line (Routine_Name & "Row, Selected_Row (Col_2): " &
+--                             Integer'Image (Selected_IDs (index)) & "   " &
+--                             Float'Image (Selected_Row (Col_2)));
+--              end if;
+            Selected_Data.Append (Selected_Cols);
          end loop;
       end if;
---        Print_Matrix_Dimensions (Routine_Name & "Selected_Data",
---                                 To_Real_Float_Matrix (Selected_Data));
+      Print_Matrix_Dimensions (Routine_Name & "Selected_Data",
+                               To_Real_Float_Matrix (Selected_Data));
 
       return To_Real_Float_Matrix (Selected_Data);
 
