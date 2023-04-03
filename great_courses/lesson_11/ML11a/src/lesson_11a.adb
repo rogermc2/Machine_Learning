@@ -61,8 +61,6 @@ begin
 
    --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
-   --     Print_Float_Matrix (Program_Name & "Initial Best_Centres",
-   --                         Best_Centres, 1, Num_Clusters, 210, 216);
 
    --     for rep in 1 .. 8 loop
    for rep in 1 .. 1 loop
@@ -110,27 +108,27 @@ begin
 
    for index in 1 .. Num_Clusters loop
       Put_Line ("Cluster" & Integer'Image (index));
-      Print_Matrix_Dimensions ("", Get_Cluster_Data (Test_X, Cluster_Labels,
-                               Test_Center_IDs, index));
+      Print_Matrix_Dimensions ("", Get_Plot_Data (Test_X, Cluster_Labels,
+                               Test_Center_IDs, index, 1, 2));
    end loop;
 
-   --     Print_Float_Matrix ("Get_Cluster_Data 7", Get_Cluster_Data
+   --     Print_Float_Matrix ("Get_Plot_Data 7", Get_Plot_Data
    --                         (Test_X, Cluster_Labels, Test_Center_IDs, 7),
    --                         100, 102, 203, 210);
-   --     Print_Float_Matrix ("Get_Cluster_Data 7", Get_Cluster_Data
+   --     Print_Float_Matrix ("Get_Plot_Data 7", Get_Plot_Data
    --                         (Test_X, Cluster_Labels, Test_Center_IDs, 8),
    --                         100, 102, 203, 210);
-   Print_Matrix_Dimensions ("Get_Cluster_Data 7", Get_Cluster_Data (Test_X,
-                            Cluster_Labels, Test_Center_IDs, 7));
-   Print_Matrix_Dimensions ("Get_Cluster_Data 8", Get_Cluster_Data (Test_X,
-                            Cluster_Labels, Test_Center_IDs, 8));
+   Print_Matrix_Dimensions ("Get_Plot_Data 1", Get_Plot_Data (Test_X,
+                            Cluster_Labels, Test_Center_IDs, 1, 120, 121));
+   Print_Matrix_Dimensions ("Get_Plot_Data 2", Get_Plot_Data (Test_X,
+                            Cluster_Labels, Test_Center_IDs, 2, 120, 121));
    declare
       Cluster_Data_1 : constant Real_Float_Matrix :=
-                         Get_Cluster_Data (Test_X, Cluster_Labels,
-                                           Test_Center_IDs, 7);
+                         Get_Plot_Data (Test_X, Cluster_Labels,
+                                        Test_Center_IDs, 1, 120, 121);
       Cluster_Data_2 : constant Real_Float_Matrix :=
-                         Get_Cluster_Data (Test_X, Cluster_Labels,
-                                           Test_Center_IDs, 8);
+                         Get_Plot_Data (Test_X, Cluster_Labels,
+                                        Test_Center_IDs, 2, 120, 121);
    begin
       if Cluster_Data_1'Length = 0 then
          Put_Line (Program_Name & "Cluster_Data_1 is empty.");

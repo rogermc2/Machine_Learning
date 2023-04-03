@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use  Basic_Printing;
+with Basic_Printing; use  Basic_Printing;
 
 package body Support_11A is
 
@@ -404,16 +404,16 @@ package body Support_11A is
 
    --  -------------------------------------------------------------------------
    --  Centre_Ids associate each sample with its closest cluster centre
-   function Get_Cluster_Data
-     (Data            : Real_Float_Matrix;
-      Cluster_Labels,
-      Center_IDs      : Integer_Array; Cluster_ID : Natural)
-      return Real_Float_Matrix is
-      Routine_Name  : constant String := "Support_11A.Get_Cluster_Data ";
+   function Get_Plot_Data
+     (Data         : Real_Float_Matrix; Cluster_Labels : Integer_Array;
+      Center_IDs   : Integer_Array; Cluster_ID : Natural;
+      Col_1, Col_2 : Positive) return Real_Float_Matrix is
+      Routine_Name  : constant String := "Support_11A.Get_Plot_Data ";
       Selected_IDs  : ML_Types.Integer_List;
       Data_ID       : Positive;
       Label         : Natural;
       Selected_Row  : Real_Float_Vector (Data'Range (2));
+      Selected_Cols : Real_Float_Vector (1 .. 2);
       Selected_Data : Float_Vector_List;
    begin
       --  Centre_Ids associates each sample (row) of Data with its closest
@@ -438,13 +438,17 @@ package body Support_11A is
       else
          for index in Selected_IDs.First_Index .. Selected_IDs.Last_Index loop
             Selected_Row := Get_Row (Data, Selected_IDs (index));
-            Selected_Data.Append (Selected_Row);
+--              Selected_Cols (1) := Selected_Row (Col_1);
+--              Selected_Cols (2) := Selected_Row (Col_2);
          end loop;
+         Selected_Data.Append (Selected_Row);
       end if;
+      Print_Float_Matrix (Routine_Name & "Selected_Data" ,
+                          To_Real_Float_Matrix (Selected_Data), 1, 2, 120, 126);
 
       return To_Real_Float_Matrix (Selected_Data);
 
-   end Get_Cluster_Data;
+   end Get_Plot_Data;
 
    --  -------------------------------------------------------------------------
 

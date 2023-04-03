@@ -22,11 +22,10 @@ package Support_11A is
    procedure Get_Best_Centres
      (Data         : Real_Float_Matrix; Num_Clusters : Positive;
       Best_Centres : in out Real_Float_Matrix; Best_Loss : in out Float);
-   function Get_Cluster_Data (Data            : Real_Float_Matrix;
-                              Cluster_Labels,
-                              Center_IDs      : Integer_Array;
-                              Cluster_ID      : Natural)
-                              return Real_Float_Matrix;
+   function Get_Plot_Data
+     (Data         : Real_Float_Matrix; Cluster_Labels : Integer_Array;
+      Center_IDs   : Integer_Array; Cluster_ID : Natural;
+      Col_1, Col_2 : Positive) return Real_Float_Matrix ;
    function Select_Items (Data  : Integer_Matrix;  Center_IDs : Integer_Array;
                           Index : Natural) return ML_Types.Integer_List;
 
