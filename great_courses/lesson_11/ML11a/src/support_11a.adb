@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use  Basic_Printing;
+--  with Basic_Printing; use  Basic_Printing;
 
 package body Support_11A is
 
@@ -461,8 +461,8 @@ package body Support_11A is
             Selected_Data.Append (Selected_Cols);
          end loop;
       end if;
-      Print_Matrix_Dimensions (Routine_Name & "Selected_Data",
-                               To_Real_Float_Matrix (Selected_Data));
+--        Print_Matrix_Dimensions (Routine_Name & "Selected_Data",
+--                                 To_Real_Float_Matrix (Selected_Data));
 
       return To_Real_Float_Matrix (Selected_Data);
 

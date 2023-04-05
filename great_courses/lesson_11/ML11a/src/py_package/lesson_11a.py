@@ -1,8 +1,13 @@
+import numpy as np
 from matplotlib import pyplot as plt
 
-def plot(data1, data2):
-    print("data1 x points", data1[11][0], data1[12][0], data1[13][0], data1[14][0], data1[15][0], data2[16][0], data2[17][0], data2[18][0], data2[19][0], data1[20][0])
-    print("data2 x points", data2[11][0], data2[12][0], data2[13][0], data2[14][0], data1[15][0], data2[16][0], data2[17][0], data2[18][0], data2[19][0], data1[20][0])
-    plt.plot(data1[:][0], data1[:][1],'o',color='r')
-    plt.plot(data2[:][0], data2[:][1],'o',color='b')
+def plot(X, Y):
+    print("plot x points", X[11][0], X[12][0], X[13][0], X[14][0], X[15][0], Y[16][0], Y[17][0], Y[18][0], Y[19][0], X[20][0])
+    print("plot X y points", X[11][1], X[12][1], X[13][1], X[14][1], X[15][1], Y[16][1], Y[17][1], Y[18][1], Y[19][1], X[20][1])
+    print("plot Y x points", Y[11][0], Y[12][0], Y[13][0], Y[14][0], X[15][0], Y[16][0], Y[17][0], Y[18][0], Y[19][0], X[20][0])
+    print("plot Y y points", Y[11][1], Y[12][1], Y[13][1], Y[14][1], X[15][1], Y[16][1], Y[17][1], Y[18][1], Y[19][1], X[20][1])
+    plt.plot(X[:][0], X[:][1],'o',color='r')
+    plt.plot(Y[:][0], Y[:][1],'o',color='b')
+    plt.xticks(np.arange(np.min(X), np.max(X) + 20, 20.0))
+    plt.yticks(np.arange(np.min(Y), np.max(Y) + 20, 20.0))
     plt.show()
