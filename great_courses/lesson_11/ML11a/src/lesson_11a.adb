@@ -64,8 +64,8 @@ begin
    --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
-   --     for rep in 1 .. 8 loop
-   for rep in 1 .. 1 loop
+   for rep in 1 .. 8 loop
+--     for rep in 1 .. 1 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Get_Best_Centres (Train_X, Num_Clusters, Best_Centres, Best_Loss);
    end loop;
