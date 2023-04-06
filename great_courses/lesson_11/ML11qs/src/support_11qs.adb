@@ -1,4 +1,6 @@
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Python_CLF;
 
 package body Support_11QS is
@@ -7,7 +9,8 @@ package body Support_11QS is
      (Classifier : Python.Module; Num_Clusters : Positive;
       Train_X    : Real_Float_Matrix; Train_Y : Integer_Matrix) return Float is
       use Python_API;
-      Clr    : constant PyObject := Python.Call (Classifier, "clust",
+      Routine_Name : constant String := "Support_11QS.Try_Clusterer ";
+      Clr          : constant PyObject := Python.Call (Classifier, "clust",
                                                  Num_Clusters);
       Result : Float;
    begin
@@ -18,6 +21,8 @@ package body Support_11QS is
          Cluster_Labels : Integer_Array (1 .. Num_Clusters) := (others => -1);
          Y_Guess        : Integer_Array (Train_IDs'Range);
       begin
+         Put_Line (Routine_Name & "Train_IDs:" &
+                     Integer'Image (Train_IDs'Length));
          --  Request one label per cluster and make an interim dataset out of
          --  X_train, y_guess.
          for index in Cluster_Labels'Range loop
