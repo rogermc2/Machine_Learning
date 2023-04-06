@@ -13,7 +13,8 @@ package body Support_11A is
      (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
       Test : Boolean := False) return Real_Float_Matrix;
    procedure Initialize_Centres
-     (Data    : Real_Float_Matrix; Centres : out Real_Float_Matrix; Test : Boolean);
+     (Data    : Real_Float_Matrix; Centres : out Real_Float_Matrix;
+      Test    : Boolean := False);
    function Means (Data : Float_Vector_List) return Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
@@ -104,6 +105,7 @@ package body Support_11A is
 
       for index in Min_Vals'Range loop
          Loss := Loss + Min_Vals (index);
+         Centre_Ids (index) := Centre_Ids (index) - 1;
       end loop;
 
       return Loss;
@@ -127,10 +129,10 @@ package body Support_11A is
    --  data points, in which case its at a local minimum of the loss function
    --  or some center is moved.
    --  Such a move decreases the loss the most over all center relocations.
-   function Cluster_Means
+   function Cluster_Means  --  kmeans
      (Data : Real_Float_Matrix; Num_Clusters : Positive; Curr_Loss : out Float;
       Test : Boolean := False) return Real_Float_Matrix is
-      --        Routine_Name    : constant String := "Support_11A.Cluster_Means ";
+--        Routine_Name    : constant String := "Support_11A.Cluster_Means ";
       Cluster_Centres : Real_Float_Matrix (1 .. Num_Clusters, Data'Range (2));
       Centre_Ids      : Integer_Array (Data'Range);
       Prev_Loss       : Float := 0.0;
@@ -172,8 +174,6 @@ package body Support_11A is
             Max := A (index);
          end if;
       end loop;
-      --        Put_Line (Routine_Name & "Max, Min: " & Integer'Image (Max) & " " &
-      --                    Integer'Image (Min));
 
       Int_Range := Max - Min + 1;
       declare
@@ -299,7 +299,7 @@ package body Support_11A is
          --  Cols is an array of all points having the current center id.
          Cols.Clear;
          for index in Centre_Ids'Range loop            --  j
-            if Centre_Ids (index) = cluster then
+            if Centre_Ids (index) + 1 = cluster then
                --  Get data for Data row (cluster)
                Cols.Append (Get_Row (Data, index));
             end if;
@@ -367,7 +367,7 @@ package body Support_11A is
 
    procedure Initialize_Centres
      (Data : Real_Float_Matrix; Centres : out Real_Float_Matrix;
-      Test : Boolean) is
+      Test : Boolean := False) is
    begin
       for cluster in Centres'Range loop
          if Test then
@@ -423,17 +423,8 @@ package body Support_11A is
       --      if Cluster_Label is equal to the required Cluster_ID
       --        Add Center_ID to Selected_IDs list
       for sample in Center_IDs'Range loop
-         Data_ID := Center_IDs (sample);
+         Data_ID := Center_IDs (sample) + 1;
          Label := Cluster_Labels (Data_ID);
-
---           if Label + 1 = Cluster_ID then
---              Put_Line (Routine_Name & "Cluster_ID found, sample row" &
---                          Integer'Image (sample));
---              if not Selected_IDs.Contains (sample) then
---                 Put_Line (Routine_Name & "adding sample to Selected_IDs");
---                 Selected_IDs.Append (sample);
---              end if;
---           end if;
          if Label + 1 = Cluster_ID and then
            not Selected_IDs.Contains (sample) then
             Selected_IDs.Append (sample);
@@ -448,21 +439,9 @@ package body Support_11A is
             Selected_Row := Get_Row (Data, Selected_IDs (index));
             Selected_Cols (1) := Selected_Row (Col_1);
             Selected_Cols (2) := Selected_Row (Col_2);
---              if Selected_Row (Col_1) > 0.0 then
---                 Put_Line (Routine_Name & "Row, Selected_Row (Col_1): " &
---                             Integer'Image (Selected_IDs (index)) & "   " &
---                             Float'Image (Selected_Row (Col_1)));
---              end if;
---              if Selected_Row (Col_2) > 0.0 then
---                 Put_Line (Routine_Name & "Row, Selected_Row (Col_2): " &
---                             Integer'Image (Selected_IDs (index)) & "   " &
---                             Float'Image (Selected_Row (Col_2)));
---              end if;
             Selected_Data.Append (Selected_Cols);
          end loop;
       end if;
---        Print_Matrix_Dimensions (Routine_Name & "Selected_Data",
---                                 To_Real_Float_Matrix (Selected_Data));
 
       return To_Real_Float_Matrix (Selected_Data);
 

@@ -43,7 +43,6 @@ procedure Lesson_11A is
    Plot_Col_2       : constant Positive := 101;
    Loss             : Float;
    Best_Loss        : Float;
-   --  Unsupervised learning
    --  Best_Centres are Num_Clusters data points, each data point representing
    --  the location of the centre of a cluster
    Best_Centres     : Real_Float_Matrix :=
@@ -64,17 +63,18 @@ begin
    --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
-   --     for rep in 1 .. 8 loop
-   for rep in 1 .. 1 loop
+   for rep in 1 .. 8 loop
+--     for rep in 1 .. 1 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Get_Best_Centres (Train_X, Num_Clusters, Best_Centres, Best_Loss);
    end loop;
    --  Best_Centres are Num_Clusters data points, each data point representing
    --  the location of the centre of a cluster
-   Print_Float_Matrix (Program_Name & "Final Best_Centres",
-                       Best_Centres, 1, Num_Clusters, 210, 216);
+--     Print_Float_Matrix (Program_Name & "Final Best_Centres",
+--                         Best_Centres, 1, Num_Clusters, 210, 216);
    Put_Line (Program_Name & "Best_Loss: " & Float'Image (Best_Loss));
-   --  Assign test points to discovered clusters
+   --  Test the clustering that was discovered.
+   --  Assign test points, Test_Center_IDs, to discovered clusters
    --  Centerids is an array with one integer for each datapoint that indicates
    --  which of the centers is closest.
    --  The current loss is the minimum squared distance summed over all data
@@ -84,9 +84,9 @@ begin
    --  A loss function is defined as the total squared distances between the
    --  points and their respective centers.
    Loss := Assign_Data_To_Clusters (Test_X, Best_Centres, Test_Center_IDs);
-   Put_Line (Program_Name & "Test_Center_IDs length: " &
-               Integer'Image (Test_Center_IDs'Length));
-   Print_Integer_Array ("Test_Center_IDs", Test_Center_IDs, 1, 20);
+--     Put_Line (Program_Name & "Test_Center_IDs length: " &
+--                 Integer'Image (Test_Center_IDs'Length));
+--     Print_Integer_Array ("Test_Center_IDs", Test_Center_IDs, 1, 20);
    Put_Line (Program_Name & "Test Loss: " & Float'Image (Loss));
 
    --  Use the labeled examples to label the clusters
@@ -114,9 +114,9 @@ begin
                                Test_Center_IDs, index, 1, 2));
    end loop;
 
-   Print_Float_Matrix ("Get_Plot_Data 1", Get_Plot_Data (Test_X,
-                       Cluster_Labels, Test_Center_IDs, 1,
-                       Plot_Col_1, Plot_Col_2));
+--     Print_Float_Matrix ("Get_Plot_Data 1", Get_Plot_Data (Test_X,
+--                         Cluster_Labels, Test_Center_IDs, 1,
+--                         Plot_Col_1, Plot_Col_2));
    Print_Matrix_Dimensions ("Get_Plot_Data 1", Get_Plot_Data (Test_X,
                             Cluster_Labels, Test_Center_IDs, 1,
                             Plot_Col_1, Plot_Col_2));

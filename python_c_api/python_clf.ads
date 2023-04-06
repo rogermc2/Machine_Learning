@@ -31,6 +31,8 @@ package Python_CLF is
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : PyObject; A : Real_Float_List);
    procedure Call (M   : Python.Module; Function_Name : String;
+                   CLF : PyObject; A : Real_Float_Matrix);
+   procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : PyObject; A : Real_Float_Matrix;
                    B   : Boolean_Array); 
    function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
