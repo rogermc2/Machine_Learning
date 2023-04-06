@@ -107,9 +107,9 @@ print ("clust_labs", clust_labs)
 print ("clust_labs[test_centerids]", clust_labs[test_centerids])
 print ("clust_labs[test_centerids] == 0", clust_labs[test_centerids] == 0,0)
 
-# plt.plot(X_test[clust_labs[test_centerids] == 0,0],X_test[clust_labs[test_centerids] == 0,1],'o',color='r')
-# plt.plot(X_test[clust_labs[test_centerids] == 1,0],X_test[clust_labs[test_centerids] == 1,1],'o',color='b')
-# plt.show()
+plt.plot(X_test[clust_labs[test_centerids] == 0,0],X_test[clust_labs[test_centerids] == 0,1],'o',color='r')
+plt.plot(X_test[clust_labs[test_centerids] == 1,0],X_test[clust_labs[test_centerids] == 1,1],'o',color='b')
+plt.show()
 labids, loss = assign_data(X_test, X_train[:nlabeled])
 print(nlabeled, sum(y_train[labids] == y_test)/len(y_test))
 # tt_comp = y_train[labids] == y_test

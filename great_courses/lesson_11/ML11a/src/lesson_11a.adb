@@ -39,8 +39,8 @@ procedure Lesson_11A is
                         Slice (Train_X, 1, Num_Labelled);
    Labels           : constant Integer_Matrix :=
                         Slice (Train_Y, 1, Num_Labelled);
-   Plot_Col_1       : constant Positive := 216;
-   Plot_Col_2       : constant Positive := 217;
+   Plot_Col_1       : constant Positive := 100;
+   Plot_Col_2       : constant Positive := 101;
    Loss             : Float;
    Best_Loss        : Float;
    --  Unsupervised learning
@@ -64,8 +64,8 @@ begin
    --     Print_Integer_Matrix ("Labels", Labels);
    Put_Line (Program_Name & "Initial Loss: " & Float'Image (Best_Loss));
 
-   for rep in 1 .. 8 loop
---     for rep in 1 .. 1 loop
+   --     for rep in 1 .. 8 loop
+   for rep in 1 .. 1 loop
       Put_Line (Program_Name & "Rep" & Integer'Image (rep) & ":");
       Get_Best_Centres (Train_X, Num_Clusters, Best_Centres, Best_Loss);
    end loop;
@@ -119,10 +119,10 @@ begin
                        Plot_Col_1, Plot_Col_2));
    Print_Matrix_Dimensions ("Get_Plot_Data 1", Get_Plot_Data (Test_X,
                             Cluster_Labels, Test_Center_IDs, 1,
-                       Plot_Col_1, Plot_Col_2));
+                            Plot_Col_1, Plot_Col_2));
    Print_Matrix_Dimensions ("Get_Plot_Data 2", Get_Plot_Data (Test_X,
                             Cluster_Labels, Test_Center_IDs, 2,
-                       Plot_Col_1, Plot_Col_2));
+                            Plot_Col_1, Plot_Col_2));
    declare
       Cluster_Data_1 : constant Real_Float_Matrix :=
                          Get_Plot_Data (Test_X, Cluster_Labels,
@@ -145,9 +145,11 @@ begin
    Python.Close_Module (Classifier);
    Python.Finalize;
 
-   --     Loss := Assign_Data (Test_X, X_Labelled, Label_IDs);
-   --     Put_Line ((Program_Name & "Labelled: " &
-   --                 Float'Image (Compute_Labelled (Train_Y, Test_Y, Label_IDs))));
+   Loss := Assign_Data_To_Clusters (Test_X, X_Labelled, Test_Center_IDs);
+   Put_Line (Program_Name & "Loss: " & Float'Image (Loss));
+   Put_Line ((Program_Name & "Labelled: " &
+               Float'Image (Compute_Labelled
+               (Train_Y, Test_Y, Test_Center_IDs))));
 
    Put_Line ("----------------------------------------------");
 
