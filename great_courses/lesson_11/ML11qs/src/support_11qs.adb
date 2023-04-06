@@ -11,6 +11,12 @@ package body Support_11QS is
       Result : Float;
    begin
       Python_CLF.Call (Classifier, "fit", Clr, Train_X);
+      declare
+         Train_IDS : constant Integer_Array :=
+           Python_CLF.Call (Classifier, "copy_labels", Clr);
+      begin
+         null;
+      end;
       return Result;
 
    end Try_Clusterer;

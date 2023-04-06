@@ -11,6 +11,9 @@ def clust (num_clusters):
 
 def fit (clf, X_train):
     clf.fit(X_train)
+    
+def copy_labels (clf):
+    return clf.labels_.copy()
 
 def plot(data1, data2):
     dp1 = np.array (data1)
