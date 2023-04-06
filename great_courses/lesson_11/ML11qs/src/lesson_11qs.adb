@@ -5,7 +5,6 @@ with Basic_Printing; use  Basic_Printing;
 with CSV_Data_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
-with Python_API; use Python_API;
 
 --  with Support_11A; use Support_11A;
 with Support_11QS; use Support_11QS;
@@ -27,7 +26,6 @@ procedure Lesson_11QS is
                         "../../../neural_learning/datasets/mnist_784";
    Train_Size       : constant Positive := 4700;
    Test_Size        : constant Positive := 2300;
-   Num_Labelled     : constant Positive := 20;   --  20
    Num_Clusters     : constant Positive := 10;   --  k 10
    Data             : constant Base_Split_State :=
                         Get_Split_State (Dataset_Name, Digits_Data, Train_Size,
@@ -36,16 +34,9 @@ procedure Lesson_11QS is
    Train_X          : constant Real_Float_Matrix := Data.Train_X;
    Train_Y          : constant Integer_Matrix := Data.Train_Y;
    Test_X           : constant Real_Float_Matrix := Data.Test_X;
-   Test_Y           : constant Integer_Matrix := Data.Test_Y;
-   X_Labelled       : constant Real_Float_Matrix :=
-                        Slice (Train_X, 1, Num_Labelled);
-   Labels           : constant Integer_Matrix :=
-                        Slice (Train_Y, 1, Num_Labelled);
-   Plot_Col_1       : constant Positive := 100;
-   Plot_Col_2       : constant Positive := 101;
+--     Test_Y           : constant Integer_Matrix := Data.Test_Y;
 
    Classifier       : Python.Module;
-   Clusterer        : PyObject;
    Loss             : Float;
 begin
    Put_Line (Program_Name);
@@ -56,8 +47,7 @@ begin
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_11qs");
-   Clusterer := Python.Call (Classifier, "KMeans");
-   Loss := Try_Clusterer (Classifier, Num_Clusters, Clusterer, Train_X);
+   Loss := Try_Clusterer (Classifier, Num_Clusters, Train_X, Train_Y);
 
    Python.Close_Module (Classifier);
    Python.Finalize;
