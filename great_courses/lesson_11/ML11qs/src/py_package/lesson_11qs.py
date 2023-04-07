@@ -5,11 +5,14 @@ from sklearn.neighbors import KNeighborsClassifier
 
 import numpy as np
 
-def clust (num_clusters):
-    return sklearn.cluster.KMeans(n_clusters=num_clusters)
+#def clust (num_clusters):
+#    return sklearn.cluster.KMeans(n_clusters=num_clusters)
 
 def kmeans_fit (num_clusters, X):
-    return KMeans(n_clusters=num_clusters,n_init="auto").fit(X)
+    kmeans = KMeans(n_clusters=num_clusters).fit(X)
+    return kmeans
     
-def copy_labels (clf):
-    return clf.labels_.copy()
+def labels (kmeans):
+#    print ("labels kmeans.labels_", kmeans.labels_.shape)
+    print ("labels kmeans.labels_", kmeans.labels_)
+    return tuple(kmeans.labels_)

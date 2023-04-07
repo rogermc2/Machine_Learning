@@ -13,21 +13,20 @@ package body Support_11QS is
       K_Means      : constant PyObject := Python.Call (Classifier, "kmeans_fit",
                                                        Num_Clusters, Train_X);
       Train_IDs    : constant Integer_Array :=
-        Python_CLF.Call (Classifier, "copy_labels", K_Means);
+        Python_CLF.Call (Classifier, "labels", K_Means);
       Cluster_Labels : Integer_Array (1 .. Num_Clusters) := (others => -1);
       Y_Guess        : Integer_Array (Train_IDs'Range);
       Result : Float;
    begin
-      Put_Line (Routine_Name & "Train_IDs:" &
-                  Integer'Image (Train_IDs'Length));
       --  Request one label per cluster and make an interim dataset out of
       --  X_train, y_guess.
+      --  Train_IDs values start at 0.
       for index in Cluster_Labels'Range loop
-         Cluster_Labels (index) := Train_Y (Train_IDs (index), 1);
+         Cluster_Labels (index) := Train_Y (Train_IDs (index) + 1, 1);
       end loop;
 
       for index in Y_Guess'Range loop
-         Y_Guess (index) := Cluster_Labels (Train_IDs (index));
+         Y_Guess (index) := Cluster_Labels (Train_IDs (index) + 1);
       end loop;
 
       return Result;

@@ -255,6 +255,32 @@ package body Python is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M : Module; Function_Name : String; A : Integer;
+                  B : ML_Arrays_And_Matrices.Real_Float_Matrix)
+                  return Python_API.PyObject is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; A : int;
+                              T1      : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("iO"), int (A), A_Tuple);
+      PyResult := Call_Object (F, PyParams);
+      
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    procedure Call (M : Module; Function_Name : String; A, B : Integer) is
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
