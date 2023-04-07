@@ -10,29 +10,25 @@ package body Support_11QS is
       Train_X    : Real_Float_Matrix; Train_Y : Integer_Matrix) return Float is
       use Python_API;
       Routine_Name : constant String := "Support_11QS.Try_Clusterer ";
-      Clr          : constant PyObject := Python.Call (Classifier, "clust",
-                                                 Num_Clusters);
+      K_Means      : constant PyObject := Python.Call (Classifier, "kmeans_fit",
+                                                       Num_Clusters, Train_X);
+      Train_IDs    : constant Integer_Array :=
+        Python_CLF.Call (Classifier, "copy_labels", K_Means);
+      Cluster_Labels : Integer_Array (1 .. Num_Clusters) := (others => -1);
+      Y_Guess        : Integer_Array (Train_IDs'Range);
       Result : Float;
    begin
-      Python_CLF.Call (Classifier, "fit", Clr, Train_X);
-      declare
-         Train_IDs      : constant Integer_Array :=
-                            Python_CLF.Call (Classifier, "copy_labels", Clr);
-         Cluster_Labels : Integer_Array (1 .. Num_Clusters) := (others => -1);
-         Y_Guess        : Integer_Array (Train_IDs'Range);
-      begin
-         Put_Line (Routine_Name & "Train_IDs:" &
-                     Integer'Image (Train_IDs'Length));
-         --  Request one label per cluster and make an interim dataset out of
-         --  X_train, y_guess.
-         for index in Cluster_Labels'Range loop
-            Cluster_Labels (index) := Train_Y (Train_IDs (index), 1);
-         end loop;
+      Put_Line (Routine_Name & "Train_IDs:" &
+                  Integer'Image (Train_IDs'Length));
+      --  Request one label per cluster and make an interim dataset out of
+      --  X_train, y_guess.
+      for index in Cluster_Labels'Range loop
+         Cluster_Labels (index) := Train_Y (Train_IDs (index), 1);
+      end loop;
 
-         for index in Y_Guess'Range loop
-            Y_Guess (index) := Cluster_Labels (Train_IDs (index));
-         end loop;
-      end;
+      for index in Y_Guess'Range loop
+         Y_Guess (index) := Cluster_Labels (Train_IDs (index));
+      end loop;
 
       return Result;
 

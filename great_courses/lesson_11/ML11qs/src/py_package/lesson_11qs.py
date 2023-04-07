@@ -8,10 +8,8 @@ import numpy as np
 def clust (num_clusters):
     return sklearn.cluster.KMeans(n_clusters=num_clusters)
 
-def fit (clf, X_train):
-    kmeans = clf.fit(X_train)
-    print ("kmeans.labels", kmeans.labels_.shape)
-    print ("kmeans.labels", kmeans.labels_)
+def kmeans_fit (num_clusters, X):
+    return KMeans(n_clusters=num_clusters,n_init="auto").fit(X)
     
 def copy_labels (clf):
     return clf.labels_.copy()
