@@ -47,7 +47,7 @@ begin
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_11qs");
-   Loss := Try_Clusterer (Classifier, Num_Clusters, Train_X, Train_Y);
+   Loss := Try_Clusterer (Classifier, Num_Clusters, Train_X, Test_X, Train_Y);
 
    Python.Close_Module (Classifier);
    Python.Finalize;
