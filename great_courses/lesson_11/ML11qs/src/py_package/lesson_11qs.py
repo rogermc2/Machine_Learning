@@ -16,4 +16,4 @@ def labels (kmeans):
 
 def y_pred (X_train,X_test,Y):
     clf = KNeighborsClassifier(n_neighbors=1).fit(X_train,Y)
-    return clf.predict(X_test)
+    return tuple(clf.predict(X_test))

@@ -1,5 +1,5 @@
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Python_API;
 with Python_CLF;
@@ -11,14 +11,14 @@ package body Support_11QS is
       Train_X, Test_X : Real_Float_Matrix; Train_Y : Integer_Matrix)
       return Float is
       use Python_API;
-      Routine_Name   : constant String := "Support_11QS.Try_Clusterer ";
+--        Routine_Name   : constant String := "Support_11QS.Try_Clusterer ";
       K_Means        : constant PyObject := Python.Call (Classifier, "kmeans_fit",
                                                          Num_Clusters, Train_X);
       Train_IDs      : constant Integer_Array :=
                          Python_CLF.Call (Classifier, "labels", K_Means);
       Cluster_Labels : Integer_Array (1 .. Num_Clusters) := (others => -1);
       Y_Guess        : Integer_Array (Train_X'Range);
-      Y_Pred         : Integer_Array (Train_X'Range);
+      Y_Pred         : Integer_Array (Test_X'Range);
       Result         : Float;
    begin
       --  Request one label per cluster and make an interim dataset out of
