@@ -34,8 +34,7 @@ procedure Lesson_11QS is
    Train_X          : constant Real_Float_Matrix := Data.Train_X;
    Train_Y          : constant Integer_Matrix := Data.Train_Y;
    Test_X           : constant Real_Float_Matrix := Data.Test_X;
---     Test_Y           : constant Integer_Matrix := Data.Test_Y;
-
+   Test_Y           : constant Integer_Matrix := Data.Test_Y;
    Classifier       : Python.Module;
    Loss             : Float;
 begin
@@ -47,7 +46,8 @@ begin
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_11qs");
-   Loss := Try_Clusterer (Classifier, Num_Clusters, Train_X, Test_X, Train_Y);
+   Loss := Try_Clusterer (Classifier, Num_Clusters, Train_X, Test_X,
+                          Train_Y, Test_Y);
 
    Python.Close_Module (Classifier);
    Python.Finalize;

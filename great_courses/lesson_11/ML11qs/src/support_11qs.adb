@@ -8,7 +8,8 @@ package body Support_11QS is
 
    function Try_Clusterer
      (Classifier      : Python.Module; Num_Clusters : Positive;
-      Train_X, Test_X : Real_Float_Matrix; Train_Y : Integer_Matrix)
+      Train_X, Test_X : Real_Float_Matrix;
+      Train_Y, Test_Y : Integer_Matrix)
       return Float is
       use Python_API;
 --        Routine_Name   : constant String := "Support_11QS.Try_Clusterer ";
@@ -19,7 +20,7 @@ package body Support_11QS is
       Cluster_Labels : Integer_Array (1 .. Num_Clusters) := (others => -1);
       Y_Guess        : Integer_Array (Train_X'Range);
       Y_Pred         : Integer_Array (Test_X'Range);
-      Result         : Float;
+      Result         : Natural := 0;
    begin
       --  Request one label per cluster and make an interim dataset out of
       --  X_train, y_guess.
@@ -34,7 +35,13 @@ package body Support_11QS is
 
       Y_Pred := Python.Call (Classifier, "y_pred", Train_X, Test_X, Y_Guess);
 
-      return Result;
+      for index in Y_Pred'Range loop
+         if Y_Pred (index) = Test_Y (index, 1) then
+            Result := Result + Y_Pred (index);
+         end if;
+      end loop;
+
+      return Float (Result) / Float (Test_Y'Length);
 
    end Try_Clusterer;
 
