@@ -342,24 +342,28 @@ package body Basic_Printing is
       Last  : Positive;
       Count : Positive := 1;
    begin
-      if Finish > 0 then
-         Last := Finish;
+      if anArray'Length = 0 then
+         Put_Line (Name & " is empty");
       else
-         Last := Integer (anArray'Length);
-      end if;
+         if Finish > 0 then
+            Last := Finish;
+         else
+            Last := Integer (anArray'Length);
+         end if;
 
-      Put_Line (Name & ": ");
-      if Start >= anArray'First and then Finish <= anArray'Last then
-         for Index in Start .. Last loop
-            Put (Integer'Image (anArray (Index)) & "  ");
-            Count := Count + 1;
-            if Count > 10 then
-               New_Line;
-               Count := 1;
-            end if;
-         end loop;
-      else
-         Put_Line ("Print_Integer_Array called with invalid start or finish index.");
+         Put_Line (Name & ": ");
+         if Start >= anArray'First and then Finish <= anArray'Last then
+            for Index in Start .. Last loop
+               Put (Integer'Image (anArray (Index)) & "  ");
+               Count := Count + 1;
+               if Count > 10 then
+                  New_Line;
+                  Count := 1;
+               end if;
+            end loop;
+         else
+            Put_Line ("Print_Integer_Array called with invalid start or finish index.");
+         end if;
       end if;
       New_Line;
 

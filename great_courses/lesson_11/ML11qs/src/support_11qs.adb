@@ -1,10 +1,43 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
+with Basic_Printing; use  Basic_Printing;
+with ML_Types;
 with Python_API;
 with Python_CLF;
 
 package body Support_11QS is
+
+   function Get_ID (Train_IDs : Integer_Array; ID : Positive)
+                    return Integer_Array is
+      ID_List : ML_Types.Integer_List;
+   begin
+      --  Train_IDs values start at 0.
+      for index in Train_IDs'Range loop
+         if Train_IDs (index) = ID then
+            ID_List.Append (index + 1);
+         end if;
+      end loop;
+
+      return To_Integer_Array (ID_List);
+
+   end Get_ID;
+
+   --  -------------------------------------------------------------------------
+
+   function Get_IDs (Train_Vals : Integer_Matrix; IDs : Integer_Array)
+                    return Integer_Array is
+      Result : Integer_Array (IDs'Range);
+   begin
+      for index in IDs'Range loop
+         Result (index) := Train_Vals (IDs (index) - 1, 1);
+      end loop;
+
+      return Result;
+
+   end Get_IDs;
+
+   --  -------------------------------------------------------------------------
 
    function Try_Clusterer
      (Classifier      : Python.Module; Num_Clusters : Positive;
@@ -12,7 +45,7 @@ package body Support_11QS is
       Train_Y, Test_Y : Integer_Matrix)
       return Float is
       use Python_API;
---        Routine_Name   : constant String := "Support_11QS.Try_Clusterer ";
+      Routine_Name   : constant String := "Support_11QS.Try_Clusterer ";
       K_Means        : constant PyObject := Python.Call (Classifier, "kmeans_fit",
                                                          Num_Clusters, Train_X);
       Train_IDs      : constant Integer_Array :=
@@ -26,7 +59,13 @@ package body Support_11QS is
       --  X_train, y_guess.
       --  Train_IDs values start at 0.
       for index in Cluster_Labels'Range loop
-         Cluster_Labels (index) := Train_Y (Train_IDs (index) + 1, 1);
+         declare
+            D : constant Integer_Array := Get_ID (Train_IDs, index);
+            E : constant Integer_Array := Get_IDs (Train_Y, D);
+         begin
+            Print_Integer_Array (Routine_Name & "E", E, 1, 8);
+            Cluster_Labels (index) := E(1);
+         end;
       end loop;
 
       for index in Y_Guess'Range loop
@@ -37,7 +76,7 @@ package body Support_11QS is
 
       for index in Y_Pred'Range loop
          if Y_Pred (index) = Test_Y (index, 1) then
-            Result := Result + Y_Pred (index);
+            Result := Result + 1;
          end if;
       end loop;
 

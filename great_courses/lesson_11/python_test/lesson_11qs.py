@@ -27,9 +27,11 @@ def tryclusterer(k, clust):
   # Request one label per cluster and make an interim dataset out of X_train, y_guess .
   clust_labs = np.array(k*['-1'])
   for i in range(k):
-    clust_labs[i] = y_train[train_ids [i]][0]
-  y_guess = clust_labs[train_ids]
-  print ("clust_labs", clust_labs.shape)
+    d = np.where(train_ids == i)
+    e = y_train[d][0]
+    clust_labs[i] = e[0]
+    y_guess = clust_labs[train_ids]
+  print ("clust_labs", clust_labs)
   print ("y_guess", y_guess.shape)
 
   # Assign test data labels based on the nearest instance in the interim dataset.
