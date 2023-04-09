@@ -26,12 +26,14 @@ package body Support_11QS is
    --  -------------------------------------------------------------------------
 
    function Get_IDs (Train_Vals : Integer_Matrix; IDs : Integer_Array)
-                    return Integer_Array is
-      Result : Integer_Array (IDs'Range);
+                     return ML_Types.Integer_List is
+      Result : ML_Types.Integer_List;
    begin
-      for index in IDs'Range loop
-         Result (index) := Train_Vals (IDs (index) - 1, 1);
-      end loop;
+      if IDs'Length > 0 then
+         for index in IDs'Range loop
+            Result.Append (Train_Vals (IDs (index) - 1, 1));
+         end loop;
+      end if;
 
       return Result;
 
@@ -61,10 +63,13 @@ package body Support_11QS is
       for index in Cluster_Labels'Range loop
          declare
             D : constant Integer_Array := Get_ID (Train_IDs, index);
---              E : constant Integer_Array := Get_IDs (Train_Y, D);
+            E : constant ML_Types.Integer_List := Get_IDs (Train_Y, D);
          begin
-            Print_Integer_Array (Routine_Name & "E", Get_IDs (Train_Y, D), 1, 8);
-            Cluster_Labels (index) := Get_IDs (Train_Y, D)(1);
+            Print_Integer_List (Routine_Name & "E", E, 1, 10);
+            for index in E.First_Index .. E.Last_Index loop
+               Put_Line (Routine_Name & "index" & Integer'Image (index));
+               Cluster_Labels (index) := E (index);
+            end loop;
          end;
       end loop;
 
