@@ -874,15 +874,13 @@ package body Python is
       Routine_Name : constant String := "Python.Call RFM2 IA"; 
       
       procedure Parse_Tuple (Tuple : PyObject; Vec : in out Integer_Array) is
-         T_Row : PyObject;
       begin
          Assert (Vec'Length = Integer (PyTuple_Size (Tuple)), Routine_Name &
                    ".Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
                  & " /= Vec Length" & Integer'Image (Vec'Length));
          for index in 1 .. PyTuple_Size (Tuple) loop
-            T_Row := PyTuple_GetItem (Tuple, index - 1);
             Vec (Integer (index)) :=
-              Integer (PyLong_AsLong (PyTuple_GetItem (T_Row, 0)));
+              Integer (PyLong_AsLong (PyTuple_GetItem (Tuple, index - 1)));
          end loop;
       end Parse_Tuple;
       

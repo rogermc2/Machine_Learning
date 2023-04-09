@@ -10,8 +10,6 @@ def kmeans_fit (num_clusters, X):
     return kmeans
     
 def labels (kmeans):
-#    print ("labels kmeans.labels_", kmeans.labels_.shape)
-    print ("labels kmeans.labels_", kmeans.labels_)
     return tuple(kmeans.labels_)
 
 def y_pred (X_train,X_test,Y):

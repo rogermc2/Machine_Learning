@@ -1,7 +1,7 @@
 
 --  with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use  Basic_Printing;
+with Basic_Printing; use  Basic_Printing;
 with ML_Types;
 with Python_API;
 with Python_CLF;
@@ -47,7 +47,7 @@ package body Support_11QS is
       Train_Y, Test_Y : Integer_Matrix)
       return Float is
       use Python_API;
---        Routine_Name   : constant String := "Support_11QS.Try_Clusterer ";
+      Routine_Name   : constant String := "Support_11QS.Try_Clusterer ";
       K_Means        : constant PyObject := Python.Call (Classifier, "kmeans_fit",
                                                          Num_Clusters, Train_X);
       Train_IDs      : constant Integer_Array :=
@@ -89,6 +89,8 @@ package body Support_11QS is
       end loop;
 
       Y_Pred := Python.Call (Classifier, "y_pred", Train_X, Test_X, Y_Guess);
+      Print_Integer_Array (Routine_Name & "Y_Pred", Y_Pred, 1, 10);
+      Print_Integer_Matrix (Routine_Name & "Test_Y", Test_Y, 1, 10);
 
       for index in Y_Pred'Range loop
          if Y_Pred (index) = Test_Y (index, 1) then
