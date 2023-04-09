@@ -1,7 +1,7 @@
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use  Basic_Printing;
+--  with Basic_Printing; use  Basic_Printing;
 with ML_Types;
 with Python_API;
 with Python_CLF;
@@ -47,7 +47,7 @@ package body Support_11QS is
       Train_Y, Test_Y : Integer_Matrix)
       return Float is
       use Python_API;
-      Routine_Name   : constant String := "Support_11QS.Try_Clusterer ";
+--        Routine_Name   : constant String := "Support_11QS.Try_Clusterer ";
       K_Means        : constant PyObject := Python.Call (Classifier, "kmeans_fit",
                                                          Num_Clusters, Train_X);
       Train_IDs      : constant Integer_Array :=
@@ -65,10 +65,21 @@ package body Support_11QS is
             D : constant Integer_Array := Get_ID (Train_IDs, index);
             E : constant ML_Types.Integer_List := Get_IDs (Train_Y, D);
          begin
-            Print_Integer_List (Routine_Name & "E", E, 1, 10);
+--              Print_Integer_List (Routine_Name & "E", E, 1, 10);
+--              Put_Line (Routine_Name & "Cluster_Labels length" &
+--                          Integer'Image (Cluster_Labels'Length));
+--              Put_Line (Routine_Name & "Cluster_Labels first" &
+--                          Integer'Image (Cluster_Labels'First));
+--              Put_Line (Routine_Name & "E length" &
+--                          Integer'Image (Integer (E.Length)));
+--              Put_Line (Routine_Name & "E first" &
+--                          Integer'Image (E.First_Index));
+
             for index in E.First_Index .. E.Last_Index loop
-               Put_Line (Routine_Name & "index" & Integer'Image (index));
-               Cluster_Labels (index) := E (index);
+--                 Put_Line (Routine_Name & "index" & Integer'Image (index));
+--                 Put_Line (Routine_Name & "E (" & Integer'Image (index) & ")" &
+--                             Integer'Image (E (index)));
+               Cluster_Labels (E (index) + 1) := Train_Y (index, 1);
             end loop;
          end;
       end loop;
