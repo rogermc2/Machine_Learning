@@ -57,14 +57,14 @@ package body Support_11QS is
    begin
       --  Request one label per cluster and make an interim dataset out of
       --  X_train, y_guess.
-      --  Train_IDs values start at 0.
+      --  Train_IDs and Cluster_Labels values start at 0.
       for index in Cluster_Labels'Range loop
          declare
             D : constant Integer_Array := Get_ID (Train_IDs, index);
-            E : constant Integer_Array := Get_IDs (Train_Y, D);
+--              E : constant Integer_Array := Get_IDs (Train_Y, D);
          begin
-            Print_Integer_Array (Routine_Name & "E", E, 1, 8);
-            Cluster_Labels (index) := E(1);
+            Print_Integer_Array (Routine_Name & "E", Get_IDs (Train_Y, D), 1, 8);
+            Cluster_Labels (index) := Get_IDs (Train_Y, D)(1);
          end;
       end loop;
 
