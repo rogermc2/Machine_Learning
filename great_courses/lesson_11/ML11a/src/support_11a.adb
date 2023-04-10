@@ -358,8 +358,6 @@ package body Support_11A is
          Best_Centres := Cluster_Centres;
          Best_Loss := Loss;
       end if;
-      --        Print_Float_Matrix (Program_Name & "Cluster Centres",
-      --                            Centres, 1, Num_Clusters, 230, 236);
 
    end Get_Best_Centres;
 

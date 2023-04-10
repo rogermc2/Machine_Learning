@@ -65,20 +65,7 @@ package body Support_11QS is
             D : constant Integer_Array := Get_ID (Train_IDs, index);
             E : constant ML_Types.Integer_List := Get_IDs (Train_Y, D);
          begin
---              Print_Integer_List (Routine_Name & "E", E, 1, 10);
---              Put_Line (Routine_Name & "Cluster_Labels length" &
---                          Integer'Image (Cluster_Labels'Length));
---              Put_Line (Routine_Name & "Cluster_Labels first" &
---                          Integer'Image (Cluster_Labels'First));
---              Put_Line (Routine_Name & "E length" &
---                          Integer'Image (Integer (E.Length)));
---              Put_Line (Routine_Name & "E first" &
---                          Integer'Image (E.First_Index));
-
             for index in E.First_Index .. E.Last_Index loop
---                 Put_Line (Routine_Name & "index" & Integer'Image (index));
---                 Put_Line (Routine_Name & "E (" & Integer'Image (index) & ")" &
---                             Integer'Image (E (index)));
                Cluster_Labels (E (index) + 1) := Train_Y (index, 1);
             end loop;
          end;
