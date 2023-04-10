@@ -255,6 +255,32 @@ package body Python is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M : Module; Function_Name : String; A : Integer;
+                  B : ML_Arrays_And_Matrices.Real_Float_Matrix)
+                  return Python_API.PyObject is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format  : char_array; A : int;
+                              T1      : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("iO"), int (A), A_Tuple);
+      PyResult := Call_Object (F, PyParams);
+      
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    procedure Call (M : Module; Function_Name : String; A, B : Integer) is
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
@@ -356,6 +382,33 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : ML_Types.Integer_List) is
+      function Py_BuildValue (Format  : Interfaces.C.char_array;
+                              T1, T2  : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+
+      PyResult := Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix) is
 
@@ -439,7 +492,7 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
-   procedure Call (M : Module; Function_Name : String;
+   procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Arrays_And_Matrices.Integer_Array;
                    B, C : ML_Arrays_And_Matrices.Real_Float_List) is
       
@@ -496,7 +549,7 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
-   procedure Call (M : Module; Function_Name : String;
+   procedure Call (M    : Module; Function_Name : String;
                    A    : ML_Types.Integer_List;
                    B, C : ML_Arrays_And_Matrices.Real_Float_List) is
       
@@ -537,7 +590,7 @@ package body Python is
          T_Row : PyObject;
       begin
          Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
-                 "Parse_Tuple Real_Float_List Tuple Size" &
+                 "Python.Parse_Tuple Real_Float_List Tuple Size" &
                    int'Image (PyTuple_Size (Tuple))
                  & " /= Vec Length" & Integer'Image (Vec'Length));
          for row in 1 .. PyTuple_Size (Tuple) loop
@@ -577,7 +630,9 @@ package body Python is
 
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Matrix) is
-
+      Routine_Name : constant String :=
+                       "Python.Parse_Tuple Real_Float_Matrix * 2 ";
+      
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -588,6 +643,8 @@ package body Python is
       PyParams : PyObject;
       PyResult : PyObject;
    begin
+      Assert (A'Length > 0, Routine_Name & "matrix A is empty");
+      Assert (B'Length > 0, Routine_Name & "matrix B is empty");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
 
@@ -802,6 +859,64 @@ package body Python is
       Py_DecRef (B_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Call (M    : Module; Function_Name : String;
+                  A, B : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                  C    : ML_Arrays_And_Matrices.Integer_Array)
+                  return ML_Arrays_And_Matrices.Integer_Array is
+      use System;
+      use Interfaces.C;
+      use ML_Arrays_And_Matrices;
+      Routine_Name : constant String := "Python.Call RFM2 IA"; 
+      
+      procedure Parse_Tuple (Tuple : PyObject; Vec : in out Integer_Array) is
+      begin
+         Assert (Vec'Length = Integer (PyTuple_Size (Tuple)), Routine_Name &
+                   ".Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
+                 & " /= Vec Length" & Integer'Image (Vec'Length));
+         for index in 1 .. PyTuple_Size (Tuple) loop
+            Vec (Integer (index)) :=
+              Integer (PyLong_AsLong (PyTuple_GetItem (Tuple, index - 1)));
+         end loop;
+      end Parse_Tuple;
+      
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
+                              T1, T2, T3 : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      C_Tuple  : constant PyObject := To_Tuple (C);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : ML_Arrays_And_Matrices.Integer_Array (B'Range);
+   begin
+--        Print_Matrix_Dimensions (Routine_Name & "A", A);
+--        Print_Matrix_Dimensions (Routine_Name & "B", B);
+--        Put_Line (Routine_Name & "C length" & Integer'Image (C'Length));
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOO"), A_Tuple, B_Tuple, C_Tuple);
+
+      PyResult := Call_Object (F, PyParams);
+--        Assert (PyError_Occurred /= Null_Address, Routine_Name &
+--                  " PyError_Occurred");      
+      Assert (PyTuple_Size (PyResult) > 0, Routine_Name &
+                " invalid Tuple Size: " & int'Image (PyTuple_Size (PyResult)));
+      Parse_Tuple (PyResult, Result);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (C_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+      
+      return Result;
 
    end Call;
 
@@ -1712,7 +1827,7 @@ package body Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Vector_List) is
       use System;
-      function Py_BuildValue (Format : Interfaces.C.char_array;
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
                               T1, T2     : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -1749,7 +1864,7 @@ package body Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_List) is
       use System;
-      function Py_BuildValue (Format : Interfaces.C.char_array;
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
                               T1, T2     : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 

@@ -35,6 +35,9 @@ package Python is
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Python_API.PyObject;
+   function Call (M : Module; Function_Name : String; A : Integer;
+                  B : ML_Arrays_And_Matrices.Real_Float_Matrix)
+                  return Python_API.PyObject;
    procedure Call (M : Module; Function_Name : String; A, B : Integer);
    function Call (M : Module; Function_Name : String; A, B : Integer)
                   return Integer;
@@ -42,6 +45,8 @@ package Python is
                   return Python_API.PyObject;
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Array);
+   procedure Call (M    : Module; Function_Name : String;
+                   A, B : ML_Types.Integer_List);
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
@@ -81,9 +86,13 @@ package Python is
                    B : ML_Arrays_And_Matrices.Integer_Array);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Vector);
-   procedure Call (M    : Module; Function_Name : String;
-                   A    : ML_Arrays_And_Matrices.Real_Float_Vector;
-                   B    : ML_Arrays_And_Matrices.Integer_Array);
+   function Call (M    : Module; Function_Name : String;
+                  A, B : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                  C    : ML_Arrays_And_Matrices.Integer_Array)
+                  return ML_Arrays_And_Matrices.Integer_Array;
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Arrays_And_Matrices.Real_Float_Vector;
+                   B : ML_Arrays_And_Matrices.Integer_Array);
    procedure Call (M          : Module; Function_Name : String;
                    A, B, C, D : ML_Arrays_And_Matrices.Real_Float_Vector);
    procedure Call (M    : Module; Function_Name : String;

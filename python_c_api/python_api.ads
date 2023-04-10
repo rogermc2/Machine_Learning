@@ -30,6 +30,9 @@ package Python_API is
    
    procedure Py_DecRef (Obj : PyObject);
    pragma Import (C, Py_DecRef, "Py_DecRef");
+   
+   function PyError_Occurred return PyObject;
+   pragma Import (C, PyError_Occurred, "PyErr_Occurred");
           
    procedure Py_IncRef (Obj : PyObject);
    pragma Import (C, Py_IncRef, "Py_IncRef");

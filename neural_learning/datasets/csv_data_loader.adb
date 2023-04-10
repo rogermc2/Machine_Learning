@@ -188,13 +188,13 @@ package body CSV_Data_Loader is
          declare
             XY_Data : Digits_XY_Data :=
                         Fetch_Digits_Data (Dataset_Name, Normalize);
-            Train_Y : Integer_Array (1 .. Train_Size);
-            Test_Y  : Integer_Array (1 .. Test_Size);
          begin
             Put_Line (Routine_Name & Dataset_Name & ".csv loaded");
             declare
-               Data  : Base_Split_State (Train_Size, Test_Size,
-                                         XY_Data.Num_Features, Y_Categorized);
+               Train_Y : Integer_Array (1 .. Train_Size);
+               Test_Y  : Integer_Array (1 .. Test_Size);
+               Data    : Base_Split_State (Train_Size, Test_Size,
+                                           XY_Data.Num_Features, Y_Categorized);
             begin
                if Shuffle then
                   Put_Line (Routine_Name & "shuffling");
@@ -422,7 +422,7 @@ package body CSV_Data_Loader is
    procedure Save_State (Dataset_Name : String; State : Base_Split_State) is
       use Ada.Streams;
       use Stream_IO;
-      --        Routine_Name : constant String := "CSV_Data_Loader.Save_State ";
+      Routine_Name : constant String := "CSV_Data_Loader.Save_State ";
       State_File   : constant String := Dataset_Name & ".sta";
       File_ID      : Stream_IO.File_Type;
       aStream      : Stream_Access;
@@ -432,6 +432,7 @@ package body CSV_Data_Loader is
       Positive'Write (aStream, State.Num_Features);
       Base_Split_State'Write (aStream, State);
       Close (File_ID);
+      Put_Line (Routine_Name & State_File & " written.");
 
    end Save_State;
 

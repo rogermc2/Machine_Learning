@@ -20,7 +20,7 @@ package body Classifier_Utilities is
    package Float_IO is new Ada.Text_IO.Float_IO (Num => Float);
 
    --  -------------------------------------------------------------------------
-   --  Arg_Max returns the indices of the maximum values along an axis.
+   --  Arg_Max returns the index of the maximum value.
    function Arg_Max (Values : Weights.Weight_List) return Positive is
       Max_Value  : Float := Float'Safe_First;
       Max_Index  : Positive := 1;

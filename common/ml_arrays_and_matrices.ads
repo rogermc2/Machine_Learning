@@ -95,6 +95,11 @@ package ML_Arrays_And_Matrices is
      Ada.Containers.Indefinite_Vectors (Positive, Float_Array);
    subtype Float_Array_List is Float_Array_Package.Vector;
 
+   use Real_Float_Arrays;
+   package Float_Matrix_Package is new
+     Ada.Containers.Indefinite_Vectors (Positive, Real_Float_Matrix);
+   subtype Float_Matrix_List is Float_Matrix_Package.Vector;
+
    package Real_Float_Package is new
      Ada.Containers.Vectors (Positive, Float);
    subtype Real_Float_List is Real_Float_Package.Vector;
@@ -104,11 +109,14 @@ package ML_Arrays_And_Matrices is
      Ada.Containers.Vectors (Positive, Real_Float_List);
    subtype Real_Float_List_2D is Real_Float_Package_2D.Vector;
 
+   package Float_Vector_Package is new
+     Ada.Containers.Indefinite_Vectors (Positive, Real_Float_Vector);
+   subtype Float_Vector_List is Float_Vector_Package.Vector;
+
    package Integer_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
      (Positive, Integer_Matrix);
    subtype Integer_Matrix_List is Integer_Matrix_List_Package.Vector;
 
-   use Real_Float_Arrays;
    package Real_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
      (Positive, Real_Float_Matrix);
    subtype Real_Matrix_List is Real_Matrix_List_Package.Vector;
@@ -277,6 +285,8 @@ package ML_Arrays_And_Matrices is
      (Vec         : Real_Float_Vector; Data_Axis : Positive := 1;
       First_Index : Integer := 1) return Real_Float_Matrix;
    function To_Real_Float_Matrix (List : Real_Float_List_2D)
+                                   return Real_Float_Matrix;
+   function To_Real_Float_Matrix (List : Float_Vector_List)
                                    return Real_Float_Matrix;
    function To_Real_Float_Matrix (BM : Boolean_Matrix)
                                    return Real_Float_Matrix;

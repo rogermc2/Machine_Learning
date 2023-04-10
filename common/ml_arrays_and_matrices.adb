@@ -1487,6 +1487,35 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Real_Float_Matrix (List : Float_Vector_List)
+                                  return Real_Float_Matrix is
+   begin
+      if not List.Is_Empty then
+         declare
+            List_Row : Real_Float_Vector (List.Element (1)'range);
+            Result   : Real_Float_Matrix
+              (List.First_Index .. List.Last_Index, List_Row'range);
+         begin
+            for row in Result'Range loop
+               List_Row := List (row);
+               for col in Result'Range (2) loop
+                  Result (row, col) := List_Row (col);
+               end loop;
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Real_Float_Matrix (1 .. 0, 1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
+
+   end To_Real_Float_Matrix;
+
+   --  ------------------------------------------------------------------------
+
    function To_Real_Float_Matrix (List : Real_Float_List_2D)
                                   return Real_Float_Matrix is
    begin
