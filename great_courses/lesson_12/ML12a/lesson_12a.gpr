@@ -3,8 +3,8 @@ project Lesson_12A is
    type Operating_System_Type is
       ("high_sierra", "ventura");
    Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
-
-   for Source_Dirs use ("src", "../../../common", "../../../neural_learning/datasets", "../../../neural_learning/common", "../../../python_c_api");
+   for Source_Dirs use ("src", "../../../common", "../../../neural_learning/datasets", "../../../neural_learning/common", "../../../python_c_api", 
+      "../../../tree_learning/decision_tree_classifier/support");
    for Object_Dir use "obj";
    for Main use ("lesson_12a.adb");
    for Exec_Dir use ".";
