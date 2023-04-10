@@ -1,50 +1,13 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
-
-with Maths;
 
 --  with Basic_Printing; use  Basic_Printing;
 
 package body Support_12A is
 
-   function Cluster_Mode (A : ML_Types.Integer_List) return Integer;
-   function Compute_Means
-     (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
-      Test : Boolean := False) return Real_Float_Matrix;
-   procedure Initialize_Centres
-     (Data    : Real_Float_Matrix; Centres : out Real_Float_Matrix;
-      Test    : Boolean := False);
    function Means (Data : Float_Vector_List) return Real_Float_Vector;
-
-   --  ------------------------------------------------------------------------
-   --  Add_Reduce_Differences (Data, Centres, n) finds the difference  between
-   --  each data value Data (m, p) and the corresponding centre value (n, p)
-   --  Res_N (m, p) is Data (m, p) - Centres (n, p)
-   function Add_Reduce_Differences
-     (Data, Centres : Real_Float_Matrix; Centre_Row : Positive)
-      return Real_Float_Vector is
-      --  Routine_Name : constant String := "Support_11A.Add_Reduce_Differences ";
-      Res_N2       : Real_Float_Matrix (Data'Range, Data'Range (2));
-      Result       : Real_Float_Vector (Data'Range) := (others => 0.0);
-   begin
-      --  subtract the set of centers from each data point
-      for m in Data'Range loop
-         for p in Data'Range (2) loop
-            Res_N2 (m, p) := (Data (m, p) - Centres (Centre_Row, p)) ** 2;
-         end loop;
-      end loop;
-
-      --  add.reduce(res**2,2)
-      for row in Res_N2'Range loop
-         for col in Res_N2'Range (2) loop
-            Result (row) := Result (row) + Res_N2 (row, col);
-         end loop;
-      end loop;
-
-      return Result;
-
-   end Add_Reduce_Differences;
 
    --  ------------------------------------------------------------------------
 
@@ -72,317 +35,6 @@ package body Support_12A is
    end Arg_Min;
 
    --  -------------------------------------------------------------------------
-   --  Assign_Data_To_Clusters assigns each datapoint in data to the closest
-   --  cluster center.
-   function Assign_Data_To_Clusters
-     (Data, Cluster_Centres : Real_Float_Matrix; Centre_Ids : out Integer_Array)
-      return Float is
-      --        Routine_Name : constant String := "Support_11A.Assign_Data_To_Clusters ";
-      Res_Array    : Real_Float_Vector (Data'Range);
-      Res2_Diffs   : Real_Float_Matrix (Cluster_Centres'Range, Data'Range);
-      Min_Vals     : Real_Float_Vector (Centre_Ids'Range);
-      Loss         : Float := 0.0;
-   begin
-      --  Subtract the set of cluster centers from each data point.
-      --  For each centre c (n), Add_Reduce_Differences finds the difference
-      --  between each data value data (m, p) and the corresponding centre
-      --  value centre (n, p), squares each value then adds the values of each
-      --  row together.
-      --  res (n, m) is data (m) - centre (n)
-      --  res_n (m, p) is Data (m, p) - Cluster_Centres (n, p)
-      --        Print_Float_Matrix (Routine_Name & "Cluster_Centres", Cluster_Centres, 1, 3);
-      for row in Cluster_Centres'Range loop
-         Res_Array := Add_Reduce_Differences (Data, Cluster_Centres, row);
-         for col in Res2_Diffs'Range (2) loop
-            Res2_Diffs (row, col) := Res_Array (col);
-         end loop;
-      end loop;
-
-      --  assign each data point to its closest center
-      --  Centre_Ids is an array that associates each sample with its closest
-      --  cluster centre
-      Centre_Ids := Arg_Min (Res2_Diffs, Min_Vals);
-
-      for index in Min_Vals'Range loop
-         Loss := Loss + Min_Vals (index);
-         Centre_Ids (index) := Centre_Ids (index) - 1;
-      end loop;
-
-      return Loss;
-
-   end Assign_Data_To_Clusters;
-
-   --  ------------------------------------------------------------------------
-   --  kmeans
-   --  Cluster_Means categorizes the data based on appearance.
-   --  This optimizer starts with center locations and assignments of data to
-   --  the centers.
-   --  It then alternates between two steps.
-   --  Both steps are simple are guaranteed to decrease the loss whenever they
-   --  produce any change at all.
-   --  The first step, Assign_Data, reassigns the data points to centers.
-   --  Specifically, each data point is assigned to its closest center.
-   --  The second step, Compute_Means, recomputes the centers for each cluster.
-   --  Specifically, each center is moved to the mean position of the
-   --  data points that it is assigned to.
-   --  Either the center is already assigned to the mean of its associated
-   --  data points, in which case its at a local minimum of the loss function
-   --  or some center is moved.
-   --  Such a move decreases the loss the most over all center relocations.
-   function Cluster_Means  --  kmeans
-     (Data : Real_Float_Matrix; Num_Clusters : Positive; Curr_Loss : out Float;
-      Test : Boolean := False) return Real_Float_Matrix is
---        Routine_Name    : constant String := "Support_11A.Cluster_Means ";
-      Cluster_Centres : Real_Float_Matrix (1 .. Num_Clusters, Data'Range (2));
-      Centre_Ids      : Integer_Array (Data'Range);
-      Prev_Loss       : Float := 0.0;
-   begin
-      --  kmeans
-      --  Cluster_Centres is an array of Num_Cluster data points.
-      --  Each data point represents the location of the centre of a cluster
-      --  Initialize  the cluster centers by selecting random data points.
-      Initialize_Centres (Data, Cluster_Centres, Test);
-
-      Curr_Loss := 1.0;
-      while Prev_Loss /= Curr_Loss loop
-         Prev_Loss := Curr_Loss;
-         Curr_Loss :=
-           Assign_Data_To_Clusters (Data, Cluster_Centres, Centre_Ids);
-         Cluster_Centres :=
-           Compute_Means (Data, Centre_Ids, Num_Clusters, Test);
-      end loop;
-
-      return Cluster_Centres;
-
-   end Cluster_Means;
-
-   --  ------------------------------------------------------------------------
-
-   function Cluster_Mode (A : ML_Types.Integer_List) return Integer is
-      --        Routine_Name : constant String := "Support_11A.Cluster_Mode ";
-      Min         : Integer := Integer'Last;
-      Max         : Integer := Integer'First;
-      Int_Range   : Integer;
-      Mode_Offset : Natural := 0;
-   begin
-      for index in 1 .. Integer (A.Length) loop
-         if A (index) < Min then
-            Min := A (index);
-         end if;
-
-         if A (index) > Max then
-            Max := A (index);
-         end if;
-      end loop;
-
-      Int_Range := Max - Min + 1;
-      declare
-         Counters    : Integer_Array (0 .. Int_Range - 1) := (others => 0);
-         Offset      : Natural;
-      begin
-         for index in 1 .. Integer (A.Length) loop
-            Offset := A (index) - Min;
-            Counters (Offset) := Counters (Offset) + 1;
-         end loop;
-
-         for Index in 1 .. Int_Range - 1 loop
-            if Counters (Index) > Counters (Mode_Offset) then
-               Mode_Offset := Index;
-            end if;
-         end loop;
-      end;
-
-      return Min + Mode_Offset;
-
-   end Cluster_Mode;
-
-   --  -------------------------------------------------------------------------
-
-   function Compute_Ans
-     (Labels         : Integer_Matrix; Center_IDs : Integer_Array;
-      Cluster_Labels : Integer_Array; Num_Clusters : Positive)
-      return Real_Float_List is
-      Ans         : Real_Float_List;
-      Labels_List : ML_Types.Integer_List;
-      Sum         : Integer;
-   begin
-      for cluster in 1 .. Num_Clusters loop
-         Labels_List.Clear;
-         for lab_index in Center_IDs'Range loop
-            if Center_IDs (lab_index) = Labels (cluster, 1) then
-               Labels_List.Append (Cluster_Labels (cluster));
-            end if;
-         end loop;
-
-         if not Labels_List.Is_Empty then
-            Sum := 0;
-            for index in Labels_List.First_Index .. Labels_List.Last_Index loop
-               Sum := Sum + Labels_List (index);
-            end loop;
-            Ans.Append (Float (Sum) / Float (Labels'Length));
-         end if;
-      end loop;
-
-      return Ans;
-
-   end Compute_Ans;
-
-   --  -------------------------------------------------------------------------
-
-   function Compute_Labelled
-     (Train_Y, Test_Y : Integer_Matrix; IDs : Integer_Array) return Float is
-      Test_Row    : Natural := 0;
-      Found       : Boolean;
-      Sum         : Natural := 0;
-   begin
-      for row in Train_Y'Range loop
-         for ID in IDs'Range loop
-            if IDs (ID) = row then
-               Test_Row := Test_Row + 1;
-               Found := True;
-               for col in Train_Y'Range (2) loop
-                  Found := Found and
-                    Test_Y (Test_Row, col) = Train_Y (row, col);
-               end loop;
-
-               if Found then
-                  Sum := Sum + 1;
-               end if;
-            end if;
-         end loop;
-      end loop;
-
-      return Float (Sum) / Float (Test_Y'Length);
-
-   end Compute_Labelled;
-
-   --  -------------------------------------------------------------------------
-
-   function Compute_Cluster_Labels
-     (Labels       : Integer_Matrix; Center_IDs : Integer_Array;
-      Num_Clusters : Positive) return Integer_Array is
-      C_Labels    : Integer_Array (1 .. Num_Clusters);
-      Labels_List : ML_Types.Integer_List;
-   begin
-      for cluster in 1 .. Num_Clusters loop
-         C_Labels (cluster) := Labels (1, 1);
-      end loop;
-
-      for cluster in 1 .. Num_Clusters loop
-         Labels_List := Select_Items (Labels, Center_IDs, cluster);
-
-         if not Labels_List.Is_Empty then
-            --  use mode of label item as cluster label
-            C_Labels (cluster) := Cluster_Mode (Labels_List);
-         end if;
-
-      end loop;
-
-      return C_Labels;
-
-   end Compute_Cluster_Labels;
-
-   --  -------------------------------------------------------------------------
-
-   function Compute_Means
-     (Data : Real_Float_Matrix; Centre_Ids : Integer_Array; K : Positive;
-      Test : Boolean := False) return Real_Float_Matrix is
-      use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Support_11A.Compute_Means ";
-      Centres      : Real_Float_Matrix (1 .. K, Data'Range (2)) :=
-                       (others => (others => 0.0));
-      Cols         : Float_Vector_List;  --  data points assigned to a cluster
-   begin
-      for cluster in 1 .. K loop               --  i
-         --  Gather the data points assigned to cluster i
-         --  cols = np.array([data[j] for j in range(n) if centerids[j] == i])
-         --  Cols is an array of all points having the current center id.
-         Cols.Clear;
-         for index in Centre_Ids'Range loop            --  j
-            if Centre_Ids (index) + 1 = cluster then
-               --  Get data for Data row (cluster)
-               Cols.Append (Get_Row (Data, index));
-            end if;
-         end loop;
-
-         if Cols.Is_Empty then
-            --  Cols is empty, which means that the cluster center is out of
-            --  the action and we should pick a different location for it.
-            if Test then
-               for row in Centres'Range loop
-                  for col in Centres'Range (2) loop
-                     Centres (cluster, col) := Data (row, col);
-                  end loop;
-               end loop;
-            else
-               --  choose one of the data points at random to be the new
-               --  location of this cluster centre.
-               for row in Centres'Range loop
-                  for col in Centres'Range (2) loop
-                     Centres (cluster, col) :=
-                       Data (Maths.Random_Integer (1, Data'Length), col);
-                  end loop;
-               end loop;
-            end if;
-         else
-            --  Cols is not empty meaning that there are data points close to
-            --  the cluster center so move that center to the mean position of the
-            --  closest points.
-            declare
-               Mean_Col_Values : constant Real_Float_Vector := Means (Cols);
-            begin
-               for row in Centres'Range loop
-                  for col in Centres'Range (2) loop
-                     Centres (cluster, col) := Mean_Col_Values (col);
-                  end loop;
-               end loop;
-            end;
-         end if;
-      end loop; --  for clusters
-
-      return Centres;
-
-   end Compute_Means;
-
-   --  ------------------------------------------------------------------------
-
-   procedure Get_Best_Centres
-     (Data         : Real_Float_Matrix; Num_Clusters : Positive;
-      Best_Centres : in out Real_Float_Matrix; Best_Loss : in out Float) is
-      Loss            : Float;
-      --  Cluster_Means categorizes the mnist digits based on their appearance.
-      Cluster_Centres : constant Real_Float_Matrix :=
-                          Cluster_Means (Data, Num_Clusters, Loss);
-   begin
-      if Loss < Best_Loss then
-         Best_Centres := Cluster_Centres;
-         Best_Loss := Loss;
-      end if;
-
-   end Get_Best_Centres;
-
-   --  ------------------------------------------------------------------------
-
-   procedure Initialize_Centres
-     (Data : Real_Float_Matrix; Centres : out Real_Float_Matrix;
-      Test : Boolean := False) is
-   begin
-      for cluster in Centres'Range loop
-         if Test then
-            for col in Centres'Range (2) loop
-               Centres (cluster, col) := Data (cluster, col);
-            end loop;
-         else
-            for col in Centres'Range (2) loop
-               Centres (cluster, col) :=
-                 Data (Maths.Random_Integer (1, Data'Length), col);
-            end loop;
-         end if;
-      end loop;
-
-   end Initialize_Centres;
-
-   --  ------------------------------------------------------------------------
 
    function Means (Data : Float_Vector_List) return Real_Float_Vector is
       use Real_Float_Arrays;
@@ -444,6 +96,30 @@ package body Support_12A is
       return To_Real_Float_Matrix (Selected_Data);
 
    end Get_Plot_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Data (File_Name : String) return ML_Types.Unbounded_List is
+      Routine_Name : constant String := "Support_12A.Load_Data ";
+      Data_File    : File_Type;
+      Data         : ML_Types.Unbounded_List;
+   begin
+      Open (Data_File, In_File, File_Name);
+
+      while not End_Of_File (Data_File) loop
+         Data.Append (To_Unbounded_String (Get_Line (Data_File)));
+      end loop;
+
+      Close (Data_File);
+
+      return Data;
+
+   exception
+      when others =>
+         Put_Line (Routine_Name & "failed.");
+         return Data;
+
+   end Load_Data;
 
    --  -------------------------------------------------------------------------
 

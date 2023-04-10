@@ -12,8 +12,8 @@ procedure Lesson_12A is
    use CSV_Data_Loader;
    use Real_Float_Arrays;
    Program_Name     : constant String := "Lesson 12A ";
-   Dataset_Name     : constant String :=
-                        "../../../neural_learning/datasets/mnist_784";
+   Vocab            : constant String := "../../../data/vocab2";
+   CB               : constant String := "../../../data/cb";
    Train_Size       : constant Positive := 4700;
    Test_Size        : constant Positive := 2300;
    Num_Labelled     : constant Positive := 20;   --  20
