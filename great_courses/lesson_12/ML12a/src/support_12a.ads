@@ -24,6 +24,11 @@ package Support_12A is
 
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
                       return Data_Record;
+   function Play_Game (Classifier   : Python.Module; Rounds : Positive;
+                       Data, Labels : Integer_Array; Alpha : Integer)
+                       return Integer;
    function Read_Vocabulary (File_Name : String) return Dictionary_List;
+   function To_Integer_Array (A : Integer_Array_List) return Integer_Array;
+   pragma Inline (To_Integer_Array);
 
 end Support_12A;

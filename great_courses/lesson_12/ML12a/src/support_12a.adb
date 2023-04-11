@@ -1,5 +1,6 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -16,8 +17,33 @@ package body Support_12A is
    Num_Known   : Natural := 0;
    Num_Unknown : Natural := 0;
 
+   function ProbA_Chooser
+     (Classifier              : Python.Module;
+      Current_Item            : Positive; B : Positive;
+      Train_Set, Train_Labels : ML_Types.Integer_List; Alpha : Integer)
+      return Positive;
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
+
+   --  -------------------------------------------------------------------------
+
+   function Arg_Max (Indices, Values : Integer_Array) return Positive is
+      Best   : constant Integer := Max (Values);
+      Found  : Boolean := False;
+      index  : Integer := Indices'First - 1;
+      Result : Positive := Indices (Indices'First);
+   begin
+      while index <= Indices'last and not Found loop
+         index := index + 1;
+         Found := Values (index) = Best;
+         if Found then
+            Result := Indices (index);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Arg_Max;
 
    --  -------------------------------------------------------------------------
 
@@ -75,13 +101,23 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
 
-   function Play_Game (Classifier : Python.Module; Rounds : Positive; Alpha : Float) return Float is
-      use Python_API;
---        Clf          : PyObject;
-      Score        : Float := 0.0;
+   function Play_Game (Classifier   : Python.Module; Rounds : Positive;
+                       Data, Labels : Integer_Array; Alpha : Integer)
+                       return Integer is
+      B            : constant Positive := 5;
+      Train_Set    : ML_Types.Integer_List;
+      Train_Labels : ML_Types.Integer_List;
+      current_item : Positive := 1;
+      Item         : Positive;
+      Score        : Integer := 0;
    begin
-      for Item in 1 .. Rounds loop
-         null;
+      while current_item < Rounds loop
+         Item := ProbA_Chooser (Classifier, current_item, B, Train_Set,
+                                Train_Labels, Alpha);
+         Score := Score + Labels (Item);
+         Train_Set.Append (Data (Item));
+         Train_Set.Append (Labels (Item));
+         current_item := current_item + B;
       end loop;
 
       return Score;
@@ -153,7 +189,7 @@ package body Support_12A is
    --       (Classifier : Python.Module; CLF : Python_API.PyObject;
    --        Word_Dict  : Dictionary_List; Sentence : ML_Types.Indef_String_List) is
    --        use ML_Types.Indefinite_String_Package;
-   --  --        Routine_Name : constant String := "Support_12A.Print_Bayes_Data ";
+   --        Routine_Name : constant String := "Support_12A.Print_Bayes_Data ";
    --        Label_Cursor : Cursor;
    --        Facs         : Real_Float_List;
    --        Labels       : ML_Types.Indef_String_List;
@@ -183,22 +219,31 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
 
    function ProbA_Chooser
-     (Classifier : Python.Module; Current_Item : Positive; B : Positive;
-      Data       : Data_Record; Alpha      : Float) return Positive is
+     (Classifier : Python.Module; Current_Item : Positive;
+      B          : Positive; Train_Set, Train_Labels : ML_Types.Integer_List;
+      Alpha      : Integer) return Positive is
       use Python_API;
-      use ML_Types;
+      --        Routine_Name : constant String := "Support_12.ProbA_Chooser ";
       Clf          : PyObject;
-      Y_Hat        : Integer_Array (Data.Features.First_Index ..
-                                    Data.Features.Last_Index);
+      Indices      : Integer_Array (1 .. B);
+      --  Y_Hat predictions
+      Y_Hat        : Integer_Array (Train_Set.First_Index ..
+                                      Train_Set.Last_Index);
       Item         : Positive;
    begin
-      if Integer (Data.Features.Length) = 0 then
+      if Integer (Train_Set.Length) = 0 then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
       else
-         Clf := Python.Call (Classifier, "multinomial_nb");
-         Python_CLF.Call (Classifier, "fit", Clf, Data.Features, Data.Labels);
-         Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf,
-                                   Data.Features);
+         Clf := Python.Call (Classifier, "multinomial_nb", Alpha);
+         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
+         --  predict_proba() method returns a two-dimensional array,
+         --  containing the estimated probabilities for each instance and each
+         --  class:
+         Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf, Train_Set);
+         for index in Indices'Range loop
+            Indices (index) := Current_Item + index - 1;
+         end loop;
+         Item := Arg_Max (Indices, Y_Hat) - 1;
       end if;
 
       return Item;
@@ -246,6 +291,22 @@ package body Support_12A is
       return Vocab_Dictionary;
 
    end Read_Vocabulary;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Integer_Array (A : Integer_Array_List) return Integer_Array is
+      Result : Integer_Array (Integer (A.First_Index) ..
+                                Integer (A.Last_Index));
+      Item   : Integer_Array (1 .. 1);
+   begin
+      for index in A.First_Index .. A.Last_Index loop
+         Item := A (index);
+         Result (index) := Item (1);
+      end loop;
+
+      return Result;
+
+   end To_Integer_Array;
 
    --  -------------------------------------------------------------------------
 
