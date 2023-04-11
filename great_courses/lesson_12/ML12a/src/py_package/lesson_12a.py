@@ -5,10 +5,13 @@ from matplotlib import pyplot as plt
 def multinomial_nb():
     return MultinomialNB()
 
+def multinomial_nb(alpha):
+    return MultinomialNB(alpha=alpha)
+
 def fit (clf, features, labels):
     return tuple(clf.fit(features, labels))
 
-def predict_proba(features):
+def predict_proba(clf, features):
     return tuple(clf.predict_proba(features))
 
 def plot(data1, data2):
