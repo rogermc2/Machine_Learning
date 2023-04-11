@@ -2,8 +2,12 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Maths;
+
 --  with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
+with Python_API;
+with Python_CLF;
 
 package body Support_12A is
 
@@ -24,7 +28,6 @@ package body Support_12A is
       --        Routine_Name : constant String := "Support_6A.Find_Item ";
       Curs  : Cursor := Dictionary.First;
       Found : Boolean := False;
-
    begin
       while Has_Element (Curs) and not Found loop
          Item := Element (Curs);
@@ -35,12 +38,13 @@ package body Support_12A is
       return Found;
 
    end Find_Item;
+   pragma Inline (Find_Item);
 
    --  -------------------------------------------------------------------------
 
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
                       return Data_Record is
-      Routine_Name : constant String := "Support_12A.Get_Data ";
+      Routine_Name    : constant String := "Support_12A.Get_Data ";
       File_ID         : File_Type;
       Data            : Data_Record;
    begin
@@ -71,100 +75,140 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
 
---     procedure Plot_Sentence (Classifier : Python.Module;
---                              CLF        : Python_API.PyObject;
---                              Word_Dict  : Dictionary_List;
---                              Sentence   : ML_Types.Indef_String_List;
---                              Facs       : out Real_Float_List;
---                              Labels     : out ML_Types.Indef_String_List) is
---        use Maths.Float_Math_Functions;
---        use ML_Types.Indefinite_String_Package;
---        use Python_CLF;
---        Routine_Name     : constant String := "Support_6A.Plot_Sentence ";
---        Class_Log_Prior  : constant Python_API.PyObject :=
---                             Get_Attribute (CLF, "class_log_prior_");
---        Feature_Log_Prob : constant Python_API.PyObject :=
---                             Get_Attribute (CLF, "feature_log_prob_");
---        Curs             : Cursor := Sentence.First;
---        Acc              : Float := 1.0;
---        Log_Prior_0      : constant Float :=
---                             Call (Classifier, "array_item", Class_Log_Prior, 0);
---        Log_Prior_1      : constant Float :=
---                             Call (Classifier, "array_item", Class_Log_Prior, 1);
---        Log_Prob_0       : Float;
---        Log_Prob_1       : Float;
---        Factor           : Float := Exp (Log_Prior_0 - Log_Prior_1);
---     begin
---        Labels.Append ("PRIOR");
---        Facs.Append (Factor);
---        Acc := Acc * Factor;
---
---        while Has_Element (Curs) loop
---           declare
---              Word  : constant String := Sentence (Curs);
---              Item  : Dictionary_Record;
---              Index : Natural;
---           begin
---              Assert (Find_Item (Word_Dict, To_Unbounded_String (Word), Item),
---                      Routine_Name & Word & " is not in the dictionary");
---              Labels.Append (Word);
---              Index := Item.Value;
---              Log_Prob_0 :=
---                Call (Classifier, "matrix_item", Feature_Log_Prob,
---                      0, Index);
---              Log_Prob_1 :=
---                Call (Classifier, "matrix_item", Feature_Log_Prob,
---                      1, Index);
---              Factor := Exp (Log_Prob_0 - Log_Prob_1);
---              Facs.Append (Factor);
---              Acc := Acc * Factor;
---           end;
---
---           Next (Curs);
---        end loop;
---
---        Labels.Append ("POST");
---        Facs.Append (Acc);
---
---     end Plot_Sentence;
+   function Play_Game (Classifier : Python.Module; Rounds : Positive; Alpha : Float) return Float is
+      use Python_API;
+--        Clf          : PyObject;
+      Score        : Float := 0.0;
+   begin
+      for Item in 1 .. Rounds loop
+         null;
+      end loop;
+
+      return Score;
+
+   end Play_Game;
 
    --  -------------------------------------------------------------------------
 
---     procedure Print_Bayes_Data
---       (Classifier : Python.Module; CLF : Python_API.PyObject;
---        Word_Dict  : Dictionary_List; Sentence : ML_Types.Indef_String_List) is
---        use ML_Types.Indefinite_String_Package;
---  --        Routine_Name : constant String := "Support_12A.Print_Bayes_Data ";
---        Label_Cursor : Cursor;
---        Facs         : Real_Float_List;
---        Labels       : ML_Types.Indef_String_List;
---        Index        : Natural := 0;
---     begin
---        Plot_Sentence (Classifier, CLF, Word_Dict, Sentence, Facs, Labels);
---        for fac in Facs.First_Index .. Facs.Last_Index loop
---           if Facs (fac) < 1.0 then
---              Facs.Replace_Element (fac, -1.0 / Facs (fac));
---           end if;
---        end loop;
---
---        New_Line;
---        Put_Line ("Naive Bayes factors:");
---        Label_Cursor := Labels.First;
---        Index := 0;
---        while Has_Element (Label_Cursor) loop
---           Index := Index + 1;
---           Put_Line (Element (Label_Cursor) & ", " &
---                       Float'Image (Facs (Index)));
---           Next (Label_Cursor);
---        end loop;
---        New_Line;
---
---     end Print_Bayes_Data;
+   --     procedure Plot_Sentence (Classifier : Python.Module;
+   --                              CLF        : Python_API.PyObject;
+   --                              Word_Dict  : Dictionary_List;
+   --                              Sentence   : ML_Types.Indef_String_List;
+   --                              Facs       : out Real_Float_List;
+   --                              Labels     : out ML_Types.Indef_String_List) is
+   --        use Maths.Float_Math_Functions;
+   --        use ML_Types.Indefinite_String_Package;
+   --        use Python_CLF;
+   --        Routine_Name     : constant String := "Support_6A.Plot_Sentence ";
+   --        Class_Log_Prior  : constant Python_API.PyObject :=
+   --                             Get_Attribute (CLF, "class_log_prior_");
+   --        Feature_Log_Prob : constant Python_API.PyObject :=
+   --                             Get_Attribute (CLF, "feature_log_prob_");
+   --        Curs             : Cursor := Sentence.First;
+   --        Acc              : Float := 1.0;
+   --        Log_Prior_0      : constant Float :=
+   --                             Call (Classifier, "array_item", Class_Log_Prior, 0);
+   --        Log_Prior_1      : constant Float :=
+   --                             Call (Classifier, "array_item", Class_Log_Prior, 1);
+   --        Log_Prob_0       : Float;
+   --        Log_Prob_1       : Float;
+   --        Factor           : Float := Exp (Log_Prior_0 - Log_Prior_1);
+   --     begin
+   --        Labels.Append ("PRIOR");
+   --        Facs.Append (Factor);
+   --        Acc := Acc * Factor;
+   --
+   --        while Has_Element (Curs) loop
+   --           declare
+   --              Word  : constant String := Sentence (Curs);
+   --              Item  : Dictionary_Record;
+   --              Index : Natural;
+   --           begin
+   --              Assert (Find_Item (Word_Dict, To_Unbounded_String (Word), Item),
+   --                      Routine_Name & Word & " is not in the dictionary");
+   --              Labels.Append (Word);
+   --              Index := Item.Value;
+   --              Log_Prob_0 :=
+   --                Call (Classifier, "matrix_item", Feature_Log_Prob,
+   --                      0, Index);
+   --              Log_Prob_1 :=
+   --                Call (Classifier, "matrix_item", Feature_Log_Prob,
+   --                      1, Index);
+   --              Factor := Exp (Log_Prob_0 - Log_Prob_1);
+   --              Facs.Append (Factor);
+   --              Acc := Acc * Factor;
+   --           end;
+   --
+   --           Next (Curs);
+   --        end loop;
+   --
+   --        Labels.Append ("POST");
+   --        Facs.Append (Acc);
+   --
+   --     end Plot_Sentence;
+
+   --  -------------------------------------------------------------------------
+
+   --     procedure Print_Bayes_Data
+   --       (Classifier : Python.Module; CLF : Python_API.PyObject;
+   --        Word_Dict  : Dictionary_List; Sentence : ML_Types.Indef_String_List) is
+   --        use ML_Types.Indefinite_String_Package;
+   --  --        Routine_Name : constant String := "Support_12A.Print_Bayes_Data ";
+   --        Label_Cursor : Cursor;
+   --        Facs         : Real_Float_List;
+   --        Labels       : ML_Types.Indef_String_List;
+   --        Index        : Natural := 0;
+   --     begin
+   --        Plot_Sentence (Classifier, CLF, Word_Dict, Sentence, Facs, Labels);
+   --        for fac in Facs.First_Index .. Facs.Last_Index loop
+   --           if Facs (fac) < 1.0 then
+   --              Facs.Replace_Element (fac, -1.0 / Facs (fac));
+   --           end if;
+   --        end loop;
+   --
+   --        New_Line;
+   --        Put_Line ("Naive Bayes factors:");
+   --        Label_Cursor := Labels.First;
+   --        Index := 0;
+   --        while Has_Element (Label_Cursor) loop
+   --           Index := Index + 1;
+   --           Put_Line (Element (Label_Cursor) & ", " &
+   --                       Float'Image (Facs (Index)));
+   --           Next (Label_Cursor);
+   --        end loop;
+   --        New_Line;
+   --
+   --     end Print_Bayes_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function ProbA_Chooser
+     (Classifier : Python.Module; Current_Item : Positive; B : Positive;
+      Data       : Data_Record; Alpha      : Float) return Positive is
+      use Python_API;
+      use ML_Types;
+      Clf          : PyObject;
+      Y_Hat        : Integer_Array (Data.Features.First_Index ..
+                                    Data.Features.Last_Index);
+      Item         : Positive;
+   begin
+      if Integer (Data.Features.Length) = 0 then
+         Item := Maths.Random_Integer (Current_Item, Current_Item + B);
+      else
+         Clf := Python.Call (Classifier, "multinomial_nb");
+         Python_CLF.Call (Classifier, "fit", Clf, Data.Features, Data.Labels);
+         Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf,
+                                   Data.Features);
+      end if;
+
+      return Item;
+
+   end ProbA_Chooser;
 
    --  -------------------------------------------------------------------------
 
    function Read_Vocabulary (File_Name : String) return Dictionary_List is
-      Routine_Name    : constant String := "Support_12A.Read_Vocabulary ";
+      Routine_Name     : constant String := "Support_12A.Read_Vocabulary ";
       File_ID          : File_Type;
       Lexicon_Size     : Natural := 0;  --  Token
       Vocab_Dictionary : Dictionary_List;
@@ -243,26 +287,26 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
 
---     function Word_List  (Dictionary : Dictionary_List)
---                          return ML_Types.Indef_String_List is
---        use ML_Types;
---        use Dictionary_Package;
---        --        Routine_Name : constant String := "Support_6A.Word_List ";
---        Curs  : Cursor := Dictionary.First;
---        Words : Indef_String_List;
---        Item  : Dictionary_Record;
---     begin
---        while Has_Element (Curs) loop
---           if Curs /= Dictionary.Last then
---              Item := Element (Curs);
---              Words.Append (To_String (Item.Key));
---           end if;
---           Next (Curs);
---        end loop;
---
---        return Words;
---
---     end Word_List;
+   --     function Word_List  (Dictionary : Dictionary_List)
+   --                          return ML_Types.Indef_String_List is
+   --        use ML_Types;
+   --        use Dictionary_Package;
+   --        --        Routine_Name : constant String := "Support_6A.Word_List ";
+   --        Curs  : Cursor := Dictionary.First;
+   --        Words : Indef_String_List;
+   --        Item  : Dictionary_Record;
+   --     begin
+   --        while Has_Element (Curs) loop
+   --           if Curs /= Dictionary.Last then
+   --              Item := Element (Curs);
+   --              Words.Append (To_String (Item.Key));
+   --           end if;
+   --           Next (Curs);
+   --        end loop;
+   --
+   --        return Words;
+   --
+   --     end Word_List;
 
    --  -------------------------------------------------------------------------
 
