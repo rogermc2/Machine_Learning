@@ -9,7 +9,7 @@ def multinomial_nb(alpha):
     return MultinomialNB(alpha=alpha)
 
 def fit (clf, features, labels):
-    return tuple(clf.fit(features, labels))
+    clf.fit(features, labels)
 
 def predict_proba(clf, features):
     return tuple(clf.predict_proba(features))

@@ -5,11 +5,10 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
 with Python_API;
 with Python_CLF;
-with Type_Utilities;
 
 package body Support_12A is
 
@@ -21,21 +20,26 @@ package body Support_12A is
    function ProbA_Chooser
      (Classifier              : Python.Module;
       Current_Item            : Positive; B : Positive;
-      Train_Set, Train_Labels : ML_Types.Integer_List_2D; Alpha : Integer) return Integer;
+      Train_Set, Train_Labels : ML_Types.Integer_List_2D; Alpha : Integer;
+      Clf                     : Python_API.PyObject) return Integer;
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
 
    --  -------------------------------------------------------------------------
 
-   function Arg_Max (Indices, Values : Integer_Array) return Positive is
-      Best   : constant Integer := Max (Values);
-      Found  : Boolean := False;
-      index  : Integer := Indices'First - 1;
-      Result : Positive := Indices (Indices'First);
+   function Arg_Max (Indices : Integer_Array; Values : Integer_Matrix)
+                     return Positive is
+      Routine_Name : constant String := "Support_6A.Arg_Max ";
+      Data         : constant Integer_Array := Get_Row (Values, 1);
+      Best         : constant Integer := Max (Data);
+      Found        : Boolean := False;
+      index        : Integer := Indices'First - 1;
+      Result       : Positive := Indices (Indices'First);
    begin
+      Print_Matrix_Dimensions (Routine_Name & "Values", Values);
       while index <= Indices'last and not Found loop
          index := index + 1;
-         Found := Values (index) = Best;
+         Found := Data (index) = Best;
          if Found then
             Result := Indices (index);
          end if;
@@ -81,7 +85,7 @@ package body Support_12A is
             aLine : constant String := Get_Line (File_ID);
             Label : constant Integer := Integer'Value (aLine (1 .. 1));
             Token : constant Integer_Array :=
-              Tokenize (aLine (3 .. aLine'Last), Dictionary);
+                      Tokenize (aLine (3 .. aLine'Last), Dictionary);
          begin
             Data.Labels.Append (Label);
             Data.Features.Append (Token);
@@ -101,10 +105,12 @@ package body Support_12A is
                        Data, Labels : Integer_Array; Alpha : Integer)
                        return ML_Types.Integer_List is
       use ML_Types;
-      use Type_Utilities;
+      --        Routine_Name : constant String := "Support_12A.Get_Data ";
       B            : constant Positive := 5;
---        Data_List    : constant Integer_List := To_Integer_List (Data);
---        Labels_List  : constant Integer_List := To_Integer_List (Labels);
+      --        Data_List    : constant Integer_List := To_Integer_List (Data);
+      --        Labels_List  : constant Integer_List := To_Integer_List (Labels);
+      Clf          : constant Python_API.PyObject :=
+                       Python.Call (Classifier, "multinomial_nb");
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List_2D;
       current_item : Positive := 1;
@@ -117,7 +123,7 @@ package body Support_12A is
          Train_Item.Clear;
          Labels_Item.Clear;
          Item := ProbA_Chooser (Classifier, current_item, B, Train_Set,
-                                Train_Labels, Alpha);
+                                Train_Labels, Alpha, Clf);
          Score.Append (Labels (Item));
          Train_Item.Append (Data (Item));
          Labels_Item.Append (Labels (Item));
@@ -135,25 +141,32 @@ package body Support_12A is
    function ProbA_Chooser
      (Classifier : Python.Module; Current_Item : Positive;
       B          : Positive; Train_Set, Train_Labels : ML_Types.Integer_List_2D;
-      Alpha      : Integer) return Integer is
-      use Python_API;
-      --        Routine_Name : constant String := "Support_12.ProbA_Chooser ";
-      Clf          : PyObject;
+      Alpha      : Integer;  Clf : Python_API.PyObject) return Integer is
+      Routine_Name : constant String := "Support_12.ProbA_Chooser ";
       Indices      : Integer_Array (1 .. B);
       --  Y_Hat predictions
       Y_Hat        : Integer_Matrix (Train_Set.First_Index ..
-                                      Train_Set.Last_Index, 1 .. 1);
+                                       Train_Set.Last_Index, 1 .. 1);
       Item         : Integer;
    begin
-      if Integer (Train_Set.Length) = 0 then
+      Put_Line (Routine_Name & "Train_Set length " &
+                  Integer'Image (Integer (Train_Set.Length)));
+      if Integer (Train_Set.Length) = Alpha then
+         Put_Line (Routine_Name & "Train_Labels length " &
+                     Integer'Image (Integer (Train_Labels.Length)));
+         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
+      end if;
+
+      if Integer (Train_Set.Length) < Alpha then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
       else
-         Clf := Python.Call (Classifier, "multinomial_nb", Alpha);
-         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
+         Put_Line (Routine_Name & "Train_Set (1) length " &
+                     Integer'Image (Integer (Train_Set (1).Length)));
          --  predict_proba() method returns a two-dimensional array,
          --  containing the estimated probabilities for each instance and each
          --  class:
          Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf, Train_Set);
+         Print_Matrix_Dimensions (Routine_Name & "Y_Hat", Y_Hat);
          for index in Indices'Range loop
             Indices (index) := Current_Item + index - 1;
          end loop;
@@ -182,11 +195,11 @@ package body Support_12A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant Unbounded_String :=
-              To_Unbounded_String (Get_Line (File_ID));
+                      To_Unbounded_String (Get_Line (File_ID));
             Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
             Token : constant Unbounded_String :=
-              To_Unbounded_String
-                (Slice (aLine, 6, Length (aLine) - 1));
+                      To_Unbounded_String
+                        (Slice (aLine, 6, Length (aLine) - 1));
          begin
             if Count > 1 then
                Item :=  (Token, Lexicon_Size);
@@ -209,7 +222,7 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Array (A : Integer_Array_List) return Integer_Array is
---        Routine_Name : constant String := "Support_12A.To_Integer_Array ";
+      --        Routine_Name : constant String := "Support_12A.To_Integer_Array ";
       Result : constant Integer_Array := A (1);
    begin
 
@@ -230,7 +243,7 @@ package body Support_12A is
       Index        : Natural;
       Item         : Dictionary_Record;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-        (others => 0);
+                       (others => 0);
       Word         : Unbounded_String;
       Dummy        : Boolean;
    begin
