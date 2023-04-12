@@ -9,6 +9,7 @@ with Maths;
 with Neural_Utilities;
 with Python_API;
 with Python_CLF;
+with Type_Utilities;
 
 package body Support_12A is
 
@@ -20,8 +21,7 @@ package body Support_12A is
    function ProbA_Chooser
      (Classifier              : Python.Module;
       Current_Item            : Positive; B : Positive;
-      Train_Set, Train_Labels : ML_Types.Integer_List; Alpha : Integer)
-      return Positive;
+      Train_Set, Train_Labels : ML_Types.Integer_List_2D; Alpha : Integer) return Integer;
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
 
@@ -75,12 +75,13 @@ package body Support_12A is
       Data            : Data_Record;
    begin
       Open (File_ID, In_File, File_Name);
+
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant String := Get_Line (File_ID);
             Label : constant Integer := Integer'Value (aLine (1 .. 1));
             Token : constant Integer_Array :=
-                      Tokenize (aLine (3 .. aLine'Last), Dictionary);
+              Tokenize (aLine (3 .. aLine'Last), Dictionary);
          begin
             Data.Labels.Append (Label);
             Data.Features.Append (Token);
@@ -90,11 +91,6 @@ package body Support_12A is
       Close (File_ID);
       Put_Line (Routine_Name & File_Name & " procesed.");
 
-      --        Put_Line (Routine_Name & "Number of words occurring more than once: " &
-      --                    Integer'Image (Num_Known));
-      --        Put_Line (Routine_Name & "Number of words occurring only once: " &
-      --                    Integer'Image (Num_Unknown));
-
       return Data;
 
    end Get_Data;
@@ -103,20 +99,30 @@ package body Support_12A is
 
    function Play_Game (Classifier   : Python.Module; Rounds : Positive;
                        Data, Labels : Integer_Array; Alpha : Integer)
-                       return Integer is
+                       return ML_Types.Integer_List is
+      use ML_Types;
+      use Type_Utilities;
       B            : constant Positive := 5;
-      Train_Set    : ML_Types.Integer_List;
-      Train_Labels : ML_Types.Integer_List;
+--        Data_List    : constant Integer_List := To_Integer_List (Data);
+--        Labels_List  : constant Integer_List := To_Integer_List (Labels);
+      Train_Set    : Integer_List_2D;
+      Train_Labels : Integer_List_2D;
       current_item : Positive := 1;
-      Item         : Positive;
-      Score        : Integer := 0;
+      Item         : Integer;
+      Train_Item   : Integer_List;
+      Labels_Item  : Integer_List;
+      Score        : Integer_List;
    begin
       while current_item < Rounds loop
+         Train_Item.Clear;
+         Labels_Item.Clear;
          Item := ProbA_Chooser (Classifier, current_item, B, Train_Set,
                                 Train_Labels, Alpha);
-         Score := Score + Labels (Item);
-         Train_Set.Append (Data (Item));
-         Train_Set.Append (Labels (Item));
+         Score.Append (Labels (Item));
+         Train_Item.Append (Data (Item));
+         Labels_Item.Append (Labels (Item));
+         Train_Set.Append (Train_Item);
+         Train_Set.Append (Labels_Item);
          current_item := current_item + B;
       end loop;
 
@@ -126,110 +132,18 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
 
-   --     procedure Plot_Sentence (Classifier : Python.Module;
-   --                              CLF        : Python_API.PyObject;
-   --                              Word_Dict  : Dictionary_List;
-   --                              Sentence   : ML_Types.Indef_String_List;
-   --                              Facs       : out Real_Float_List;
-   --                              Labels     : out ML_Types.Indef_String_List) is
-   --        use Maths.Float_Math_Functions;
-   --        use ML_Types.Indefinite_String_Package;
-   --        use Python_CLF;
-   --        Routine_Name     : constant String := "Support_6A.Plot_Sentence ";
-   --        Class_Log_Prior  : constant Python_API.PyObject :=
-   --                             Get_Attribute (CLF, "class_log_prior_");
-   --        Feature_Log_Prob : constant Python_API.PyObject :=
-   --                             Get_Attribute (CLF, "feature_log_prob_");
-   --        Curs             : Cursor := Sentence.First;
-   --        Acc              : Float := 1.0;
-   --        Log_Prior_0      : constant Float :=
-   --                             Call (Classifier, "array_item", Class_Log_Prior, 0);
-   --        Log_Prior_1      : constant Float :=
-   --                             Call (Classifier, "array_item", Class_Log_Prior, 1);
-   --        Log_Prob_0       : Float;
-   --        Log_Prob_1       : Float;
-   --        Factor           : Float := Exp (Log_Prior_0 - Log_Prior_1);
-   --     begin
-   --        Labels.Append ("PRIOR");
-   --        Facs.Append (Factor);
-   --        Acc := Acc * Factor;
-   --
-   --        while Has_Element (Curs) loop
-   --           declare
-   --              Word  : constant String := Sentence (Curs);
-   --              Item  : Dictionary_Record;
-   --              Index : Natural;
-   --           begin
-   --              Assert (Find_Item (Word_Dict, To_Unbounded_String (Word), Item),
-   --                      Routine_Name & Word & " is not in the dictionary");
-   --              Labels.Append (Word);
-   --              Index := Item.Value;
-   --              Log_Prob_0 :=
-   --                Call (Classifier, "matrix_item", Feature_Log_Prob,
-   --                      0, Index);
-   --              Log_Prob_1 :=
-   --                Call (Classifier, "matrix_item", Feature_Log_Prob,
-   --                      1, Index);
-   --              Factor := Exp (Log_Prob_0 - Log_Prob_1);
-   --              Facs.Append (Factor);
-   --              Acc := Acc * Factor;
-   --           end;
-   --
-   --           Next (Curs);
-   --        end loop;
-   --
-   --        Labels.Append ("POST");
-   --        Facs.Append (Acc);
-   --
-   --     end Plot_Sentence;
-
-   --  -------------------------------------------------------------------------
-
-   --     procedure Print_Bayes_Data
-   --       (Classifier : Python.Module; CLF : Python_API.PyObject;
-   --        Word_Dict  : Dictionary_List; Sentence : ML_Types.Indef_String_List) is
-   --        use ML_Types.Indefinite_String_Package;
-   --        Routine_Name : constant String := "Support_12A.Print_Bayes_Data ";
-   --        Label_Cursor : Cursor;
-   --        Facs         : Real_Float_List;
-   --        Labels       : ML_Types.Indef_String_List;
-   --        Index        : Natural := 0;
-   --     begin
-   --        Plot_Sentence (Classifier, CLF, Word_Dict, Sentence, Facs, Labels);
-   --        for fac in Facs.First_Index .. Facs.Last_Index loop
-   --           if Facs (fac) < 1.0 then
-   --              Facs.Replace_Element (fac, -1.0 / Facs (fac));
-   --           end if;
-   --        end loop;
-   --
-   --        New_Line;
-   --        Put_Line ("Naive Bayes factors:");
-   --        Label_Cursor := Labels.First;
-   --        Index := 0;
-   --        while Has_Element (Label_Cursor) loop
-   --           Index := Index + 1;
-   --           Put_Line (Element (Label_Cursor) & ", " &
-   --                       Float'Image (Facs (Index)));
-   --           Next (Label_Cursor);
-   --        end loop;
-   --        New_Line;
-   --
-   --     end Print_Bayes_Data;
-
-   --  -------------------------------------------------------------------------
-
    function ProbA_Chooser
      (Classifier : Python.Module; Current_Item : Positive;
-      B          : Positive; Train_Set, Train_Labels : ML_Types.Integer_List;
-      Alpha      : Integer) return Positive is
+      B          : Positive; Train_Set, Train_Labels : ML_Types.Integer_List_2D;
+      Alpha      : Integer) return Integer is
       use Python_API;
       --        Routine_Name : constant String := "Support_12.ProbA_Chooser ";
       Clf          : PyObject;
       Indices      : Integer_Array (1 .. B);
       --  Y_Hat predictions
-      Y_Hat        : Integer_Array (Train_Set.First_Index ..
-                                      Train_Set.Last_Index);
-      Item         : Positive;
+      Y_Hat        : Integer_Matrix (Train_Set.First_Index ..
+                                      Train_Set.Last_Index, 1 .. 1);
+      Item         : Integer;
    begin
       if Integer (Train_Set.Length) = 0 then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
@@ -268,11 +182,11 @@ package body Support_12A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant Unbounded_String :=
-                      To_Unbounded_String (Get_Line (File_ID));
+              To_Unbounded_String (Get_Line (File_ID));
             Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
             Token : constant Unbounded_String :=
-                      To_Unbounded_String
-                        (Slice (aLine, 6, Length (aLine) - 1));
+              To_Unbounded_String
+                (Slice (aLine, 6, Length (aLine) - 1));
          begin
             if Count > 1 then
                Item :=  (Token, Lexicon_Size);
@@ -295,14 +209,9 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Array (A : Integer_Array_List) return Integer_Array is
-      Result : Integer_Array (Integer (A.First_Index) ..
-                                Integer (A.Last_Index));
-      Item   : Integer_Array (1 .. 1);
+--        Routine_Name : constant String := "Support_12A.To_Integer_Array ";
+      Result : constant Integer_Array := A (1);
    begin
-      for index in A.First_Index .. A.Last_Index loop
-         Item := A (index);
-         Result (index) := Item (1);
-      end loop;
 
       return Result;
 
@@ -321,7 +230,7 @@ package body Support_12A is
       Index        : Natural;
       Item         : Dictionary_Record;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-                       (others => 0);
+        (others => 0);
       Word         : Unbounded_String;
       Dummy        : Boolean;
    begin

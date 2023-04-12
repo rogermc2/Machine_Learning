@@ -17,9 +17,10 @@ procedure Lesson_12A is
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
    Rounds           : constant Positive := 1000;
    Alpha            : Positive := 5;
+   Alphas           : ML_Types.Integer_List;
    Result           : ML_Types.Integer_List;
    Classifier       : Python.Module;
-   Score            : Integer;
+   Score            : ML_Types.Integer_List;
 begin
    Put_Line (Program_Name);
 
@@ -28,10 +29,13 @@ begin
 
    while Alpha <= 200 loop
       Alpha := Alpha + 5;
+      Alphas.Append (Alpha);
       Score := Play_Game (Classifier, Rounds, To_Integer_Array (CB.Features),
                           To_Integer_Array (CB.Labels), Alpha);
       Result.Append (Score);
    end loop;
+
+   Python.Call (Classifier, "plot", Result, Alphas);
 
    Python.Close_Module (Classifier);
    Python.Finalize;
