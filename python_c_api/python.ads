@@ -49,6 +49,8 @@ package Python is
                    A : ML_Arrays_And_Matrices.Integer_Array);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Types.Integer_List);
+   procedure Call (M    : Module; Function_Name : String;
+                   A : ML_Types.Integer_List; B : Integer);
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;

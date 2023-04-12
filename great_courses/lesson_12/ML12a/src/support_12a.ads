@@ -26,7 +26,7 @@ package Support_12A is
                       return Data_Record;
    function Play_Game (Classifier   : Python.Module; Rounds : Positive;
                        Data, Labels : Integer_Array; Alpha : Integer)
-                       return Integer;
+                       return ML_Types.Integer_List;
    function Read_Vocabulary (File_Name : String) return Dictionary_List;
    function To_Integer_Array (A : Integer_Array_List) return Integer_Array;
    pragma Inline (To_Integer_Array);
