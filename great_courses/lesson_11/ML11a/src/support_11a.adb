@@ -269,11 +269,8 @@ package body Support_11A is
       end loop;
 
       for cluster in 1 .. Num_Clusters loop
-<<<<<<< Updated upstream
          Labels_List := Select_Items (Labels, Center_IDs, cluster);
 
-=======
->>>>>>> Stashed changes
          if not Labels_List.Is_Empty then
             --  use mode of label item as cluster label
             C_Labels (cluster) := Cluster_Mode (Labels_List);
