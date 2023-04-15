@@ -98,8 +98,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Types.Integer_List_2D) 
                       return PyObject is
       use Interfaces.C;
-      use Ada.Containers;
-      --        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+--        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
       Num_Cols     : constant Positive := Positive (Data (1).Length);
       Row_Size     : constant int := int (Num_Cols);
       Value        : Integer;
@@ -109,20 +108,18 @@ package body Tuple_Builder is
       Py_Col       : int := -1;
       Result       : constant PyObject := PyTuple_New (int (Data.Length));
    begin
-      if Data.Length > 0 then
-         for row in Data.First_Index .. Data.Last_Index loop
-            Item := PyTuple_New (Row_Size);
-            Data_Row :=Data (row);
-            Py_Row := Py_Row + 1;
-            Py_Col := -1;
-            for col in Data_Row.First_Index .. Data_Row.Last_Index loop
-               Py_Col := Py_Col + 1;
-               Value := Data_Row (col);
-               PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (long (Value)));
-            end loop;
-            PyTuple_SetItem (Result, Py_Row, Item);
+      for row in Data.First_Index .. Data.Last_Index loop
+         Item := PyTuple_New (Row_Size);
+         Data_Row :=Data (row);
+         Py_Row := Py_Row + 1;
+         Py_Col := -1;
+         for col in Data_Row.First_Index .. Data_Row.Last_Index loop
+            Py_Col := Py_Col + 1;
+            Value := Data_Row (col);
+            PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (long (Value)));
          end loop;
-      end if;
+         PyTuple_SetItem (Result, Py_Row, Item);
+      end loop;
       
       return Result;
 
