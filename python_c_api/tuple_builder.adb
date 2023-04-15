@@ -3,7 +3,6 @@
 
 with Interfaces.C;
 
-with Ada.Containers;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
