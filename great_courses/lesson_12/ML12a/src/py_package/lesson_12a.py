@@ -8,6 +8,9 @@ def multinomial_nb():
 def multinomial_nb(alpha):
     return MultinomialNB(alpha=alpha)
 
+def fit (clf, features):
+    clf.fit(features)
+
 def fit (clf, features, labels):
     clf.fit(features, labels)
 

@@ -159,9 +159,18 @@ package body Support_12A is
       if Integer (Train_Set.Length) = Alpha then
          Put_Line (Routine_Name & "Train_Labels length " &
                      Integer'Image (Integer (Train_Labels.Length)));
-         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
+         Put_Line (Routine_Name & "fitting Train_Set and Train_Labels.");
+         if Integer (Train_Labels.Length) > 0 then
+            Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
+         else
+            Put_Line (Routine_Name & "fitting Train_Set.");
+            Python_CLF.Call (Classifier, "fit", Clf, Train_Set);
+         end if;
+         Put_Line (Routine_Name & "fitted.");
       end if;
 
+      Put_Line (Routine_Name & "Train_Set length " &
+                  Integer'Image (Integer (Train_Set.Length)));
       if Integer (Train_Set.Length) < Alpha then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
       else
