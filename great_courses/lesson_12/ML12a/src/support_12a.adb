@@ -96,15 +96,16 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
    --  For alpha days the selections are random.
    function Play_Game (Classifier   : Python.Module; Rounds : Positive;
-                       Data, Labels : Integer_Array; Alpha : Integer;
-                       Chooser : Chooser_Access) return ML_Types.Integer_List is
+                       Data, Labels : Integer_Array;
+                       Alpha        : Integer; Chooser : Chooser_Access)
+                       return ML_Types.Integer_List is
       use ML_Types;
-      --        Routine_Name : constant String := "Support_12A.Get_Data ";
+      --        Routine_Name : constant String := "Support_12A.Play_Game ";
       B            : constant Positive := 5;
-      --        Data_List    : constant Integer_List := To_Integer_List (Data);
-      --        Labels_List  : constant Integer_List := To_Integer_List (Labels);
       Clf          : constant Python_API.PyObject :=
                        Python.Call (Classifier, "multinomial_nb");
+--        Data_List    : Integer_List;
+--        Labels_List  : Integer_List;
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List_2D;
       current_item : Positive := 1;
