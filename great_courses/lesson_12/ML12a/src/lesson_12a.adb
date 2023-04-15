@@ -31,7 +31,8 @@ begin
       Alpha := Alpha + 5;
       Alphas.Append (Alpha);
       Score := Play_Game (Classifier, Rounds, To_Integer_Array (CB.Features),
-                          To_Integer_Array (CB.Labels), Alpha);
+                          To_Integer_Array (CB.Labels), Alpha,
+                          ProbA_Chooser'Access);
       Result.Append (Score);
    end loop;
 

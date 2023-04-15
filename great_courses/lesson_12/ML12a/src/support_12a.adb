@@ -7,7 +7,6 @@ with Maths;
 
 with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
-with Python_API;
 with Python_CLF;
 
 package body Support_12A is
@@ -17,11 +16,6 @@ package body Support_12A is
    Num_Known   : Natural := 0;
    Num_Unknown : Natural := 0;
 
-   function ProbA_Chooser
-     (Classifier              : Python.Module;
-      Current_Item            : Positive; B : Positive;
-      Train_Set, Train_Labels : ML_Types.Integer_List_2D; Alpha : Integer;
-      Clf                     : Python_API.PyObject) return Integer;
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
 
@@ -100,10 +94,10 @@ package body Support_12A is
    end Get_Data;
 
    --  -------------------------------------------------------------------------
-
+   --  For alpha days the selections are random.
    function Play_Game (Classifier   : Python.Module; Rounds : Positive;
-                       Data, Labels : Integer_Array; Alpha : Integer)
-                       return ML_Types.Integer_List is
+                       Data, Labels : Integer_Array; Alpha : Integer;
+                       Chooser : Chooser_Access) return ML_Types.Integer_List is
       use ML_Types;
       --        Routine_Name : constant String := "Support_12A.Get_Data ";
       B            : constant Positive := 5;
@@ -122,8 +116,8 @@ package body Support_12A is
       while current_item < Rounds loop
          Train_Item.Clear;
          Labels_Item.Clear;
-         Item := ProbA_Chooser (Classifier, current_item, B, Train_Set,
-                                Train_Labels, Alpha, Clf);
+         Item := Chooser (Classifier, current_item, B, Train_Set,
+                          Train_Labels, Alpha, Clf);
          Score.Append (Labels (Item));
          Train_Item.Append (Data (Item));
          Labels_Item.Append (Labels (Item));
@@ -137,11 +131,21 @@ package body Support_12A is
    end Play_Game;
 
    --  -------------------------------------------------------------------------
-
+   --  ProbA_Chooser chooses between B options.
+   --  Current_Item is the initial item to consider.
+   --  Train_Set represents the results of previous selections.
+   --  If alpha selections have not yet made the selection is random.
+   --  If alpha selections have been made in the past, fit a clf Naive Bayes
+   --  model using the traing data of academic papers by title, trainset and
+   --  training labels if the academic papers were interesting, trainlabs.
+   --  After fitting the clf model use it to select the item most likely to be
+   --  labeled as interesting.
    function ProbA_Chooser
-     (Classifier : Python.Module; Current_Item : Positive;
-      B          : Positive; Train_Set, Train_Labels : ML_Types.Integer_List_2D;
-      Alpha      : Integer;  Clf : Python_API.PyObject) return Integer is
+     (Classifier   : Python.Module; Current_Item : Positive;
+      B            : Positive;
+      Train_Set    : in out ML_Types.Integer_List_2D;
+      Train_Labels : in out ML_Types.Integer_List_2D;
+      Alpha        : Integer;  Clf : Python_API.PyObject) return Integer is
       Routine_Name : constant String := "Support_12.ProbA_Chooser ";
       Indices      : Integer_Array (1 .. B);
       --  Y_Hat predictions
