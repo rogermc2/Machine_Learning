@@ -394,22 +394,27 @@ package body Basic_Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_List
-     (Name  : String; aList : ML_Types.Integer_List;
-      Start : Positive := 1; Finish : Natural := 0) is
-      Last  : Positive;
+     (Name          : String; aList : ML_Types.Integer_List;
+      Start, Finish : Natural := 0) is
+      Pos_1 : Natural := Start;
+      Last  : Natural;
       Count : Integer := 1;
    begin
       if aList.Is_Empty then
          Put_Line (Name & " list is empty.");
       else
+         if aList.First_Index > Pos_1 then
+            Pos_1 := aList.First_Index;
+         end if;
+
          if Finish > 0 then
             Last := Finish;
          else
-            Last := Integer (aList.Length);
+            Last := Integer (aList.Last_Index);
          end if;
 
          Put_Line (Name & ": ");
-         for Index in Start .. Last loop
+         for Index in Pos_1 .. Last loop
             Put (Integer'Image (aList (Index)) & "  ");
             Count := Count + 1;
             if Count > 10 then
@@ -425,25 +430,30 @@ package body Basic_Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_List_2D
-     (Name  : String; aList : ML_Types.Integer_List_2D;
-      Start : Positive := 1; Finish : Natural := 0) is
+     (Name          : String; aList : ML_Types.Integer_List_2D;
+      Start, Finish : Natural := 0) is
       List_Row : ML_Types.Integer_List;
-      Last     : Positive;
+      Pos_1    : Natural := Start;
+      Last     : Natural;
       Count    : Integer := 1;
    begin
       if aList.Is_Empty then
          Put_Line (Name & " list is empty.");
       else
+         if aList.First_Index > Pos_1 then
+            Pos_1 := aList.First_Index;
+         end if;
+
          if Finish > 0 then
             Last := Finish;
          else
-            Last := Integer (aList.Length);
+            Last := Integer (aList.Last_Index);
          end if;
 
          Put_Line (Name & ": ");
-         for row in Start .. Last loop
+         for row in Pos_1 .. Last loop
             List_Row := aList (row);
-            for col in Start .. Last loop
+            for col in List_Row.First_Index .. List_Row.Last_Index loop
                Put (Integer'Image (List_Row (col)) & "  ");
             end loop;
 

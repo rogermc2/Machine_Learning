@@ -140,35 +140,28 @@ package body Python_CLF is
       Routine_Name : constant String := "Python_CLF.Call IL2D ";
 
       function Parse_Tuple (Tuple : PyObject) return ML_Types.Integer_List_2D is
-         Routine_Name : constant String := "Python_CLF.Call IL2D.Parse  ";
+         use ML_Types;
+--           Routine_Name : constant String := "Python_CLF.Call IL2D.Parse  ";
          Tuple_Size     : constant int := PyTuple_Size (Tuple);
          Tuple_Row_Size : constant int := PyTuple_Size (PyTuple_GetItem (Tuple, 1));
          Tuple_Row      : PyObject;
          Tuple_Item     : PyObject;
-         Result_Row     : ML_Types.Integer_List;
-         Result         : ML_Types.Integer_List_2D;
+         Result_Row     : Integer_List;
+         Value          : Integer;
+         Result         : Integer_List_2D;
       begin
-         Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
          for row in 0 .. Tuple_Size - 1 loop
             Tuple_Row := PyTuple_GetItem (Tuple, row);
-            Put_Line (Routine_Name & "Tuple_Row Size: " &
-                        int'Image (PyTuple_Size (Tuple_Row)));
             Result_Row.Clear;
             for col in 0 .. Tuple_Row_Size - 1 loop
                Tuple_Item := PyTuple_GetItem (Tuple_Row, col);
-               Put_Line (Routine_Name & "row, col, Tuple_Item: " &
-                           int'Image (row) & int'Image (col) & "  " &
-                           long'Image (PyLong_AsLong (Tuple_Item)));
-               Result_Row.Append (Integer (PyLong_AsLong (Tuple_Item)));
+               Value := Integer (PyLong_AsLong (Tuple_Item));
+               Result_Row.Append (Value);
             end loop;
-            Print_Integer_List (Routine_Name & "Result_Row", Result_Row);
+
             Result.Append (Result_Row);
-            Print_Integer_List_2D (Routine_Name & "row" & int'Image (row) &
-                                     " Result: ", Result);
-            New_Line;
          end loop;
 
-         Print_Integer_List_2D (Routine_Name & "Result: ", Result);
          return Result;
 
       end Parse_Tuple;
@@ -178,13 +171,13 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple      : PyObject;
+      A_Tuple      : constant PyObject := To_Tuple (A);
       PyParams     : PyObject;
       PyResult     : PyObject;
    begin
       Put_Line (Routine_Name & "A size:" & Integer'Image (Integer (A.Length)) & " x" &
                   Integer'Image (Integer (A (1).Length)));
-      A_Tuple := To_Tuple (A);
+
       Print_Integer_List_2D (Routine_Name & "A ", Parse_Tuple (A_Tuple));
       Assert (F /= System.Null_Address, Routine_Name &
                 "F is null");
