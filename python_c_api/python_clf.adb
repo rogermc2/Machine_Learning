@@ -140,6 +140,7 @@ package body Python_CLF is
       Routine_Name : constant String := "Python_CLF.Call IL2D ";
 
       function Parse_Tuple (Tuple : PyObject) return ML_Types.Integer_List_2D is
+         Routine_Name : constant String := "Python_CLF.Call IL2D.Parse  ";
          Tuple_Size     : constant int := PyTuple_Size (Tuple);
          Tuple_Row_Size : constant int := PyTuple_Size (PyTuple_GetItem (Tuple, 1));
          Tuple_Row      : PyObject;
@@ -147,17 +148,27 @@ package body Python_CLF is
          Result_Row     : ML_Types.Integer_List;
          Result         : ML_Types.Integer_List_2D;
       begin
-         --           Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
+         Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
          for row in 0 .. Tuple_Size - 1 loop
             Tuple_Row := PyTuple_GetItem (Tuple, row);
+            Put_Line (Routine_Name & "Tuple_Row Size: " &
+                        int'Image (PyTuple_Size (Tuple_Row)));
             Result_Row.Clear;
             for col in 0 .. Tuple_Row_Size - 1 loop
                Tuple_Item := PyTuple_GetItem (Tuple_Row, col);
+               Put_Line (Routine_Name & "row, col, Tuple_Item: " &
+                           int'Image (row) & int'Image (col) & "  " &
+                           long'Image (PyLong_AsLong (Tuple_Item)));
                Result_Row.Append (Integer (PyLong_AsLong (Tuple_Item)));
             end loop;
+            Print_Integer_List (Routine_Name & "Result_Row", Result_Row);
             Result.Append (Result_Row);
+            Print_Integer_List_2D (Routine_Name & "row" & int'Image (row) &
+                                     " Result: ", Result);
+            New_Line;
          end loop;
 
+         Print_Integer_List_2D (Routine_Name & "Result: ", Result);
          return Result;
 
       end Parse_Tuple;
