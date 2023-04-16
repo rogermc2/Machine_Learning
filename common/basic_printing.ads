@@ -47,6 +47,9 @@ package Basic_Printing is
    procedure Print_Integer_List
      (Name  : String; aList : ML_Types.Integer_List;
       Start : Positive := 1; Finish : Natural := 0);
+   procedure Print_Integer_List_2D
+     (Name  : String; aList : ML_Types.Integer_List_2D;
+      Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Integer_Map (Name : String;
                                 aMap : ML_Types.Integer_Label_Map);
    procedure Print_Integer_Matrix (Name  : String; aMatrix : Integer_Matrix;

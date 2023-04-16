@@ -424,6 +424,42 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Integer_List_2D
+     (Name  : String; aList : ML_Types.Integer_List_2D;
+      Start : Positive := 1; Finish : Natural := 0) is
+      List_Row : ML_Types.Integer_List;
+      Last     : Positive;
+      Count    : Integer := 1;
+   begin
+      if aList.Is_Empty then
+         Put_Line (Name & " list is empty.");
+      else
+         if Finish > 0 then
+            Last := Finish;
+         else
+            Last := Integer (aList.Length);
+         end if;
+
+         Put_Line (Name & ": ");
+         for row in Start .. Last loop
+            List_Row := aList (row);
+            for col in Start .. Last loop
+               Put (Integer'Image (List_Row (col)) & "  ");
+            end loop;
+
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+         New_Line;
+      end if;
+
+   end Print_Integer_List_2D;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Integer_Map
      (Name : String; aMap : ML_Types.Integer_Label_Map) is
       use ML_Types.Integer_Label_Map_Package;

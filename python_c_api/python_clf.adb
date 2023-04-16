@@ -7,7 +7,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with Tuple_Builder; use Tuple_Builder;
 
 package body Python_CLF is
@@ -139,15 +139,42 @@ package body Python_CLF is
       use Interfaces.C;
       Routine_Name : constant String := "Python_CLF.Call IL2D ";
 
+      function Parse_Tuple (Tuple : PyObject) return ML_Types.Integer_List_2D is
+         Tuple_Size     : constant int := PyTuple_Size (Tuple);
+         Tuple_Row_Size : constant int := PyTuple_Size (PyTuple_GetItem (Tuple, 1));
+         Tuple_Row      : PyObject;
+         Tuple_Item     : PyObject;
+         Result_Row     : ML_Types.Integer_List;
+         Result         : ML_Types.Integer_List_2D;
+      begin
+         --           Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
+         for row in 0 .. Tuple_Size - 1 loop
+            Tuple_Row := PyTuple_GetItem (Tuple, row);
+            Result_Row.Clear;
+            for col in 0 .. Tuple_Row_Size - 1 loop
+               Tuple_Item := PyTuple_GetItem (Tuple_Row, col);
+               Result_Row.Append (Integer (PyLong_AsLong (Tuple_Item)));
+            end loop;
+            Result.Append (Result_Row);
+         end loop;
+
+         return Result;
+
+      end Parse_Tuple;
+
       function Py_BuildValue (Format : char_array; O1, T1 : PyObject)
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple      : constant PyObject := To_Tuple (A);
+      A_Tuple      : PyObject;
       PyParams     : PyObject;
       PyResult     : PyObject;
    begin
+      Put_Line (Routine_Name & "A size:" & Integer'Image (Integer (A.Length)) & " x" &
+                  Integer'Image (Integer (A (1).Length)));
+      A_Tuple := To_Tuple (A);
+      Print_Integer_List_2D (Routine_Name & "A ", Parse_Tuple (A_Tuple));
       Assert (F /= System.Null_Address, Routine_Name &
                 "F is null");
       Assert (A_Tuple /= System.Null_Address, Routine_Name &
@@ -155,6 +182,7 @@ package body Python_CLF is
       PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
       Assert (PyParams /= System.Null_Address, Routine_Name &
                 "PyParams is null");
+      Put_Line (Routine_Name & "PyParams set");
       PyResult := Python.Call_Object (F, PyParams);
 
       Py_DecRef (F);

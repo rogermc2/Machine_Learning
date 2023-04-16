@@ -77,16 +77,18 @@ package body Tuple_Builder is
 
    function To_Tuple (Data : ML_Types.Integer_List) return PyObject is
       use Interfaces.C;
-      --        Routine_Name : constant String := "Python.To_Tuple Boolean_List ";
+      --        Routine_Name : constant String := "Python.To_Tuple Integer_List ";
       Tuple        : constant PyObject := PyTuple_New (int (Data.Length));
-      Long_Value   : long;
+      Value        : long;
       Py_Index     : int := -1;
    begin
-      for index in Data.First_Index .. Data.Last_Index loop
-         Py_Index := Py_Index + 1;
-         Long_Value := long (Data.Element (index));
-         PyTuple_SetItem (Tuple, Py_Index, PyLong_FromLong (Long_Value));
-      end loop;
+      if Integer (Data.Length) > 0 then
+         for index in Data.First_Index .. Data.Last_Index loop
+            Py_Index := Py_Index + 1;
+            Value := long (Data.Element (index));
+            PyTuple_SetItem (Tuple, Py_Index, PyLong_FromLong (Value));
+         end loop;
+      end if;
 
       return Tuple;
 
@@ -97,7 +99,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Types.Integer_List_2D) 
                       return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
       Num_Cols     : Natural := 0;
       Row_Size     : int := 0;
       Value        : Integer;
@@ -107,6 +109,7 @@ package body Tuple_Builder is
       Py_Col       : int := -1;
       Result       : constant PyObject := PyTuple_New (int (Data.Length));
    begin
+      Put_Line (Routine_Name & "Data Length:" & Integer'Image (Integer (Data.Length)));
       if Integer (Data.Length) > 0 then
          Num_Cols := Natural (Data (1).Length);
          Row_Size := int (Num_Cols);
@@ -119,12 +122,14 @@ package body Tuple_Builder is
                for col in Data_Row.First_Index .. Data_Row.Last_Index loop
                   Py_Col := Py_Col + 1;
                   Value := Data_Row (col);
-                  PyTuple_SetItem (Item, Py_Col,
-                                   PyLong_FromLong (long (Value)));
+                  Put_Line (Routine_Name & "row, col, long Value:" & Integer'Image (row) & " " &
+                              Integer'Image (col) & "  " & long'Image (long (Value)));
+                  PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (long (Value)));
                end loop;
             end if;
             PyTuple_SetItem (Result, Py_Row, Item);
          end loop;
+         Put_Line (Routine_Name & "Result set"); 
       end if;
       
       return Result;
