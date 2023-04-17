@@ -631,20 +631,6 @@ package body Python_CLF is
    function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
                   A : Real_Float_Matrix) return Boolean_Array is
       Routine_Name : constant String := "Python_Clf.Call FM ";
-      procedure Parse_Tuple (Tuple : PyObject;
-                             Vec   : in out Boolean_Array) is
-         use Interfaces.C;
-         T_Row : PyObject;
-      begin
-         Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
-                 "Parse_Tuple Real_Float_List Tuple Size " &
-                   int'Image (PyTuple_Size (Tuple))
-                 & " /= Vec Length" & Integer'Image (Vec'Length));
-         for row in 1 .. PyTuple_Size (Tuple) loop
-            T_Row := PyTuple_GetItem (Tuple, row - 1);
-            Vec (Integer (row)) := PyObject_IsTrue (T_Row) /= 0;
-         end loop;
-      end Parse_Tuple;
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject) return PyObject;
@@ -661,7 +647,7 @@ package body Python_CLF is
         Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
 
       PyResult := Python.Call_Object (F, PyParams);
-      Parse_Tuple (PyResult, Result);
+      Parsers.Parse_Tuple (PyResult, Result);
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
@@ -802,7 +788,6 @@ package body Python_CLF is
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_List)
                   return Real_Float_Vector is
-      use Interfaces.C;
       use Python;
       Routine_Name : constant String :=
         "Python_CLF.Call Real_Float_List ";
@@ -810,18 +795,6 @@ package body Python_CLF is
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      procedure Parse_Tuple (Tuple : PyObject;
-                             Vec   : in out Real_Float_Vector) is
-      begin
-         Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
-                   "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
-                 & " /= Vec'Length" & Integer'Image (Vec'Length));
-         for index in 1 .. PyTuple_Size (Tuple) loop
-            Vec (Integer (index)) :=
-              Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, index - 1)));
-         end loop;
-      end Parse_Tuple;
 
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
@@ -844,7 +817,7 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
-      Parse_Tuple (PyResult, Result);
+      Parsers.Parse_Tuple (PyResult, Result);
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
@@ -860,7 +833,6 @@ package body Python_CLF is
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_Matrix)
                   return Real_Float_Vector is
-      use Interfaces.C;
       use Python;
       Routine_Name : constant String :=
         "Python_CLF.Call 2 * Real_Float_Vector ";
@@ -868,17 +840,6 @@ package body Python_CLF is
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      procedure Parse_Tuple (Tuple : PyObject;
-                             Vec   : in out Real_Float_Vector) is
-      begin
-         Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
-                   "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
-                 & " /= Vec'Length" & Integer'Image (Vec'Length));
-         for index in 1 .. PyTuple_Size (Tuple) loop
-            Vec (Integer (index)) := Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, index - 1)));
-         end loop;
-      end Parse_Tuple;
 
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
@@ -901,7 +862,7 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
-      Parse_Tuple (PyResult, Result);
+      Parsers.Parse_Tuple (PyResult, Result);
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
