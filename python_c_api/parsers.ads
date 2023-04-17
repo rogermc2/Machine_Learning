@@ -5,8 +5,10 @@ with Python_API; use Python_API;
 
 package Parsers is
 
-   function Parse_Tuple (Tuple : PyObject) return ML_Types.Integer_List_2D;
    procedure Parse_Tuple (Tuple : PyObject; Vec : in out Boolean_Array);
+   procedure Parse_Tuple (Tuple : PyObject; Vec : in out Integer_Array);
+   function Parse_Tuple (Tuple : PyObject) return ML_Types.Integer_List_2D;
+   procedure Parse_Tuple (Tuple : PyObject; theMatrix : in out Integer_Matrix);
    procedure Parse_Tuple (Tuple : PyObject; Vec : in out Real_Float_Vector);
 
 end Parsers;
