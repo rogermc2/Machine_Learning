@@ -170,11 +170,14 @@ package body Python is
 
    function Call (M : Module; Function_Name : String)
                   return Python_API.PyObject is
+      use System;
+      Routine_Name : constant String := "Python.Call function only ";
       Func     : PyObject;
       PyResult : PyObject;
    begin
       Func := Get_Symbol (M, Function_Name);
       PyResult := PyObject_CallObject (Func, System.Null_Address);
+      Assert (PyResult /= Null_Address, Routine_Name & "PyResult is null");
       
       Py_DecRef (Func);
       

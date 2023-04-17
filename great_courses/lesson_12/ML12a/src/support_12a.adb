@@ -74,12 +74,14 @@ package body Support_12A is
       File_ID         : File_Type;
       Data            : Data_Record;
    begin
+      Put_Line (Routine_Name & "processing " & File_Name);
       Open (File_ID, In_File, File_Name);
 
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant String := Get_Line (File_ID);
-            Label : constant Integer := Integer'Value (aLine (1 .. 1));
+            Label : constant Integer_Array (1 .. 1) :=
+                      (1 => Integer'Value (aLine (1 .. 1)));
             Token : constant Integer_Array :=
                       Tokenize (aLine (3 .. aLine'Last), Dictionary);
          begin
@@ -89,7 +91,7 @@ package body Support_12A is
       end loop;
 
       Close (File_ID);
-      Put_Line (Routine_Name & File_Name & " procesed.");
+      Put_Line (Routine_Name & File_Name & " processed.");
 
       return Data;
 
@@ -98,7 +100,7 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
    --  For alpha days the selections are random.
    function Play_Game (Classifier   : Python.Module; Rounds : Positive;
-                       Data, Labels : Integer_Array;
+                       Data, Labels : Integer_Matrix;
                        Alpha        : Integer; Chooser : Chooser_Access)
                        return ML_Types.Integer_List is
       use System;
@@ -106,9 +108,7 @@ package body Support_12A is
       Routine_Name : constant String := "Support_12A.Play_Game ";
       B            : constant Positive := 5;
       Clf          : constant Python_API.PyObject :=
-                       Python.Call (Classifier, "multinomial_nb");
---        Data_List    : Integer_List;
---        Labels_List  : Integer_List;
+                       Python.Call (Classifier, "multinomial_nb1");
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List_2D;
       current_item : Positive := 1;
@@ -118,16 +118,24 @@ package body Support_12A is
       Score        : Integer_List;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+      Assert (Labels'Length = Data'Length, Routine_Name & "Labels Length" &
+                Integer'Image (Labels'Length) & " not equal to Data Length" &
+                Integer'Image (Data'Length));
+      Print_Matrix_Dimensions (Routine_Name & "Data", Data);
+      Print_Matrix_Dimensions (Routine_Name & "Labels", Labels);
+
       while current_item < Rounds loop
          Train_Item.Clear;
          Labels_Item.Clear;
          Item := Chooser (Classifier, current_item, B, Train_Set,
                           Train_Labels, Alpha, Clf);
-         Score.Append (Labels (Item));
-         Train_Item.Append (Data (Item));
-         Labels_Item.Append (Labels (Item));
+         Score.Append (Labels (Item, 1));
+
+         Train_Item.Append (Data (Item, 1));
+         Labels_Item.Append (Labels (Item, 1));
+
          Train_Set.Append (Train_Item);
-         Train_Set.Append (Labels_Item);
+         Train_Labels.Append (Labels_Item);
          current_item := current_item + B;
       end loop;
 
@@ -166,12 +174,7 @@ package body Support_12A is
          Put_Line (Routine_Name & "Train_Labels length " &
                      Integer'Image (Integer (Train_Labels.Length)));
          Put_Line (Routine_Name & "fitting Train_Set and Train_Labels.");
-         if Integer (Train_Labels.Length) > 0 then
-            Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
-         else
-            Put_Line (Routine_Name & "fitting Train_Set.");
-            Python_CLF.Call (Classifier, "fit", Clf, Train_Set);
-         end if;
+         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
          Put_Line (Routine_Name & "fitted.");
       end if;
 
@@ -233,7 +236,7 @@ package body Support_12A is
 
       Item :=  (Lex_Size, Lexicon_Size);
       Vocab_Dictionary.Append (Item);
-      Put_Line (Routine_Name & File_Name & " procesed.");
+      Put_Line (Routine_Name & File_Name & " processed.");
 
       return Vocab_Dictionary;
 
@@ -241,14 +244,23 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_Array (A : Integer_Array_List) return Integer_Array is
+   function To_Integer_Matrix (A : Integer_Array_List) return Integer_Matrix is
       --        Routine_Name : constant String := "Support_12A.To_Integer_Array ";
-      Result : constant Integer_Array := A (1);
+      Row_Length : constant Integer := A.Element (1)'Length;
+      List_Row   : Integer_Array (1 .. Row_Length);
+      Result     : Integer_Matrix (1 .. Integer (A.Length),
+                                 1 .. Row_Length);
    begin
+      for row in Result'Range loop
+         List_Row  := A (row);
+         for col in Result'Range (2) loop
+            Result (row, col) := List_Row (col);
+         end loop;
+      end loop;
 
       return Result;
 
-   end To_Integer_Array;
+   end To_Integer_Matrix;
 
    --  -------------------------------------------------------------------------
 
