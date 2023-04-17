@@ -1,5 +1,7 @@
 
---  with Ada.Assertions; use Ada.Assertions;
+with System;
+
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -99,8 +101,9 @@ package body Support_12A is
                        Data, Labels : Integer_Array;
                        Alpha        : Integer; Chooser : Chooser_Access)
                        return ML_Types.Integer_List is
+      use System;
       use ML_Types;
-      --        Routine_Name : constant String := "Support_12A.Play_Game ";
+      Routine_Name : constant String := "Support_12A.Play_Game ";
       B            : constant Positive := 5;
       Clf          : constant Python_API.PyObject :=
                        Python.Call (Classifier, "multinomial_nb");
@@ -114,6 +117,7 @@ package body Support_12A is
       Labels_Item  : Integer_List;
       Score        : Integer_List;
    begin
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
       while current_item < Rounds loop
          Train_Item.Clear;
          Labels_Item.Clear;
@@ -147,6 +151,7 @@ package body Support_12A is
       Train_Set    : in out ML_Types.Integer_List_2D;
       Train_Labels : in out ML_Types.Integer_List_2D;
       Alpha        : Integer;  Clf : Python_API.PyObject) return Integer is
+      use System;
       Routine_Name : constant String := "Support_12.ProbA_Chooser ";
       Indices      : Integer_Array (1 .. B);
       --  Y_Hat predictions
@@ -154,6 +159,7 @@ package body Support_12A is
                                        Train_Set.Last_Index, 1 .. 1);
       Item         : Integer;
    begin
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
       Put_Line (Routine_Name & "Train_Set length " &
                   Integer'Image (Integer (Train_Set.Length)));
       if Integer (Train_Set.Length) = Alpha then

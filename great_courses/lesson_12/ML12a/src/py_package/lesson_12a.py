@@ -3,7 +3,9 @@ from sklearn.naive_bayes import MultinomialNB
 from matplotlib import pyplot as plt
 
 def multinomial_nb():
-    return MultinomialNB()
+    clf = MultinomialNB()
+    print ("clf", clf)
+    return clf
 
 def multinomial_nb(alpha):
     return MultinomialNB(alpha=alpha)
