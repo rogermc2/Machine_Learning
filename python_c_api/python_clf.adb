@@ -175,18 +175,11 @@ package body Python_CLF is
       PyParams     : PyObject;
       PyResult     : PyObject;
    begin
-      Put_Line (Routine_Name & "A size:" & Integer'Image (Integer (A.Length)) & " x" &
-                  Integer'Image (Integer (A (1).Length)));
-
       Print_Integer_List_2D (Routine_Name & "A ", Parse_Tuple (A_Tuple));
-      Assert (F /= System.Null_Address, Routine_Name &
-                "F is null");
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       Assert (A_Tuple /= System.Null_Address, Routine_Name &
                 "A_Tuple is null");
       PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
-      Assert (PyParams /= System.Null_Address, Routine_Name &
-                "PyParams is null");
-      Put_Line (Routine_Name & "PyParams set");
       PyResult := Python.Call_Object (F, PyParams);
 
       Py_DecRef (F);
