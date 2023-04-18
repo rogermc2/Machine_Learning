@@ -107,8 +107,7 @@ package body Support_12A is
       use ML_Types;
       Routine_Name : constant String := "Support_12A.Play_Game ";
       B            : constant Positive := 5;
-      Clf          : constant Python_API.PyObject :=
-                       Python.Call (Classifier, "multinomial_nb1");
+      Clf          : Python_API.PyObject;
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List_2D;
       current_item : Positive := 1;
@@ -117,10 +116,12 @@ package body Support_12A is
       Labels_Item  : Integer_List;
       Score        : Integer_List;
    begin
+      Put_Line (Routine_Name);
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
       Assert (Labels'Length = Data'Length, Routine_Name & "Labels Length" &
                 Integer'Image (Labels'Length) & " not equal to Data Length" &
                 Integer'Image (Data'Length));
+      Clf := Python.Call (Classifier, "init_MultinomialNB");
       Print_Matrix_Dimensions (Routine_Name & "Data", Data);
       Print_Matrix_Dimensions (Routine_Name & "Labels", Labels);
 
@@ -244,23 +245,28 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_Matrix (A : Integer_Array_List) return Integer_Matrix is
-      --        Routine_Name : constant String := "Support_12A.To_Integer_Array ";
-      Row_Length : constant Integer := A.Element (1)'Length;
-      List_Row   : Integer_Array (1 .. Row_Length);
-      Result     : Integer_Matrix (1 .. Integer (A.Length),
-                                 1 .. Row_Length);
+   function To_Matrix (A : Integer_Array_List) return Integer_Matrix is
+      Routine_Name : constant String := "Support_12A.To_Matrix ";
+      Row_Length   : constant Integer := A.Element (1)'Length;
    begin
-      for row in Result'Range loop
-         List_Row  := A (row);
-         for col in Result'Range (2) loop
-            Result (row, col) := List_Row (col);
+      Put_Line (Routine_Name);
+      Put_Line (Routine_Name & "Row_Length" & Integer'Image (Row_Length));
+      declare
+         List_Row   : Integer_Array (1 .. Row_Length);
+         Result     : Integer_Matrix (1 .. Integer (A.Length),
+                                      1 .. Row_Length);
+      begin
+         for row in Result'Range loop
+            List_Row  := A (row);
+            for col in Result'Range (2) loop
+               Result (row, col) := List_Row (col);
+            end loop;
          end loop;
-      end loop;
+         Put_Line (Routine_Name & "done");
+         return Result;
+      end;
 
-      return Result;
-
-   end To_Integer_Matrix;
+   end To_Matrix;
 
    --  -------------------------------------------------------------------------
 

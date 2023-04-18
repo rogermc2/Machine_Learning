@@ -40,9 +40,10 @@ package Support_12A is
                       return Data_Record;
    function Play_Game (Classifier   : Python.Module; Rounds : Positive;
                        Data, Labels : Integer_Matrix; Alpha : Integer;
-                       Chooser : Chooser_Access) return ML_Types.Integer_List;
+                       Chooser      : Chooser_Access)
+                       return ML_Types.Integer_List;
    function Read_Vocabulary (File_Name : String) return Dictionary_List;
-   function To_Integer_Matrix (A : Integer_Array_List) return Integer_Matrix;
-   pragma Inline (To_Integer_Matrix);
+   function To_Matrix (A : Integer_Array_List) return Integer_Matrix;
+   pragma Inline (To_Matrix);
 
 end Support_12A;

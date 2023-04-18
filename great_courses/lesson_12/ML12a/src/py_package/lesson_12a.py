@@ -2,11 +2,10 @@ import numpy as np
 from sklearn.naive_bayes import MultinomialNB
 from matplotlib import pyplot as plt
 
-def multinomial_nb1():
-    print ("multinomial_nb1")
+def init_MultinomialNB():
     return MultinomialNB()
 
-def multinomial_nb2(alpha):
+def init_multinomial_nb2(alpha):
     return MultinomialNB(alpha=alpha)
 
 def fit (clf, features, labels):

@@ -13,6 +13,8 @@ procedure Lesson_12A is
                         Read_Vocabulary ("../../data/vocab2.txt");
    CB               : constant Data_Record :=
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
+--     Features         : Integer_Matrix := To_Integer_Matrix (CB.Features);
+--     Labels         : Integer_Matrix := To_Integer_Matrix (CB.Labels);
    Rounds           : constant Positive := 2; --  1000;
    Alpha            : Positive := 5;
    Alphas           : ML_Types.Integer_List;
@@ -28,10 +30,16 @@ begin
 --     while Alpha <= 200 loop
    while Alpha <= 10 loop
       Alpha := Alpha + 5;
-      Put_Line (Program_Name & "Alpha" & Integer'Image (Alpha));
       Alphas.Append (Alpha);
-      Score := Play_Game (Classifier, Rounds, To_Integer_Matrix (CB.Features),
-                          To_Integer_Matrix (CB.Labels), Alpha,
+      Put_Line (Program_Name & "Alpha" & Integer'Image (Alpha));
+      Put_Line (Program_Name & "CB.Features length" &
+                  Integer'Image (Integer (CB.Features.Length)));
+      Put_Line (Program_Name & "CB.Labels length" &
+                  Integer'Image (Integer (CB.Labels.Length)));
+      Put_Line (Program_Name & "CB.Labels (1) length" &
+                  Integer'Image (Integer (CB.Labels.Element (1)'Length)));
+      Score := Play_Game (Classifier, Rounds, To_Matrix (CB.Features),
+                          To_Matrix (CB.Labels), Alpha,
                           ProbA_Chooser'Access);
       Result.Append (Score);
    end loop;
