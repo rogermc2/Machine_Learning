@@ -9,7 +9,7 @@ with Python_API;
 
 package Support_12A is
 
-   type Data_Record is record
+   type Data_Lists is record
       Features : Integer_Array_List;
       Labels   : Integer_Array_List;
    end record;
@@ -37,7 +37,7 @@ package Support_12A is
       Train_Labels : in out ML_Types.Integer_List_2D; Alpha : Integer;
       Clf          : Python_API.PyObject) return Integer;
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
-                      return Data_Record;
+                      return Data_Lists;
    function Play_Game (Classifier   : Python.Module; Rounds : Positive;
                        Data, Labels : Integer_Matrix; Alpha : Integer;
                        Chooser      : Chooser_Access)

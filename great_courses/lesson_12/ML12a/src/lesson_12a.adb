@@ -11,7 +11,7 @@ procedure Lesson_12A is
    Program_Name     : constant String := "Lesson 12A ";
    Vocab_Dictionary : constant Dictionary_List :=
                         Read_Vocabulary ("../../data/vocab2.txt");
-   CB               : constant Data_Record :=
+   CB               : constant Data_Lists :=
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
 --     Features         : Integer_Matrix := To_Integer_Matrix (CB.Features);
 --     Labels         : Integer_Matrix := To_Integer_Matrix (CB.Labels);
@@ -39,8 +39,7 @@ begin
       Put_Line (Program_Name & "CB.Labels (1) length" &
                   Integer'Image (Integer (CB.Labels.Element (1)'Length)));
       Score := Play_Game (Classifier, Rounds, To_Matrix (CB.Features),
-                          To_Matrix (CB.Labels), Alpha,
-                          ProbA_Chooser'Access);
+                          To_Matrix (CB.Labels), Alpha, ProbA_Chooser'Access);
       Result.Append (Score);
    end loop;
 

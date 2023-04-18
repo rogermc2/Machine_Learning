@@ -69,10 +69,10 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
 
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
-                      return Data_Record is
-      Routine_Name    : constant String := "Support_12A.Get_Data ";
-      File_ID         : File_Type;
-      Data            : Data_Record;
+                      return Data_Lists is
+      Routine_Name : constant String := "Support_12A.Get_Data ";
+      File_ID      : File_Type;
+      Data         : Data_Lists;
    begin
       Put_Line (Routine_Name & "processing " & File_Name);
       Open (File_ID, In_File, File_Name);
