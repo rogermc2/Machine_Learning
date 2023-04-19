@@ -280,6 +280,11 @@ package body Support_12A is
          return Result;
       end;
 
+   exception
+      when others =>
+         Put_Line (Routine_Name & "exception");
+         raise;
+
    end To_Matrix;
 
    --  -------------------------------------------------------------------------
