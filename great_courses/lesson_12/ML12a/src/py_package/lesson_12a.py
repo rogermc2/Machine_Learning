@@ -3,6 +3,7 @@ from sklearn.naive_bayes import MultinomialNB
 from matplotlib import pyplot as plt
 
 def init_MultinomialNB():
+    print ("Py init_MultinomialNB")
     return MultinomialNB()
 
 def init_multinomial_nb2(alpha):

@@ -121,6 +121,7 @@ package body Support_12A is
       Assert (Labels'Length = Data'Length, Routine_Name & "Labels Length" &
                 Integer'Image (Labels'Length) & " not equal to Data Length" &
                 Integer'Image (Data'Length));
+      Put_Line (Routine_Name & "init_MultinomialNB");
       Clf := Python.Call (Classifier, "init_MultinomialNB");
       Print_Matrix_Dimensions (Routine_Name & "Data", Data);
       Print_Matrix_Dimensions (Routine_Name & "Labels", Labels);
@@ -246,20 +247,33 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
 
    function To_Matrix (A : Integer_Array_List) return Integer_Matrix is
-      Routine_Name : constant String := "Support_12A.To_Matrix ";
-      Row_Length   : constant Integer := A.Element (1)'Length;
+      Routine_Name   : constant String := "Support_12A.To_Matrix ";
+      A_Length       : constant Integer := Integer (A.Length);
+      Row_Length     : constant Integer := A.Element (1)'Length;
+      Max_Row_Length : Natural := 0;
    begin
-      Put_Line (Routine_Name);
-      Put_Line (Routine_Name & "Row_Length" & Integer'Image (Row_Length));
+      Put_Line (Routine_Name & "A length" & Integer'Image (A_Length));
+      Put_Line (Routine_Name & "first Row_Length" & Integer'Image (Row_Length));
+      for row in A.First_Index .. A.Last_Index loop
+         if A.Element (row)'Length > Max_Row_Length then
+            Max_Row_Length := A.Element (row)'Length;
+         end if;
+      end loop;
+      Put_Line (Routine_Name & "Max_Row_Length:" &
+                  Integer'Image (Max_Row_Length));
+      Assert (Max_Row_Length = A.Element (A.First_Index)'Length, Routine_Name &
+                "List arrays have different lengths.");
+
+      Put_Line (Routine_Name & "declare Result");
       declare
-         List_Row   : Integer_Array (1 .. Row_Length);
-         Result     : Integer_Matrix (1 .. Integer (A.Length),
-                                      1 .. Row_Length);
+         Result : Integer_Matrix (1 .. A_Length, 1 .. Max_Row_Length);
       begin
+         Put_Line (Routine_Name & "declare code");
          for row in Result'Range loop
-            List_Row  := A (row);
+            Put_Line (Routine_Name & "loading matrix row" &
+                        Integer'Image (row));
             for col in Result'Range (2) loop
-               Result (row, col) := List_Row (col);
+               Result (row, col) := A.Element (row) (col);
             end loop;
          end loop;
          Put_Line (Routine_Name & "done");
