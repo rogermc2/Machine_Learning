@@ -14,7 +14,6 @@ procedure Lesson_12A is
                         Read_Vocabulary ("../../data/vocab2.txt");
    CB               : constant Data_Items :=
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
---     Features         : constant Integer_Matrix := To_Matrix (CB.Features);
    Rounds           : constant Positive := 2; --  1000;
    Alpha            : Positive := 5;
    Alphas           : ML_Types.Integer_List;
@@ -23,30 +22,20 @@ procedure Lesson_12A is
    Score            : ML_Types.Integer_List;
 begin
    Put_Line (Program_Name);
-
-   Print_Matrix_Dimensions (Program_Name & "CB.Features", CB.Features);
---     Print_Matrix_Dimensions (Program_Name & "Features", Features);
    Print_Matrix_Dimensions (Program_Name & "CB.Labels", CB.Labels);
    Python.Initialize;
---
---     declare
---        Labels : Integer_Matrix (1 .. Integer (CB.Labels.Length),
---                                 1 .. CB.Labels.Element (1)'Length);
---     begin
---        Labels := To_Matrix (CB.Labels);
---        Print_Matrix_Dimensions (Program_Name & "Labels", Labels);
-      Classifier := Python.Import_File ("lesson_12a");
 
-      --     while Alpha <= 200 loop
-      while Alpha <= 10 loop
-         Alpha := Alpha + 5;
-         Alphas.Append (Alpha);
-         Put_Line (Program_Name & "Alpha" & Integer'Image (Alpha));
-         Score := Play_Game (Classifier, Rounds, CB.Features, CB.Labels, Alpha,
-                             ProbA_Chooser'Access);
-         Result.Append (Score);
-      end loop;
---     end;
+   Classifier := Python.Import_File ("lesson_12a");
+   --     while Alpha <= 200 loop
+   while Alpha <= 10 loop
+      Alpha := Alpha + 5;
+      Alphas.Append (Alpha);
+      Put_Line (Program_Name & "Alpha" & Integer'Image (Alpha));
+      Score := Play_Game (Classifier, Rounds, CB, Alpha,
+                          ProbA_Chooser'Access);
+      Result.Append (Score);
+   end loop;
+   --     end;
 
    Python.Call (Classifier, "plot", Result, Alphas);
 
@@ -58,8 +47,8 @@ begin
    Put_Line (Program_Name & "finished.");
    New_Line;
 
-   exception
-      when Constraint_Error => Put_Line (Program_Name & "Constraint_Error");
-      when others => Put_Line (Program_Name & "exception");
+exception
+   when Constraint_Error => Put_Line (Program_Name & "Constraint_Error");
+   when others => Put_Line (Program_Name & "exception");
 
 end Lesson_12A;

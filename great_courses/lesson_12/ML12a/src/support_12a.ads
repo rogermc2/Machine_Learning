@@ -9,8 +9,8 @@ with Python_API;
 
 package Support_12A is
 
-   type Data_Items (Rows, Num_Features : Positive) is record
-      Features : Integer_Matrix (1 .. Rows, 1 .. Num_Features);
+   type Data_Items (Rows : Positive) is record
+      Features : Integer_Array_List;
       Labels   : Integer_Matrix (1 .. Rows, 1 .. 1);
    end record;
 
@@ -34,16 +34,14 @@ package Support_12A is
      (Classifier   : Python.Module;
       Current_Item : Positive; B : Positive;
       Train_Set    : in out ML_Types.Integer_List_2D;
-      Train_Labels : in out ML_Types.Integer_List_2D; Alpha : Integer;
+      Train_Labels : in out ML_Types.Integer_List; Alpha : Integer;
       Clf          : Python_API.PyObject) return Integer;
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
                       return Data_Items;
-   function Play_Game (Classifier   : Python.Module; Rounds : Positive;
-                       Data, Labels : Integer_Matrix; Alpha : Integer;
-                       Chooser      : Chooser_Access)
+   function Play_Game (Classifier : Python.Module; Rounds : Positive;
+                       Data       : Data_Items; Alpha : Integer;
+                       Chooser    : Chooser_Access)
                        return ML_Types.Integer_List;
    function Read_Vocabulary (File_Name : String) return Dictionary_List;
---     function To_Matrix (A : Integer_Array_List) return Integer_Matrix;
---     pragma Inline (To_Matrix);
 
 end Support_12A;
