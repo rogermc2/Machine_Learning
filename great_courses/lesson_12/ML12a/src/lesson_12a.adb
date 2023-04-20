@@ -2,7 +2,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use  Basic_Printing;
-with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+--  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;
 
@@ -12,9 +12,9 @@ procedure Lesson_12A is
    Program_Name     : constant String := "Lesson 12A ";
    Vocab_Dictionary : constant Dictionary_List :=
                         Read_Vocabulary ("../../data/vocab2.txt");
-   CB               : constant Data_Lists :=
+   CB               : constant Data_Items :=
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
-   Features         : constant Integer_Matrix := To_Matrix (CB.Features);
+--     Features         : constant Integer_Matrix := To_Matrix (CB.Features);
    Rounds           : constant Positive := 2; --  1000;
    Alpha            : Positive := 5;
    Alphas           : ML_Types.Integer_List;
@@ -24,21 +24,17 @@ procedure Lesson_12A is
 begin
    Put_Line (Program_Name);
 
-   Put_Line (Program_Name & "Features length" &
-               Integer'Image (Integer (Features'Length)));
-   Print_Matrix_Dimensions (Program_Name & "Features", Features);
-   Put_Line (Program_Name & "CB.Labels length" &
-               Integer'Image (Integer (CB.Labels.Length)));
-   Put_Line (Program_Name & "CB.Labels (1) length" &
-               Integer'Image (Integer (CB.Labels.Element (1)'Length)));
+   Print_Matrix_Dimensions (Program_Name & "CB.Features", CB.Features);
+--     Print_Matrix_Dimensions (Program_Name & "Features", Features);
+   Print_Matrix_Dimensions (Program_Name & "CB.Labels", CB.Labels);
    Python.Initialize;
-
-   declare
-      Labels : Integer_Matrix (1 .. Integer (CB.Labels.Length),
-                               1 .. CB.Labels.Element (1)'Length);
-   begin
-      Labels := To_Matrix (CB.Labels);
-      Print_Matrix_Dimensions (Program_Name & "Labels", Labels);
+--
+--     declare
+--        Labels : Integer_Matrix (1 .. Integer (CB.Labels.Length),
+--                                 1 .. CB.Labels.Element (1)'Length);
+--     begin
+--        Labels := To_Matrix (CB.Labels);
+--        Print_Matrix_Dimensions (Program_Name & "Labels", Labels);
       Classifier := Python.Import_File ("lesson_12a");
 
       --     while Alpha <= 200 loop
@@ -46,11 +42,11 @@ begin
          Alpha := Alpha + 5;
          Alphas.Append (Alpha);
          Put_Line (Program_Name & "Alpha" & Integer'Image (Alpha));
-         Score := Play_Game (Classifier, Rounds, Features, Labels, Alpha,
+         Score := Play_Game (Classifier, Rounds, CB.Features, CB.Labels, Alpha,
                              ProbA_Chooser'Access);
          Result.Append (Score);
       end loop;
-   end;
+--     end;
 
    Python.Call (Classifier, "plot", Result, Alphas);
 
@@ -61,5 +57,9 @@ begin
 
    Put_Line (Program_Name & "finished.");
    New_Line;
+
+   exception
+      when Constraint_Error => Put_Line (Program_Name & "Constraint_Error");
+      when others => Put_Line (Program_Name & "exception");
 
 end Lesson_12A;

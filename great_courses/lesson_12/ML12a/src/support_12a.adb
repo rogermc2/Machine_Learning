@@ -3,6 +3,7 @@ with System;
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Directories;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -69,31 +70,40 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
 
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
-                      return Data_Lists is
+                      return Data_Items is
       Routine_Name : constant String := "Support_12A.Get_Data ";
+      FileSize     : constant Integer := Integer (Ada.Directories.Size (File_Name));
       File_ID      : File_Type;
-      Data         : Data_Lists;
    begin
       Put_Line (Routine_Name & "processing " & File_Name);
       Open (File_ID, In_File, File_Name);
+      declare
+         aLine : constant String := Get_Line (File_ID);
+         Data  : Data_Items (FileSize, aLine'Length);
+         Row   : Natural := 0;
+      begin
+         Reset (File_ID);
+         while not End_Of_File (File_ID) loop
+            Row := Row + 1;
+            declare
+               aLine : constant String := Get_Line (File_ID);
+               --                 Label : constant Integer_Array (1 .. 1) :=
+               --                   (1 => Integer'Value (aLine (1 .. 1)));
+               Token : constant Integer_Array :=
+                 Tokenize (aLine (3 .. aLine'Last), Dictionary);
+            begin
+               Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
+               for col in Token'Range loop
+                  Data.Features (Row, col) := Token (col);
+               end loop;
+            end;
+         end loop;
 
-      while not End_Of_File (File_ID) loop
-         declare
-            aLine : constant String := Get_Line (File_ID);
-            Label : constant Integer_Array (1 .. 1) :=
-                      (1 => Integer'Value (aLine (1 .. 1)));
-            Token : constant Integer_Array :=
-                      Tokenize (aLine (3 .. aLine'Last), Dictionary);
-         begin
-            Data.Labels.Append (Label);
-            Data.Features.Append (Token);
-         end;
-      end loop;
+         Close (File_ID);
+         Put_Line (Routine_Name & File_Name & " processed.");
 
-      Close (File_ID);
-      Put_Line (Routine_Name & File_Name & " processed.");
-
-      return Data;
+         return Data;
+      end;
 
    end Get_Data;
 
@@ -220,11 +230,11 @@ package body Support_12A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant Unbounded_String :=
-                      To_Unbounded_String (Get_Line (File_ID));
+              To_Unbounded_String (Get_Line (File_ID));
             Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
             Token : constant Unbounded_String :=
-                      To_Unbounded_String
-                        (Slice (aLine, 6, Length (aLine) - 1));
+              To_Unbounded_String
+                (Slice (aLine, 6, Length (aLine) - 1));
          begin
             if Count > 1 then
                Item :=  (Token, Lexicon_Size);
@@ -246,46 +256,47 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
 
-   function To_Matrix (A : Integer_Array_List) return Integer_Matrix is
-      Routine_Name   : constant String := "Support_12A.To_Matrix ";
-      A_Length       : constant Integer := Integer (A.Length);
-      Row_Length     : constant Integer := A.Element (1)'Length;
-      Max_Row_Length : Natural := 0;
-   begin
-      Put_Line (Routine_Name & "A length" & Integer'Image (A_Length));
-      Put_Line (Routine_Name & "first Row_Length" & Integer'Image (Row_Length));
-      for row in A.First_Index .. A.Last_Index loop
-         if A.Element (row)'Length > Max_Row_Length then
-            Max_Row_Length := A.Element (row)'Length;
-         end if;
-      end loop;
-      Put_Line (Routine_Name & "Max_Row_Length:" &
-                  Integer'Image (Max_Row_Length));
-      Assert (Max_Row_Length = A.Element (A.First_Index)'Length, Routine_Name &
-                "List arrays have different lengths.");
-
-      Put_Line (Routine_Name & "declare Result");
-      declare
-         Result : Integer_Matrix (1 .. A_Length, 1 .. Max_Row_Length);
-      begin
-         Put_Line (Routine_Name & "declare code");
-         for row in Result'Range loop
-            Put_Line (Routine_Name & "loading matrix row" &
-                        Integer'Image (row));
-            for col in Result'Range (2) loop
-               Result (row, col) := A.Element (row) (col);
-            end loop;
-         end loop;
-         Put_Line (Routine_Name & "done");
-         return Result;
-      end;
-
-   exception
-      when others =>
-         Put_Line (Routine_Name & "exception");
-         raise;
-
-   end To_Matrix;
+--     function To_Matrix (A : Integer_Array_List) return Integer_Matrix is
+--        Routine_Name   : constant String := "Support_12A.To_Matrix ";
+--        A_Length       : constant Integer := Integer (A.Length);
+--        Row_Length     : constant Integer := A.Element (1)'Length;
+--        Max_Row_Length : Natural := 0;
+--     begin
+--        Put_Line (Routine_Name & "A length" & Integer'Image (A_Length));
+--        Put_Line (Routine_Name & "first Row_Length" & Integer'Image (Row_Length));
+--        for row in A.First_Index .. A.Last_Index loop
+--           if A.Element (row)'Length > Max_Row_Length then
+--              Max_Row_Length := A.Element (row)'Length;
+--           end if;
+--        end loop;
+--        Put_Line (Routine_Name & "Max_Row_Length:" &
+--                    Integer'Image (Max_Row_Length));
+--        Assert (Max_Row_Length = A.Element (A.First_Index)'Length, Routine_Name &
+--                  "List arrays have different lengths.");
+--
+--        Put_Line (Routine_Name & "declare Result");
+--        declare
+--           Result : Integer_Matrix (1 .. A_Length, 1 .. Max_Row_Length);
+--        begin
+--           Put_Line (Routine_Name & "declare code");
+--           for row in Result'Range loop
+--              Put_Line (Routine_Name & "loading matrix row" &
+--                          Integer'Image (row));
+--              for col in Result'Range (2) loop
+--                 Result (row, col) := A.Element (row) (col);
+--              end loop;
+--           end loop;
+--           Put_Line (Routine_Name & "done");
+--           return Result;
+--        end;
+--
+--     exception
+--        when Constraint_Error => Put_Line (Routine_Name & "Constraint_Error");
+--           raise;
+--        when others => Put_Line (Routine_Name & "exception");
+--           raise;
+--
+--     end To_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -300,7 +311,7 @@ package body Support_12A is
       Index        : Natural;
       Item         : Dictionary_Record;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-                       (others => 0);
+        (others => 0);
       Word         : Unbounded_String;
       Dummy        : Boolean;
    begin
