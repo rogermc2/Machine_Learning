@@ -21,7 +21,6 @@ package body Support_12A is
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
    --     function To_Matrix (A : Integer_Array_List) return Integer_Matrix;
-   --     pragma Inline (To_Matrix);
 
    --  -------------------------------------------------------------------------
 
@@ -90,8 +89,16 @@ package body Support_12A is
          Row  : Natural := 0;
       begin
          Put_Line (Routine_Name & "reading " & File_Name);
+         Num_Lines := 0;
+         Put ("*");
+
          while not End_Of_File (File_ID) loop
             Row := Row + 1;
+            Num_Lines := Num_Lines + 1;
+            if Num_Lines mod 10 = 0 then
+               Put ("*");
+            end if;
+
             declare
                aLine : constant String := Get_Line (File_ID);
                --  Token arrays are of varying length
@@ -106,7 +113,10 @@ package body Support_12A is
          end loop;
 
          Close (File_ID);
-         Put_Line (Routine_Name & File_Name & " processed.");
+
+         New_Line;
+         Put_Line (Routine_Name & File_Name & Integer'Image (Num_Lines) &
+                     " lines processed.");
 
          return Data;
       end;
@@ -338,29 +348,6 @@ package body Support_12A is
       return Vec;
 
    end Tokenize;
-
-   --  -------------------------------------------------------------------------
-
-   --     function Word_List  (Dictionary : Dictionary_List)
-   --                          return ML_Types.Indef_String_List is
-   --        use ML_Types;
-   --        use Dictionary_Package;
-   --        --        Routine_Name : constant String := "Support_6A.Word_List ";
-   --        Curs  : Cursor := Dictionary.First;
-   --        Words : Indef_String_List;
-   --        Item  : Dictionary_Record;
-   --     begin
-   --        while Has_Element (Curs) loop
-   --           if Curs /= Dictionary.Last then
-   --              Item := Element (Curs);
-   --              Words.Append (To_String (Item.Key));
-   --           end if;
-   --           Next (Curs);
-   --        end loop;
-   --
-   --        return Words;
-   --
-   --     end Word_List;
 
    --  -------------------------------------------------------------------------
 
