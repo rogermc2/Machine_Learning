@@ -20,8 +20,8 @@ package body Support_12A is
 
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
---     function To_Matrix (A : Integer_Array_List) return Integer_Matrix;
---     pragma Inline (To_Matrix);
+   --     function To_Matrix (A : Integer_Array_List) return Integer_Matrix;
+   --     pragma Inline (To_Matrix);
 
    --  -------------------------------------------------------------------------
 
@@ -84,10 +84,10 @@ package body Support_12A is
       end loop;
 
       Reset (File_ID);
-      Put_Line (Routine_Name & "Num_Lines " & Integer'Image (Num_Lines));
+      Put_Line (Routine_Name & "Num Lines: " & Integer'Image (Num_Lines));
       declare
-         Data         : Data_Items (Num_Lines);
-         Row          : Natural := 0;
+         Data : Data_Items (Num_Lines);
+         Row  : Natural := 0;
       begin
          Put_Line (Routine_Name & "reading " & File_Name);
          while not End_Of_File (File_ID) loop
@@ -116,8 +116,7 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
    --  For alpha days the selections are random.
    function Play_Game (Classifier : Python.Module; Rounds : Positive;
-                       Data       : Data_Items;
-                       Alpha      : Integer; Chooser : Chooser_Access)
+                       Data       : Data_Items; Alpha : Integer)
                        return ML_Types.Integer_List is
       use System;
       use ML_Types;
@@ -128,7 +127,6 @@ package body Support_12A is
       Train_Labels : Integer_List;
       current_item : Positive := 1;
       Item         : Integer;
-      Train_Item   : Integer_List;
       Score        : Integer_List;
    begin
       Put_Line (Routine_Name);
@@ -138,15 +136,21 @@ package body Support_12A is
       Print_Matrix_Dimensions (Routine_Name & "Labels", Data.Labels);
 
       while current_item < Rounds loop
-         Train_Item.Clear;
-         Item := Chooser (Classifier, current_item, B, Train_Set,
-                          Train_Labels, Alpha, Clf);
-         Score.Append (Data.Labels (Item, 1));
-
-         Train_Item.Append (Data.Features (Item));
-         Labels_Item.Append (Data.Labels (Item, 1));
+         Item := ProbA_Chooser (Classifier, current_item, B, Train_Set,
+                                Train_Labels, Alpha, Clf);
+         declare
+            Features   : constant Integer_Array := Data.Features (Item);
+            Train_Item : Integer_List;
+         begin
+            for col in Features'Range loop
+               Train_Item.Append (Features (col));
+            end loop;
+            Train_Labels.Append (Train_Item);
+         end;
 
          Train_Labels.Append (Data.Labels (Item, 1));
+         Score.Append (Data.Labels (Item, 1));
+
          current_item := current_item + B;
       end loop;
 

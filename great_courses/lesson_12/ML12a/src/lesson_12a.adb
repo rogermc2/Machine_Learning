@@ -31,8 +31,7 @@ begin
       Alpha := Alpha + 5;
       Alphas.Append (Alpha);
       Put_Line (Program_Name & "Alpha" & Integer'Image (Alpha));
-      Score := Play_Game (Classifier, Rounds, CB, Alpha,
-                          ProbA_Chooser'Access);
+      Score := Play_Game (Classifier, Rounds, CB, Alpha);
       Result.Append (Score);
    end loop;
    --     end;
