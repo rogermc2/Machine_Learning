@@ -10,7 +10,7 @@ project Lesson_12A is
    for Exec_Dir use ".";
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnat12", "-O", "-gnatn", "-funroll-loops", "-gnatw.Tkmru", "-gnatyclux");
+      for Default_Switches ("ada") use ("-gnat12", "-O", "-gnatn", "-funroll-loops", "-gnato", "-fstack-check", "-gnatw.Tkmru", "-gnatyclux");
    end Compiler;
 
    package Linker is
@@ -21,9 +21,12 @@ project Lesson_12A is
             for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.2_1/Frameworks/Python.framework/Versions/3.11/lib", "-lpython3.11");
 
          when "ventura" =>
-            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.1/Frameworks/Python.framework/Versions/3.11/lib", "-lpython3.11");
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.11.2_1/Frameworks/Python.framework/Versions/3.11/lib", "-lpython3.11");
       end case;
    end Linker;
+
+   package Builder is
+   end Builder;
 
 end Lesson_12A;
 

@@ -34,7 +34,6 @@ begin
       Score := Play_Game (Classifier, Rounds, CB, Alpha);
       Result.Append (Score);
    end loop;
-   --     end;
 
    Python.Call (Classifier, "plot", Result, Alphas);
 

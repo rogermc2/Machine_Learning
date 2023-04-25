@@ -95,7 +95,7 @@ package body Support_12A is
          while not End_Of_File (File_ID) loop
             Row := Row + 1;
             Num_Lines := Num_Lines + 1;
-            if Num_Lines mod 10 = 0 then
+            if Num_Lines mod 100 = 0 then
                Put ("*");
             end if;
 
@@ -106,18 +106,16 @@ package body Support_12A is
                          Tokenize (aLine (3 .. aLine'Last), Dictionary);
             begin
                Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
-               for col in Token'Range loop
-                  Data.Features.Append (Token);
-               end loop;
+               Data.Features.Append (Token);
             end;
+
          end loop;
+         New_Line;
 
          Close (File_ID);
 
-         New_Line;
          Put_Line (Routine_Name & File_Name & Integer'Image (Num_Lines) &
                      " lines processed.");
-
          return Data;
       end;
 
@@ -269,50 +267,6 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
 
-   --     function To_Matrix (A : Integer_Array_List) return Integer_Matrix is
-   --        Routine_Name   : constant String := "Support_12A.To_Matrix ";
-   --        A_Length       : constant Integer := Integer (A.Length);
-   --        Row_Length     : constant Integer := A.Element (1)'Length;
-   --        Max_Row_Length : Natural := 0;
-   --     begin
-   --        Put_Line (Routine_Name & "A length" & Integer'Image (A_Length));
-   --        Put_Line (Routine_Name & "first Row_Length" & Integer'Image (Row_Length));
-   --        for row in A.First_Index .. A.Last_Index loop
-   --           if A.Element (row)'Length > Max_Row_Length then
-   --              Max_Row_Length := A.Element (row)'Length;
-   --           end if;
-   --        end loop;
-   --        Put_Line (Routine_Name & "Max_Row_Length:" &
-   --                    Integer'Image (Max_Row_Length));
-   --        Assert (Max_Row_Length = A.Element (A.First_Index)'Length, Routine_Name &
-   --                  "List arrays have different lengths.");
-   --
-   --        Put_Line (Routine_Name & "declare Result");
-   --        declare
-   --           Result : Integer_Matrix (1 .. A_Length, 1 .. Max_Row_Length);
-   --        begin
-   --           Put_Line (Routine_Name & "declare code");
-   --           for row in Result'Range loop
-   --              Put_Line (Routine_Name & "loading matrix row" &
-   --                          Integer'Image (row));
-   --              for col in Result'Range (2) loop
-   --                 Result (row, col) := A.Element (row) (col);
-   --              end loop;
-   --           end loop;
-   --           Put_Line (Routine_Name & "done");
-   --           return Result;
-   --        end;
-   --
-   --     exception
-   --        when Constraint_Error => Put_Line (Routine_Name & "Constraint_Error");
-   --           raise;
-   --        when others => Put_Line (Routine_Name & "exception");
-   --           raise;
-   --
-   --     end To_Matrix;
-
-   --  -------------------------------------------------------------------------
-
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array is
       use Neural_Utilities;
@@ -323,22 +277,26 @@ package body Support_12A is
       Word_Cursor  : String_Package.Cursor;
       Index        : Natural;
       Item         : Dictionary_Record;
+      Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
+      Unknown_Val  : constant Integer := Item.Value;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
                        (others => 0);
       Word         : Unbounded_String;
-      Dummy        : Boolean;
    begin
+      pragma Warnings (Off, Unknown_Item);
       Words := Split_String_On_Spaces (Data);
       Word_Cursor := Words.First;
       while Has_Element (Word_Cursor) loop
          Word := Element (Word_Cursor);
          if Find_Item (Dictionary, Word, Item) then
+            --  the word has a feature so add one to the corresponding feature
             Num_Known := Num_Known + 1;
             Index := Item.Value;
          else
+            --  add one to the Unknown
             Num_Unknown := Num_Unknown + 1;
-            Dummy := Find_Item (Dictionary, Unknown, Item);
-            Index := Item.Value;
+--              Dummy := Find_Item (Dictionary, Unknown, Item);
+            Index := Unknown_Val;
          end if;
 
          Vec (Index) := Vec (Index) + 1;
