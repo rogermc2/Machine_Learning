@@ -75,7 +75,6 @@ package body Support_12A is
       File_ID      : File_Type;
       Num_Lines    : Natural := 0;
    begin
-      Put_Line (Routine_Name & "processing " & File_Name);
       Open (File_ID, In_File, File_Name);
       while not End_Of_File (File_ID) loop
          Num_Lines := Num_Lines + 1;
@@ -83,7 +82,8 @@ package body Support_12A is
       end loop;
 
       Reset (File_ID);
-      Put_Line (Routine_Name & "Num Lines: " & Integer'Image (Num_Lines));
+      Put_Line (Routine_Name & "processing " & File_Name & ", Num Lines: " &
+                  Integer'Image (Num_Lines));
       declare
          Data : Data_Items (Num_Lines);
          Row  : Natural := 0;

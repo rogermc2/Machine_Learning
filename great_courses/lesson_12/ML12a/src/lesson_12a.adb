@@ -1,4 +1,5 @@
 
+with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use  Basic_Printing;
@@ -46,7 +47,10 @@ begin
    New_Line;
 
 exception
-   when Constraint_Error => Put_Line (Program_Name & "Constraint_Error");
-   when others => Put_Line (Program_Name & "exception");
+   when Error: Constraint_Error => Put_Line (Program_Name &
+                                               "Constraint_Error");
+      Put_Line (Exception_Information(Error));
+   when Error: others => Put_Line (Program_Name & "exception");
+      Put_Line (Exception_Information(Error));
 
 end Lesson_12A;
