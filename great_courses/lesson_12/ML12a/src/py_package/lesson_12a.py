@@ -2,8 +2,7 @@ import numpy as np
 from sklearn.naive_bayes import MultinomialNB
 from matplotlib import pyplot as plt
 
-def init_MultinomialNB():
-    print ("Py init_MultinomialNB")
+def init_multinomialnb1():
     return MultinomialNB()
 
 def init_multinomial_nb2(alpha):
@@ -15,11 +14,9 @@ def fit (clf, features, labels):
 def predict_proba(clf, features):
     return tuple(clf.predict_proba(features))
 
-def plot(data1, data2):
-    dp1 = np.array (data1)
-    dp2 = np.array (data2)
-    plt.plot(dp1[:,0], dp1[:,1],'o',color='r')
-    plt.plot(dp2[:,0], dp2[:,1],'o',color='b')
-    plt.xticks(np.arange(0, np.max(data1) + 20, 20.0))
-    plt.yticks(np.arange(0, np.max(data1) + 20, 20.0))
+def plot(ress, alphas):
+    plt.scatter(alphas, ress)
+    plt.plot(alphas, ress)
+#    plt.xticks(np.arange(0, np.max(data1) + 20, 20.0))
+#    plt.yticks(np.arange(0, np.max(data1) + 20, 20.0))
     plt.show()

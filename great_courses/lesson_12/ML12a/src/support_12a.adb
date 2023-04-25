@@ -82,7 +82,7 @@ package body Support_12A is
       end loop;
 
       Reset (File_ID);
-      Put_Line (Routine_Name & "processing " & File_Name & ", Num Lines: " &
+      Put_Line (Routine_Name & "processing " & File_Name & ", Num Lines:" &
                   Integer'Image (Num_Lines));
       declare
          Data : Data_Items (Num_Lines);
@@ -130,21 +130,21 @@ package body Support_12A is
       use ML_Types;
       Routine_Name : constant String := "Support_12A.Play_Game ";
       B            : constant Positive := 5;
-      Clf          : Python_API.PyObject;
+      Clf          : constant Python_API.PyObject :=
+                       Python.Call (Classifier, "init_multinomialnb1");
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List;
-      current_item : Positive := 1;
+      Current_Item : Positive := 1;
       Item         : Integer;
       Score        : Integer_List;
    begin
       Put_Line (Routine_Name);
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      Put_Line (Routine_Name & "init_MultinomialNB");
-      Clf := Python.Call (Classifier, "init_MultinomialNB");
       Print_Matrix_Dimensions (Routine_Name & "Labels", Data.Labels);
 
-      while current_item < Rounds loop
-         Item := ProbA_Chooser (Classifier, current_item, B, Train_Set,
+      while Current_Item < Rounds loop
+         Put_Line (Routine_Name & "Current_Item " & Integer'Image (Current_Item));
+         Item := ProbA_Chooser (Classifier, Current_Item, B, Train_Set,
                                 Train_Labels, Alpha, Clf);
          declare
             Features   : constant Integer_Array := Data.Features (Item);
@@ -153,13 +153,17 @@ package body Support_12A is
             for col in Features'Range loop
                Train_Item.Append (Features (col));
             end loop;
-            Train_Labels.Append (Train_Item);
+            Train_Set.Append (Train_Item);
+            Put_Line (Routine_Name & "Train_Item length " &
+                        Integer'Image (Integer (Train_Item.Length)));
          end;
+         Put_Line (Routine_Name & "Train_Set length " &
+                     Integer'Image (Integer (Train_Set.Length)));
 
          Train_Labels.Append (Data.Labels (Item, 1));
          Score.Append (Data.Labels (Item, 1));
 
-         current_item := current_item + B;
+         Current_Item := Current_Item + B;
       end loop;
 
       return Score;
@@ -179,8 +183,8 @@ package body Support_12A is
    function ProbA_Chooser
      (Classifier   : Python.Module; Current_Item : Positive;
       B            : Positive;
-      Train_Set    : in out ML_Types.Integer_List_2D;
-      Train_Labels : in out ML_Types.Integer_List;
+      Train_Set    : ML_Types.Integer_List_2D;
+      Train_Labels : ML_Types.Integer_List;
       Alpha        : Integer;  Clf : Python_API.PyObject) return Integer is
       use System;
       Routine_Name : constant String := "Support_12.ProbA_Chooser ";
@@ -295,7 +299,7 @@ package body Support_12A is
          else
             --  add one to the Unknown
             Num_Unknown := Num_Unknown + 1;
---              Dummy := Find_Item (Dictionary, Unknown, Item);
+            --              Dummy := Find_Item (Dictionary, Unknown, Item);
             Index := Unknown_Val;
          end if;
 

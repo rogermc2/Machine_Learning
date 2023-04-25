@@ -33,8 +33,8 @@ package Support_12A is
    function ProbA_Chooser
      (Classifier   : Python.Module;
       Current_Item : Positive; B : Positive;
-      Train_Set    : in out ML_Types.Integer_List_2D;
-      Train_Labels : in out ML_Types.Integer_List; Alpha : Integer;
+      Train_Set    : ML_Types.Integer_List_2D;
+      Train_Labels : ML_Types.Integer_List; Alpha : Integer;
       Clf          : Python_API.PyObject) return Integer;
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
                       return Data_Items;
