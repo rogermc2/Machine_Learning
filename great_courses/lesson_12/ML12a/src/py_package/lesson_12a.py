@@ -14,9 +14,9 @@ def fit (clf, features, labels):
 def predict_proba(clf, features):
     return tuple(clf.predict_proba(features))
 
-def plot(ress, alphas):
-    plt.scatter(alphas, ress)
-    plt.plot(alphas, ress)
+def plot(alphas, result):
+    plt.scatter(alphas, result)
+    plt.plot(alphas, result)
 #    plt.xticks(np.arange(0, np.max(data1) + 20, 20.0))
 #    plt.yticks(np.arange(0, np.max(data1) + 20, 20.0))
     plt.show()

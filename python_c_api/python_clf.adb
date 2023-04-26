@@ -235,7 +235,6 @@ package body Python_CLF is
       Py_DecRef (B_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
-      Put_Line (Routine_Name & "done");
 
    end Call;
 

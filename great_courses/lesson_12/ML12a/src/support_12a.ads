@@ -40,7 +40,7 @@ package Support_12A is
                       return Data_Items;
    function Play_Game (Classifier : Python.Module;
                        Rounds  : Positive; Data : Data_Items; Alpha : Integer)
-                       return ML_Types.Integer_List;
+                       return Natural;
    function Read_Vocabulary (File_Name : String) return Dictionary_List;
 
 end Support_12A;

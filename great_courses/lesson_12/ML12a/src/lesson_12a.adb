@@ -2,8 +2,7 @@
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use  Basic_Printing;
---  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+--  with Basic_Printing; use  Basic_Printing;
 with ML_Types;
 with Python;
 
@@ -15,27 +14,23 @@ procedure Lesson_12A is
                         Read_Vocabulary ("../../data/vocab2.txt");
    CB               : constant Data_Items :=
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
-   Rounds           : constant Positive := 2; --  1000;
+   Rounds           : constant Positive := 500;
+   Classifier       : Python.Module;
    Alpha            : Positive := 5;
    Alphas           : ML_Types.Integer_List;
    Result           : ML_Types.Integer_List;
-   Classifier       : Python.Module;
-   Score            : ML_Types.Integer_List;
 begin
    Put_Line (Program_Name);
-   Print_Matrix_Dimensions (Program_Name & "CB.Labels", CB.Labels);
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_12a");
    while Alpha <= 200 loop
       Alpha := Alpha + 5;
       Alphas.Append (Alpha);
-      Put_Line (Program_Name & "Alpha" & Integer'Image (Alpha));
-      Score := Play_Game (Classifier, Rounds, CB, Alpha);
-      Result.Append (Score);
+      Result.Append (Play_Game (Classifier, Rounds, CB, Alpha));
    end loop;
 
-   Python.Call (Classifier, "plot", Result, Alphas);
+   Python.Call (Classifier, "plot", Alphas, Result);
 
    Python.Close_Module (Classifier);
    Python.Finalize;

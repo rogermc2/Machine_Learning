@@ -20,7 +20,6 @@ package body Support_12A is
 
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
-   --     function To_Matrix (A : Integer_Array_List) return Integer_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -88,7 +87,6 @@ package body Support_12A is
          Data : Data_Items (Num_Lines);
          Row  : Natural := 0;
       begin
-         Put_Line (Routine_Name & "reading " & File_Name);
          Num_Lines := 0;
          Put ("*");
 
@@ -125,7 +123,7 @@ package body Support_12A is
    --  For alpha days the selections are random.
    function Play_Game (Classifier : Python.Module; Rounds : Positive;
                        Data       : Data_Items; Alpha : Integer)
-                       return ML_Types.Integer_List is
+                       return Natural is
       use System;
       use ML_Types;
       Routine_Name : constant String := "Support_12A.Play_Game ";
@@ -136,14 +134,11 @@ package body Support_12A is
       Train_Labels : Integer_List;
       Current_Item : Positive := 1;
       Item         : Integer;
-      Score        : Integer_List;
+      Score        : Natural := 0;
    begin
-      Put_Line (Routine_Name);
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      Print_Matrix_Dimensions (Routine_Name & "Labels", Data.Labels);
 
       while Current_Item < Rounds loop
-         Put_Line (Routine_Name & "Current_Item " & Integer'Image (Current_Item));
          Item := ProbA_Chooser (Classifier, Current_Item, B, Train_Set,
                                 Train_Labels, Alpha, Clf);
          declare
@@ -154,17 +149,15 @@ package body Support_12A is
                Train_Item.Append (Features (col));
             end loop;
             Train_Set.Append (Train_Item);
-            Put_Line (Routine_Name & "Train_Item length " &
-                        Integer'Image (Integer (Train_Item.Length)));
          end;
-         Put_Line (Routine_Name & "Train_Set length " &
-                     Integer'Image (Integer (Train_Set.Length)));
 
          Train_Labels.Append (Data.Labels (Item, 1));
-         Score.Append (Data.Labels (Item, 1));
+         Score := Score + Data.Labels (Item, 1);
 
          Current_Item := Current_Item + B;
       end loop;
+
+      New_Line;
 
       return Score;
 
@@ -189,38 +182,32 @@ package body Support_12A is
       use System;
       Routine_Name : constant String := "Support_12.ProbA_Chooser ";
       Indices      : Integer_Array (1 .. B);
-      --  Y_Hat predictions
-      Y_Hat        : Integer_Matrix (Train_Set.First_Index ..
-                                       Train_Set.Last_Index, 1 .. 1);
       Item         : Integer;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      Put_Line (Routine_Name & "Train_Set length " &
-                  Integer'Image (Integer (Train_Set.Length)));
       if Integer (Train_Set.Length) = Alpha then
-         Put_Line (Routine_Name & "Train_Labels length " &
-                     Integer'Image (Integer (Train_Labels.Length)));
          Put_Line (Routine_Name & "fitting Train_Set and Train_Labels.");
          Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
          Put_Line (Routine_Name & "fitted.");
       end if;
 
-      Put_Line (Routine_Name & "Train_Set length " &
-                  Integer'Image (Integer (Train_Set.Length)));
       if Integer (Train_Set.Length) < Alpha then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
       else
-         Put_Line (Routine_Name & "Train_Set (1) length " &
-                     Integer'Image (Integer (Train_Set (1).Length)));
          --  predict_proba() method returns a two-dimensional array,
          --  containing the estimated probabilities for each instance and each
          --  class:
-         Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf, Train_Set);
-         Print_Matrix_Dimensions (Routine_Name & "Y_Hat", Y_Hat);
-         for index in Indices'Range loop
-            Indices (index) := Current_Item + index - 1;
-         end loop;
-         Item := Arg_Max (Indices, Y_Hat) - 1;
+         declare
+            --  Y_Hat predictions
+            Y_Hat : constant Integer_Matrix := Python_CLF.Call
+              (Classifier, "predict_proba", Clf, Train_Set);
+         begin
+            --           Print_Matrix_Dimensions (Routine_Name & "Y_Hat", Y_Hat);
+            for index in Indices'Range loop
+               Indices (index) := Current_Item + index - 1;
+            end loop;
+            Item := Arg_Max (Indices, Y_Hat) - 1;
+         end;
       end if;
 
       return Item;
