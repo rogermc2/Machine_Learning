@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
 with Python_CLF;
 
@@ -25,14 +25,13 @@ package body Support_12A is
 
    function Arg_Max (Indices : Integer_Array; Values : Integer_Matrix)
                      return Positive is
-      Routine_Name : constant String := "Support_6A.Arg_Max ";
+      --        Routine_Name : constant String := "Support_6A.Arg_Max ";
       Data         : constant Integer_Array := Get_Row (Values, 1);
       Best         : constant Integer := Max (Data);
       Found        : Boolean := False;
       index        : Integer := Indices'First - 1;
       Result       : Positive := Indices (Indices'First);
    begin
-      Print_Matrix_Dimensions (Routine_Name & "Values", Values);
       while index <= Indices'last and not Found loop
          index := index + 1;
          Found := Data (index) = Best;
@@ -134,11 +133,18 @@ package body Support_12A is
       Train_Labels : Integer_List;
       Current_Item : Positive := 1;
       Item         : Integer;
+      Count        : Natural := 0;
       Score        : Natural := 0;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+      Put ("*");
 
       while Current_Item < Rounds loop
+         Count := Count + 1;
+         if Count mod 20 = 0 then
+            Put ("*");
+         end if;
+
          Item := ProbA_Chooser (Classifier, Current_Item, B, Train_Set,
                                 Train_Labels, Alpha, Clf);
          declare
@@ -186,9 +192,9 @@ package body Support_12A is
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
       if Integer (Train_Set.Length) = Alpha then
-         Put_Line (Routine_Name & "fitting Train_Set and Train_Labels.");
+         --           Put_Line (Routine_Name & "fitting Train_Set and Train_Labels.");
          Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
-         Put_Line (Routine_Name & "fitted.");
+         --           Put_Line (Routine_Name & "fitted.");
       end if;
 
       if Integer (Train_Set.Length) < Alpha then
@@ -202,7 +208,7 @@ package body Support_12A is
             Y_Hat : constant Integer_Matrix := Python_CLF.Call
               (Classifier, "predict_proba", Clf, Train_Set);
          begin
-            --           Print_Matrix_Dimensions (Routine_Name & "Y_Hat", Y_Hat);
+            --              Print_Matrix_Dimensions (Routine_Name & "Y_Hat", Y_Hat);
             for index in Indices'Range loop
                Indices (index) := Current_Item + index - 1;
             end loop;

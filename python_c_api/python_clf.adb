@@ -263,12 +263,8 @@ package body Python_CLF is
       Py_DecRef (PyParams);
 
       declare
-         Row_Size : constant int :=
-                      PyTuple_Size (PyTuple_GetItem (Py_Result, 1));
-         Result   : Integer_Matrix (1 .. Integer (PyTuple_Size (Py_Result)),
-                                    1 .. Integer (Row_Size));
+         Result : constant Integer_Matrix := Parsers.Parse_Tuple (Py_Result);
       begin
-         Parsers.Parse_Tuple (Py_Result, Result);
          Py_DecRef (Py_Result);
          return Result;
       end;

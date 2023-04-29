@@ -12,7 +12,8 @@ def fit (clf, features, labels):
     clf.fit(features, labels)
 
 def predict_proba(clf, features):
-    return tuple(clf.predict_proba(features))
+    pred=clf.predict_proba(features)
+    return tuple(map(tuple, pred))
 
 def plot(alphas, result):
     plt.scatter(alphas, result)

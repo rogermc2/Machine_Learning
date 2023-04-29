@@ -2,6 +2,7 @@
 with Interfaces.C; use Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 package body Parsers is
 
@@ -68,21 +69,25 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   procedure Parse_Tuple (Tuple : PyObject; theMatrix : in out Integer_Matrix)  is
-      --           Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
+   function Parse_Tuple (Tuple : PyObject) return Integer_Matrix  is
+--        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
-      Tuple_Row_Size : constant int := PyTuple_Size (PyTuple_GetItem (Tuple, 1));
+      Tuple_Row_Size : constant int := PyTuple_Size (PyTuple_GetItem (Tuple, 0));
       Tuple_Row      : PyObject;
       Tuple_Item     : PyObject;
+      Result         : Integer_Matrix (1 .. Integer (Tuple_Size),
+                                       1 .. Integer (Tuple_Row_Size));
    begin
       for row in 0 .. Tuple_Size - 1 loop
          Tuple_Row := PyTuple_GetItem (Tuple, row);
          for col in 0 .. Tuple_Row_Size - 1 loop
             Tuple_Item := PyTuple_GetItem (Tuple_Row, col);
-            theMatrix (Integer (row) + 1, Integer (col) + 1) :=
+            Result (Integer (row) + 1, Integer (col) + 1) :=
               Integer (PyLong_AsLong (Tuple_Item));
          end loop;
       end loop;
+
+      return Result;
 
    end Parse_Tuple;
 
