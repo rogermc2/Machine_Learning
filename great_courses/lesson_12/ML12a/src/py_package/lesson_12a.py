@@ -18,6 +18,6 @@ def predict_proba(clf, features):
 def plot(alphas, result):
     plt.scatter(alphas, result)
     plt.plot(alphas, result)
-#    plt.xticks(np.arange(0, np.max(data1) + 20, 20.0))
-#    plt.yticks(np.arange(0, np.max(data1) + 20, 20.0))
+    plt.xlabel("Alphas")
+    plt.ylabel("Result")
     plt.show()
