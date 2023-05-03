@@ -100,7 +100,7 @@ package body Support_12A is
                aLine : constant String := Get_Line (File_ID);
                --  Token arrays are of varying length
                Token : constant Integer_Array :=
-                         Tokenize (aLine (3 .. aLine'Last), Dictionary);
+                 Tokenize (aLine (3 .. aLine'Last), Dictionary);
             begin
                Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
                Data.Features.Append (Token);
@@ -128,7 +128,7 @@ package body Support_12A is
       Routine_Name : constant String := "Support_12A.Play_Game ";
       B            : constant Positive := 5;
       Clf          : constant Python_API.PyObject :=
-                       Python.Call (Classifier, "init_multinomialnb1");
+        Python.Call (Classifier, "init_multinomialnb1");
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List;
       Current_Item : Positive := 1;
@@ -137,12 +137,18 @@ package body Support_12A is
       Score        : Natural := 0;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      Put ("*");
+      --        Put ("*");
 
       while Current_Item < Rounds loop
          Count := Count + 1;
-         if Count mod 20 = 0 then
-            Put ("*");
+         --           if Count mod 20 = 0 then
+         --              Put ("*");
+         --           end if;
+
+         if Alpha > 90 and Alpha < 115 then
+            Put_Line (Routine_Name & "Train_Set.Length, Alpha" &
+                        Integer'Image (Integer (Train_Set.Length)) & "   " &
+                        Integer'Image (Alpha));
          end if;
 
          Item := ProbA_Chooser (Classifier, Current_Item, B, Train_Set,
@@ -156,6 +162,11 @@ package body Support_12A is
             end loop;
             Train_Set.Append (Train_Item);
          end;
+         if Alpha > 90 and Alpha < 115 then
+            Put_Line (Routine_Name & "Train_Set.Length, Alpha" &
+                        Integer'Image (Integer (Train_Set.Length)) & "   " &
+                        Integer'Image (Alpha));
+         end if;
 
          Train_Labels.Append (Data.Labels (Item, 1));
          Score := Score + Data.Labels (Item, 1);
@@ -163,7 +174,7 @@ package body Support_12A is
          Current_Item := Current_Item + B;
       end loop;
 
-      New_Line;
+      --        New_Line;
 
       return Score;
 
@@ -187,19 +198,28 @@ package body Support_12A is
       Alpha        : Integer;  Clf : Python_API.PyObject) return Integer is
       use System;
       Routine_Name : constant String := "Support_12.ProbA_Chooser ";
+      Train_Set_Length : constant Natural := Integer (Train_Set.Length);
       Indices      : Integer_Array (1 .. B);
       Item         : Integer;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      if Integer (Train_Set.Length) = Alpha then
-         --           Put_Line (Routine_Name & "fitting Train_Set and Train_Labels.");
+      if Train_Set_Length = Alpha then
+         if Alpha > 90 and Alpha < 115 then
+            Put_Line (Routine_Name & "FIT Train_Set_Length = Alpha" &
+                        Integer'Image (Train_Set_Length) & "   " &
+                        Integer'Image (Alpha));
+         end if;
          Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
-         --           Put_Line (Routine_Name & "fitted.");
       end if;
 
-      if Integer (Train_Set.Length) < Alpha then
+      if Train_Set_Length < Alpha then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
-      else
+      else  --  Train_Set_Length >= Alpha
+         --           if Alpha > 90 and Alpha < 115 then
+         --              Put_Line (Routine_Name & "Train_Set_Length >= Alpha" &
+         --                       Integer'Image (Train_Set_Length)) & "   " &
+         --                       Integer'Image (Alpha));
+         --           end if;
          --  predict_proba() method returns a two-dimensional array,
          --  containing the estimated probabilities for each instance and each
          --  class:
@@ -238,11 +258,11 @@ package body Support_12A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant Unbounded_String :=
-                      To_Unbounded_String (Get_Line (File_ID));
+              To_Unbounded_String (Get_Line (File_ID));
             Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
             Token : constant Unbounded_String :=
-                      To_Unbounded_String
-                        (Slice (aLine, 6, Length (aLine) - 1));
+              To_Unbounded_String
+                (Slice (aLine, 6, Length (aLine) - 1));
          begin
             if Count > 1 then
                Item :=  (Token, Lexicon_Size);
@@ -277,7 +297,7 @@ package body Support_12A is
       Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
       Unknown_Val  : constant Integer := Item.Value;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-                       (others => 0);
+        (others => 0);
       Word         : Unbounded_String;
    begin
       pragma Warnings (Off, Unknown_Item);

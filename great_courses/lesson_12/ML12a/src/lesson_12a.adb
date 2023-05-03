@@ -24,7 +24,7 @@ begin
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_12a");
-   while Alpha <= 200 loop
+   while Alpha < 200 loop
       Alpha := Alpha + 5;
       Alphas.Append (Alpha);
       Result.Append (Play_Game (Classifier, Rounds, CB, Alpha));
