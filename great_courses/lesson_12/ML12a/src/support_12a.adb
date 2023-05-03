@@ -20,6 +20,7 @@ package body Support_12A is
 
    function Tokenize (Data : String; Dictionary : Dictionary_List)
                       return Integer_Array;
+   pragma Inline (Tokenize);
 
    --  -------------------------------------------------------------------------
 
@@ -43,6 +44,7 @@ package body Support_12A is
       return Result;
 
    end Arg_Max;
+   pragma Inline (Arg_Max);
 
    --  -------------------------------------------------------------------------
 
@@ -100,7 +102,7 @@ package body Support_12A is
                aLine : constant String := Get_Line (File_ID);
                --  Token arrays are of varying length
                Token : constant Integer_Array :=
-                 Tokenize (aLine (3 .. aLine'Last), Dictionary);
+                         Tokenize (aLine (3 .. aLine'Last), Dictionary);
             begin
                Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
                Data.Features.Append (Token);
@@ -128,28 +130,21 @@ package body Support_12A is
       Routine_Name : constant String := "Support_12A.Play_Game ";
       B            : constant Positive := 5;
       Clf          : constant Python_API.PyObject :=
-        Python.Call (Classifier, "init_multinomialnb1");
+                       Python.Call (Classifier, "init_multinomialnb1");
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List;
       Current_Item : Positive := 1;
       Item         : Integer;
-      Count        : Natural := 0;
       Score        : Natural := 0;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      --        Put ("*");
 
       while Current_Item < Rounds loop
-         Count := Count + 1;
-         --           if Count mod 20 = 0 then
-         --              Put ("*");
+         --           if Alpha > 90 and Alpha < 115 then
+         --              Put_Line (Routine_Name & "Train_Set.Length, Alpha" &
+         --                          Integer'Image (Integer (Train_Set.Length)) & "   " &
+         --                          Integer'Image (Alpha));
          --           end if;
-
-         if Alpha > 90 and Alpha < 115 then
-            Put_Line (Routine_Name & "Train_Set.Length, Alpha" &
-                        Integer'Image (Integer (Train_Set.Length)) & "   " &
-                        Integer'Image (Alpha));
-         end if;
 
          Item := ProbA_Chooser (Classifier, Current_Item, B, Train_Set,
                                 Train_Labels, Alpha, Clf);
@@ -162,19 +157,21 @@ package body Support_12A is
             end loop;
             Train_Set.Append (Train_Item);
          end;
-         if Alpha > 90 and Alpha < 115 then
-            Put_Line (Routine_Name & "Train_Set.Length, Alpha" &
-                        Integer'Image (Integer (Train_Set.Length)) & "   " &
-                        Integer'Image (Alpha));
-         end if;
+         --  Maximum length of Train_Set is Rounds / B
+
+--           if Integer (Train_Set.Length) > 90 and Alpha > 90 and Alpha < 115 then
+--              Put_Line (Routine_Name &
+--                          "Train_Set.Appended Train_Set Length, Alpha" &
+--                          Integer'Image (Integer (Train_Set.Length)) & "   " &
+--                          Integer'Image (Alpha));
+--              Put_Line (Routine_Name & "Current_Item" & Integer'Image (Current_Item));
+--           end if;
 
          Train_Labels.Append (Data.Labels (Item, 1));
          Score := Score + Data.Labels (Item, 1);
 
          Current_Item := Current_Item + B;
       end loop;
-
-      --        New_Line;
 
       return Score;
 
@@ -197,29 +194,32 @@ package body Support_12A is
       Train_Labels : ML_Types.Integer_List;
       Alpha        : Integer;  Clf : Python_API.PyObject) return Integer is
       use System;
-      Routine_Name : constant String := "Support_12.ProbA_Chooser ";
+      Routine_Name     : constant String := "Support_12.ProbA_Chooser ";
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);
-      Indices      : Integer_Array (1 .. B);
-      Item         : Integer;
+      Indices          : Integer_Array (1 .. B);
+      Item             : Integer;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+--        if Train_Set_Length > 90 and Alpha > 90 and Alpha < 115 then
+--           Put_Line (Routine_Name & "entry Train_Set_Length, Alpha" &
+--                       Integer'Image (Train_Set_Length) & "   " &
+--                       Integer'Image (Alpha));
+--        end if;
+
+      --  Maximum length of Train_Set is Rounds / B
       if Train_Set_Length = Alpha then
-         if Alpha > 90 and Alpha < 115 then
-            Put_Line (Routine_Name & "FIT Train_Set_Length = Alpha" &
-                        Integer'Image (Train_Set_Length) & "   " &
-                        Integer'Image (Alpha));
-         end if;
+--           if Train_Set_Length > 90 and Alpha > 90 and Alpha < 115 then
+--              Put_Line (Routine_Name & "FIT");
+--           end if;
          Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
       end if;
 
       if Train_Set_Length < Alpha then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
       else  --  Train_Set_Length >= Alpha
-         --           if Alpha > 90 and Alpha < 115 then
-         --              Put_Line (Routine_Name & "Train_Set_Length >= Alpha" &
-         --                       Integer'Image (Train_Set_Length)) & "   " &
-         --                       Integer'Image (Alpha));
-         --           end if;
+--           if Train_Set_Length > 90 and Alpha > 90 and Alpha < 115 then
+--              Put_Line (Routine_Name & "Train_Set_Length >= Alpha");
+--           end if;
          --  predict_proba() method returns a two-dimensional array,
          --  containing the estimated probabilities for each instance and each
          --  class:
@@ -258,11 +258,11 @@ package body Support_12A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant Unbounded_String :=
-              To_Unbounded_String (Get_Line (File_ID));
+                      To_Unbounded_String (Get_Line (File_ID));
             Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
             Token : constant Unbounded_String :=
-              To_Unbounded_String
-                (Slice (aLine, 6, Length (aLine) - 1));
+                      To_Unbounded_String
+                        (Slice (aLine, 6, Length (aLine) - 1));
          begin
             if Count > 1 then
                Item :=  (Token, Lexicon_Size);
@@ -285,7 +285,7 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
 
    function Tokenize (Data : String; Dictionary : Dictionary_List)
-                      return Integer_Array is
+                   return Integer_Array is
       use Neural_Utilities;
       use ML_Types;
       use String_Package;
@@ -297,7 +297,7 @@ package body Support_12A is
       Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
       Unknown_Val  : constant Integer := Item.Value;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-        (others => 0);
+                       (others => 0);
       Word         : Unbounded_String;
    begin
       pragma Warnings (Off, Unknown_Item);

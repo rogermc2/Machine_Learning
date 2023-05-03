@@ -14,7 +14,7 @@ procedure Lesson_12A is
                         Read_Vocabulary ("../../data/vocab2.txt");
    CB               : constant Data_Items :=
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
-   Rounds           : constant Positive := 500;
+   Rounds           : constant Positive := 1000;
    Classifier       : Python.Module;
    Alpha            : Positive := 5;
    Alphas           : ML_Types.Integer_List;
@@ -25,10 +25,12 @@ begin
 
    Classifier := Python.Import_File ("lesson_12a");
    while Alpha < 200 loop
+      Put ("*");
       Alpha := Alpha + 5;
       Alphas.Append (Alpha);
       Result.Append (Play_Game (Classifier, Rounds, CB, Alpha));
    end loop;
+   New_Line;
 
    Python.Call (Classifier, "plot", Alphas, Result);
 

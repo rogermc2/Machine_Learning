@@ -19,5 +19,5 @@ def plot(alphas, result):
     plt.scatter(alphas, result)
     plt.plot(alphas, result)
     plt.xlabel("Alphas")
-    plt.ylabel("Result")
+    plt.ylabel("Score")
     plt.show()
