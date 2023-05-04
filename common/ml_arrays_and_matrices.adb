@@ -942,6 +942,25 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Max (Data : Integer_Matrix; Max_Row : out Natural) return Integer is
+      Max_Val : Integer := Data (1, 1);
+   begin
+      Max_Row := 1;
+      for row in Data'Range loop
+         for col in Data'Range (2) loop
+            if Data (row, col) > Max_Val then
+               Max_Row := row;
+               Max_Val := Data (row, col);
+            end if;
+         end loop;
+      end loop;
+
+      return Max_Val;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
+
    function Max (Data : Real_Float_Matrix) return Float is
       Max_Val : Float := Float'Safe_First;
    begin

@@ -24,28 +24,15 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
-   --  vals list with the highest value.
+   --  Values list with the highest value.
    function Arg_Max (Indices : Integer_Array; Values : Integer_Matrix)
                      return Integer is
       --        Routine_Name : constant String := "Support_6A.Arg_Max ";
-      V1           : Integer_Array (1 .. 2);
-      Best         : Integer;
-      Found        : Boolean := False;
-      index        : Integer := Indices'First - 1;
-      Result       : Integer;
+      Best_Row     : Integer;
+      Best         : constant Integer := Max (Values, Best_Row);
    begin
-      V1 (1):= Values (1, 1);
-      V1 (2):= Values (1, 2);
-      Best := Max (V1);
-      while index <= Indices'last and not Found loop
-         index := index + 1;
-         Found := Values (index) = Best;
-         if Found then
-            Result := Indices (index);
-         end if;
-      end loop;
 
-      return Result;
+      return Indices (Best_Row);
 
    end Arg_Max;
    pragma Inline (Arg_Max);
@@ -190,9 +177,8 @@ package body Support_12A is
       Routine_Name     : constant String := "Support_12.ProbA_Chooser ";
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);
       --  Y_Hat predictions
-      Y_Hat            : Integer_Matrix (1 .. Train_Set_Length, 1 .. 2);
+      Y_Hat            : Integer_Matrix (1 .. B, 1 .. 2);
       Indices          : Integer_Array (1 .. B);
-      Y_Hat_Part       : Integer_Matrix (Indices'Range, 1 .. 2);
       Item             : Integer;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
@@ -212,10 +198,8 @@ package body Support_12A is
          Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf, Train_Set);
          for index in Indices'Range loop
             Indices (index) := Current_Item + index - 1;
-            Y_Hat_Part (index, 1) := Y_Hat (Indices (index), 1);
-            Y_Hat_Part (index, 2) := Y_Hat (Indices (index), 2);
          end loop;
-         Item := Arg_Max (Indices, Y_Hat_Part) - 1;
+         Item := Arg_Max (Indices, Y_Hat) - 1;
       end if;
 
       return Item;
