@@ -140,12 +140,6 @@ package body Support_12A is
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
 
       while Current_Item < Rounds loop
-         --           if Alpha > 90 and Alpha < 115 then
-         --              Put_Line (Routine_Name & "Train_Set.Length, Alpha" &
-         --                          Integer'Image (Integer (Train_Set.Length)) & "   " &
-         --                          Integer'Image (Alpha));
-         --           end if;
-
          Item := ProbA_Chooser (Classifier, Current_Item, B, Train_Set,
                                 Train_Labels, Alpha, Clf);
          declare
@@ -158,14 +152,6 @@ package body Support_12A is
             Train_Set.Append (Train_Item);
          end;
          --  Maximum length of Train_Set is Rounds / B
-
---           if Integer (Train_Set.Length) > 90 and Alpha > 90 and Alpha < 115 then
---              Put_Line (Routine_Name &
---                          "Train_Set.Appended Train_Set Length, Alpha" &
---                          Integer'Image (Integer (Train_Set.Length)) & "   " &
---                          Integer'Image (Alpha));
---              Put_Line (Routine_Name & "Current_Item" & Integer'Image (Current_Item));
---           end if;
 
          Train_Labels.Append (Data.Labels (Item, 1));
          Score := Score + Data.Labels (Item, 1);
@@ -200,26 +186,14 @@ package body Support_12A is
       Item             : Integer;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
---        if Train_Set_Length > 90 and Alpha > 90 and Alpha < 115 then
---           Put_Line (Routine_Name & "entry Train_Set_Length, Alpha" &
---                       Integer'Image (Train_Set_Length) & "   " &
---                       Integer'Image (Alpha));
---        end if;
-
       --  Maximum length of Train_Set is Rounds / B
       if Train_Set_Length = Alpha then
---           if Train_Set_Length > 90 and Alpha > 90 and Alpha < 115 then
---              Put_Line (Routine_Name & "FIT");
---           end if;
          Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
       end if;
 
       if Train_Set_Length < Alpha then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
       else  --  Train_Set_Length >= Alpha
---           if Train_Set_Length > 90 and Alpha > 90 and Alpha < 115 then
---              Put_Line (Routine_Name & "Train_Set_Length >= Alpha");
---           end if;
          --  predict_proba() method returns a two-dimensional array,
          --  containing the estimated probabilities for each instance and each
          --  class:
@@ -228,10 +202,9 @@ package body Support_12A is
             Y_Hat : constant Integer_Matrix := Python_CLF.Call
               (Classifier, "predict_proba", Clf, Train_Set);
          begin
-            --              Print_Matrix_Dimensions (Routine_Name & "Y_Hat", Y_Hat);
-            for index in Indices'Range loop
+             for index in Indices'Range loop
                Indices (index) := Current_Item + index - 1;
-            end loop;
+             end loop;
             Item := Arg_Max (Indices, Y_Hat) - 1;
          end;
       end if;
