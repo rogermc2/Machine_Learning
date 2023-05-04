@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
 with Python_CLF;
 
@@ -102,9 +102,9 @@ package body Support_12A is
                aLine : constant String := Get_Line (File_ID);
                --  Token arrays are of varying length
                Token : constant Integer_Array :=
-                         Tokenize (aLine (3 .. aLine'Last), Dictionary);
+                 Tokenize (aLine (3 .. aLine'Last), Dictionary);
             begin
---                 Delay (3.0);
+               --                 Delay (3.0);
                Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
                Data.Features.Append (Token);
             end;
@@ -131,7 +131,7 @@ package body Support_12A is
       Routine_Name : constant String := "Support_12A.Play_Game ";
       B            : constant Positive := 5;
       Clf          : constant Python_API.PyObject :=
-                       Python.Call (Classifier, "init_multinomialnb1");
+        Python.Call (Classifier, "init_multinomialnb1");
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List;
       Current_Item : Positive := 1;
@@ -185,6 +185,8 @@ package body Support_12A is
       use System;
       Routine_Name     : constant String := "Support_12.ProbA_Chooser ";
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);
+      --  Y_Hat predictions
+      Y_Hat            : Integer_Matrix (1 .. Train_Set_Length, 1 .. 2);
       Indices          : Integer_Array (1 .. B);
       Item             : Integer;
    begin
@@ -197,20 +199,13 @@ package body Support_12A is
       if Train_Set_Length < Alpha then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
       else  --  Train_Set_Length >= Alpha
-         --  predict_proba() method returns a two-dimensional array,
-         --  containing the estimated probabilities for each instance and each
-         --  class:
-         declare
-            --  Y_Hat predictions
-            Y_Hat : constant Integer_Matrix := Python_CLF.Call
-              (Classifier, "predict_proba", Clf, Train_Set);
-         begin
-            Print_Matrix_Dimensions (Routine_Name & "Y_Hat", Y_Hat);
-            for index in Indices'Range loop
-               Indices (index) := Current_Item + index - 1;
-            end loop;
-            Item := Arg_Max (Indices, Y_Hat) - 1;
-         end;
+         --  predict_proba() returns a two-dimensional array containing the
+         --  estimated probabilities for each instance and each class:
+         Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf, Train_Set);
+         for index in Indices'Range loop
+            Indices (index) := Current_Item + index - 1;
+         end loop;
+         Item := Arg_Max (Indices, Y_Hat) - 1;
       end if;
 
       return Item;
@@ -235,11 +230,11 @@ package body Support_12A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant Unbounded_String :=
-                      To_Unbounded_String (Get_Line (File_ID));
+              To_Unbounded_String (Get_Line (File_ID));
             Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
             Token : constant Unbounded_String :=
-                      To_Unbounded_String
-                        (Slice (aLine, 6, Length (aLine) - 1));
+              To_Unbounded_String
+                (Slice (aLine, 6, Length (aLine) - 1));
          begin
             if Count > 1 then
                Item :=  (Token, Lexicon_Size);
@@ -266,7 +261,7 @@ package body Support_12A is
       use Neural_Utilities;
       use ML_Types;
       use String_Package;
---        Routine_Name : constant String := "Support_6A.Tokenize ";
+      --        Routine_Name : constant String := "Support_6A.Tokenize ";
       Words        : ML_Types.String_List;
       Word_Cursor  : String_Package.Cursor;
       Index        : Natural;
@@ -274,7 +269,7 @@ package body Support_12A is
       Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
       Unknown_Val  : constant Integer := Item.Value;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-                       (others => 0);
+        (others => 0);
       Word         : Unbounded_String;
    begin
       pragma Warnings (Off, Unknown_Item);
@@ -297,13 +292,13 @@ package body Support_12A is
          Vec (Index) := Vec (Index) + 1;
          Next  (Word_Cursor);
       end loop;
---        Put_Line (Routine_Name & "Vec vals not 0:");
---        for index in Vec'Range loop
---           if Vec (index) /= 0 then
---              Put (Integer'Image (index) & Integer'Image (Vec (index)) & "   ");
---           end if;
---        end loop;
---        New_Line;
+      --        Put_Line (Routine_Name & "Vec vals not 0:");
+      --        for index in Vec'Range loop
+      --           if Vec (index) /= 0 then
+      --              Put (Integer'Image (index) & Integer'Image (Vec (index)) & "   ");
+      --           end if;
+      --        end loop;
+      --        New_Line;
 
       return Vec;
 
