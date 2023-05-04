@@ -199,8 +199,9 @@ package body Support_12A is
       if Train_Set_Length < Alpha then
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
       else  --  Train_Set_Length >= Alpha
-         --  predict_proba() returns a two-dimensional array containing the
-         --  estimated probabilities for each instance and each class:
+         --  predict_proba() returns a Train_Set_Length x two-dimensional array
+         --  containing the estimated probabilities for each instance and each
+         --  class.
          Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf, Train_Set);
          for index in Indices'Range loop
             Indices (index) := Current_Item + index - 1;
