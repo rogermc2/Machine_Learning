@@ -18,7 +18,7 @@ package body Support_12A is
    Num_Known   : Natural := 0;
    Num_Unknown : Natural := 0;
 
-   function Tokenize (Data : String; Dictionary : Dictionary_List)
+   function Tokenize (aLine : String; Dictionary : Dictionary_List)
                       return Integer_Array;
    pragma Inline (Tokenize);
 
@@ -104,6 +104,7 @@ package body Support_12A is
                Token : constant Integer_Array :=
                          Tokenize (aLine (3 .. aLine'Last), Dictionary);
             begin
+--                 Delay (3.0);
                Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
                Data.Features.Append (Token);
             end;
@@ -146,6 +147,8 @@ package body Support_12A is
             Features   : constant Integer_Array := Data.Features (Item);
             Train_Item : Integer_List;
          begin
+            --              Put_Line (Routine_Name & "Item, Features: " & Integer'Image (Item) &
+            --                          Integer'Image (Features'Length));
             for col in Features'Range loop
                Train_Item.Append (Features (col));
             end loop;
@@ -202,9 +205,9 @@ package body Support_12A is
             Y_Hat : constant Integer_Matrix := Python_CLF.Call
               (Classifier, "predict_proba", Clf, Train_Set);
          begin
-             for index in Indices'Range loop
+            for index in Indices'Range loop
                Indices (index) := Current_Item + index - 1;
-             end loop;
+            end loop;
             Item := Arg_Max (Indices, Y_Hat) - 1;
          end;
       end if;
@@ -257,12 +260,12 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
 
-   function Tokenize (Data : String; Dictionary : Dictionary_List)
-                   return Integer_Array is
+   function Tokenize (aLine : String; Dictionary : Dictionary_List)
+                      return Integer_Array is
       use Neural_Utilities;
       use ML_Types;
       use String_Package;
-      --        Routine_Name : constant String := "Support_6A.Tokenize ";
+--        Routine_Name : constant String := "Support_6A.Tokenize ";
       Words        : ML_Types.String_List;
       Word_Cursor  : String_Package.Cursor;
       Index        : Natural;
@@ -274,7 +277,7 @@ package body Support_12A is
       Word         : Unbounded_String;
    begin
       pragma Warnings (Off, Unknown_Item);
-      Words := Split_String_On_Spaces (Data);
+      Words := Split_String_On_Spaces (aLine);
       Word_Cursor := Words.First;
       while Has_Element (Word_Cursor) loop
          Word := Element (Word_Cursor);
@@ -283,15 +286,23 @@ package body Support_12A is
             Num_Known := Num_Known + 1;
             Index := Item.Value;
          else
-            --  add one to the Unknown
+            --  add one to the Unknown count
             Num_Unknown := Num_Unknown + 1;
-            --              Dummy := Find_Item (Dictionary, Unknown, Item);
             Index := Unknown_Val;
          end if;
+         --           Put_Line (Routine_Name & "Num_Unknown, Num_Known: " &
+         --                       Integer'Image (Num_Known) & Integer'Image (Num_Unknown));
 
          Vec (Index) := Vec (Index) + 1;
          Next  (Word_Cursor);
       end loop;
+--        Put_Line (Routine_Name & "Vec vals not 0:");
+--        for index in Vec'Range loop
+--           if Vec (index) /= 0 then
+--              Put (Integer'Image (index) & Integer'Image (Vec (index)) & "   ");
+--           end if;
+--        end loop;
+--        New_Line;
 
       return Vec;
 

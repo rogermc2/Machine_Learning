@@ -675,6 +675,77 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Strings (Name : String; theList : ML_Types.String_List) is
+      use ML_Types.String_Package;
+      Curs  : Cursor := theList.First;
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+
+      while Has_Element (Curs) loop
+         Put (To_String (Element (Curs)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+         Next (Curs);
+      end loop;
+      New_Line;
+
+   end Print_Strings;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Strings (Name    : String;
+                            theList : ML_Types.Indef_String_List) is
+      use ML_Types.Indefinite_String_Package;
+      Curs  : Cursor := theList.First;
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+      Put_Line ("Length: " & Integer'Image (Integer (theList.Length)));
+
+      while Has_Element (Curs) loop
+         Put (Element (Curs) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+         Next (Curs);
+      end loop;
+      New_Line;
+
+   end Print_Strings;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Strings (Name : String; theList : ML_Types.String_Vector) is
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+
+      for index in theList.First_Index .. theList.Last_Index loop
+         Put (To_String (theList.Element (index)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Strings;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Unbound_Array (Name : String;
                                   UB   : Unbounded_String_Array) is
       Count : Integer := 1;
