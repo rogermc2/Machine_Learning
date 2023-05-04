@@ -23,19 +23,23 @@ package body Support_12A is
    pragma Inline (Tokenize);
 
    --  -------------------------------------------------------------------------
-
+   --  Arg_Max returns the index from indices associated with the item in the
+   --  vals list with the highest value.
    function Arg_Max (Indices : Integer_Array; Values : Integer_Matrix)
-                     return Positive is
+                     return Integer is
       --        Routine_Name : constant String := "Support_6A.Arg_Max ";
-      Data         : constant Integer_Array := Get_Row (Values, 1);
-      Best         : constant Integer := Max (Data);
+      V1           : Integer_Array (1 .. 2);
+      Best         : Integer;
       Found        : Boolean := False;
       index        : Integer := Indices'First - 1;
-      Result       : Positive := Indices (Indices'First);
+      Result       : Integer;
    begin
+      V1 (1):= Values (1, 1);
+      V1 (2):= Values (1, 2);
+      Best := Max (V1);
       while index <= Indices'last and not Found loop
          index := index + 1;
-         Found := Data (index) = Best;
+         Found := Values (index) = Best;
          if Found then
             Result := Indices (index);
          end if;
@@ -102,7 +106,7 @@ package body Support_12A is
                aLine : constant String := Get_Line (File_ID);
                --  Token arrays are of varying length
                Token : constant Integer_Array :=
-                 Tokenize (aLine (3 .. aLine'Last), Dictionary);
+                         Tokenize (aLine (3 .. aLine'Last), Dictionary);
             begin
                --                 Delay (3.0);
                Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
@@ -131,7 +135,7 @@ package body Support_12A is
       Routine_Name : constant String := "Support_12A.Play_Game ";
       B            : constant Positive := 5;
       Clf          : constant Python_API.PyObject :=
-        Python.Call (Classifier, "init_multinomialnb1");
+                       Python.Call (Classifier, "init_multinomialnb1");
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List;
       Current_Item : Positive := 1;
@@ -188,6 +192,7 @@ package body Support_12A is
       --  Y_Hat predictions
       Y_Hat            : Integer_Matrix (1 .. Train_Set_Length, 1 .. 2);
       Indices          : Integer_Array (1 .. B);
+      Y_Hat_Part       : Integer_Matrix (Indices'Range, 1 .. 2);
       Item             : Integer;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
@@ -200,13 +205,17 @@ package body Support_12A is
          Item := Maths.Random_Integer (Current_Item, Current_Item + B);
       else  --  Train_Set_Length >= Alpha
          --  predict_proba() returns a Train_Set_Length x two-dimensional array
-         --  containing the estimated probabilities for each instance and each
-         --  class.
+         --  For binary data, the first column is the probability that the
+         --  outcome will be 0 and the second is the probability that the
+         --  outcome will be 1, P(0) + P (1) = 1.
+         --  The sum of each row of the two columns should equal one.
          Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf, Train_Set);
          for index in Indices'Range loop
             Indices (index) := Current_Item + index - 1;
+            Y_Hat_Part (index, 1) := Y_Hat (Indices (index), 1);
+            Y_Hat_Part (index, 2) := Y_Hat (Indices (index), 2);
          end loop;
-         Item := Arg_Max (Indices, Y_Hat) - 1;
+         Item := Arg_Max (Indices, Y_Hat_Part) - 1;
       end if;
 
       return Item;
@@ -231,11 +240,11 @@ package body Support_12A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant Unbounded_String :=
-              To_Unbounded_String (Get_Line (File_ID));
+                      To_Unbounded_String (Get_Line (File_ID));
             Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
             Token : constant Unbounded_String :=
-              To_Unbounded_String
-                (Slice (aLine, 6, Length (aLine) - 1));
+                      To_Unbounded_String
+                        (Slice (aLine, 6, Length (aLine) - 1));
          begin
             if Count > 1 then
                Item :=  (Token, Lexicon_Size);
@@ -270,7 +279,7 @@ package body Support_12A is
       Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
       Unknown_Val  : constant Integer := Item.Value;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-        (others => 0);
+                       (others => 0);
       Word         : Unbounded_String;
    begin
       pragma Warnings (Off, Unknown_Item);
