@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
 with Python_CLF;
 
@@ -205,6 +205,7 @@ package body Support_12A is
             Y_Hat : constant Integer_Matrix := Python_CLF.Call
               (Classifier, "predict_proba", Clf, Train_Set);
          begin
+            Print_Matrix_Dimensions (Routine_Name & "Y_Hat", Y_Hat);
             for index in Indices'Range loop
                Indices (index) := Current_Item + index - 1;
             end loop;
