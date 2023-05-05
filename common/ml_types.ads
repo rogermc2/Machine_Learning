@@ -293,4 +293,6 @@ package ML_Types is
      Ada.Containers.Indefinite_Ordered_Maps (String, Natural);
    subtype String_Map is String_Map_Package.Map;
 
+   function Slice (aList : Integer_List_2D; First, Last : Positive)
+                   return Integer_List_2D;
 end ML_Types;

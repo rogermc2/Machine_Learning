@@ -114,8 +114,8 @@ package body Support_12A is
 
    --  -------------------------------------------------------------------------
    --  For alpha days the selections are random.
-   function Play_Game (Classifier : Python.Module; Rounds : Positive;
-                       Data       : Data_Items; Alpha : Integer)
+   function Play_Game (Classifier       : Python.Module; Rounds : Positive;
+                       Labeled_Examples : Data_Items; Alpha : Integer)
                        return Natural is
       use System;
       use ML_Types;
@@ -132,10 +132,11 @@ package body Support_12A is
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
 
       while Current_Item < Rounds loop
-         Item := ProbA_Chooser (Classifier, Current_Item, B, Train_Set,
-                                Train_Labels, Alpha, Clf);
+         Item := ProbA_Chooser (Classifier, Current_Item, B, Labeled_Examples,
+                                Train_Set, Train_Labels, Alpha, Clf);
          declare
-            Features   : constant Integer_Array := Data.Features (Item);
+            Features   : constant Integer_Array :=
+                           Labeled_Examples.Features (Item);
             Train_Item : Integer_List;
          begin
             --              Put_Line (Routine_Name & "Item, Features: " & Integer'Image (Item) &
@@ -147,8 +148,8 @@ package body Support_12A is
          end;
          --  Maximum length of Train_Set is Rounds / B
 
-         Train_Labels.Append (Data.Labels (Item, 1));
-         Score := Score + Data.Labels (Item, 1);
+         Train_Labels.Append (Labeled_Examples.Labels (Item, 1));
+         Score := Score + Labeled_Examples.Labels (Item, 1);
 
          Current_Item := Current_Item + B;
       end loop;
@@ -168,14 +169,19 @@ package body Support_12A is
    --  After fitting the clf model use it to select the item most likely to be
    --  labeled as interesting.
    function ProbA_Chooser
-     (Classifier   : Python.Module; Current_Item : Positive;
-      B            : Positive;
-      Train_Set    : ML_Types.Integer_List_2D;
-      Train_Labels : ML_Types.Integer_List;
-      Alpha        : Integer;  Clf : Python_API.PyObject) return Integer is
+     (Classifier       : Python.Module; Current_Item : Positive;
+      B                : Positive;
+      Labeled_Examples : Data_Items;
+      Train_Set        : ML_Types.Integer_List_2D;
+      Train_Labels     : ML_Types.Integer_List;
+      Alpha            : Integer;  Clf : Python_API.PyObject) return Integer is
       use System;
       Routine_Name     : constant String := "Support_12.ProbA_Chooser ";
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);
+      BM1              : constant Natural := B - 1;
+      Examples_Batch   : constant ML_Types.Integer_List_2D :=
+                           ML_Types.Slice (Labeled_Examples.Features,
+                                           Current_Item, Current_Item + BM1);
       --  Y_Hat predictions
       Y_Hat            : Integer_Matrix (1 .. B, 1 .. 2);
       Indices          : Integer_Array (1 .. B);
@@ -195,7 +201,8 @@ package body Support_12A is
          --  outcome will be 0 and the second is the probability that the
          --  outcome will be 1, P(0) + P (1) = 1.
          --  The sum of each row of the two columns should equal one.
-         Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf, Train_Set);
+         Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf,
+                                   Train_Set_Batch);
          for index in Indices'Range loop
             Indices (index) := Current_Item + index - 1;
          end loop;

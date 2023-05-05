@@ -12,7 +12,8 @@ procedure Lesson_12A is
    Program_Name     : constant String := "Lesson 12A ";
    Vocab_Dictionary : constant Dictionary_List :=
                         Read_Vocabulary ("../../data/vocab2.txt");
-   CB               : constant Data_Items :=
+   --  CB_Data is (dat, labs)
+   CB_Data          : constant Data_Items :=
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
    Rounds           : constant Positive := 1000;
    Classifier       : Python.Module;
@@ -22,9 +23,9 @@ procedure Lesson_12A is
 begin
    Put_Line (Program_Name);
    Put_Line (Program_Name & "Features length, 1 and 2 lengths: " &
-               Integer'Image (Integer (CB.Features.Length)) &
-               Integer'Image (CB.Features.Element (1)'Length) &
-               Integer'Image (CB.Features.Element (2)'Length));
+               Integer'Image (Integer (CB_Data.Features.Length)) &
+               Integer'Image (CB_Data.Features.Element (1)'Length) &
+               Integer'Image (CB_Data.Features.Element (2)'Length));
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_12a");
@@ -32,7 +33,7 @@ begin
       Put ("*");
       Alpha := Alpha + 5;
       Alphas.Append (Alpha);
-      Result.Append (Play_Game (Classifier, Rounds, CB, Alpha));
+      Result.Append (Play_Game (Classifier, Rounds, CB_Data, Alpha));
    end loop;
    New_Line;
 

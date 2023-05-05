@@ -1139,6 +1139,20 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Slice (Data : Integer_Array_List; First, Last : Positive)
+                   return Integer_Array_List is
+      Result : Integer_Array_List;
+   begin
+      for row in First .. Last loop
+         Result.Append (Data.Element (row));
+      end loop;
+
+      return Result;
+
+   end Slice;
+
+   --  ------------------------------------------------------------------------
+
    function Sum (Data : Integer_Matrix) return Integer is
       Result : Integer := 0;
    begin
@@ -1494,28 +1508,28 @@ package body ML_Arrays_And_Matrices is
       Assert (Data_Axis = 1 or Data_Axis = 2, Routine_Name &
                 " Invalid Data_Axis" & Integer'Image (Data_Axis) &
                 " should be 1 or 2.");
-         if Data_Axis = 1 then
-            declare
-               Result : Real_Float_Matrix
-                 (First_Index .. First_Index + Vec'Length - 1, 1 .. 1);
-            begin
-               for row in Result'Range loop
-                  Result (row, 1) := Vec (row);
-               end loop;
-               return Result;
-            end;
+      if Data_Axis = 1 then
+         declare
+            Result : Real_Float_Matrix
+              (First_Index .. First_Index + Vec'Length - 1, 1 .. 1);
+         begin
+            for row in Result'Range loop
+               Result (row, 1) := Vec (row);
+            end loop;
+            return Result;
+         end;
 
-         else
-            declare
-               Result : Real_Float_Matrix
-                 (1 .. 1, First_Index .. First_Index + Vec'Length - 1);
-            begin
-               for col in Result'Range (2) loop
-                  Result (1, col) := Vec (col);
-               end loop;
-               return Result;
-            end;
-         end if;
+      else
+         declare
+            Result : Real_Float_Matrix
+              (1 .. 1, First_Index .. First_Index + Vec'Length - 1);
+         begin
+            for col in Result'Range (2) loop
+               Result (1, col) := Vec (col);
+            end loop;
+            return Result;
+         end;
+      end if;
 
    end To_Real_Float_Matrix;
 

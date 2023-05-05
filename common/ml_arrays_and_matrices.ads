@@ -241,10 +241,12 @@ package ML_Arrays_And_Matrices is
    pragma Inline (Min);
    function Slice (Matrix : Binary_Matrix; First, Last : Positive)
                    return Binary_Matrix;
-   function Slice (Matrix : Real_Float_Matrix; First, Last : Positive)
-                   return Real_Float_Matrix;
+   function Slice (Data : Integer_Array_List; First, Last : Positive)
+                   return Integer_Array_List;
    function Slice (Matrix : Integer_Matrix; First, Last : Positive)
                    return Integer_Matrix;
+   function Slice (Matrix : Real_Float_Matrix; First, Last : Positive)
+                   return Real_Float_Matrix;
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                                return Boolean_Array;
    pragma Inline (To_Boolean_Array);

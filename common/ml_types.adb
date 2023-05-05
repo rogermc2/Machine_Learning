@@ -281,6 +281,27 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function Slice (aList : Integer_List_2D; First, Last : Positive)
+                   return Integer_List_2D is
+      Result    : Integer_List_2D;
+      List_Row  : Integer_List;
+      Slice_Row : Integer_List;
+   begin
+      for row in First .. Last loop
+         List_Row := aList.Element (row);
+         Slice_Row.Clear;
+         for col in Integer (List_Row.First_Index) .. Integer (List_Row.Last_Index) loop
+            Slice_Row.Append (List_Row.Element (col));
+         end loop;
+         Result.Append (Slice_Row);
+      end loop;
+
+      return Result;
+
+   end Slice;
+
+   --  ------------------------------------------------------------------------
+
    function Transpose (Values : Integer_List_2D) return  Integer_List_2D is
       use Ada.Containers;
       Num_Rows : constant Positive := Positive (Values.Length);
