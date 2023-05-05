@@ -25,14 +25,13 @@ package body Support_12A is
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
    --  Values list with the highest value.
-   function Arg_Max (Indices : Integer_Array; Values : Integer_Matrix)
+   function Arg_Max (Indices : Integer_Array; Values : Integer_Array)
                      return Integer is
       --        Routine_Name : constant String := "Support_6A.Arg_Max ";
-      Best_Row     : Integer;
-      Best         : constant Integer := Max (Values, Best_Row);
+      Best         : constant Integer := Max (Values);
    begin
 
-      return Indices (Best_Row);
+      return Indices (Best);
 
    end Arg_Max;
    pragma Inline (Arg_Max);
@@ -185,6 +184,7 @@ package body Support_12A is
       --  Y_Hat predictions
       Y_Hat            : Integer_Matrix (1 .. B, 1 .. 2);
       Indices          : Integer_Array (1 .. B);
+      Y_Hat_2          : Integer_Array (1 .. B);
       Item             : Integer;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
@@ -205,8 +205,9 @@ package body Support_12A is
                                    Examples_Batch);
          for index in Indices'Range loop
             Indices (index) := Current_Item + index - 1;
+            Y_Hat_2 (index) := Y_Hat (index, 2);
          end loop;
-         Item := Arg_Max (Indices, Y_Hat) - 1;
+         Item := Arg_Max (Indices, Y_Hat_2) - 1;
       end if;
 
       return Item;
