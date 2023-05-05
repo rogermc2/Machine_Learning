@@ -942,6 +942,23 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Max (V : Integer_Array; Max_Row : out Natural) return Integer is
+      Result : Integer := Integer'First;
+   begin
+      Max_Row := V'First;
+      for index in V'Range loop
+         if V (index) > Result then
+            Max_Row := index;
+            Result := V (index);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
+
    function Max (Data : Integer_Matrix; Max_Row : out Natural) return Integer is
       Max_Val : Integer := Data (1, 1);
    begin
@@ -1019,6 +1036,23 @@ package body ML_Arrays_And_Matrices is
    begin
       for index in V'Range loop
          if V (index) > Result then
+            Result := V (index);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
+
+   function Max (V : Real_Float_Vector; Max_Row : out Natural) return Float is
+      Result : Float := Float'Safe_First;
+   begin
+      Max_Row := V'First;
+      for index in V'Range loop
+         if V (index) > Result then
+            Max_Row := index;
             Result := V (index);
          end if;
       end loop;
