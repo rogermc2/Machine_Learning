@@ -179,8 +179,8 @@ package body Support_12A is
       Routine_Name     : constant String := "Support_12.ProbA_Chooser ";
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);
       BM1              : constant Natural := B - 1;
-      Examples_Batch   : constant ML_Types.Integer_List_2D :=
-                           ML_Types.Slice (Labeled_Examples.Features,
+      Examples_Batch   : constant Integer_Array_List :=
+                           Slice (Labeled_Examples.Features,
                                            Current_Item, Current_Item + BM1);
       --  Y_Hat predictions
       Y_Hat            : Integer_Matrix (1 .. B, 1 .. 2);
@@ -202,7 +202,7 @@ package body Support_12A is
          --  outcome will be 1, P(0) + P (1) = 1.
          --  The sum of each row of the two columns should equal one.
          Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf,
-                                   Train_Set_Batch);
+                                   Examples_Batch);
          for index in Indices'Range loop
             Indices (index) := Current_Item + index - 1;
          end loop;

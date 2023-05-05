@@ -137,6 +137,39 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                  A : Integer_Array_List) return Integer_Matrix is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python_CLF.Call IL2D ";
+
+      function Py_BuildValue (Format : char_array; O1, T1 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      Py_Result    : PyObject;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
+      Py_Result := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      declare
+         Result : constant Integer_Matrix := Parsers.Parse_Tuple (Py_Result);
+      begin
+         Py_DecRef (Py_Result);
+         return Result;
+      end;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
                    A : ML_Types.Integer_List_2D) is
       use Interfaces.C;
@@ -167,7 +200,7 @@ package body Python_CLF is
 
    end Call;
 
-   -- --------------------------------------------------------------------------
+   -- -------------------------------------------------------------------------
 
    procedure Call (M    : Python.Module; Function_Name : String; CLF : PyObject;
                    A, B : ML_Types.Integer_List_2D) is
