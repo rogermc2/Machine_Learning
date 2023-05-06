@@ -339,20 +339,21 @@ package body Basic_Printing is
    procedure Print_Integer_Array
      (Name  : String; anArray : Integer_Array;
       Start : Positive := 1; Finish : Natural := 0) is
-      Last  : Positive;
-      Count : Positive := 1;
+      Array_Last : constant Natural := anArray'Last;
+      Last       : Positive;
+      Count      : Positive := 1;
    begin
       if anArray'Length = 0 then
          Put_Line (Name & " is empty");
       else
-         if Finish > 0 then
+         if Finish > 0 and Finish <= Array_Last then
             Last := Finish;
          else
-            Last := Integer (anArray'Length);
+            Last := Array_Last;
          end if;
 
          Put_Line (Name & ": ");
-         if Start >= anArray'First and then Finish <= anArray'Last then
+         if Start >= anArray'First and then Finish <= Array_Last then
             for Index in Start .. Last loop
                Put (Integer'Image (anArray (Index)) & "  ");
                Count := Count + 1;
