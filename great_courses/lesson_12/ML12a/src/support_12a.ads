@@ -32,7 +32,7 @@ package Support_12A is
 
    function ProbA_Chooser
      (Classifier       : Python.Module;
-      Current_Item     : Positive; B : Positive;
+      Current_Item     : Positive; Num_Items : Positive;
       Labeled_Examples : Data_Items;
       Train_Set        : ML_Types.Integer_List_2D;
       Train_Labels     : ML_Types.Integer_List; Alpha : Integer;

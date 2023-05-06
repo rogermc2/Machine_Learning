@@ -27,7 +27,7 @@ package body Support_12A is
    --  Values list with the highest value.
    function Arg_Max (Indices : Integer_Array; Values : Real_Float_Vector)
                      return Integer is
---        Routine_Name : constant String := "Support_6A.Arg_Max ";
+      --        Routine_Name : constant String := "Support_6A.Arg_Max ";
       Best_Index   : Positive;
       pragma Warnings (Off);
       Best         : constant Float := Max (Values, Best_Index);
@@ -121,7 +121,7 @@ package body Support_12A is
       use System;
       use ML_Types;
       Routine_Name : constant String := "Support_12A.Play_Game ";
-      B            : constant Positive := 5;
+      Num_Items    : constant Positive := 5;  -- b
       Clf          : constant Python_API.PyObject :=
                        Python.Call (Classifier, "init_multinomialnb1");
       Train_Set    : Integer_List_2D;
@@ -134,8 +134,9 @@ package body Support_12A is
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
 
       while Current_Item < Rounds loop
-         Item := ProbA_Chooser (Classifier, Current_Item, B, Labeled_Examples,
-                                Train_Set, Train_Labels, Alpha, Clf);
+         Item := ProbA_Chooser
+           (Classifier, Current_Item, Num_Items, Labeled_Examples, Train_Set,
+            Train_Labels, Alpha, Clf);
          Chosen_Label := Labeled_Examples.Labels (Item, 1);
          Score := Score + Chosen_Label;
          Train_Labels.Append (Chosen_Label);
@@ -153,7 +154,7 @@ package body Support_12A is
             Train_Set.Append (Train_Item);
          end;
 
-         Current_Item := Current_Item + B;
+         Current_Item := Current_Item + Num_Items;
       end loop;
 
       return Score;
@@ -172,7 +173,7 @@ package body Support_12A is
    --  labeled as interesting.
    function ProbA_Chooser
      (Classifier       : Python.Module; Current_Item : Positive;
-      B                : Positive;
+      Num_Items        : Positive;  --  b
       Labeled_Examples : Data_Items;
       Train_Set        : ML_Types.Integer_List_2D;
       Train_Labels     : ML_Types.Integer_List;
@@ -180,14 +181,14 @@ package body Support_12A is
       use System;
       Routine_Name     : constant String := "Support_12.ProbA_Chooser ";
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);
-      BM1              : constant Natural := B - 1;
+      NIM1             : constant Natural := Num_Items - 1;
       Examples_Batch   : constant Integer_Array_List :=
                            Slice (Labeled_Examples.Features,
-                                           Current_Item, Current_Item + BM1);
+                                  Current_Item, Current_Item + NIM1);
       --  Y_Hat predictions
-      Y_Hat            : Real_Float_Matrix (1 .. B, 1 .. 2);
-      Indices          : Integer_Array (1 .. B);
-      Y_Hat_2          : Real_Float_Vector (1 .. B);
+      Y_Hat            : Real_Float_Matrix (1 .. Num_Items, 1 .. 2);
+      Indices          : Integer_Array (Y_Hat'Range);
+      Y_Hat_2          : Real_Float_Vector (Y_Hat'Range);
       Item             : Integer;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
@@ -197,7 +198,7 @@ package body Support_12A is
       end if;
 
       if Train_Set_Length < Alpha then
-         Item := Maths.Random_Integer (Current_Item, Current_Item + B);
+         Item := Maths.Random_Integer (Current_Item, Current_Item + NIM1);
       else  --  Train_Set_Length >= Alpha
          --  predict_proba() returns a Train_Set_Length x two-dimensional array
          --  For binary data, the first column is the probability that the
