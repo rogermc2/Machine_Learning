@@ -210,7 +210,7 @@ package body Support_12A is
             Indices (index) := Current_Item + index - 1;
             Y_Hat_2 (index) := Y_Hat (index, 2);
          end loop;
-         Item := Arg_Max (Indices, Y_Hat_2) - 1;
+         Item := Arg_Max (Indices, Y_Hat_2);
       end if;
 
       return Item;

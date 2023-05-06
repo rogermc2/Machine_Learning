@@ -22,10 +22,6 @@ procedure Lesson_12A is
    Result           : ML_Types.Integer_List;
 begin
    Put_Line (Program_Name);
-   Put_Line (Program_Name & "Features length, 1 and 2 lengths: " &
-               Integer'Image (Integer (CB_Data.Features.Length)) &
-               Integer'Image (CB_Data.Features.Element (1)'Length) &
-               Integer'Image (CB_Data.Features.Element (2)'Length));
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_12a");
