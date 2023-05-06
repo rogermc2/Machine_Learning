@@ -292,19 +292,10 @@ package body Support_12A is
             Num_Unknown := Num_Unknown + 1;
             Index := Unknown_Val;
          end if;
-         --           Put_Line (Routine_Name & "Num_Unknown, Num_Known: " &
-         --                       Integer'Image (Num_Known) & Integer'Image (Num_Unknown));
 
          Vec (Index) := Vec (Index) + 1;
          Next  (Word_Cursor);
       end loop;
-      --        Put_Line (Routine_Name & "Vec vals not 0:");
-      --        for index in Vec'Range loop
-      --           if Vec (index) /= 0 then
-      --              Put (Integer'Image (index) & Integer'Image (Vec (index)) & "   ");
-      --           end if;
-      --        end loop;
-      --        New_Line;
 
       return Vec;
 
