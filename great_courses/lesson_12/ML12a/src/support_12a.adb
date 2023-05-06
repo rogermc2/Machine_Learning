@@ -128,6 +128,7 @@ package body Support_12A is
       Train_Labels : Integer_List;
       Current_Item : Positive := 1;
       Item         : Integer;
+      Chosen_Label : Natural;
       Score        : Natural := 0;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
@@ -135,22 +136,22 @@ package body Support_12A is
       while Current_Item < Rounds loop
          Item := ProbA_Chooser (Classifier, Current_Item, B, Labeled_Examples,
                                 Train_Set, Train_Labels, Alpha, Clf);
+         Chosen_Label := Labeled_Examples.Labels (Item, 1);
+         Score := Score + Chosen_Label;
+         Train_Labels.Append (Chosen_Label);
+
          declare
             Features   : constant Integer_Array :=
                            Labeled_Examples.Features (Item);
             Train_Item : Integer_List;
          begin
-            --              Put_Line (Routine_Name & "Item, Features: " & Integer'Image (Item) &
-            --                          Integer'Image (Features'Length));
             for col in Features'Range loop
                Train_Item.Append (Features (col));
             end loop;
+
+            --  Maximum length of Train_Set is Rounds / B
             Train_Set.Append (Train_Item);
          end;
-         --  Maximum length of Train_Set is Rounds / B
-
-         Train_Labels.Append (Labeled_Examples.Labels (Item, 1));
-         Score := Score + Labeled_Examples.Labels (Item, 1);
 
          Current_Item := Current_Item + B;
       end loop;
