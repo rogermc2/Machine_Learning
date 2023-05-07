@@ -414,9 +414,13 @@ package body Basic_Printing is
             Last := Integer (aList.Last_Index);
          end if;
 
+         if Last < Pos_1 then
+            Last := Pos_1;
+         end if;
+
          Put_Line (Name & ": ");
-         for Index in Pos_1 .. Last loop
-            Put (Integer'Image (aList (Index)) & "  ");
+         for index in Pos_1 .. Last loop
+            Put (Integer'Image (aList (index)) & "  ");
             Count := Count + 1;
             if Count > 10 then
                New_Line;
@@ -451,12 +455,20 @@ package body Basic_Printing is
             Last := Integer (aList.Last_Index);
          end if;
 
+         if Last < Pos_1 then
+            Last := Pos_1;
+         end if;
+
          Put_Line (Name & ": ");
          for row in Pos_1 .. Last loop
-            List_Row := aList (row);
-            for col in List_Row.First_Index .. List_Row.Last_Index loop
-               Put (Integer'Image (List_Row (col)) & "  ");
-            end loop;
+            if aList (row).Is_Empty then
+               Put_Line (Name & " row" & Integer'Image (row) & " is empty.");
+            else
+               List_Row := aList (row);
+               for col in List_Row.First_Index .. List_Row.Last_Index loop
+                  Put (Integer'Image (List_Row (col)) & "  ");
+               end loop;
+            end if;
 
             Count := Count + 1;
             if Count > 10 then

@@ -45,10 +45,6 @@ package ML_Types is
      Ada.Containers.Doubly_Linked_Lists (Integer);
    subtype Integer_DL_List is Integer_DLL_Package.List;
 
---      package Real_Float_Arrays is new Ada.Numerics.Generic_Real_Arrays (Float);
---      subtype Real_Float_Matrix is Real_Float_Arrays.Real_Matrix;
---      subtype Real_Float_Vector is Real_Float_Arrays.Real_Vector;
-
    package Character_Package is new Ada.Containers.Vectors
      (Positive, Character);
    subtype Character_List is Character_Package.Vector;

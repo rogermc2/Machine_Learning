@@ -196,19 +196,31 @@ package body Support_12B is
       Examples_Batch := Slice (Labeled_Examples.Features,
                                Current_Item, Current_Item + NIM1);
       Print_Integer_Array_List (Routine_Name & "Examples_Batch",
-                                Examples_Batch, 1, 2, 1, 10);
+                                Examples_Batch, 1, 2, 1, 20);
       --  Maximum length of Train_Set is Rounds / B
       if Train_Set.Is_Empty then
+         Put_Line (Routine_Name & "Train_Set.Is_Empty");
          Item := Maths.Random_Integer (Current_Item, Current_Item + NIM1);
       else
+         Put_Line (Routine_Name & "Train_Labels length" &
+                     Integer'Image (Integer (Train_Labels.Length)));
+         Put_Line (Routine_Name & "Train_Set length" &
+                     Integer'Image (Integer (Train_Set.Length)));
+         Put_Line (Routine_Name & "Train_Set 1 length" &
+                     Integer'Image (Integer (Train_Set.First_Element.Length)));
+         Put_Line (Routine_Name & "init_multinomial_nb");
          Clf := Python.Call (Classifier, "init_multinomial_nb", Alpha);
          Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+         Print_Integer_List (Routine_Name & "Train_Labels", Train_Labels);
+         Print_Integer_List_2D (Routine_Name & "Train_Set", Train_Set);
+         Put_Line (Routine_Name & "fit");
          Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
          --  predict_proba() returns a Train_Set_Length x two-dimensional array
          --  For binary data, the first column is the probability that the
          --  outcome will be 0 and the second is the probability that the
          --  outcome will be 1, P(0) + P (1) = 1.
          --  The sum of each row of the two columns should equal one.
+         Put_Line (Routine_Name & "predict_proba");
          Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf,
                                    Examples_Batch);
          Put_Line (Routine_Name & "Current_Item" &
