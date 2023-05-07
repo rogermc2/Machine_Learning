@@ -158,6 +158,7 @@ package body Support_12B is
          end;
 
          Current_Item := Current_Item + Num_Items;
+         New_Line;
       end loop;
 
       return Score;
@@ -212,7 +213,6 @@ package body Support_12B is
          Clf := Python.Call (Classifier, "init_multinomial_nb", Alpha);
          Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
          Print_Integer_List (Routine_Name & "Train_Labels", Train_Labels);
-         Print_Integer_List_2D (Routine_Name & "Train_Set", Train_Set);
          Put_Line (Routine_Name & "fit");
          Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
          --  predict_proba() returns a Train_Set_Length x two-dimensional array

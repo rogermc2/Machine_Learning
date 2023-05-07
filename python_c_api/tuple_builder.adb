@@ -82,7 +82,7 @@ package body Tuple_Builder is
       Value        : long;
       Py_Index     : int := -1;
    begin
-      if Integer (Data.Length) > 0 then
+      if not Data.Is_Empty then
          for index in Data.First_Index .. Data.Last_Index loop
             Py_Index := Py_Index + 1;
             Value := long (Data.Element (index));
@@ -99,7 +99,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Types.Integer_List_2D) 
                       return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
+      Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
       Num_Cols     : Natural := 0;
       Row_Size     : int := 0;
       Value        : Integer;
@@ -109,16 +109,23 @@ package body Tuple_Builder is
       Py_Col       : int := -1;
       Result       : constant PyObject := PyTuple_New (int (Data.Length));
    begin
-      if Integer (Data.Length) > 0 then
-         Num_Cols := Natural (Data (1).Length);
+      Put_Line (Routine_Name);
+      if not Data.Is_Empty then
+         Put_Line (Routine_Name & "data not empty");
+         Put_Line (Routine_Name & "Data (1).Length" &
+                     Integer'Image (Integer (Data.First_Element.Length)));
+         Num_Cols := Natural (Data.First_Element.Length);
+         Put_Line (Routine_Name & "Num_Cols" & Integer'Image (Integer (Num_Cols)));
          Row_Size := int (Num_Cols);
          for row in Data.First_Index .. Data.Last_Index loop
+            Put_Line (Routine_Name & "row" & Integer'Image (Integer (row)));
             Item := PyTuple_New (Row_Size);
             Data_Row := Data (row);
             Py_Row := Py_Row + 1;
             Py_Col := -1;
-            if Integer (Data_Row.Length) > 0 then
+            if not Data_Row.Is_Empty then
                for col in Data_Row.First_Index .. Data_Row.Last_Index loop
+                  Put_Line (Routine_Name & "col" & Integer'Image (Integer (col)));
                   Py_Col := Py_Col + 1;
                   Value := Data_Row (col);
                   PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (long (Value)));
