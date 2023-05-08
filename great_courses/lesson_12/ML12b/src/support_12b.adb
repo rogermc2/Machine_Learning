@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
 with Python_API;
 with Python_CLF;
@@ -120,7 +120,7 @@ package body Support_12B is
                        Labeled_Examples : Data_Items; Alpha : Float)
                        return Natural is
       use ML_Types;
-      Routine_Name : constant String := "Support_12A.Play_Game ";
+--        Routine_Name : constant String := "Support_12A.Play_Game ";
       Num_Items    : constant Positive := 5;  -- b
       Train_Set    : Integer_List_2D;
       Train_Labels : Integer_List;
@@ -128,20 +128,19 @@ package body Support_12B is
       Item         : Integer;
       Chosen_Label : Natural;
       Score        : Natural := 0;
+      Count        : Natural := 0;
    begin
-      Put_Line (Routine_Name);
       while Current_Item < Rounds loop
-         Put_Line (Routine_Name & "Current_Item" &
-                     Integer'Image (Current_Item));
+         if Count mod 10 = 0 then
+           Put ("*");
+         end if;
+         Count := Count + 1;
+
          Item := ProbA_Chooser
            (Classifier, Current_Item, Num_Items, Labeled_Examples, Train_Set,
             Train_Labels, Alpha);
-         Put_Line (Routine_Name & "Item" & Integer'Image (Item));
          Chosen_Label := Labeled_Examples.Labels (Item, 1);
-         Put_Line (Routine_Name & "Chosen_Label" &
-                     Integer'Image (Chosen_Label));
          Score := Score + Chosen_Label;
-         Put_Line (Routine_Name & "Score" & Integer'Image (Score));
          Train_Labels.Append (Chosen_Label);
 
          declare
@@ -158,8 +157,8 @@ package body Support_12B is
          end;
 
          Current_Item := Current_Item + Num_Items;
-         New_Line;
       end loop;
+      New_Line;
 
       return Score;
 
@@ -187,50 +186,39 @@ package body Support_12B is
       NIM1             : constant Natural := Num_Items - 1;
       Examples_Batch   : Integer_Array_List;
       Clf              : Python_API.PyObject;
-      --  Y_Hat predictions
-      Y_Hat            : Real_Float_Matrix (1 .. Num_Items, 1 .. 2);
-      Indices          : Integer_Array (Y_Hat'Range);
-      Y_Hat_2          : Real_Float_Vector (Y_Hat'Range);
       Item             : Integer;
    begin
-      Put_Line (Routine_Name);
       Examples_Batch := Slice (Labeled_Examples.Features,
                                Current_Item, Current_Item + NIM1);
-      Print_Integer_Array_List (Routine_Name & "Examples_Batch",
-                                Examples_Batch, 1, 2, 1, 20);
       --  Maximum length of Train_Set is Rounds / B
       if Train_Set.Is_Empty then
-         Put_Line (Routine_Name & "Train_Set.Is_Empty");
          Item := Maths.Random_Integer (Current_Item, Current_Item + NIM1);
       else
-         Put_Line (Routine_Name & "Train_Labels length" &
-                     Integer'Image (Integer (Train_Labels.Length)));
-         Put_Line (Routine_Name & "Train_Set length" &
-                     Integer'Image (Integer (Train_Set.Length)));
-         Put_Line (Routine_Name & "Train_Set 1 length" &
-                     Integer'Image (Integer (Train_Set.First_Element.Length)));
-         Put_Line (Routine_Name & "init_multinomial_nb");
          Clf := Python.Call (Classifier, "init_multinomial_nb", Alpha);
          Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-         Print_Integer_List (Routine_Name & "Train_Labels", Train_Labels);
-         Put_Line (Routine_Name & "fit");
+
          Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
+
          --  predict_proba() returns a Train_Set_Length x two-dimensional array
          --  For binary data, the first column is the probability that the
          --  outcome will be 0 and the second is the probability that the
          --  outcome will be 1, P(0) + P (1) = 1.
          --  The sum of each row of the two columns should equal one.
-         Put_Line (Routine_Name & "predict_proba");
-         Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf,
-                                   Examples_Batch);
-         Put_Line (Routine_Name & "Current_Item" &
-                     Integer'Image (Current_Item));
-         for index in Indices'Range loop
-            Indices (index) := Current_Item + index - 1;
-            Y_Hat_2 (index) := Y_Hat (index, 2);
-         end loop;
-         Item := Arg_Max (Indices, Y_Hat_2);
-         Put_Line (Routine_Name & "Item" & Integer'Image (Item));
+         declare
+            --  Y_Hat predictions
+            Y_Hat   : constant Real_Float_Matrix :=
+                        Python_CLF.Call (Classifier, "predict_proba", Clf,
+                                         Examples_Batch);
+            Indices : Integer_Array (Y_Hat'Range);
+            Y_Hat_2 : Real_Float_Vector (Y_Hat'Range);
+         begin
+            for index in Indices'Range loop
+               Indices (index) := Current_Item + index - 1;
+               Y_Hat_2 (index) := Y_Hat (index, 1);
+            end loop;
+            Item := Arg_Max (Indices, Y_Hat_2);
+         end;
+
       end if;
 
       return Item;

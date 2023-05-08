@@ -7,7 +7,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Parsers;
 with Tuple_Builder; use Tuple_Builder;
 
@@ -217,8 +217,6 @@ package body Python_CLF is
       PyParams     : PyObject;
       PyResult     : PyObject;
    begin
-      Print_Integer_List_2D (Routine_Name & "A ",
-                             Parsers.Parse_Tuple (A_Tuple));
       Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       Assert (A_Tuple /= System.Null_Address, Routine_Name &
                 "A_Tuple is null");
@@ -229,7 +227,6 @@ package body Python_CLF is
       Py_DecRef (A_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
-      Put_Line (Routine_Name & "done");
 
    end Call;
 
@@ -281,16 +278,11 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple      :  PyObject;
-      B_Tuple      :  PyObject;
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
       PyParams     : PyObject;
       PyResult     : PyObject;
    begin
-      Put_Line (Routine_Name);
-      A_Tuple := To_Tuple (A);
-      Put_Line (Routine_Name & "A_Tuple set");
-      B_Tuple := To_Tuple (B);
-      Put_Line (Routine_Name & "B_Tuple set");
       Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       Assert (A_Tuple /= System.Null_Address, Routine_Name &
                 "A_Tuple is null");
@@ -299,9 +291,8 @@ package body Python_CLF is
       PyParams := Py_BuildValue (To_C ("OOO"), CLF, A_Tuple, B_Tuple);
       Assert (PyParams /= System.Null_Address, Routine_Name &
                 "PyParams is null");
-      Put_Line (Routine_Name & "PyParams set");
+
       PyResult := Python.Call_Object (F, PyParams);
-      Put_Line (Routine_Name & "PyResult set");
       Assert (PyResult /= System.Null_Address, Routine_Name &
                 "PyResult is null");
 

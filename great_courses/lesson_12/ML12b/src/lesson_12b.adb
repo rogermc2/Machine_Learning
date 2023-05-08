@@ -23,8 +23,6 @@ procedure Lesson_12B is
                         (0.00005, 0.0001, 0.0002, 0.0005, 0.001, 0.002,
                          0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0);
    Classifier       : Python.Module;
---     Mins             : ML_Types.Integer_List;
---     Maxs             : ML_Types.Integer_List;
    Res              : ML_Types.Integer_List;
    Result           : Real_Float_List;
 begin
@@ -41,8 +39,6 @@ begin
       end loop;
 
       Result.Append (Float (ML_Types.Sum (Res)) / F_Rep);
---        Mins.Append (ML_Types.Min (Res));
---        Maxs.Append (ML_Types.Max (Res));
    end loop;
 
    New_Line;
