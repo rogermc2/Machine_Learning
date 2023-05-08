@@ -13,8 +13,8 @@ procedure Lesson_12B is
    Program_Name     : constant String := "Lesson 12B ";
    Vocab_Dictionary : constant Dictionary_List :=
                         Read_Vocabulary ("../../data/vocab2.txt");
-   --  CB_Data is (dat, labs)
-   CB_Data          : constant Data_Items :=
+   --  Paper_Titles is (dat, labs)
+   Paper_Titles    : constant Data_Items :=
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
    Rounds           : constant Positive := 1000;
    Rep              : constant Positive := 10;
@@ -35,7 +35,8 @@ begin
                   Float'Image (Alphas (alpha)));
       Res.Clear;
       for index in 1 .. Rep loop
-         Res.Append (Play_Game (Classifier, Rounds, CB_Data, Alphas (alpha)));
+         Res.Append (Play_Game (Classifier, Rounds, Paper_Titles,
+                     Alphas (alpha)));
       end loop;
 
       Result.Append (Float (ML_Types.Sum (Res)) / F_Rep);

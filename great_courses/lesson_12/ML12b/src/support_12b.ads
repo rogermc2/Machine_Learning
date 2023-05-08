@@ -23,16 +23,16 @@ package Support_12B is
    subtype Dictionary_List is Dictionary_Package.List;
 
    function ProbA_Chooser
-     (Classifier       : Python.Module;
-      Current_Item     : Positive; Num_Items : Positive;
-      Labeled_Examples : Data_Items;
-      Train_Set        : ML_Types.Integer_List_2D;
-      Train_Labels     : ML_Types.Integer_List;
-      Alpha            : Float) return Integer;
+     (Classifier     : Python.Module;
+      Current_Item   : Positive; Num_Titles : Positive;
+      Labeled_Titles : Data_Items;
+      Train_Set      : ML_Types.Integer_List_2D;
+      Train_Labels   : ML_Types.Integer_List;
+      Alpha          : Float) return Integer;
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
                       return Data_Items;
    function Play_Game (Classifier : Python.Module;
-                       Rounds     : Positive; Labeled_Examples : Data_Items;
+                       Rounds     : Positive; Labeled_Titles : Data_Items;
                        Alpha      : Float) return Natural;
    function Read_Vocabulary (File_Name : String) return Dictionary_List;
 

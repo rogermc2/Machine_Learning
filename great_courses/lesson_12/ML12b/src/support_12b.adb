@@ -116,47 +116,47 @@ package body Support_12B is
 
    --  -------------------------------------------------------------------------
    --  For alpha days the selections are random.
-   function Play_Game (Classifier       : Python.Module; Rounds : Positive;
-                       Labeled_Examples : Data_Items; Alpha : Float)
+   function Play_Game (Classifier     : Python.Module; Rounds : Positive;
+                       Labeled_Titles : Data_Items; Alpha : Float)
                        return Natural is
       use ML_Types;
 --        Routine_Name : constant String := "Support_12A.Play_Game ";
-      Num_Items    : constant Positive := 5;  -- b
-      Train_Set    : Integer_List_2D;
-      Train_Labels : Integer_List;
-      Current_Item : Positive := 1;
-      Item         : Integer;
-      Chosen_Label : Natural;
-      Score        : Natural := 0;
-      Count        : Natural := 0;
+      Num_Titles    : constant Positive := 5;  -- b
+      Train_Set     : Integer_List_2D;
+      Train_Labels  : Integer_List;
+      Current_Title : Positive := 1;
+      Title_ID      : Integer;
+      Chosen_Label  : Natural;
+      Score         : Natural := 0;
+      Count         : Natural := 0;
    begin
-      while Current_Item < Rounds loop
+      while Current_Title < Rounds loop
          if Count mod 10 = 0 then
            Put ("*");
          end if;
          Count := Count + 1;
 
-         Item := ProbA_Chooser
-           (Classifier, Current_Item, Num_Items, Labeled_Examples, Train_Set,
+         Title_ID := ProbA_Chooser
+           (Classifier, Current_Title, Num_Titles, Labeled_Titles, Train_Set,
             Train_Labels, Alpha);
-         Chosen_Label := Labeled_Examples.Labels (Item, 1);
+         Chosen_Label := Labeled_Titles.Labels (Title_ID, 1);
          Score := Score + Chosen_Label;
          Train_Labels.Append (Chosen_Label);
 
          declare
-            Features   : constant Integer_Array :=
-                           Labeled_Examples.Features (Item);
-            Train_Item : Integer_List;
+            Features    : constant Integer_Array :=
+                           Labeled_Titles.Features (Title_ID);
+            Train_Title : Integer_List;
          begin
             for col in Features'Range loop
-               Train_Item.Append (Features (col));
+               Train_Title.Append (Features (col));
             end loop;
 
             --  Maximum length of Train_Set is Rounds / B
-            Train_Set.Append (Train_Item);
+            Train_Set.Append (Train_Title);
          end;
 
-         Current_Item := Current_Item + Num_Items;
+         Current_Title := Current_Title + Num_Titles;
       end loop;
       New_Line;
 
@@ -175,24 +175,24 @@ package body Support_12B is
    --  After fitting the clf model use it to select the item most likely to be
    --  labeled as interesting.
    function ProbA_Chooser
-     (Classifier       : Python.Module; Current_Item : Positive;
-      Num_Items        : Positive;  --  b
-      Labeled_Examples : Data_Items;
-      Train_Set        : ML_Types.Integer_List_2D;
-      Train_Labels     : ML_Types.Integer_List;
-      Alpha            : Float) return Integer is
+     (Classifier     : Python.Module; Current_Item : Positive;
+      Num_Titles     : Positive;  --  b
+      Labeled_Titles : Data_Items;
+      Train_Set      : ML_Types.Integer_List_2D;
+      Train_Labels   : ML_Types.Integer_List;
+      Alpha          : Float) return Integer is
       use System;
-      Routine_Name     : constant String := "Support_12.ProbA_Chooser ";
-      NIM1             : constant Natural := Num_Items - 1;
-      Examples_Batch   : Integer_Array_List;
-      Clf              : Python_API.PyObject;
-      Item             : Integer;
+      Routine_Name   : constant String := "Support_12.ProbA_Chooser ";
+      NTM1           : constant Natural := Num_Titles - 1;
+      Titles_Batch   : Integer_Array_List;
+      Clf            : Python_API.PyObject;
+      Title_ID       : Integer;
    begin
-      Examples_Batch := Slice (Labeled_Examples.Features,
-                               Current_Item, Current_Item + NIM1);
+      Titles_Batch := Slice (Labeled_Titles.Features,
+                               Current_Item, Current_Item + NTM1);
       --  Maximum length of Train_Set is Rounds / B
       if Train_Set.Is_Empty then
-         Item := Maths.Random_Integer (Current_Item, Current_Item + NIM1);
+         Title_ID := Maths.Random_Integer (Current_Item, Current_Item + NTM1);
       else
          Clf := Python.Call (Classifier, "init_multinomial_nb", Alpha);
          Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
@@ -208,20 +208,20 @@ package body Support_12B is
             --  Y_Hat predictions
             Y_Hat   : constant Real_Float_Matrix :=
                         Python_CLF.Call (Classifier, "predict_proba", Clf,
-                                         Examples_Batch);
+                                         Titles_Batch);
             Indices : Integer_Array (Y_Hat'Range);
             Y_Hat_2 : Real_Float_Vector (Y_Hat'Range);
          begin
             for index in Indices'Range loop
                Indices (index) := Current_Item + index - 1;
-               Y_Hat_2 (index) := Y_Hat (index, 1);
+               Y_Hat_2 (index) := 1.0 - Y_Hat (index, 1);
             end loop;
-            Item := Arg_Max (Indices, Y_Hat_2);
+            Title_ID := Arg_Max (Indices, Y_Hat_2);
          end;
 
       end if;
 
-      return Item;
+      return Title_ID;
 
    end ProbA_Chooser;
 
