@@ -14,6 +14,30 @@ package body Maths is
    Integer_Gen         : Random_Integer_Package.Generator;
 
    --  ------------------------------------------------------------------------
+   --  n = the number of trials (or the number being sampled)
+   --  × = the number of successes desired
+   --  p = the probability of getting a success in one trial
+   --  a = 1 - p= the probability of getting a failure in one trial
+   function Binomial (N, X : Integer; P : Float) return Long_Float is
+      Q : constant Float := 1.0 - P;
+   begin
+
+      return Binomial_Coefficient (N, X) * Long_Float (P ** X) *
+        Long_Float (Q ** (N - X));
+
+   end Binomial;
+
+   --  ------------------------------------------------------------------------
+   --  Binomial coeffient defined by G. Woan equation (2.122)
+   --  Factorial(<1) returns 1.
+   function Binomial_Coefficient (N, B : Integer) return Long_Float is
+   begin
+      return Long_Float (Factorial (N)) /
+        Long_Float (Factorial (N) * Factorial (n - B));
+
+   end Binomial_Coefficient;
+
+   --  ------------------------------------------------------------------------
 
    function Cube_Root (Value : Float) return Float is
    begin
@@ -28,6 +52,18 @@ package body Maths is
    end Degrees;
 
    --  -----------------------------------------------------------------------
+
+   Function Factorial (N : Integer) return Integer is
+      Result : Integer := 1;
+   begin
+      if n > 1 then
+         Result := n * Factorial(n - 1);
+      end if;
+      return result;
+
+   end Factorial;
+
+   -- ------------------------------------------------------------
 
    function Normal_Distribution (Mu : Float := 0.0; Sigma : Float := 1.0) return Float is
       use Ada.Numerics;
@@ -108,6 +144,18 @@ package body Maths is
    end Radians;
 
    --  ------------------------------------------------------------------------
+
+   function Random_Binomial (N : Integer; B : Float) return Float is
+      use Ada.Numerics.Float_Random;
+      --  Random range 0.0 .. 1.0
+   begin
+      Reset (Float_Gen);
+      return 2.0 * Float (Random (Binomial (N, B))) - 1.0;
+
+   end Random_Binomial;
+
+   --  ------------------------------------------------------------------------
+
    --  Random_Float generates a random number in the range  -1.0 .. 1.0
    function Random_Float return Float is
       use Ada.Numerics.Float_Random;

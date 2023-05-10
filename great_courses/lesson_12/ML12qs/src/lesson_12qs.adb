@@ -19,9 +19,8 @@ procedure Lesson_12QS is
    Rounds           : constant Positive := 1000;
    Rep              : constant Positive := 10;
    F_Rep            : constant := Float (Rep);
-   Alphas           : constant Real_Float_Vector (1 .. 14) :=
-                        (0.00005, 0.0001, 0.0002, 0.0005, 0.001, 0.002,
-                         0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0);
+   Alphas           : constant Real_Float_Vector (1 .. 5) :=
+     (0.05, 0.1, 0.2, 0.5, 1.0);
    Classifier       : Python.Module;
    Res              : ML_Types.Integer_List;
    Result           : Real_Float_List;

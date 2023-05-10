@@ -9,7 +9,6 @@ with Maths;
 
 --  with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
-with Python_API;
 with Python_CLF;
 
 package body Support_12QS is
@@ -119,8 +118,11 @@ package body Support_12QS is
    function Play_Game (Classifier     : Python.Module; Rounds : Positive;
                        Labeled_Titles : Data_Items; Alpha : Float)
                        return Natural is
+      use System;
       use ML_Types;
---        Routine_Name : constant String := "Support_12A.Play_Game ";
+      Routine_Name : constant String := "Support_12A.Play_Game ";
+
+      Clf           : constant Python_API.PyObject := Python.Call (Classifier, "init_multinomial_nb");
       Num_Titles    : constant Positive := 5;  -- b
       Train_Set     : Integer_List_2D;
       Train_Labels  : Integer_List;
@@ -130,6 +132,8 @@ package body Support_12QS is
       Score         : Natural := 0;
       Count         : Natural := 0;
    begin
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+
       while Current_Title < Rounds loop
          if Count mod 10 = 0 then
            Put ("*");
@@ -137,8 +141,8 @@ package body Support_12QS is
          Count := Count + 1;
 
          Title_ID := ProbA_Chooser
-           (Classifier, Current_Title, Num_Titles, Labeled_Titles, Train_Set,
-            Train_Labels, Alpha);
+           (Classifier, Clf, Current_Title, Num_Titles, Labeled_Titles, Train_Set,
+            Train_Labels, Natural (Alpha));
          Chosen_Label := Labeled_Titles.Labels (Title_ID, 1);
          Score := Score + Chosen_Label;
          Train_Labels.Append (Chosen_Label);
@@ -165,7 +169,24 @@ package body Support_12QS is
    end Play_Game;
 
    --  -------------------------------------------------------------------------
-   --  ProbA_Chooser chooses between B options.
+
+   function Pick_One (V : ML_Types.Integer_List) return Positive is
+      C    : Natural := 0;
+      Pick : Positive;
+   begin
+      Pick := Maths.Random_Integer (1, Integer (V.Length));
+      for index in V.First_Index .. V.Last_Index loop
+         if V (index) = 1 then
+             C := C + 1;
+         end if;
+      end loop;
+
+      return Pick;
+
+   end Pick_One;
+
+   --  -------------------------------------------------------------------------
+  --  ProbA_Chooser chooses between B options.
    --  Current_Item is the initial item to consider.
    --  Train_Set represents the results of previous selections.
    --  If alpha selections have not yet made the selection is random.
@@ -175,30 +196,29 @@ package body Support_12QS is
    --  After fitting the clf model use it to select the item most likely to be
    --  labeled as interesting.
    function ProbA_Chooser
-     (Classifier     : Python.Module; Current_Item : Positive;
+     (Classifier     : Python.Module; Clf : Python_API.PyObject;
+      Current_Item   : Positive;
       Num_Titles     : Positive;  --  b
       Labeled_Titles : Data_Items;
       Train_Set      : ML_Types.Integer_List_2D;
       Train_Labels   : ML_Types.Integer_List;
-      Alpha          : Float) return Integer is
-      use System;
-      Routine_Name   : constant String := "Support_12QS.ProbA_Chooser ";
-      NTM1           : constant Natural := Num_Titles - 1;
-      Titles_Batch   : Integer_Array_List;
-      Clf            : Python_API.PyObject;
-      Title_ID       : Integer;
+      Alpha          : Integer) return Integer is
+      --        Routine_Name   : constant String := "Support_12QS.ProbA_Chooser ";
+      Train_Set_Length : constant Natural := Natural (Train_Set.Length);
+      NTM1             : constant Natural := Num_Titles - 1;
+      Titles_Batch     : Integer_Array_List;
+      Title_ID         : Integer;
    begin
       Titles_Batch := Slice (Labeled_Titles.Features,
                                Current_Item, Current_Item + NTM1);
       --  Maximum length of Train_Set is Rounds / B
-      if Train_Set.Is_Empty then
+      if Train_Set_Length = Alpha then
+         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
+      end if;
+
+      if Train_Set_Length < Alpha then
          Title_ID := Maths.Random_Integer (Current_Item, Current_Item + NTM1);
       else
-         Clf := Python.Call (Classifier, "init_multinomial_nb", Alpha);
-         Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-
-         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
-
          --  predict_proba() returns a Train_Set_Length x two-dimensional array
          --  For binary data, the first column is the probability that the
          --  outcome will be 0 and the second is the probability that the
@@ -214,7 +234,7 @@ package body Support_12QS is
          begin
             for index in Indices'Range loop
                Indices (index) := Current_Item + index - 1;
-               Y_Hat_2 (index) := 1.0 - Y_Hat (index, 1);
+               Y_Hat_2 (index) := Y_Hat (index, 2);
             end loop;
             Title_ID := Arg_Max (Indices, Y_Hat_2);
          end;

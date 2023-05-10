@@ -2,8 +2,8 @@ import numpy as np
 from sklearn.naive_bayes import MultinomialNB
 from matplotlib import pyplot as plt
 
-def init_multinomial_nb(alpha):
-    return MultinomialNB(alpha=alpha)
+def init_multinomial_nb():
+    return MultinomialNB()
 
 def fit (clf, features, labels):
     clf.fit(features, labels)

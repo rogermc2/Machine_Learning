@@ -5,6 +5,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;
+with Python_API;
 
 package Support_12QS is
 
@@ -23,12 +24,12 @@ package Support_12QS is
    subtype Dictionary_List is Dictionary_Package.List;
 
    function ProbA_Chooser
-     (Classifier     : Python.Module;
+     (Classifier     : Python.Module; Clf : Python_API.PyObject;
       Current_Item   : Positive; Num_Titles : Positive;
       Labeled_Titles : Data_Items;
       Train_Set      : ML_Types.Integer_List_2D;
       Train_Labels   : ML_Types.Integer_List;
-      Alpha          : Float) return Integer;
+      Alpha          : Integer) return Integer;
    function Get_Data (File_Name : String; Dictionary : Dictionary_List)
                       return Data_Items;
    function Play_Game (Classifier : Python.Module;
