@@ -14,18 +14,19 @@ package body Maths is
    Integer_Gen         : Random_Integer_Package.Generator;
 
    --  ------------------------------------------------------------------------
-   --  n = the number of trials (or the number being sampled)
+   --  Binomial PDF (x) for specified N and P
+   --  N = the number of trials (or the number being sampled)
    --  × = the number of successes desired
-   --  p = the probability of getting a success in one trial
-   --  a = 1 - p= the probability of getting a failure in one trial
-   function Binomial (N, X : Integer; P : Float) return Long_Float is
+   --  P = the probability of getting a success in one trial
+   --  Q = 1 - P = the probability of getting a failure in one trial
+   function Binomial_Distribution (N, X : Integer; P : Float) return Long_Float is
       Q : constant Float := 1.0 - P;
    begin
 
       return Binomial_Coefficient (N, X) * Long_Float (P ** X) *
         Long_Float (Q ** (N - X));
 
-   end Binomial;
+   end Binomial_Distribution;
 
    --  ------------------------------------------------------------------------
    --  Binomial coeffient defined by G. Woan equation (2.122)
@@ -150,7 +151,7 @@ package body Maths is
       --  Random range 0.0 .. 1.0
    begin
       Reset (Float_Gen);
-      return 2.0 * Float (Random (Binomial (N, B))) - 1.0;
+      return 2.0 * Float (Random (Binomial_Distribution (N, B))) - 1.0;
 
    end Random_Binomial;
 
