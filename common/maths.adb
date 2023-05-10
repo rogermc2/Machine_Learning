@@ -14,12 +14,15 @@ package body Maths is
    Integer_Gen         : Random_Integer_Package.Generator;
 
    --  ------------------------------------------------------------------------
+   --  Binomial_Distribution returns the probability of X successes occurring
+   --  in N trials when the probability of one success is P.
    --  Binomial PDF (x) for specified N and P
    --  N = the number of trials (or the number being sampled)
    --  × = the number of successes desired
    --  P = the probability of getting a success in one trial
    --  Q = 1 - P = the probability of getting a failure in one trial
-   function Binomial_Distribution (N, X : Integer; P : Float) return Long_Float is
+   function Binomial_Distribution (N, X : Integer; P : Float)
+                                   return Long_Float is
       Q : constant Float := 1.0 - P;
    begin
 
