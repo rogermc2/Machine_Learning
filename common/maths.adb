@@ -16,7 +16,7 @@ package body Maths is
    --  ------------------------------------------------------------------------
    --  Binomial_Distribution returns the probability of X successes occurring
    --  in N trials when the probability of one success is P.
-   --  Binomial PDF (x) for specified N and P
+   --  Binomial PMF (x) for specified N and P
    --  N = the number of trials (or the number being sampled)
    --  × = the number of successes desired
    --  P = the probability of getting a success in one trial
@@ -69,7 +69,8 @@ package body Maths is
 
    -- ------------------------------------------------------------
 
-   function Normal_Distribution (Mu : Float := 0.0; Sigma : Float := 1.0) return Float is
+   function Normal_Distribution (Mu : Float := 0.0; Sigma : Float := 1.0)
+                                 return Float is
       use Ada.Numerics;
       use Float_Random;
       use Float_Math_Functions;
@@ -99,7 +100,7 @@ package body Maths is
    --
    --      end Poisson;
    --
-   --      --  -----------------------------------------------------------------------
+   --      --  -----------------------------------------------------------------
 
    function Poisson (Lambda : Float) return Integer is
       use Ada.Numerics.Float_Random;
@@ -149,12 +150,13 @@ package body Maths is
 
    --  ------------------------------------------------------------------------
 
-   function Random_Binomial (N : Integer; B : Float) return Float is
+   function Random_Binomial (Num_Trials : Integer; Probability : Float) return Float is
       use Ada.Numerics.Float_Random;
       --  Random range 0.0 .. 1.0
    begin
       Reset (Float_Gen);
-      return 2.0 * Float (Random (Binomial_Distribution (N, B))) - 1.0;
+      return 2.0 * Float (Random (Binomial_Distribution
+                          (Num_Trials, Probability))) - 1.0;
 
    end Random_Binomial;
 
