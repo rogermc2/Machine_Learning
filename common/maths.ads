@@ -12,8 +12,8 @@ package Maths is
    package Long_Float_Math_Functions is new
      Ada.Numerics.Generic_Elementary_Functions (Long_Float);
 
-   Function Binomial_Coefficient (N, B : Integer) return Long_Float;
-   function Binomial_Distribution (N, X : Integer; P : Float) return Long_Float;
+   Function Binomial_Coefficient (N, B : Integer) return Float;
+   function Binomial_Distribution (N : Integer; P : Float) return Float;
    function Cube_Root (Value : Float) return Float;
    function Degrees (Angle : Radian) return Degree;
    function Factorial (N: Integer) return Integer;

@@ -14,6 +14,16 @@ package body Maths is
    Integer_Gen         : Random_Integer_Package.Generator;
 
    --  ------------------------------------------------------------------------
+   --  Binomial coeffient defined by G. Woan equation (2.122)
+   --  Factorial(<1) returns 1.
+   function Binomial_Coefficient (N, B : Integer) return Float is
+   begin
+
+      return Float (Factorial (N)) / Float (Factorial (N) * Factorial (n - B));
+
+   end Binomial_Coefficient;
+
+   --  ------------------------------------------------------------------------
    --  Binomial_Distribution returns the probability of X successes occurring
    --  in N trials when the probability of one success is P.
    --  Binomial PMF (x) for specified N and P
@@ -21,25 +31,14 @@ package body Maths is
    --  × = the number of successes desired
    --  P = the probability of getting a success in one trial
    --  Q = 1 - P = the probability of getting a failure in one trial
-   function Binomial_Distribution (N, X : Integer; P : Float)
-                                   return Long_Float is
+   function Binomial_Distribution (N : Integer; P : Float) return Float is
       Q : constant Float := 1.0 - P;
+      X : constant Positive := Random_Integer (1, N);
    begin
 
-      return Binomial_Coefficient (N, X) * Long_Float (P ** X) *
-        Long_Float (Q ** (N - X));
+      return Binomial_Coefficient (N, X) * P ** X * Q ** (N - X);
 
    end Binomial_Distribution;
-
-   --  ------------------------------------------------------------------------
-   --  Binomial coeffient defined by G. Woan equation (2.122)
-   --  Factorial(<1) returns 1.
-   function Binomial_Coefficient (N, B : Integer) return Long_Float is
-   begin
-      return Long_Float (Factorial (N)) /
-        Long_Float (Factorial (N) * Factorial (n - B));
-
-   end Binomial_Coefficient;
 
    --  ------------------------------------------------------------------------
 
@@ -147,18 +146,6 @@ package body Maths is
    begin
       return Radian (Angle) * Radians_Per_Degree;
    end Radians;
-
-   --  ------------------------------------------------------------------------
-
-   function Random_Binomial (Num_Trials : Integer; Probability : Float) return Float is
-      use Ada.Numerics.Float_Random;
-      --  Random range 0.0 .. 1.0
-   begin
-      Reset (Float_Gen);
-      return 2.0 * Float (Random (Binomial_Distribution
-                          (Num_Trials, Probability))) - 1.0;
-
-   end Random_Binomial;
 
    --  ------------------------------------------------------------------------
 
