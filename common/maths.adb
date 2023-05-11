@@ -147,8 +147,27 @@ package body Maths is
       return Radian (Angle) * Radians_Per_Degree;
    end Radians;
 
-   --  ------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------   --  Based on Numerical Recipes, Figure 7.3.1
+   --  Based on Numerical Recipes, Figure 7.3.1
+   function Random_Binomial (N : Integer; P : Float) return Integer is
+      Ran    : constant Float := Float (Random_Integer (0, 1));
+      Index  : Integer := 0;
+      Found  : Boolean := False;
+      Result : Integer := 0;
+   begin
+      while not Found and then Index <= N  loop
+         Found := Binomial_Distribution (Index, P) >= Ran;
+         if Found then
+            Result := Index;
+         end if;
+         Index := Index + 1;
+      end loop;
 
+      return Result;
+
+   end Random_Binomial;
+
+   --  ------------------------------------------------------------------------
    --  Random_Float generates a random number in the range  -1.0 .. 1.0
    function Random_Float return Float is
       use Ada.Numerics.Float_Random;

@@ -22,6 +22,7 @@ package Maths is
    function Poisson (Lambda : Float) return Integer;
    function Poisson_Single (Lambda : Float) return Integer;
    function Radians (Angle : Degree) return Radian;
+   function Random_Binomial (N : Integer; P : Float) return Integer;
    function Random_Float return Float;
    function Random_Integer return Integer;
    function Random_Integer (First, Last : Integer) return Integer;
