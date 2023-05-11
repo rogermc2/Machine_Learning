@@ -7,11 +7,16 @@ package body Maths is
    package Random_Integer_Package is new
      Ada.Numerics.Discrete_Random (Random_Integer_Range);
 
+--     type Func_Type is access function (X : Float) return Float;
+
    Radians_Per_Degree : constant Radian := Ada.Numerics.Pi / 180.0;
    Degrees_Per_Radian : constant Degree := 180.0 / Ada.Numerics.Pi;
 
    Float_Gen           : Ada.Numerics.Float_Random.Generator;
    Integer_Gen         : Random_Integer_Package.Generator;
+
+--     function Integrate (Func : Func_Type; A, B : Float; N : Positive)
+--                         return Float;
 
    --  ------------------------------------------------------------------------
    --  Binomial coeffient defined by G. Woan equation (2.122)
@@ -65,6 +70,40 @@ package body Maths is
       return result;
 
    end Factorial;
+
+   -- ------------------------------------------------------------
+
+   --        function Trapezium (A, B : Float; N : Positive) return Scalar is
+   --           Sum : Float := F(A) + F(B);
+   --           X   : Float := 1.0;
+   --        begin
+   --           while X <= Float (N) - 1.0 loop
+   --              Sum := Sum + 2.0 * F (A + X * (B - A) / Float (N));
+   --              X := X + 1.0;
+   --           end loop;
+   --        return (B - A) / (2.0 * Float (N)) * Sum;
+   --
+   --        end Trapezium;
+
+   -- --------------------------------------------------------------------------
+   --  Integrate using Simpson's rule
+--     function Integrate (Func : Func_Type; A, B : Float; N : Positive)
+--                         return Float is
+--        H     : constant Float := (B - A) / Float (N);
+--        Sum_U : Float := 0.0;
+--        Sum_E : Float := 0.0;
+--     begin
+--        for index in 1 .. N - 1 loop
+--           if index mod 2 /= 0 then
+--              Sum_U := Sum_U + Func (A + H * Float (index));
+--           else
+--              Sum_E := Sum_E + Func (A + H * Float (index));
+--           end if;
+--        end loop;
+--
+--        return (H / 3.0) * (Func (A) + Func (B) + 4.0 * Sum_U + 2.0 * Sum_E);
+--
+--     end Integrate;
 
    -- ------------------------------------------------------------
 

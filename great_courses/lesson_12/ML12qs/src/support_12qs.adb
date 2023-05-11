@@ -25,18 +25,18 @@ package body Support_12QS is
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
    --  Values list with the highest value.
-   function Arg_Max (Indices : Integer_Array; Values : Real_Float_Vector)
-                     return Integer is
-      --        Routine_Name : constant String := "Support_6A.Arg_Max ";
-      Best_Index   : Positive;
-      pragma Warnings (Off);
-      Best         : constant Float := Max (Values, Best_Index);
-      pragma Warnings (On);
-   begin
-      return Indices (Best_Index);
-
-   end Arg_Max;
-   pragma Inline (Arg_Max);
+--     function Arg_Max (Indices : Integer_Array; Values : Real_Float_Vector)
+--                       return Integer is
+--        --        Routine_Name : constant String := "Support_12QS.Arg_Max ";
+--        Best_Index   : Positive;
+--        pragma Warnings (Off);
+--        Best         : constant Float := Max (Values, Best_Index);
+--        pragma Warnings (On);
+--     begin
+--        return Indices (Best_Index);
+--
+--     end Arg_Max;
+--     pragma Inline (Arg_Max);
 
    --  -------------------------------------------------------------------------
 
@@ -114,15 +114,16 @@ package body Support_12QS is
    end Get_Data;
 
    --  -------------------------------------------------------------------------
-   --  For alpha days the selections are random.
+
    function Play_Game (Classifier     : Python.Module; Rounds : Positive;
                        Labeled_Titles : Data_Items; Alpha : Float)
                        return Natural is
       use System;
       use ML_Types;
-      Routine_Name : constant String := "Support_12A.Play_Game ";
+      Routine_Name : constant String := "Support_12QS.Play_Game ";
 
-      Clf           : constant Python_API.PyObject := Python.Call (Classifier, "init_multinomial_nb");
+      Clf           : constant Python_API.PyObject :=
+                        Python.Call (Classifier, "init_multinomial_nb");
       Num_Titles    : constant Positive := 5;  -- b
       Train_Set     : Integer_List_2D;
       Train_Labels  : Integer_List;
@@ -136,11 +137,11 @@ package body Support_12QS is
 
       while Current_Title < Rounds loop
          if Count mod 10 = 0 then
-           Put ("*");
+            Put ("*");
          end if;
          Count := Count + 1;
 
-         Title_ID := ProbA_Chooser
+         Title_ID := Thomson_Chooser
            (Classifier, Clf, Current_Title, Num_Titles, Labeled_Titles, Train_Set,
             Train_Labels, Natural (Alpha));
          Chosen_Label := Labeled_Titles.Labels (Title_ID, 1);
@@ -149,7 +150,7 @@ package body Support_12QS is
 
          declare
             Features    : constant Integer_Array :=
-                           Labeled_Titles.Features (Title_ID);
+                            Labeled_Titles.Features (Title_ID);
             Train_Title : Integer_List;
          begin
             for col in Features'Range loop
@@ -170,14 +171,14 @@ package body Support_12QS is
 
    --  -------------------------------------------------------------------------
 
-   function Pick_One (V : ML_Types.Integer_List) return Positive is
+   function Pick_One (V : Integer_Array) return Positive is
       C    : Natural := 0;
       Pick : Positive;
    begin
-      Pick := Maths.Random_Integer (1, Integer (V.Length));
-      for index in V.First_Index .. V.Last_Index loop
+      Pick := Maths.Random_Integer (1, V'Length);
+      for index in V'Range loop
          if V (index) = 1 then
-             C := C + 1;
+            C := C + 1;
          end if;
       end loop;
 
@@ -186,7 +187,7 @@ package body Support_12QS is
    end Pick_One;
 
    --  -------------------------------------------------------------------------
-  --  ProbA_Chooser chooses between B options.
+   --  ProbA_Chooser chooses between B options.
    --  Current_Item is the initial item to consider.
    --  Train_Set represents the results of previous selections.
    --  If alpha selections have not yet made the selection is random.
@@ -195,55 +196,55 @@ package body Support_12QS is
    --  training labels if the academic papers were interesting, trainlabs.
    --  After fitting the clf model use it to select the item most likely to be
    --  labeled as interesting.
-   function ProbA_Chooser
-     (Classifier     : Python.Module; Clf : Python_API.PyObject;
-      Current_Item   : Positive;
-      Num_Titles     : Positive;  --  b
-      Labeled_Titles : Data_Items;
-      Train_Set      : ML_Types.Integer_List_2D;
-      Train_Labels   : ML_Types.Integer_List;
-      Alpha          : Integer) return Integer is
-      --        Routine_Name   : constant String := "Support_12QS.ProbA_Chooser ";
-      Train_Set_Length : constant Natural := Natural (Train_Set.Length);
-      NTM1             : constant Natural := Num_Titles - 1;
-      Titles_Batch     : Integer_Array_List;
-      Title_ID         : Integer;
-   begin
-      Titles_Batch := Slice (Labeled_Titles.Features,
-                               Current_Item, Current_Item + NTM1);
-      --  Maximum length of Train_Set is Rounds / B
-      if Train_Set_Length = Alpha then
-         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
-      end if;
-
-      if Train_Set_Length < Alpha then
-         Title_ID := Maths.Random_Integer (Current_Item, Current_Item + NTM1);
-      else
-         --  predict_proba() returns a Train_Set_Length x two-dimensional array
-         --  For binary data, the first column is the probability that the
-         --  outcome will be 0 and the second is the probability that the
-         --  outcome will be 1, P(0) + P (1) = 1.
-         --  The sum of each row of the two columns should equal one.
-         declare
-            --  Y_Hat predictions
-            Y_Hat   : constant Real_Float_Matrix :=
-                        Python_CLF.Call (Classifier, "predict_proba", Clf,
-                                         Titles_Batch);
-            Indices : Integer_Array (Y_Hat'Range);
-            Y_Hat_2 : Real_Float_Vector (Y_Hat'Range);
-         begin
-            for index in Indices'Range loop
-               Indices (index) := Current_Item + index - 1;
-               Y_Hat_2 (index) := Y_Hat (index, 2);
-            end loop;
-            Title_ID := Arg_Max (Indices, Y_Hat_2);
-         end;
-
-      end if;
-
-      return Title_ID;
-
-   end ProbA_Chooser;
+--     function ProbA_Chooser
+--       (Classifier     : Python.Module; Clf : Python_API.PyObject;
+--        Current_Item   : Positive;
+--        Num_Titles     : Positive;  --  b
+--        Labeled_Titles : Data_Items;
+--        Train_Set      : ML_Types.Integer_List_2D;
+--        Train_Labels   : ML_Types.Integer_List;
+--        Alpha          : Integer) return Integer is
+--        --        Routine_Name   : constant String := "Support_12QS.ProbA_Chooser ";
+--        Train_Set_Length : constant Natural := Natural (Train_Set.Length);
+--        NTM1             : constant Natural := Num_Titles - 1;
+--        Title_ID         : Integer;
+--     begin
+--        --  Maximum length of Train_Set is Rounds / B
+--        if Train_Set_Length = Alpha then
+--           Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
+--        end if;
+--
+--        if Train_Set_Length < Alpha then
+--           Title_ID := Maths.Random_Integer (Current_Item, Current_Item + NTM1);
+--        else
+--           --  predict_proba() returns a Train_Set_Length x two-dimensional array
+--           --  For binary data, the first column is the probability that the
+--           --  outcome will be 0 and the second is the probability that the
+--           --  outcome will be 1, P(0) + P (1) = 1.
+--           --  The sum of each row of the two columns should equal one.
+--           declare
+--              Titles_Batch : constant Integer_Array_List :=
+--                               Slice (Labeled_Titles.Features, Current_Item,
+--                                      Current_Item + NTM1);
+--              --  Y_Hat predictions
+--              Y_Hat        : constant Real_Float_Matrix :=
+--                               Python_CLF.Call (Classifier, "predict_proba", Clf,
+--                                                Titles_Batch);
+--              Indices      : Integer_Array (Y_Hat'Range);
+--              Y_Hat_2      : Real_Float_Vector (Y_Hat'Range);
+--           begin
+--              for index in Indices'Range loop
+--                 Indices (index) := Current_Item + index - 1;
+--                 Y_Hat_2 (index) := Y_Hat (index, 2);
+--              end loop;
+--              Title_ID := Arg_Max (Indices, Y_Hat_2);
+--           end;
+--
+--        end if;
+--
+--        return Title_ID;
+--
+--     end ProbA_Chooser;
 
    --  -------------------------------------------------------------------------
 
@@ -286,6 +287,56 @@ package body Support_12QS is
       return Vocab_Dictionary;
 
    end Read_Vocabulary;
+
+   --  -------------------------------------------------------------------------
+
+   function Thomson_Chooser
+     (Classifier     : Python.Module; Clf : Python_API.PyObject;
+      Current_Item   : Positive;
+      Num_Titles     : Positive;  --  b
+      Labeled_Titles : Data_Items;
+      Train_Set      : ML_Types.Integer_List_2D;
+      Train_Labels   : ML_Types.Integer_List;
+      Alpha          : Integer) return Integer is
+      --        Routine_Name   : constant String := "Support_12QS.Thomson_Chooser ";
+      Train_Set_Length : constant Natural := Natural (Train_Set.Length);
+      NTM1             : constant Natural := Num_Titles - 1;
+      Title_ID         : Integer;
+   begin
+      --  Maximum length of Train_Set is Rounds / B
+      if Train_Set_Length = Alpha then
+         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
+      end if;
+
+      if Train_Set_Length < Alpha then
+         Title_ID := Maths.Random_Integer (Current_Item, Current_Item + NTM1);
+      else
+         --  predict_proba() returns a Train_Set_Length x two-dimensional array
+         --  For binary data, the first column is the probability that the
+         --  outcome will be 0 and the second is the probability that the
+         --  outcome will be 1, P(0) + P (1) = 1.
+         --  The sum of each row of the two columns should equal one.
+         declare
+            Titles_Batch : constant Integer_Array_List :=
+                             Slice (Labeled_Titles.Features, Current_Item,
+                                    Current_Item + NTM1);
+            --  Y_Hat predictions
+            Y_Hat        : constant Real_Float_Matrix :=
+                             Python_CLF.Call (Classifier, "predict_proba", Clf,
+                                              Titles_Batch);
+            Picks        : Integer_Array (Y_Hat'Range);
+         begin
+            for index in Y_Hat'Range loop
+               Picks (index) := Maths.Random_Binomial (1, Y_Hat (index, 1));
+            end loop;
+            Title_ID := Pick_One (Picks);
+         end;
+
+      end if;
+
+      return Title_ID;
+
+   end Thomson_Chooser;
 
    --  -------------------------------------------------------------------------
 
