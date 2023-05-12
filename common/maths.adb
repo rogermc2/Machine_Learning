@@ -38,7 +38,7 @@ package body Maths is
    --  Q = 1 - P = the probability of getting a failure in one trial
    function Binomial_Distribution (N : Integer; P : Float) return Float is
       Q : constant Float := 1.0 - P;
-      X : constant Positive := Random_Integer (0, N);
+      X : constant Natural := Random_Integer (0, N);
    begin
 
       return Binomial_Coefficient (N, X) * P ** X * Q ** (N - X);

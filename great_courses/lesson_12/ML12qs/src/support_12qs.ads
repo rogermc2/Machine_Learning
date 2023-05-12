@@ -5,7 +5,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;
-with Python_API;
 
 package Support_12QS is
 
@@ -37,12 +36,12 @@ package Support_12QS is
                        Alpha      : Float) return Natural;
    function Read_Vocabulary (File_Name : String) return Dictionary_List;
    function Thomson_Chooser
-     (Classifier     : Python.Module; Clf : Python_API.PyObject;
+     (Classifier     : Python.Module;
       Current_Item   : Positive;
       Num_Titles     : Positive;  --  b
       Labeled_Titles : Data_Items;
       Train_Set      : ML_Types.Integer_List_2D;
       Train_Labels   : ML_Types.Integer_List;
-      Alpha          : Integer) return Integer;
+      Alpha          : Float) return Integer;
 
 end Support_12QS;

@@ -9,6 +9,7 @@ with Maths;
 
 --  with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
+with Python_API;
 with Python_CLF;
 
 package body Support_12QS is
@@ -118,12 +119,8 @@ package body Support_12QS is
    function Play_Game (Classifier     : Python.Module; Rounds : Positive;
                        Labeled_Titles : Data_Items; Alpha : Float)
                        return Natural is
-      use System;
       use ML_Types;
-      Routine_Name : constant String := "Support_12QS.Play_Game ";
-
-      Clf           : constant Python_API.PyObject :=
-                        Python.Call (Classifier, "init_multinomial_nb");
+--        Routine_Name : constant String := "Support_12QS.Play_Game ";
       Num_Titles    : constant Positive := 5;  -- b
       Train_Set     : Integer_List_2D;
       Train_Labels  : Integer_List;
@@ -133,8 +130,6 @@ package body Support_12QS is
       Score         : Natural := 0;
       Count         : Natural := 0;
    begin
-      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-
       while Current_Title < Rounds loop
          if Count mod 10 = 0 then
             Put ("*");
@@ -142,8 +137,8 @@ package body Support_12QS is
          Count := Count + 1;
 
          Title_ID := Thomson_Chooser
-           (Classifier, Clf, Current_Title, Num_Titles, Labeled_Titles, Train_Set,
-            Train_Labels, Natural (Alpha));
+           (Classifier, Current_Title, Num_Titles, Labeled_Titles, Train_Set,
+            Train_Labels, Alpha);
          Chosen_Label := Labeled_Titles.Labels (Title_ID, 1);
          Score := Score + Chosen_Label;
          Train_Labels.Append (Chosen_Label);
@@ -291,26 +286,27 @@ package body Support_12QS is
    --  -------------------------------------------------------------------------
 
    function Thomson_Chooser
-     (Classifier     : Python.Module; Clf : Python_API.PyObject;
+     (Classifier     : Python.Module;
       Current_Item   : Positive;
       Num_Titles     : Positive;  --  b
       Labeled_Titles : Data_Items;
       Train_Set      : ML_Types.Integer_List_2D;
       Train_Labels   : ML_Types.Integer_List;
-      Alpha          : Integer) return Integer is
-      --        Routine_Name   : constant String := "Support_12QS.Thomson_Chooser ";
-      Train_Set_Length : constant Natural := Natural (Train_Set.Length);
+      Alpha          : Float) return Integer is
+      use System;
+      Routine_Name     : constant String := "Support_12QS.Thomson_Chooser ";
+      Clf              : Python_API.PyObject;
+--        Train_Set_Length : constant Natural := Natural (Train_Set.Length);
       NTM1             : constant Natural := Num_Titles - 1;
       Title_ID         : Integer;
    begin
-      --  Maximum length of Train_Set is Rounds / B
-      if Train_Set_Length = Alpha then
-         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
-      end if;
-
-      if Train_Set_Length < Alpha then
+      --  Maximum length of Train_Set is Rounds);
+      if Train_Set.Is_Empty then
          Title_ID := Maths.Random_Integer (Current_Item, Current_Item + NTM1);
       else
+         CLF := Python.Call (Classifier, "init_multinomial_nb", Alpha);
+         Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
          --  predict_proba() returns a Train_Set_Length x two-dimensional array
          --  For binary data, the first column is the probability that the
          --  outcome will be 0 and the second is the probability that the
