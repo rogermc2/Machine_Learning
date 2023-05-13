@@ -14,13 +14,13 @@ procedure Lesson_12QS is
    Vocab_Dictionary : constant Dictionary_List :=
                         Read_Vocabulary ("../../data/vocab2.txt");
    --  Paper_Titles is (dat, labs)
-   Paper_Titles    : constant Data_Items :=
+   Paper_Titles     : constant Data_Items :=
                         Get_Data ("../../data/cb.txt", Vocab_Dictionary);
    Rounds           : constant Positive := 1000;
    Rep              : constant Positive := 10;
    F_Rep            : constant := Float (Rep);
    Alphas           : constant Real_Float_Vector (1 .. 5) :=
-     (0.05, 0.1, 0.2, 0.5, 1.0);
+                        (0.05, 0.1, 0.2, 0.5, 1.0);
    Classifier       : Python.Module;
    Res              : ML_Types.Integer_List;
    Result           : Real_Float_List;

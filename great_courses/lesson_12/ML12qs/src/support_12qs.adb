@@ -120,7 +120,7 @@ package body Support_12QS is
                        Labeled_Titles : Data_Items; Alpha : Float)
                        return Natural is
       use ML_Types;
---        Routine_Name : constant String := "Support_12QS.Play_Game ";
+--        Routine_Name  : constant String := "Support_12QS.Play_Game ";
       Num_Titles    : constant Positive := 5;  -- b
       Train_Set     : Integer_List_2D;
       Train_Labels  : Integer_List;
@@ -265,7 +265,7 @@ package body Support_12QS is
             for index in Y_Hat'Range loop
                Picks (index) := Maths.Random_Binomial (1, 1.0 - Y_Hat (index, 1));
             end loop;
-            Title_ID := Pick_One (Picks);
+            Title_ID := Current_Item + Pick_One (Picks);
          end;
 
       end if;
