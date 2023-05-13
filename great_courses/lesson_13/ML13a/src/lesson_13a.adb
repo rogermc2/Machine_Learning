@@ -5,35 +5,39 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use  Basic_Printing;
 with ML_Types;
 with Python;
+with Python_API;
 
 with Support_13A; use Support_13A;
 
 procedure Lesson_13A is
    Program_Name     : constant String := "Lesson 13A ";
-   Vocab_Dictionary : constant Dictionary_List :=
-                        Read_Vocabulary ("../../data/vocab2.txt");
-   --  CB_Data is (dat, labs)
-   CB_Data          : constant Data_Items :=
-                        Get_Data ("../../data/cb.txt", Vocab_Dictionary);
-   Rounds           : constant Positive := 1000;
+   Rounds           : constant Positive := 10000;
+   Epochs           : constant Positive := 5;
+   Epsilon          : constant Float := 0.1;
    Classifier       : Python.Module;
-   Alpha            : Positive := 5;
-   Alphas           : ML_Types.Integer_List;
+   Env              : Python_API.PyObject;
+   Action           : Positive;
+   Observation      : Positive;
+   Done             : Boolean;
    Result           : ML_Types.Integer_List;
 begin
    Put_Line (Program_Name);
    Python.Initialize;
 
-   Classifier := Python.Import_File ("lesson_12a");
-   while Alpha < 200 loop
-      Put ("*");
-      Alpha := Alpha + 5;
-      Alphas.Append (Alpha);
-      Result.Append (Play_Game (Classifier, Rounds, CB_Data, Alpha));
-   end loop;
-   New_Line;
+   Classifier := Python.Import_File ("lesson_13a");
+   Env := Python.Call (Classifier, "init_gym", "Blackjack-v1");
 
-   Python.Call (Classifier, "plot", Alphas, Result);
+   for epoch in 1 .. Epochs loop
+      Done := False;
+      Python.Call (Classifier, "reset", Env);
+      while not Done loop
+         Action := Action_Picker (Classifier, Env, Observation, Epsilon);
+         Done := Python.Call (Classifier, "step", Env, Action);
+      end loop;
+   end loop;
+
+--     Python.Call (Classifier, "plot", Alphas
+   New_Line;
 
    Python.Close_Module (Classifier);
    Python.Finalize;

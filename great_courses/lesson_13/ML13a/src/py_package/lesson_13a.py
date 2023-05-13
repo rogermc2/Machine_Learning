@@ -1,12 +1,17 @@
 import numpy as np
-from sklearn.naive_bayes import MultinomialNB
+import gym
+from sklearn import tree
 from matplotlib import pyplot as plt
 
-def init_multinomialnb1():
-    return MultinomialNB()
+def init_gym(game):
+    return gym.make(game)
 
-def init_multinomial_nb2(alpha):
-    return MultinomialNB(alpha=alpha)
+def reset(env):
+    env.reset()
+
+def step(env, action):
+    observation, reward, done, info = env.step(action)
+    return done
 
 def fit (clf, features, labels):
     clf.fit(features, labels)

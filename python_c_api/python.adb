@@ -187,6 +187,27 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   procedure Call (M : Module; Function_Name : String; A : PyObject) is
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              A      : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("(O)"), A);
+      PyResult := Call_Object (F, PyParams);
+      
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    procedure Call (M : Module; Function_Name, A : String) is
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
@@ -196,16 +217,38 @@ package body Python is
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       PyParams : PyObject;
       PyResult : PyObject;
-      Result   : aliased Interfaces.C.long;
    begin
       PyParams := Py_BuildValue (Interfaces.C.To_C ("(s)"),
                                  Interfaces.C.To_C (A));
       PyResult := Call_Object (F, PyParams);
-      Result := PyInt_AsLong (PyResult);
       
       Py_DecRef (F);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   function Call (M : Module; Function_Name, A : String)
+                  return Python_API.PyObject is
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              A      : Interfaces.C.char_array) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("(s)"),
+                                 Interfaces.C.To_C (A));
+      PyResult := Call_Object (F, PyParams);
+      
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      
+      return PyResult;
 
    end Call;
 
