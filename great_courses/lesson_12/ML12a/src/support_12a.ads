@@ -23,13 +23,6 @@ package Support_12A is
      Ada.Containers.Doubly_Linked_Lists (Dictionary_Record);
    subtype Dictionary_List is Dictionary_Package.List;
 
-   --     type Chooser_Access is access function
-   --       (Classifier   : Python.Module; Current_Item : Positive;
-   --        B            : Positive;
-   --        Train_Set    : in out ML_Types.Integer_List_2D;
-   --        Train_Labels : in out ML_Types.Integer_List_2D;
-   --        Alpha        : Integer;  Clf : Python_API.PyObject) return integer;
-
    function ProbA_Chooser
      (Classifier       : Python.Module;
       Current_Item     : Positive; Num_Items : Positive;
