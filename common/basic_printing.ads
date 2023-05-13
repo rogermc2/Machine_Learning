@@ -45,8 +45,11 @@ package Basic_Printing is
       List_Start : Positive := 1; List_Finish : Natural := 0;
       Start      : Positive := 1; Finish : Natural := 0);
    procedure Print_Integer_List
-     (Name  : String; aList : ML_Types.Integer_List;
-      Start : Positive := 1; Finish : Natural := 0);
+     (Name          : String; aList : ML_Types.Integer_List;
+      Start, Finish : Natural := 0);
+   procedure Print_Integer_List_2D
+     (Name          : String; aList : ML_Types.Integer_List_2D;
+      Start, Finish : Natural := 0);
    procedure Print_Integer_Map (Name : String;
                                 aMap : ML_Types.Integer_Label_Map);
    procedure Print_Integer_Matrix (Name  : String; aMatrix : Integer_Matrix;
@@ -68,6 +71,10 @@ package Basic_Printing is
    procedure Print_Real_Float_List_2D
      (Name  : String; aList : Real_Float_List_2D;
       Start : Positive := 1; Finish : Natural := 0);
+   procedure Print_Strings (Name : String; theList : ML_Types.String_List);
+   procedure Print_Strings (Name : String; theList : ML_Types.String_Vector);
+   procedure Print_Strings (Name    : String;
+                            theList : ML_Types.Indef_String_List);
    procedure Print_Unbound_Array (Name : String;
                                   UB   : Unbounded_String_Array);
    procedure Print_Unbound_List (Name : String; UB : ML_Types.Unbounded_List);

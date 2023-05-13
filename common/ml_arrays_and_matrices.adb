@@ -927,6 +927,57 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Max (V : Integer_Array) return Integer is
+      Result : Integer := Integer'First;
+   begin
+      for index in V'Range loop
+         if V (index) > Result then
+            Result := V (index);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
+
+   function Max (V : Integer_Array; Max_Row : out Natural) return Integer is
+      Result : Integer := Integer'First;
+   begin
+      Max_Row := V'First;
+      for index in V'Range loop
+         if V (index) > Result then
+            Max_Row := index;
+            Result := V (index);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
+
+   function Max (Data : Integer_Matrix; Max_Row : out Natural) return Integer is
+      Max_Val : Integer := Data (1, 1);
+   begin
+      Max_Row := 1;
+      for row in Data'Range loop
+         for col in Data'Range (2) loop
+            if Data (row, col) > Max_Val then
+               Max_Row := row;
+               Max_Val := Data (row, col);
+            end if;
+         end loop;
+      end loop;
+
+      return Max_Val;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
+
    function Max (Data : Real_Float_Matrix) return Float is
       Max_Val : Float := Float'Safe_First;
    begin
@@ -985,6 +1036,23 @@ package body ML_Arrays_And_Matrices is
    begin
       for index in V'Range loop
          if V (index) > Result then
+            Result := V (index);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
+
+   function Max (V : Real_Float_Vector; Max_Row : out Natural) return Float is
+      Result : Float := Float'Safe_First;
+   begin
+      Max_Row := V'First;
+      for index in V'Range loop
+         if V (index) > Result then
+            Max_Row := index;
             Result := V (index);
          end if;
       end loop;
@@ -1097,6 +1165,20 @@ package body ML_Arrays_And_Matrices is
          for col in Result'Range (2) loop
             Result (row - First + 1, col) := Matrix  (row, col);
          end loop;
+      end loop;
+
+      return Result;
+
+   end Slice;
+
+   --  ------------------------------------------------------------------------
+
+   function Slice (Data : Integer_Array_List; First, Last : Positive)
+                   return Integer_Array_List is
+      Result : Integer_Array_List;
+   begin
+      for row in First .. Last loop
+         Result.Append (Data.Element (row));
       end loop;
 
       return Result;
@@ -1460,28 +1542,28 @@ package body ML_Arrays_And_Matrices is
       Assert (Data_Axis = 1 or Data_Axis = 2, Routine_Name &
                 " Invalid Data_Axis" & Integer'Image (Data_Axis) &
                 " should be 1 or 2.");
-         if Data_Axis = 1 then
-            declare
-               Result : Real_Float_Matrix
-                 (First_Index .. First_Index + Vec'Length - 1, 1 .. 1);
-            begin
-               for row in Result'Range loop
-                  Result (row, 1) := Vec (row);
-               end loop;
-               return Result;
-            end;
+      if Data_Axis = 1 then
+         declare
+            Result : Real_Float_Matrix
+              (First_Index .. First_Index + Vec'Length - 1, 1 .. 1);
+         begin
+            for row in Result'Range loop
+               Result (row, 1) := Vec (row);
+            end loop;
+            return Result;
+         end;
 
-         else
-            declare
-               Result : Real_Float_Matrix
-                 (1 .. 1, First_Index .. First_Index + Vec'Length - 1);
-            begin
-               for col in Result'Range (2) loop
-                  Result (1, col) := Vec (col);
-               end loop;
-               return Result;
-            end;
-         end if;
+      else
+         declare
+            Result : Real_Float_Matrix
+              (1 .. 1, First_Index .. First_Index + Vec'Length - 1);
+         begin
+            for col in Result'Range (2) loop
+               Result (1, col) := Vec (col);
+            end loop;
+            return Result;
+         end;
+      end if;
 
    end To_Real_Float_Matrix;
 

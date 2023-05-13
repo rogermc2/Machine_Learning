@@ -28,14 +28,14 @@ package ML_Types is
    subtype Question_Type is Class_Range;
 
    package Integer_Package is new
-      Ada.Containers.Vectors (Positive, Integer);
+      Ada.Containers.Vectors (Natural, Integer);
    subtype Integer_List is Integer_Package.Vector;
     package Integer_Sorting is new Integer_Package.Generic_Sorting ("<");
    type Array_Of_Integer_Lists is array (Integer range <>) of Integer_List;
 
    use Integer_Package;
    package Integer_Package_2D is new
-      Ada.Containers.Vectors (Positive, Integer_List);
+      Ada.Containers.Vectors (Natural, Integer_List);
    subtype Integer_List_2D is Integer_Package_2D.Vector;
 
    function Transpose (Values : Integer_List_2D) return  Integer_List_2D;
@@ -44,10 +44,6 @@ package ML_Types is
    package Integer_DLL_Package is new
      Ada.Containers.Doubly_Linked_Lists (Integer);
    subtype Integer_DL_List is Integer_DLL_Package.List;
-
---      package Real_Float_Arrays is new Ada.Numerics.Generic_Real_Arrays (Float);
---      subtype Real_Float_Matrix is Real_Float_Arrays.Real_Matrix;
---      subtype Real_Float_Vector is Real_Float_Arrays.Real_Vector;
 
    package Character_Package is new Ada.Containers.Vectors
      (Positive, Character);
@@ -293,4 +289,9 @@ package ML_Types is
      Ada.Containers.Indefinite_Ordered_Maps (String, Natural);
    subtype String_Map is String_Map_Package.Map;
 
+   function Max (Data : Integer_List) return Integer;
+   function Min (Data : Integer_List) return Integer;
+   function Slice (aList : Integer_List_2D; First, Last : Positive)
+                   return Integer_List_2D;
+   function Sum (Data : Integer_List) return Integer;
 end ML_Types;

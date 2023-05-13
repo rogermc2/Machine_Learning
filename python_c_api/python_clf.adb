@@ -8,6 +8,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
 --  with Basic_Printing; use Basic_Printing;
+with Parsers;
 with Tuple_Builder; use Tuple_Builder;
 
 package body Python_CLF is
@@ -52,6 +53,7 @@ package body Python_CLF is
       PyResult     : PyObject;
       Result       : Float;
    begin
+      Assert (Obj /= System.Null_Address, Routine_Name & "Obj is null");
       PyParams := Py_BuildValue (To_C ("Oi"), Obj, int (A));
       PyResult := Python.Call_Object (F, PyParams);
       if PyResult = System.Null_Address then
@@ -115,6 +117,7 @@ package body Python_CLF is
       PyResult     : PyObject;
       Result       : Float;
    begin
+      Assert (Obj /= System.Null_Address, Routine_Name & "Obj is null");
       PyParams := Py_BuildValue (To_C ("Oii"), Obj, int (A), int (B));
       PyResult := Python.Call_Object (F, PyParams);
       if PyResult = System.Null_Address then
@@ -134,12 +137,107 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
-   function Call (M : Python.Module; Function_Name : String;
-                  A : Integer_Array_List; B : ML_Types.Integer_List)
-                  return PyObject is
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                  A : Integer_Array_List) return Integer_Matrix is
       use Interfaces.C;
+      Routine_Name : constant String := "Python_CLF.Call IL2D ";
 
-      function Py_BuildValue (Format : char_array; T1, T2 : PyObject)
+      function Py_BuildValue (Format : char_array; O1, T1 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      Py_Result    : PyObject;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
+      Py_Result := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      declare
+         Result : constant Integer_Matrix := Parsers.Parse_Tuple (Py_Result);
+      begin
+         Py_DecRef (Py_Result);
+         return Result;
+      end;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                  A : Integer_Array_List) return Real_Float_Matrix is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python_CLF.Call IL2D ";
+
+      function Py_BuildValue (Format : char_array; O1, T1 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      Py_Result    : PyObject;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
+      Py_Result := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      declare
+         Result : constant Real_Float_Matrix := Parsers.Parse_Tuple (Py_Result);
+      begin
+         Py_DecRef (Py_Result);
+         return Result;
+      end;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                   A : ML_Types.Integer_List_2D) is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python_CLF.Call IL2D ";
+
+      function Py_BuildValue (Format : char_array; O1, T1 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      Assert (A_Tuple /= System.Null_Address, Routine_Name &
+                "A_Tuple is null");
+      PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   -- -------------------------------------------------------------------------
+
+   procedure Call (M    : Python.Module; Function_Name : String; CLF : PyObject;
+                   A, B : ML_Types.Integer_List_2D) is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python_CLF.Call IL2D2 ";
+
+      function Py_BuildValue (Format : char_array; O1, T1, T2 : PyObject)
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -149,15 +247,93 @@ package body Python_CLF is
       PyParams     : PyObject;
       PyResult     : PyObject;
    begin
-      PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      Assert (A_Tuple /= System.Null_Address, Routine_Name &
+                "A_Tuple is null");
+      Assert (B_Tuple /= System.Null_Address, Routine_Name &
+                "B_Tuple is null");
+      PyParams := Py_BuildValue (To_C ("OOO"), CLF, A_Tuple, B_Tuple);
+      Assert (PyParams /= System.Null_Address, Routine_Name &
+                "PyParams is null");
       PyResult := Python.Call_Object (F, PyParams);
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+      Put_Line (Routine_Name & "done");
 
-      return PyResult;
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   procedure Call (M    : Python.Module; Function_Name : String; CLF : PyObject;
+                   A : ML_Types.Integer_List_2D; B : ML_Types.Integer_List) is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python_CLF.Call IL2DIL ";
+
+      function Py_BuildValue (Format : char_array; O1, T1, T2 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      Assert (A_Tuple /= System.Null_Address, Routine_Name &
+                "A_Tuple is null");
+      Assert (B_Tuple /= System.Null_Address, Routine_Name &
+                "B_Tuple is null");
+      PyParams := Py_BuildValue (To_C ("OOO"), CLF, A_Tuple, B_Tuple);
+      Assert (PyParams /= System.Null_Address, Routine_Name &
+                "PyParams is null");
+
+      PyResult := Python.Call_Object (F, PyParams);
+      Assert (PyResult /= System.Null_Address, Routine_Name &
+                "PyResult is null");
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                  A : ML_Types.Integer_List_2D) return Integer_Matrix is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python_CLF.Call IL2D ";
+
+      function Py_BuildValue (Format : char_array; O1, T1 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      Py_Result    : PyObject;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
+      Py_Result := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      declare
+         Result : constant Integer_Matrix := Parsers.Parse_Tuple (Py_Result);
+      begin
+         Py_DecRef (Py_Result);
+         return Result;
+      end;
 
    end Call;
 
@@ -176,7 +352,7 @@ package body Python_CLF is
       PyParams     : PyObject;
       Py_Result    : PyObject;
    begin
-
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("(O)"), CLF);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
@@ -209,7 +385,7 @@ package body Python_CLF is
       PyParams     : PyObject;
       Py_Result    : PyObject;
    begin
-
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       PyParams := Py_BuildValue (Interfaces.C.To_C ("(O)"), CLF);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
 
@@ -219,20 +395,13 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
-      declare
-         Tuple_Size : constant int := PyTuple_Size (Py_Result);
-         Tuple_Item : PyObject;
-         Result     : Integer_Array (1 .. Integer (Tuple_Size));
-      begin
-         --           Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
-         for index in 0 .. Tuple_Size - 1 loop
-            Tuple_Item := PyTuple_GetItem (Py_Result, index);
-            Result (Integer (index) + 1) :=
-              Integer (PyLong_AsLong (Tuple_Item));
-         end loop;
+      Py_DecRef (PyFunc);
+      Py_DecRef (PyParams);
 
-         Py_DecRef (PyFunc);
-         Py_DecRef (PyParams);
+      declare
+         Result     : Integer_Array (1 .. Integer (PyTuple_Size (Py_Result)));
+      begin
+         Parsers.Parse_Tuple (Py_Result, Result);
          Py_DecRef (Py_Result);
          return Result;
       end;
@@ -257,6 +426,7 @@ package body Python_CLF is
       PyParams     : PyObject;
       Py_Result    : PyObject;
    begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
 
       PyParams :=
@@ -269,21 +439,59 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
-      declare
-         Tuple_Size : constant int := PyTuple_Size (Py_Result);
-         Tuple_Item : PyObject;
-         Result     : Integer_Array (1 .. Integer (Tuple_Size));
-      begin
-         --           Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
-         for index in 0 .. Tuple_Size - 1 loop
-            Tuple_Item := PyTuple_GetItem (Py_Result, index);
-            Result (Integer (index) + 1) :=
-              Integer (PyLong_AsLong (Tuple_Item));
-         end loop;
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
 
-         Py_DecRef (PyFunc);
-         Py_DecRef (A_Tuple);
-         Py_DecRef (PyParams);
+      declare
+         Result     : Integer_Array (1 .. Integer (PyTuple_Size (Py_Result)));
+      begin
+         Parsers.Parse_Tuple (Py_Result, Result);
+         Py_DecRef (Py_Result);
+         return Result;
+      end;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject; A : ML_Types.Integer_List)
+                  return Integer_Array is
+      use Interfaces.C;
+      use Python;
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1, T2 : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call Integer_Array_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      Py_Result    : PyObject;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      Py_Result := Call_Object (PyFunc, PyParams);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      declare
+         Result : Integer_Array (1 .. Integer (PyTuple_Size (Py_Result)));
+      begin
+         Parsers.Parse_Tuple (Py_Result, Result);
          Py_DecRef (Py_Result);
          return Result;
       end;
@@ -307,6 +515,44 @@ package body Python_CLF is
       B_Tuple      : constant PyObject := To_Tuple (B);
       PyParams     : PyObject;
    begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      CLF := Call_Object (PyFunc, PyParams);
+      if CLF = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M   : Python.Module; Function_Name : String;
+                   CLF : in out PyObject; A, B : ML_Types.Integer_List) is
+      use Python;
+
+      function Py_BuildValue (Format     : Interfaces.C.char_array;
+                              T1, T2, T3 : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call 4 * Integer_Array_List ";
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
       Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
 
@@ -449,21 +695,7 @@ package body Python_CLF is
 
    function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
                   A : Real_Float_Matrix) return Boolean_Array is
-      --        Routine_Name : constant String := "Python_Clf.Call FM ";
-      procedure Parse_Tuple (Tuple : PyObject;
-                             Vec   : in out Boolean_Array) is
-         use Interfaces.C;
-         T_Row : PyObject;
-      begin
-         Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
-                 "Parse_Tuple Real_Float_List Tuple Size " &
-                   int'Image (PyTuple_Size (Tuple))
-                 & " /= Vec Length" & Integer'Image (Vec'Length));
-         for row in 1 .. PyTuple_Size (Tuple) loop
-            T_Row := PyTuple_GetItem (Tuple, row - 1);
-            Vec (Integer (row)) := PyObject_IsTrue (T_Row) /= 0;
-         end loop;
-      end Parse_Tuple;
+      Routine_Name : constant String := "Python_Clf.Call FM ";
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject) return PyObject;
@@ -475,11 +707,12 @@ package body Python_CLF is
       PyResult : PyObject;
       Result   : ML_Arrays_And_Matrices.Boolean_Array (A'Range);
    begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
 
       PyResult := Python.Call_Object (F, PyParams);
-      Parse_Tuple (PyResult, Result);
+      Parsers.Parse_Tuple (PyResult, Result);
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
@@ -550,6 +783,7 @@ package body Python_CLF is
       PyResult : PyObject;
       Result   : Float;
    begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
 
@@ -618,8 +852,7 @@ package body Python_CLF is
 
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_List)
-                     return Real_Float_Vector is
-      use Interfaces.C;
+                  return Real_Float_Vector is
       use Python;
       Routine_Name : constant String :=
                        "Python_CLF.Call Real_Float_List ";
@@ -627,18 +860,6 @@ package body Python_CLF is
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      procedure Parse_Tuple (Tuple : PyObject;
-                             Vec   : in out Real_Float_Vector) is
-      begin
-         Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
-                   "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
-                 & " /= Vec'Length" & Integer'Image (Vec'Length));
-         for index in 1 .. PyTuple_Size (Tuple) loop
-            Vec (Integer (index)) :=
-              Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, index - 1)));
-         end loop;
-      end Parse_Tuple;
 
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
@@ -661,7 +882,7 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
-      Parse_Tuple (PyResult, Result);
+      Parsers.Parse_Tuple (PyResult, Result);
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
@@ -676,8 +897,7 @@ package body Python_CLF is
 
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_Matrix)
-                     return Real_Float_Vector is
-      use Interfaces.C;
+                  return Real_Float_Vector is
       use Python;
       Routine_Name : constant String :=
                        "Python_CLF.Call 2 * Real_Float_Vector ";
@@ -685,17 +905,6 @@ package body Python_CLF is
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject)  return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      procedure Parse_Tuple (Tuple : PyObject;
-                             Vec   : in out Real_Float_Vector) is
-      begin
-         Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
-                   "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
-                 & " /= Vec'Length" & Integer'Image (Vec'Length));
-         for index in 1 .. PyTuple_Size (Tuple) loop
-            Vec (Integer (index)) := Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, index - 1)));
-         end loop;
-      end Parse_Tuple;
 
       PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject := To_Tuple (A);
@@ -718,7 +927,7 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
-      Parse_Tuple (PyResult, Result);
+      Parsers.Parse_Tuple (PyResult, Result);
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
@@ -744,6 +953,7 @@ package body Python_CLF is
       A_Tuple      : constant PyObject := To_Tuple (A);
       PyParams     : PyObject;
    begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
 
       PyParams :=
@@ -780,6 +990,7 @@ package body Python_CLF is
       PyParams     : PyObject;
       PyResult     : PyObject;
    begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
       PyResult := Call_Object (F, PyParams);
@@ -815,6 +1026,7 @@ package body Python_CLF is
       PyParams     : PyObject;
       PyResult     : PyObject;
    begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
       PyResult := Call_Object (F, PyParams);
@@ -837,6 +1049,7 @@ package body Python_CLF is
    function Call (M  : Python.Module; Function_Name : String; CLF : PyObject;
                   A  : Real_Float_Matrix; B  : Integer_Array) return Float is
       use Python;
+      Routine_Name : constant String := "Python_CLF.Call RFMI ";
 
       function Py_BuildValue (Format     : Interfaces.C.char_array;
                               O1, T1, T2 : PyObject) return PyObject;
@@ -849,6 +1062,7 @@ package body Python_CLF is
       PyResult : PyObject;
       Result   : Float;
    begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), CLF, A_Tuple, B_Tuple);
       PyResult := Call_Object (F, PyParams);
@@ -868,11 +1082,11 @@ package body Python_CLF is
 
    function Call (M : Python.Module; Function_Name : String;
                   A : Real_Float_Matrix; B : Integer_Array)
-                     return PyObject is
+                  return PyObject is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; T1, T2 : PyObject)
-                                 return PyObject;
+                              return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
@@ -896,7 +1110,7 @@ package body Python_CLF is
    -- --------------------------------------------------------------------------
 
    function Get_Attribute (CLF : PyObject; Attribute : String)
-                              return PyObject is
+                           return PyObject is
       use Interfaces.C;
       Routine_Name : constant String :=
                        "Python_CLF.Get_Attribute Real_Float_Matrix ";

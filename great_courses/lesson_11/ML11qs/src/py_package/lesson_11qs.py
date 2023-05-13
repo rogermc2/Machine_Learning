@@ -15,3 +15,8 @@ def labels (kmeans):
 def y_pred (X_train,X_test,Y):
     clf = KNeighborsClassifier(n_neighbors=1).fit(X_train,Y)
     return tuple(clf.predict(X_test))
+
+def plot(data, alphas):
+    plt.scatter(alphas, data)
+    plt.plot(alphas, data)
+    plt.show()

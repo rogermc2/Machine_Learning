@@ -7,11 +7,43 @@ package body Maths is
    package Random_Integer_Package is new
      Ada.Numerics.Discrete_Random (Random_Integer_Range);
 
+--     type Func_Type is access function (X : Float) return Float;
+
    Radians_Per_Degree : constant Radian := Ada.Numerics.Pi / 180.0;
    Degrees_Per_Radian : constant Degree := 180.0 / Ada.Numerics.Pi;
 
    Float_Gen           : Ada.Numerics.Float_Random.Generator;
    Integer_Gen         : Random_Integer_Package.Generator;
+
+--     function Integrate (Func : Func_Type; A, B : Float; N : Positive)
+--                         return Float;
+
+   --  ------------------------------------------------------------------------
+   --  Binomial coeffient defined by G. Woan equation (2.122)
+   --  Factorial(<1) returns 1.
+   function Binomial_Coefficient (N, B : Integer) return Float is
+   begin
+
+      return Float (Factorial (N)) / Float (Factorial (N) * Factorial (n - B));
+
+   end Binomial_Coefficient;
+
+   --  ------------------------------------------------------------------------
+   --  Binomial_Distribution returns the probability of X successes occurring
+   --  in N trials when the probability of one success is P.
+   --  Binomial PMF (x) for specified N and P
+   --  N = the number of trials (or the number being sampled)
+   --  × = the number of successes desired
+   --  P = the probability of getting a success in one trial
+   --  Q = 1 - P = the probability of getting a failure in one trial
+   function Binomial_Distribution (N : Integer; P : Float) return Float is
+      Q : constant Float := 1.0 - P;
+      X : constant Natural := Random_Integer (0, N);
+   begin
+
+      return Binomial_Coefficient (N, X) * P ** X * Q ** (N - X);
+
+   end Binomial_Distribution;
 
    --  ------------------------------------------------------------------------
 
@@ -29,7 +61,54 @@ package body Maths is
 
    --  -----------------------------------------------------------------------
 
-   function Normal_Distribution (Mu : Float := 0.0; Sigma : Float := 1.0) return Float is
+   Function Factorial (N : Integer) return Integer is
+      Result : Integer := 1;
+   begin
+      if n > 1 then
+         Result := n * Factorial(n - 1);
+      end if;
+      return result;
+
+   end Factorial;
+
+   -- ------------------------------------------------------------
+
+   --        function Trapezium (A, B : Float; N : Positive) return Scalar is
+   --           Sum : Float := F(A) + F(B);
+   --           X   : Float := 1.0;
+   --        begin
+   --           while X <= Float (N) - 1.0 loop
+   --              Sum := Sum + 2.0 * F (A + X * (B - A) / Float (N));
+   --              X := X + 1.0;
+   --           end loop;
+   --        return (B - A) / (2.0 * Float (N)) * Sum;
+   --
+   --        end Trapezium;
+
+   -- --------------------------------------------------------------------------
+   --  Integrate using Simpson's rule
+--     function Integrate (Func : Func_Type; A, B : Float; N : Positive)
+--                         return Float is
+--        H     : constant Float := (B - A) / Float (N);
+--        Sum_U : Float := 0.0;
+--        Sum_E : Float := 0.0;
+--     begin
+--        for index in 1 .. N - 1 loop
+--           if index mod 2 /= 0 then
+--              Sum_U := Sum_U + Func (A + H * Float (index));
+--           else
+--              Sum_E := Sum_E + Func (A + H * Float (index));
+--           end if;
+--        end loop;
+--
+--        return (H / 3.0) * (Func (A) + Func (B) + 4.0 * Sum_U + 2.0 * Sum_E);
+--
+--     end Integrate;
+
+   -- ------------------------------------------------------------
+
+   function Normal_Distribution (Mu : Float := 0.0; Sigma : Float := 1.0)
+                                 return Float is
       use Ada.Numerics;
       use Float_Random;
       use Float_Math_Functions;
@@ -59,7 +138,7 @@ package body Maths is
    --
    --      end Poisson;
    --
-   --      --  -----------------------------------------------------------------------
+   --      --  -----------------------------------------------------------------
 
    function Poisson (Lambda : Float) return Integer is
       use Ada.Numerics.Float_Random;
@@ -106,6 +185,26 @@ package body Maths is
    begin
       return Radian (Angle) * Radians_Per_Degree;
    end Radians;
+
+   --  ------------------------------------------------------------------------   --  Based on Numerical Recipes, Figure 7.3.1
+   --  Based on Numerical Recipes, Figure 7.3.1
+   function Random_Binomial (N : Integer; P : Float) return Integer is
+      Ran    : constant Float := Float (Random_Integer (0, 1));
+      Index  : Integer := 0;
+      Found  : Boolean := False;
+      Result : Integer := 0;
+   begin
+      while not Found and then Index <= N  loop
+         Found := Binomial_Distribution (Index, P) >= Ran;
+         if Found then
+            Result := Index;
+         end if;
+         Index := Index + 1;
+      end loop;
+
+      return Result;
+
+   end Random_Binomial;
 
    --  ------------------------------------------------------------------------
    --  Random_Float generates a random number in the range  -1.0 .. 1.0

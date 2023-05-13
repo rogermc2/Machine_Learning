@@ -339,20 +339,21 @@ package body Basic_Printing is
    procedure Print_Integer_Array
      (Name  : String; anArray : Integer_Array;
       Start : Positive := 1; Finish : Natural := 0) is
-      Last  : Positive;
-      Count : Positive := 1;
+      Array_Last : constant Natural := anArray'Last;
+      Last       : Positive;
+      Count      : Positive := 1;
    begin
       if anArray'Length = 0 then
          Put_Line (Name & " is empty");
       else
-         if Finish > 0 then
+         if Finish > 0 and Finish <= Array_Last then
             Last := Finish;
          else
-            Last := Integer (anArray'Length);
+            Last := Array_Last;
          end if;
 
          Put_Line (Name & ": ");
-         if Start >= anArray'First and then Finish <= anArray'Last then
+         if Start >= anArray'First and then Finish <= Array_Last then
             for Index in Start .. Last loop
                Put (Integer'Image (anArray (Index)) & "  ");
                Count := Count + 1;
@@ -394,23 +395,32 @@ package body Basic_Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_List
-     (Name  : String; aList : ML_Types.Integer_List;
-      Start : Positive := 1; Finish : Natural := 0) is
-      Last  : Positive;
+     (Name          : String; aList : ML_Types.Integer_List;
+      Start, Finish : Natural := 0) is
+      Pos_1 : Natural := Start;
+      Last  : Natural;
       Count : Integer := 1;
    begin
       if aList.Is_Empty then
          Put_Line (Name & " list is empty.");
       else
+         if aList.First_Index > Pos_1 then
+            Pos_1 := aList.First_Index;
+         end if;
+
          if Finish > 0 then
             Last := Finish;
          else
-            Last := Integer (aList.Length);
+            Last := Integer (aList.Last_Index);
+         end if;
+
+         if Last < Pos_1 then
+            Last := Pos_1;
          end if;
 
          Put_Line (Name & ": ");
-         for Index in Start .. Last loop
-            Put (Integer'Image (aList (Index)) & "  ");
+         for index in Pos_1 .. Last loop
+            Put (Integer'Image (aList (index)) & "  ");
             Count := Count + 1;
             if Count > 10 then
                New_Line;
@@ -421,6 +431,55 @@ package body Basic_Printing is
       end if;
 
    end Print_Integer_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Integer_List_2D
+     (Name          : String; aList : ML_Types.Integer_List_2D;
+      Start, Finish : Natural := 0) is
+      List_Row : ML_Types.Integer_List;
+      Pos_1    : Natural := Start;
+      Last     : Natural;
+      Count    : Integer := 1;
+   begin
+      if aList.Is_Empty then
+         Put_Line (Name & " list is empty.");
+      else
+         if aList.First_Index > Pos_1 then
+            Pos_1 := aList.First_Index;
+         end if;
+
+         if Finish > 0 then
+            Last := Finish;
+         else
+            Last := Integer (aList.Last_Index);
+         end if;
+
+         if Last < Pos_1 then
+            Last := Pos_1;
+         end if;
+
+         Put_Line (Name & ": ");
+         for row in Pos_1 .. Last loop
+            if aList (row).Is_Empty then
+               Put_Line (Name & " row" & Integer'Image (row) & " is empty.");
+            else
+               List_Row := aList (row);
+               for col in List_Row.First_Index .. List_Row.Last_Index loop
+                  Put (Integer'Image (List_Row (col)) & "  ");
+               end loop;
+            end if;
+
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+         New_Line;
+      end if;
+
+   end Print_Integer_List_2D;
 
    --  ------------------------------------------------------------------------
 
@@ -626,6 +685,77 @@ package body Basic_Printing is
       New_Line;
 
    end Print_Real_Float_List_2D;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Strings (Name : String; theList : ML_Types.String_List) is
+      use ML_Types.String_Package;
+      Curs  : Cursor := theList.First;
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+
+      while Has_Element (Curs) loop
+         Put (To_String (Element (Curs)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+         Next (Curs);
+      end loop;
+      New_Line;
+
+   end Print_Strings;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Strings (Name    : String;
+                            theList : ML_Types.Indef_String_List) is
+      use ML_Types.Indefinite_String_Package;
+      Curs  : Cursor := theList.First;
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+      Put_Line ("Length: " & Integer'Image (Integer (theList.Length)));
+
+      while Has_Element (Curs) loop
+         Put (Element (Curs) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+         Next (Curs);
+      end loop;
+      New_Line;
+
+   end Print_Strings;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Strings (Name : String; theList : ML_Types.String_Vector) is
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+
+      for index in theList.First_Index .. theList.Last_Index loop
+         Put (To_String (theList.Element (index)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Strings;
 
    --  ------------------------------------------------------------------------
 

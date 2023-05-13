@@ -281,6 +281,70 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function Max (Data : Integer_List) return Integer is
+      Result : Integer := Data.First_Element;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         if Data (Integer (index)) > Result then
+            Result := Data (Integer (index));
+         end if;
+      end loop;
+
+      return Result;
+
+   end Max;
+
+   --  ------------------------------------------------------------------------
+
+   function Min (Data : Integer_List) return Integer is
+      Result : Integer := Data.First_Element;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         if Data (Integer (index)) < Result then
+            Result := Data (Integer (index));
+         end if;
+      end loop;
+
+      return Result;
+
+   end Min;
+
+   --  ------------------------------------------------------------------------
+
+   function Slice (aList : Integer_List_2D; First, Last : Positive)
+                   return Integer_List_2D is
+      Result    : Integer_List_2D;
+      List_Row  : Integer_List;
+      Slice_Row : Integer_List;
+   begin
+      for row in First .. Last loop
+         List_Row := aList.Element (row);
+         Slice_Row.Clear;
+         for col in Integer (List_Row.First_Index) .. Integer (List_Row.Last_Index) loop
+            Slice_Row.Append (List_Row.Element (col));
+         end loop;
+         Result.Append (Slice_Row);
+      end loop;
+
+      return Result;
+
+   end Slice;
+
+   --  ------------------------------------------------------------------------
+
+   function Sum (Data : Integer_List) return Integer is
+      Result : Integer := 0;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         Result := Result + Data (Integer (index));
+      end loop;
+
+      return Result;
+
+   end Sum;
+
+   --  ------------------------------------------------------------------------
+
    function Transpose (Values : Integer_List_2D) return  Integer_List_2D is
       use Ada.Containers;
       Num_Rows : constant Positive := Positive (Values.Length);

@@ -228,10 +228,14 @@ package ML_Arrays_And_Matrices is
    pragma Inline (Sum_Diagonal);
    function Sum_Each_Column (Data : Real_Float_Matrix) return Real_Float_Vector;
    pragma Inline (Sum_Each_Column);
+   function Max (V : Integer_Array) return Integer;
+   function Max (V : Integer_Array; Max_Row : out Natural) return Integer;
+   function Max (Data : Integer_Matrix; Max_Row : out Natural) return Integer;
    function Max (Data : Real_Float_Matrix) return Float;
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector;
    function Max (L, R : Real_Float_Vector) return Real_Float_Vector;
    function Max (V : Real_Float_Vector) return Float;
+   function Max (V : Real_Float_Vector; Max_Row : out Natural) return Float;
    pragma Inline (Max);
    function Min (Data : Real_Float_Matrix) return Float;
    function Min (L, R : Real_Float_Vector) return Real_Float_Vector;
@@ -239,10 +243,12 @@ package ML_Arrays_And_Matrices is
    pragma Inline (Min);
    function Slice (Matrix : Binary_Matrix; First, Last : Positive)
                    return Binary_Matrix;
-   function Slice (Matrix : Real_Float_Matrix; First, Last : Positive)
-                   return Real_Float_Matrix;
+   function Slice (Data : Integer_Array_List; First, Last : Positive)
+                   return Integer_Array_List;
    function Slice (Matrix : Integer_Matrix; First, Last : Positive)
                    return Integer_Matrix;
+   function Slice (Matrix : Real_Float_Matrix; First, Last : Positive)
+                   return Real_Float_Matrix;
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                                return Boolean_Array;
    pragma Inline (To_Boolean_Array);
