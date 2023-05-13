@@ -182,66 +182,6 @@ package body Support_12QS is
    end Pick_One;
 
    --  -------------------------------------------------------------------------
-   --  ProbA_Chooser chooses between B options.
-   --  Current_Item is the initial item to consider.
-   --  Train_Set represents the results of previous selections.
-   --  If alpha selections have not yet made the selection is random.
-   --  If alpha selections have been made in the past, fit a clf Naive Bayes
-   --  model using the traing data of academic papers by title, trainset and
-   --  training labels if the academic papers were interesting, trainlabs.
-   --  After fitting the clf model use it to select the item most likely to be
-   --  labeled as interesting.
---     function ProbA_Chooser
---       (Classifier     : Python.Module; Clf : Python_API.PyObject;
---        Current_Item   : Positive;
---        Num_Titles     : Positive;  --  b
---        Labeled_Titles : Data_Items;
---        Train_Set      : ML_Types.Integer_List_2D;
---        Train_Labels   : ML_Types.Integer_List;
---        Alpha          : Integer) return Integer is
---        --        Routine_Name   : constant String := "Support_12QS.ProbA_Chooser ";
---        Train_Set_Length : constant Natural := Natural (Train_Set.Length);
---        NTM1             : constant Natural := Num_Titles - 1;
---        Title_ID         : Integer;
---     begin
---        --  Maximum length of Train_Set is Rounds / B
---        if Train_Set_Length = Alpha then
---           Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
---        end if;
---
---        if Train_Set_Length < Alpha then
---           Title_ID := Maths.Random_Integer (Current_Item, Current_Item + NTM1);
---        else
---           --  predict_proba() returns a Train_Set_Length x two-dimensional array
---           --  For binary data, the first column is the probability that the
---           --  outcome will be 0 and the second is the probability that the
---           --  outcome will be 1, P(0) + P (1) = 1.
---           --  The sum of each row of the two columns should equal one.
---           declare
---              Titles_Batch : constant Integer_Array_List :=
---                               Slice (Labeled_Titles.Features, Current_Item,
---                                      Current_Item + NTM1);
---              --  Y_Hat predictions
---              Y_Hat        : constant Real_Float_Matrix :=
---                               Python_CLF.Call (Classifier, "predict_proba", Clf,
---                                                Titles_Batch);
---              Indices      : Integer_Array (Y_Hat'Range);
---              Y_Hat_2      : Real_Float_Vector (Y_Hat'Range);
---           begin
---              for index in Indices'Range loop
---                 Indices (index) := Current_Item + index - 1;
---                 Y_Hat_2 (index) := Y_Hat (index, 2);
---              end loop;
---              Title_ID := Arg_Max (Indices, Y_Hat_2);
---           end;
---
---        end if;
---
---        return Title_ID;
---
---     end ProbA_Chooser;
-
-   --  -------------------------------------------------------------------------
 
    function Read_Vocabulary (File_Name : String) return Dictionary_List is
       Routine_Name     : constant String := "Support_12QS.Read_Vocabulary ";
@@ -323,7 +263,7 @@ package body Support_12QS is
             Picks        : Integer_Array (Y_Hat'Range);
          begin
             for index in Y_Hat'Range loop
-               Picks (index) := Maths.Random_Binomial (1, Y_Hat (index, 1));
+               Picks (index) := Maths.Random_Binomial (1, 1.0 - Y_Hat (index, 1));
             end loop;
             Title_ID := Pick_One (Picks);
          end;
