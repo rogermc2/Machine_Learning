@@ -208,6 +208,32 @@ package body Python is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M : Module; Function_Name : String; A : Python_API.PyObject)
+                  return Integer is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; A : Python_API.PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : aliased long;
+   begin
+      PyParams := Py_BuildValue (To_C ("(O)"), A);
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult);
+      
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Integer (Result);
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+ 
    procedure Call (M : Module; Function_Name, A : String) is
 
       function Py_BuildValue (Format : Interfaces.C.char_array;

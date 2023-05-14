@@ -9,6 +9,9 @@ def init_gym(game):
 def reset(env):
     env.reset()
 
+def sample(env):
+    return env.action_space.sample()
+
 def step(env, action):
     observation, reward, done, info = env.step(action)
     return done
@@ -16,8 +19,8 @@ def step(env, action):
 def fit (clf, features, labels):
     clf.fit(features, labels)
 
-def predict_proba(clf, features):
-    pred=clf.predict_proba(features)
+def predict(clf, features):
+    pred=clf.predict(features)
     return tuple(map(tuple, pred))
 
 def plot(alphas, result):

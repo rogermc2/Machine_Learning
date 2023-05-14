@@ -1,4 +1,6 @@
 
+with System;
+
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -16,6 +18,8 @@ procedure Lesson_13A is
    Epsilon          : constant Float := 0.1;
    Classifier       : Python.Module;
    Env              : Python_API.PyObject;
+   CLF              : Python_API.PyObject :=
+                             System.Null_Address;
    Action           : Positive;
    Observation      : Positive;
    Done             : Boolean;
@@ -31,7 +35,7 @@ begin
       Done := False;
       Python.Call (Classifier, "reset", Env);
       while not Done loop
-         Action := Action_Picker (Classifier, Env, Observation, Epsilon);
+         Action := Action_Picker (Classifier, Env, CLF, Observation, Epsilon);
          Done := Python.Call (Classifier, "step", Env, Action);
       end loop;
    end loop;

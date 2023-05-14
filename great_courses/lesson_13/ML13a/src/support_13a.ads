@@ -1,4 +1,6 @@
 
+with System;
+
 --  with Ada.Containers.Doubly_Linked_Lists;
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
@@ -16,6 +18,8 @@ package Support_13A is
 
    function Action_Picker (Classifier  : Python.Module;
                            Env         : Python_API.PyObject;
+                           CLF         : Python_API.PyObject :=
+                             System.Null_Address;
                            Observation : Positive;
                            Epsilon     : Float) return Natural;
 
