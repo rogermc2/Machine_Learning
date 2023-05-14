@@ -16,11 +16,15 @@ package Support_13A is
       Labels   : Integer_Matrix (1 .. Rows, 1 .. 1);
    end record;
 
-   function Action_Picker (Classifier  : Python.Module;
-                           Env         : Python_API.PyObject;
-                           CLF         : Python_API.PyObject :=
+   function Call (M           : Python.Module; Function_Name : String;
+                  Env         : Python_API.PyObject; Action : Integer;
+                  Observation : out Real_Float_Vector; Reward : out Integer)
+                  return Boolean;
+   function Action_Picker (Classifier : Python.Module;
+                           Env        : Python_API.PyObject;
+                           CLF        : Python_API.PyObject :=
                              System.Null_Address;
-                           Observation : Positive;
+                           Observation : Real_Float_Vector;
                            Epsilon     : Float) return Natural;
 
 end Support_13A;

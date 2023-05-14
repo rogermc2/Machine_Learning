@@ -5,6 +5,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;
 with Python_API;
@@ -21,7 +22,8 @@ procedure Lesson_13A is
    CLF              : Python_API.PyObject :=
                              System.Null_Address;
    Action           : Positive;
-   Observation      : Positive;
+   Observation      : Real_Float_Vector (1 .. 2);
+   Reward           : Positive;
    Done             : Boolean;
    Result           : ML_Types.Integer_List;
 begin
@@ -36,7 +38,7 @@ begin
       Python.Call (Classifier, "reset", Env);
       while not Done loop
          Action := Action_Picker (Classifier, Env, CLF, Observation, Epsilon);
-         Done := Python.Call (Classifier, "step", Env, Action);
+         Done := Call (Classifier, "step", Env, Action, Observation, Reward);
       end loop;
    end loop;
 

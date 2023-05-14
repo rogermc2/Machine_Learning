@@ -14,7 +14,7 @@ def sample(env):
 
 def step(env, action):
     observation, reward, done, info = env.step(action)
-    return done
+    return (observation, reward, done, info)
 
 def fit (clf, features, labels):
     clf.fit(features, labels)
