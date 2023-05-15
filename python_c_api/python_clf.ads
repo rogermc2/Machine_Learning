@@ -3,6 +3,7 @@
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
+with NL_Types;
 with Python;
 with Python_API; use Python_API;
 
@@ -11,6 +12,9 @@ package Python_CLF is
    Interpreter_Error : exception;
    
    function Call (M : Python.Module; Function_Name : String; A : Positive)
+                  return PyObject;
+   function Call (M : Python.Module; Function_Name : String;
+                  A : Float_Array_List; B : NL_Types.Float_List)
                   return PyObject;
    function Call (M   : Python.Module; Function_Name : String;
                   Obj : PyObject; A : Integer) return Float;
@@ -68,6 +72,8 @@ package Python_CLF is
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_List)
                   return Real_Float_Vector;
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject; A : Float_Array) return Real_Float_Matrix;
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject; A : Real_Float_Matrix)
                   return Real_Float_Vector;

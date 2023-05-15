@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with ML_Types;
+with NL_Types;
 with Python;
 with Python_API;
 with Python_CLF;
@@ -24,11 +24,11 @@ procedure Lesson_13A is
                         System.Null_Address;
    Data             : Float_Array_List;
    Data_Item        : Float_Array (1 .. 3);
-   Labels           : ML_Types.Integer_List;
+   Labels           : NL_Types.Float_List;
    Action           : Natural := 0;
    Observation      : Real_Float_Vector (1 .. 2) := (0.0, 0.0);
-   Reward           : Positive;
-   Target           : Natural;
+   Reward           : Float;
+   Target           : Float;
    Wins             : Natural;
    Done             : Boolean;
 begin
@@ -51,10 +51,11 @@ begin
             Data_Item := (Observation (1), Observation (2), Float (Action));
             Data.Append (Data_Item);
             Done := Call (Classifier, "step", Env, Action, Observation, Reward);
+
             if Done then
                Target := Reward;
             elsif epoch = 0 then
-               Target := 0;
+               Target := 0.0;
             else
                Data_Item := (Observation (1), Observation (2), 1.0);
                declare
@@ -62,11 +63,17 @@ begin
                                   Python_CLF.Call (Classifier, "predict", Clf,
                                                    Data_Item);
                begin
-                  Target := Max (Predictions);
+                  Target := Support_13A.Max (Predictions);
                end;
+            end if;
+            Labels.Append (Target);
+
+            if Reward > 0.0 then
+               Wins := Wins + 1;
             end if;
          end loop;
       end loop;
+      CLF :=  Python_CLF.Call (Classifier, "train", Data, Labels);
    end loop;
 
    --     Python.Call (Classifier, "plot", Alphas

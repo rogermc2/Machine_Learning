@@ -22,6 +22,9 @@ def step(env, action):
 def fit (clf, features, labels):
     clf.fit(features, labels)
 
+def train (clf, features, labels):
+    clf.train(features, labels)
+
 def predict(clf, features):
     pred=clf.predict(features)
     return tuple(map(tuple, pred))

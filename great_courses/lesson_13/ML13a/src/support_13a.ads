@@ -24,9 +24,10 @@ package Support_13A is
                            Epsilon     : Float) return Natural;
    function Call (M           : Python.Module; Function_Name : String;
                   Env         : Python_API.PyObject; Action : Integer;
-                  Observation : out Real_Float_Vector; Reward : out Integer)
+                  Observation : out Real_Float_Vector; Reward : out Float)
                   return Boolean;
-   function Train (Classifier : Python.Module; Data : ML_Types.Integer_List_2D;
+   function Max (Values : Real_Float_Matrix) return Float;
+   function Train (Classifier : Python.Module; Data : Float_Array_List;
                    Labels : ML_Types.Integer_List) return Python_API.PyObject;
 
 end Support_13A;

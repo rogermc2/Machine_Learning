@@ -38,6 +38,35 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M : Python.Module; Function_Name : String;
+                  A : Float_Array_List; B : NL_Types.Float_List)
+                  return PyObject is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; T1, T2 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    function Call (M   : Python.Module; Function_Name : String;
                   Obj : PyObject; A : Integer) return Float is
       use Interfaces.C;
@@ -309,7 +338,7 @@ package body Python_CLF is
    -- --------------------------------------------------------------------------
 
    procedure Call (M    : Python.Module; Function_Name : String; CLF : PyObject;
-                   A : ML_Types.Integer_List_2D; B : ML_Types.Integer_List) is
+                   A    : ML_Types.Integer_List_2D; B : ML_Types.Integer_List) is
       use Interfaces.C;
       Routine_Name : constant String := "Python_CLF.Call IL2DIL ";
 
@@ -930,6 +959,52 @@ package body Python_CLF is
       Py_DecRef (PyResult);
 
       return Result;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject; A : Float_Array) return Real_Float_Matrix is
+      use Python;
+      Routine_Name : constant String :=
+                       "Python_CLF.Call Float_Array ";
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              O1, T1 : PyObject)  return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      PyFunc       : constant PyObject := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
+      Assert (PyFunc /= Null_Address, Routine_Name & "PyFunc is null");
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      declare
+         Result : constant Real_Float_Matrix :=
+                    Parsers.Parse_Tuple (PyResult);
+      begin
+         Py_DecRef (PyResult);
+         return Result;
+      end;
 
    end Call;
 
