@@ -105,4 +105,19 @@ package body Support_13A is
 
    --  -------------------------------------------------------------------------
 
+   function Train (Classifier : Python.Module; Data : ML_Types.Integer_List_2D;
+                   Labels     : ML_Types.Integer_List)
+                   return Python_API.PyObject is
+      Max_Leaves : constant Positive := 6;
+      CLF        : Python_API.PyObject := Python_CLF.Call
+        (Classifier, "init_decision_tree_regressor", Max_Leaves);
+   begin
+
+      return Python_CLF.Call
+        (Classifier, "fit", CLF, Data, Labels);
+
+   end Train;
+
+   --  -------------------------------------------------------------------------
+
 end Support_13A;

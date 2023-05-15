@@ -8,7 +8,11 @@ with Python_API; use Python_API;
 
 package Tuple_Builder is
 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array) 
+                      return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array) 
+                      return PyObject;
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array_List)
                       return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array_List)
                       return PyObject;

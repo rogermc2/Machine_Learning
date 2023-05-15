@@ -6,6 +6,9 @@ from matplotlib import pyplot as plt
 def init_gym(game):
     return gym.make(game)
 
+def init_decision_tree_regressor(max_leaf_nodes):
+    return tree.DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes)
+
 def reset(env):
     env.reset()
 
