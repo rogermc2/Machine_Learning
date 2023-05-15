@@ -19,6 +19,9 @@ def step(env, action):
     observation, reward, done, info = env.step(action)
     return (observation, reward, done, info)
 
+def close(env):
+    env.close()
+
 def fit (clf, features, labels):
     clf.fit(features, labels)
 
@@ -29,9 +32,8 @@ def predict(clf, features):
     pred=clf.predict(features)
     return tuple(map(tuple, pred))
 
-def plot(alphas, result):
-    plt.scatter(alphas, result)
-    plt.plot(alphas, result)
-    plt.xlabel("Alphas")
-    plt.ylabel("Score")
-    plt.show()
+def render(env):
+    return env.render(mode = 'rgb_array')
+
+def plot(env_screen):
+    plt.imshow(env_screen)

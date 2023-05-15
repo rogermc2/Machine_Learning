@@ -38,6 +38,30 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M : Python.Module; Function_Name : String; A : PyObject)
+                  return PyObject is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; A : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("(O)"), A);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    function Call (M : Python.Module; Function_Name : String;
                   A : Float_Array_List; B : NL_Types.Float_List)
                   return PyObject is

@@ -31,6 +31,7 @@ procedure Lesson_13A is
    Target           : Float;
    Wins             : Natural;
    Done             : Boolean;
+   Env_Screen       : Python_API.PyObject;
 begin
    Put_Line (Program_Name);
    Python.Initialize;
@@ -76,9 +77,11 @@ begin
       CLF :=  Python_CLF.Call (Classifier, "train", Data, Labels);
    end loop;
 
-   --     Python.Call (Classifier, "plot", Alphas
+   Env_Screen :=  Python_CLF.Call (Classifier, "render", Env);
+   Python.Call (Classifier, "plot", Env_Screen);
    New_Line;
 
+   Python.Call (Classifier, "close", Env);
    Python.Close_Module (Classifier);
    Python.Finalize;
 
