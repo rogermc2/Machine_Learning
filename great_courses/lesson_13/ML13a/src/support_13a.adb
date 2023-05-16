@@ -17,16 +17,20 @@ package body Support_13A is
                              System.Null_Address;
                            Observation : Real_Float_Vector;
                            Epsilon     : Float) return Natural is
-      pragma Unreferenced (Observation);
       use System;
       Routine_Name : constant String := "Support_13a.Action_Picker ";
-      Examples     : Integer_Array_List;
+      Examples     : Real_Float_Matrix (Observation'Range, 1 .. 2);
       Action       : Integer;
    begin
       if CLF = Null_Address then
          Action := Python.Call (Classifier, "sample", Env);
       else
          Assert (CLF /= Null_Address, Routine_Name & "CLF is null!");
+         for row in Examples'Range loop
+               Examples (row, 1) := Observation (row);
+               Examples (row, 2) := Observation (row) + 1.0;
+         end loop;
+
          Put_Line (Routine_Name & "calling predict ");
          declare
             Predictions : constant Real_Float_Matrix :=

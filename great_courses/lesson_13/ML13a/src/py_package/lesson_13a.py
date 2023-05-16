@@ -27,7 +27,6 @@ def fit (clf, features, labels):
     clf.fit(features, labels)
 
 def predict(clf, features):
-    print("predict clf", clf)
     pred=clf.predict(features)
     return tuple(map(tuple, pred))
 
