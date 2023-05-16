@@ -3,7 +3,6 @@
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
-with NL_Types;
 with Python;
 with Python_API; use Python_API;
 
@@ -15,9 +14,8 @@ package Python_CLF is
                   return PyObject;
    function Call (M : Python.Module; Function_Name : String; A : Positive)
                   return PyObject;
-   function Call (M : Python.Module; Function_Name : String;
-                  A : Float_Array_List; B : NL_Types.Float_List)
-                  return PyObject;
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                   A : Float_Array_List; B : ML_Types.Integer_List);
    function Call (M   : Python.Module; Function_Name : String;
                   Obj : PyObject; A : Integer) return Float;
    function Call (M : Python.Module; Function_Name : String; A, B : Integer)

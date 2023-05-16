@@ -16,8 +16,9 @@ def sample(env):
     return env.action_space.sample()
 
 def step(env, action):
-    observation, reward, done, info = env.step(action)
-    return (observation, reward, done, info)
+    return env.step(action)
+#    observation, reward, done, info = env.step(action)
+#    return (observation, reward, done, info)
 
 def close(env):
     env.close()
@@ -25,10 +26,8 @@ def close(env):
 def fit (clf, features, labels):
     clf.fit(features, labels)
 
-def train (clf, features, labels):
-    clf.train(features, labels)
-
 def predict(clf, features):
+    print("predict clf", clf)
     pred=clf.predict(features)
     return tuple(map(tuple, pred))
 

@@ -1,9 +1,6 @@
 
 with System;
 
---  with Ada.Containers.Doubly_Linked_Lists;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;

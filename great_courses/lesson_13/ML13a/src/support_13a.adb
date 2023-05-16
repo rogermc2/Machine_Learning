@@ -2,15 +2,12 @@
 with Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
---
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Maths;
 
 --  with Basic_Printing; use Basic_Printing;
---  with Neural_Utilities;
 with Python_CLF;
---  with Tuple_Builder;
 
 package body Support_13A is
 
@@ -22,13 +19,15 @@ package body Support_13A is
                            Epsilon     : Float) return Natural is
       pragma Unreferenced (Observation);
       use System;
-      --        Routine_Name : constant String := "Support_13a.Action_Picker ";
+      Routine_Name : constant String := "Support_13a.Action_Picker ";
       Examples     : Integer_Array_List;
       Action       : Integer;
    begin
       if CLF = Null_Address then
          Action := Python.Call (Classifier, "sample", Env);
       else
+         Assert (CLF /= Null_Address, Routine_Name & "CLF is null!");
+         Put_Line (Routine_Name & "calling predict ");
          declare
             Predictions : constant Real_Float_Matrix :=
                             Python_CLF.Call (Classifier, "predict", Clf,
@@ -66,9 +65,9 @@ package body Support_13A is
                             Reward      : out Float) return Boolean is
          Py_Obs : PyObject;
       begin
-         Assert (Integer (PyTuple_Size (Tuple)) = 4,
-                 "Parse_Tuple Tuple Size" & int'Image (PyTuple_Size (Tuple)) &
-                   ", size 4 expected");
+--           Assert (Integer (PyTuple_Size (Tuple)) = 4,
+--                   "Parse_Tuple Tuple Size" & int'Image (PyTuple_Size (Tuple)) &
+--                     ", size 4 expected");
          Py_Obs := PyTuple_GetItem (Tuple, 0);
          Observation (1) :=
            Float (PyFloat_AsDouble (PyTuple_GetItem (Py_Obs, 0)));
@@ -123,13 +122,16 @@ package body Support_13A is
    function Train (Classifier : Python.Module; Data : Float_Array_List;
                    Labels     : ML_Types.Integer_List)
                    return Python_API.PyObject is
+      use System;
+      Routine_Name : constant String := "Support_13a.Train ";
       Max_Leaves : constant Positive := 6;
       CLF        : constant Python_API.PyObject := Python_CLF.Call
         (Classifier, "init_decision_tree_regressor", Max_Leaves);
    begin
+      Assert (CLF /= Null_Address, Routine_Name & "CLF is null!");
+      Python_CLF.Call (Classifier, "fit", CLF, Data, Labels);
 
-      return Python_CLF.Call
-        (Classifier, "fit", CLF, Data, Labels);
+      return CLF;
 
    end Train;
 

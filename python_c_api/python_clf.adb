@@ -62,12 +62,11 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
-   function Call (M : Python.Module; Function_Name : String;
-                  A : Float_Array_List; B : NL_Types.Float_List)
-                  return PyObject is
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                   A : Float_Array_List; B : ML_Types.Integer_List) is
       use Interfaces.C;
 
-      function Py_BuildValue (Format : char_array; T1, T2 : PyObject)
+      function Py_BuildValue (Format : char_array; T1, T2, T3: PyObject)
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -77,15 +76,14 @@ package body Python_CLF is
       PyParams : PyObject;
       PyResult : PyObject;
    begin
-      PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
+      PyParams := Py_BuildValue (To_C ("OOO"), A_Tuple, B_Tuple, CLF);
       PyResult := Python.Call_Object (F, PyParams);
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (PyParams);
-
-      return PyResult;
+      Py_DecRef (PyResult);
 
    end Call;
 

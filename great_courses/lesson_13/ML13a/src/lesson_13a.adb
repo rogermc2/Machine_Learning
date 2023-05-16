@@ -1,12 +1,13 @@
 
 with System;
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with NL_Types;
+with ML_Types;
 with Python;
 with Python_API;
 with Python_CLF;
@@ -14,9 +15,10 @@ with Python_CLF;
 with Support_13A; use Support_13A;
 
 procedure Lesson_13A is
+   use System;
    Program_Name     : constant String := "Lesson 13A ";
    Rounds           : constant Positive := 10000;
-   Epochs           : constant Positive := 5;
+   Epochs           : constant Positive := 4;
    Epsilon          : constant Float := 0.1;
    Classifier       : Python.Module;
    Env              : Python_API.PyObject;
@@ -24,7 +26,7 @@ procedure Lesson_13A is
                         System.Null_Address;
    Data             : Float_Array_List;
    Data_Item        : Float_Array (1 .. 3);
-   Labels           : NL_Types.Float_List;
+   Labels           : ML_Types.Integer_List;
    Action           : Natural := 0;
    Observation      : Real_Float_Vector (1 .. 2) := (0.0, 0.0);
    Reward           : Float;
@@ -39,7 +41,7 @@ begin
    Classifier := Python.Import_File ("lesson_13a");
    Env := Python.Call (Classifier, "init_gym", "Blackjack-v1");
 
-   for epoch in 1 .. Epochs loop
+   for epoch in 0 .. Epochs loop
       Data.Clear;
       Labels.Clear;
       Wins := 0;
@@ -58,7 +60,9 @@ begin
             elsif epoch = 0 then
                Target := 0.0;
             else
+               Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
                Data_Item := (Observation (1), Observation (2), 1.0);
+               Put_Line (Program_Name & "calling predict ");
                declare
                   Predictions : constant Real_Float_Matrix :=
                                   Python_CLF.Call (Classifier, "predict", Clf,
@@ -67,14 +71,15 @@ begin
                   Target := Support_13A.Max (Predictions);
                end;
             end if;
-            Labels.Append (Target);
+            Labels.Append (Integer (Target));
 
             if Reward > 0.0 then
                Wins := Wins + 1;
             end if;
          end loop;
       end loop;
-      CLF :=  Python_CLF.Call (Classifier, "train", Data, Labels);
+      CLF :=  Train (Classifier, Data, Labels);
+--        CLF :=  Python_CLF.Call (Classifier, "train", Data, Labels);
    end loop;
 
    Env_Screen :=  Python_CLF.Call (Classifier, "render", Env);
