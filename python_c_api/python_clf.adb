@@ -392,6 +392,45 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M : Python.Module; Function_Name : String;
+                  A : Float_Array_List; B : ML_Types.Integer_List)
+                  return Python_API.PyObject is
+      use Interfaces.C;
+      Routine_Name : constant String := "Python_CLF.Call IL2DIL ";
+
+      function Py_BuildValue (Format : char_array; T1, T2 : PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject := To_Tuple (A);
+      B_Tuple      : constant PyObject := To_Tuple (B);
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (A_Tuple /= System.Null_Address, Routine_Name &
+                "A_Tuple is null");
+      Assert (B_Tuple /= System.Null_Address, Routine_Name &
+                "B_Tuple is null");
+      PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
+      Assert (PyParams /= System.Null_Address, Routine_Name &
+                "PyParams is null");
+
+      PyResult := Python.Call_Object (F, PyParams);
+      Assert (PyResult /= System.Null_Address, Routine_Name &
+                "PyResult is null");
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    procedure Call (M    : Python.Module; Function_Name : String; CLF : PyObject;
                    A    : ML_Types.Integer_List_2D; B : ML_Types.Integer_List) is
       use Interfaces.C;

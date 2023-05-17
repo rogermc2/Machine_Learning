@@ -123,21 +123,21 @@ package body Support_13A is
 
    --  -------------------------------------------------------------------------
 
-   function Train (Classifier : Python.Module; Data : Float_Array_List;
-                   Labels     : ML_Types.Integer_List)
-                   return Python_API.PyObject is
-      use System;
-      Routine_Name : constant String := "Support_13a.Train ";
-      Max_Leaves : constant Positive := 6;
-      CLF        : constant Python_API.PyObject := Python_CLF.Call
-        (Classifier, "init_decision_tree_regressor", Max_Leaves);
-   begin
-      Assert (CLF /= Null_Address, Routine_Name & "CLF is null!");
-      Python_CLF.Call (Classifier, "fit", CLF, Data, Labels);
-
-      return CLF;
-
-   end Train;
+--     function Train (Classifier : Python.Module; Data : Float_Array_List;
+--                     Labels     : ML_Types.Integer_List)
+--                     return Python_API.PyObject is
+--        use System;
+--        Routine_Name : constant String := "Support_13a.Train ";
+--        Max_Leaves : constant Positive := 6;
+--        CLF        : constant Python_API.PyObject := Python_CLF.Call
+--          (Classifier, "init_decision_tree_regressor", Max_Leaves);
+--     begin
+--        Assert (CLF /= Null_Address, Routine_Name & "CLF is null!");
+--        Python_CLF.Call (Classifier, "fit", CLF, Data, Labels);
+--
+--        return CLF;
+--
+--     end Train;
 
    --  -------------------------------------------------------------------------
 

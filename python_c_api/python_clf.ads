@@ -36,7 +36,10 @@ package Python_CLF is
                    A, B : ML_Types.Integer_List_2D);
    function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
                   A : Float_Array_List; B : ML_Types.Integer_List)
-                  return Python_API.PyObject;
+                  return PyObject;
+   function Call (M : Python.Module; Function_Name : String;
+                  A : Float_Array_List; B : ML_Types.Integer_List)
+                  return PyObject;
    procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
                    A : ML_Types.Integer_List_2D; B : ML_Types.Integer_List);
    procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject);

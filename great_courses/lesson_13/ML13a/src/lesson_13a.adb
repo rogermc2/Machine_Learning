@@ -78,8 +78,8 @@ begin
             end if;
          end loop;
       end loop;
-      CLF :=  Train (Classifier, Data, Labels);
---        CLF :=  Python_CLF.Call (Classifier, "train", Data, Labels);
+--        CLF :=  Train (Classifier, Data, Labels);
+      CLF :=  Python_CLF.Call (Classifier, "train", Data, Labels);
    end loop;
 
    Env_Screen :=  Python_CLF.Call (Classifier, "render", Env);

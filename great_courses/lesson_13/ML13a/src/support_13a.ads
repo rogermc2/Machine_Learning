@@ -2,7 +2,7 @@
 with System;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with ML_Types;
+--  with ML_Types;
 with Python;
 with Python_API;
 
@@ -24,7 +24,7 @@ package Support_13A is
                   Observation : out Real_Float_Vector; Reward : out Float)
                   return Boolean;
    function Max (Values : Real_Float_Matrix) return Float;
-   function Train (Classifier : Python.Module; Data : Float_Array_List;
-                   Labels : ML_Types.Integer_List) return Python_API.PyObject;
+--     function Train (Classifier : Python.Module; Data : Float_Array_List;
+--                     Labels : ML_Types.Integer_List) return Python_API.PyObject;
 
 end Support_13A;
