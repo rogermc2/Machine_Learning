@@ -100,6 +100,54 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Matrix_List)
+                      return PyObject is
+      use Interfaces.C;
+      use ML_Arrays_And_Matrices;
+      
+      function Py_BuildValue (Format : char_array; T1 : double) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+      
+      --        Routine_Name : constant String := "Python.To_Tuple Integer_Array_List ";
+      Tuple        : PyObject;
+      Py_Index     : int := -1;
+   begin
+      Tuple := PyTuple_New (int (Data.Length));
+      for mat in Data.First_Index .. Data.Last_Index loop
+         Py_Index := Py_Index + 1;
+         declare
+            Row_Data     : constant Real_Float_Matrix := Data (mat);
+            PyParams     : PyObject;
+            Row_Tuple    : PyObject;
+            Py_Row_Index : int := -1;
+         begin
+            Row_Tuple := PyTuple_New (int (Row_Data'Length));
+            for row in Row_Data'Range loop
+               Py_Row_Index := Py_Row_Index + 1;
+               declare
+                  Col_Data     : constant Float_Array := Row_Data (row);
+                  PyParams     : PyObject;
+                  Col_Tuple    : PyObject;
+                  Py_Col_Index : int := -1;
+               begin
+                  for col in Row_Data'Range (2) loop
+                     PyParams := Py_BuildValue (To_C ("(d)"), double (Row_Data (row, col)));
+                     PyTuple_SetItem (Col_Tuple, Py_Col_Index, PyParams); 
+                     Py_DecRef (PyParams);
+                  end loop;
+               end;
+            end loop;
+            PyTuple_SetItem (Row_Tuple, Py_Row_Index, Col_Tuple);
+         end;
+         PyTuple_SetItem (Tuple, Py_Index, To_Tuple (Row_Data));
+      end loop;
+
+      return Tuple;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array_List)
                       return PyObject is
       use Interfaces.C;
@@ -162,7 +210,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Types.Integer_List_2D) 
                       return PyObject is
       use Interfaces.C;
---        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
+      --        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
       Num_Cols     : Natural := 0;
       Row_Size     : int := 0;
       Value        : Integer;

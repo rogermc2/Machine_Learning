@@ -10,6 +10,7 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;
 with Python_API;
+with Python_Class;
 with Python_CLF;
 
 with Support_13A; use Support_13A;
@@ -22,10 +23,10 @@ procedure Lesson_13A is
    Epsilon          : constant Float := 0.1;
    Classifier       : Python.Module;
    Env              : Python_API.PyObject;
-   CLF              : Python_API.PyObject :=
+   CLF              : Python_Class.PyTypeObject :=
                         System.Null_Address;
-   Data             : Float_Array_List;
-   Data_Item        : Float_Array (1 .. 3);
+   Data             : Float_Matrix_List;
+   Data_Item        : Real_Float_Matrix (1 .. 1, 1 .. 3);
    Labels           : ML_Types.Integer_List;
    Action           : Natural := 0;
    Observation      : Real_Float_Vector (1 .. 2) := (0.0, 0.0);
@@ -51,7 +52,9 @@ begin
          while not Done loop
             Action :=
               Action_Picker (Classifier, Env, CLF, Observation, Epsilon);
-            Data_Item := (Observation (1), Observation (2), Float (Action));
+            Data_Item (1, 1) := Observation (1);
+            Data_Item (1, 2) := Observation (2);
+            Data_Item (1, 3) := Float (Action);
             Data.Append (Data_Item);
             Done := Call (Classifier, "step", Env, Action, Observation, Reward);
 
@@ -61,7 +64,9 @@ begin
                Target := 0.0;
             else
                Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
-               Data_Item := (Observation (1), Observation (2), 1.0);
+               Data_Item (1, 1) := Observation (1);
+               Data_Item (1, 2) := Observation (2);
+               Data_Item (1, 3) := 1.0;
                Put_Line (Program_Name & "calling predict ");
                declare
                   Predictions : constant Real_Float_Matrix :=

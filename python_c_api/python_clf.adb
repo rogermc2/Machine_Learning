@@ -393,7 +393,7 @@ package body Python_CLF is
    -- --------------------------------------------------------------------------
 
    function Call (M : Python.Module; Function_Name : String;
-                  A : Float_Array_List; B : ML_Types.Integer_List)
+                  A : Float_Matrix_List; B : ML_Types.Integer_List)
                   return Python_API.PyObject is
       use Interfaces.C;
       Routine_Name : constant String := "Python_CLF.Call IL2DIL ";
