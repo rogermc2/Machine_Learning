@@ -22,8 +22,6 @@ def sample(env):
 
 def step(env, action):
     return env.step(action)
-#    observation, reward, done, info = env.step(action)
-#    return (observation, reward, done, info)
 
 def close(env):
     env.close()
@@ -33,9 +31,6 @@ def close(env):
 
 def predict(clf, features):
     pred=clf.predict(features)
-    print ("predict, pred", pred.shape)
-    print ("predict, pred", pred)
-
     return tuple(pred)
 
 def render(env):

@@ -25,11 +25,11 @@ procedure Lesson_13A is
    Env              : Python_API.PyObject;
    CLF              : Python_Class.PyTypeObject :=
                         System.Null_Address;
-   Data             : Float_Vector_List;
-   Data_Item        : Real_Float_Vector (1 .. 3);
    Labels           : ML_Types.Integer_List;
    Action           : Natural := 0;
    Observation      : Real_Float_Vector (1 .. 2) := (0.0, 0.0);
+   Data             : Float_Vector_List;
+   Data_Item        : Real_Float_Vector (1 .. Observation'Length + 1);
    Reward           : Float;
    Target           : Float;
    Wins             : Natural;
@@ -43,6 +43,7 @@ begin
    Env := Python.Call (Classifier, "init_gym", "Blackjack-v1");
 
    for epoch in 0 .. Epochs loop
+      Put_Line (Program_Name & "epoch: " & Integer'Image (epoch));
       Data.Clear;
       Labels.Clear;
       Wins := 0;
@@ -63,11 +64,9 @@ begin
             else
                Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
                Data_Item := (Observation (1), Observation (2), 1.0);
-               Put_Line (Program_Name & "calling predict ");
                declare
-                  Predictions : constant Real_Float_Matrix :=
-                                  Python_CLF.Call (Classifier, "predict", Clf,
-                                                   Data);
+                  Predictions : constant Real_Float_Vector := Python_Class.Call
+                    (Classifier, "predict", Clf, To_Real_Float_Matrix (Data));
                begin
                   Target := Support_13A.Max (Predictions);
                end;
@@ -79,12 +78,14 @@ begin
             end if;
          end loop;
       end loop;
---        CLF :=  Train (Classifier, Data, Labels);
+
       CLF :=  Python_Class.Call (Classifier, "train", Data, Labels);
       Put_Line (Program_Name & "trained with data size" &
                   Integer'Image (Integer (Data.Length)) & " x" &
                   Integer'Image (Data.First_Element'Length));
    end loop;
+
+   Put_Line (Program_Name & "epochs completed.");
 
    Env_Screen :=  Python_CLF.Call (Classifier, "render", Env);
    Python.Call (Classifier, "plot", Env_Screen);

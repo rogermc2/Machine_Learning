@@ -2,7 +2,7 @@
 with Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -34,13 +34,12 @@ package body Support_13A is
          Examples (1, Examples'Last (2)) := 0.0;
          Examples (2, Examples'Last (2)) := 1.0;
 
-         Put_Line (Routine_Name & "calling predict ");
          declare
-            Predictions : constant Real_Float_Matrix :=
+            Predictions : constant Real_Float_Vector :=
                             Python_Class.Call (Classifier, "predict", Clf,
                                                Examples);
          begin
-            if Predictions (2, 1) > Predictions (1, 1) then
+            if Predictions (2) > Predictions (1) then
                Action := 1;
             else
                Action := 0;
@@ -72,9 +71,6 @@ package body Support_13A is
                             Reward      : out Float) return Boolean is
          Py_Obs : PyObject;
       begin
---           Assert (Integer (PyTuple_Size (Tuple)) = 4,
---                   "Parse_Tuple Tuple Size" & int'Image (PyTuple_Size (Tuple)) &
---                     ", size 4 expected");
          Py_Obs := PyTuple_GetItem (Tuple, 0);
          Observation (1) :=
            Float (PyFloat_AsDouble (PyTuple_GetItem (Py_Obs, 0)));
@@ -111,12 +107,12 @@ package body Support_13A is
 
    --  -------------------------------------------------------------------------
 
-   function Max (Values : Real_Float_Matrix) return Float is
-      Max_Value : Float := Values (Values'First, 1);
+   function Max (Values : Real_Float_Vector) return Float is
+      Max_Value : Float := Values (Values'First);
    begin
       for row in Values'Range loop
-         if Values (row, 1) > Max_Value then
-            Max_Value := Values (row, 1);
+         if Values (row) > Max_Value then
+            Max_Value := Values (row);
          end if;
       end loop;
 

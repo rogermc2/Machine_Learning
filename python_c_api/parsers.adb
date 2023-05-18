@@ -119,16 +119,20 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   procedure Parse_Tuple (Tuple : PyObject;
-                          Vec   : in out Real_Float_Vector) is
-      Routine_Name : constant String := "Parsers.Parse_Tuple RFV ";
+   function Parse_Tuple (Tuple : PyObject) return Real_Float_Vector is
+--        Routine_Name : constant String := "Parsers.Parse_Tuple RFV ";
+      Result       : Real_Float_Vector (1 .. Integer (PyTuple_Size (Tuple)));
    begin
-      Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
-                "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
-              & " /= Vec'Length" & Integer'Image (Vec'Length));
-      for index in 1 .. PyTuple_Size (Tuple) loop
-         Vec (Integer (index)) := Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, index - 1)));
+--        Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
+--                  "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
+--                & " /= Vec'Length" & Integer'Image (Vec'Length));
+      for index in Result'Range loop
+         Result (index) := Float (PyFloat_AsDouble (PyTuple_GetItem
+                                  (Tuple, int (index - 1))));
       end loop;
+
+      return Result;
+
    end Parse_Tuple;
 
    --  -------------------------------------------------------------------------

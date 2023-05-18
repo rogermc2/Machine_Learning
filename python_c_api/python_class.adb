@@ -97,7 +97,7 @@ package body Python_Class is
 
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyTypeObject;
-                  A : Real_Float_Matrix) return Real_Float_Matrix is
+                  A : Real_Float_Matrix) return Real_Float_Vector is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; O1 : PyTypeObject;
@@ -117,7 +117,7 @@ package body Python_Class is
       Py_DecRef (PyParams);
 
       declare
-         Result : constant Real_Float_Matrix := Parsers.Parse_Tuple (PyResult);
+         Result : constant Real_Float_Vector := Parsers.Parse_Tuple (PyResult);
       begin
          Py_DecRef (PyResult);
 

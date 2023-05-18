@@ -20,6 +20,6 @@ package Python_Class is
                   return Real_Float_Matrix;
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyTypeObject;
-                  A : Real_Float_Matrix) return Real_Float_Matrix;
+                  A : Real_Float_Matrix) return Real_Float_Vector;
 
 end Python_Class;

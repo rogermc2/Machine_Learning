@@ -1105,7 +1105,7 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
-      Parsers.Parse_Tuple (PyResult, Result);
+      Result := Parsers.Parse_Tuple (PyResult);
 
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
@@ -1196,11 +1196,11 @@ package body Python_CLF is
          PyErr_Print;
       end if;
 
-      Parsers.Parse_Tuple (PyResult, Result);
-
       Py_DecRef (PyFunc);
       Py_DecRef (A_Tuple);
       Py_DecRef (PyParams);
+
+      Result := Parsers.Parse_Tuple (PyResult);
       Py_DecRef (PyResult);
 
       return Result;
