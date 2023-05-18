@@ -33,7 +33,10 @@ def close(env):
 
 def predict(clf, features):
     pred=clf.predict(features)
-    return tuple(map(tuple, pred))
+    print ("predict, pred", pred.shape)
+    print ("predict, pred", pred)
+
+    return tuple(pred)
 
 def render(env):
     return env.render(mode = 'rgb_array')

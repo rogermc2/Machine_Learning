@@ -19,17 +19,20 @@ package body Support_13A is
                            Epsilon     : Float) return Natural is
       use System;
       Routine_Name : constant String := "Support_13a.Action_Picker ";
-      Examples     : Real_Float_Matrix (Observation'Range, 1 .. 2);
+      Examples     : Real_Float_Matrix (1 .. 2, 1 .. Observation'Length + 1);
       Action       : Integer;
    begin
       if CLF = Null_Address then
          Action := Python.Call (Classifier, "sample", Env);
       else
          Assert (CLF /= Null_Address, Routine_Name & "CLF is null!");
-         for row in Examples'Range loop
-               Examples (row, 1) := Observation (row);
-               Examples (row, 2) := Observation (row) + 1.0;
+
+         for col in Observation'Range loop
+            Examples (1, col) := Observation (col);
+            Examples (2, col) := Observation (col);
          end loop;
+         Examples (1, Examples'Last (2)) := 0.0;
+         Examples (2, Examples'Last (2)) := 1.0;
 
          Put_Line (Routine_Name & "calling predict ");
          declare
