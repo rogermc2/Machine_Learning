@@ -25,8 +25,8 @@ procedure Lesson_13A is
    Env              : Python_API.PyObject;
    CLF              : Python_Class.PyTypeObject :=
                         System.Null_Address;
-   Data             : Float_Matrix_List;
-   Data_Item        : Real_Float_Matrix (1 .. 1, 1 .. 3);
+   Data             : Float_Vector_List;
+   Data_Item        : Real_Float_Vector (1 .. 3);
    Labels           : ML_Types.Integer_List;
    Action           : Natural := 0;
    Observation      : Real_Float_Vector (1 .. 2) := (0.0, 0.0);
@@ -52,9 +52,7 @@ begin
          while not Done loop
             Action :=
               Action_Picker (Classifier, Env, CLF, Observation, Epsilon);
-            Data_Item (1, 1) := Observation (1);
-            Data_Item (1, 2) := Observation (2);
-            Data_Item (1, 3) := Float (Action);
+            Data_Item := (Observation (1), Observation (2), Float (Action));
             Data.Append (Data_Item);
             Done := Call (Classifier, "step", Env, Action, Observation, Reward);
 
@@ -64,14 +62,12 @@ begin
                Target := 0.0;
             else
                Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
-               Data_Item (1, 1) := Observation (1);
-               Data_Item (1, 2) := Observation (2);
-               Data_Item (1, 3) := 1.0;
+               Data_Item := (Observation (1), Observation (2), 1.0);
                Put_Line (Program_Name & "calling predict ");
                declare
                   Predictions : constant Real_Float_Matrix :=
                                   Python_CLF.Call (Classifier, "predict", Clf,
-                                                   Data_Item);
+                                                   Data);
                begin
                   Target := Support_13A.Max (Predictions);
                end;
@@ -84,7 +80,8 @@ begin
          end loop;
       end loop;
 --        CLF :=  Train (Classifier, Data, Labels);
-      CLF :=  Python_CLF.Call (Classifier, "train", Data, Labels);
+      CLF :=  Python_Class.Call (Classifier, "train", Data, Labels);
+      Put_Line (Program_Name & "trained");
    end loop;
 
    Env_Screen :=  Python_CLF.Call (Classifier, "render", Env);
