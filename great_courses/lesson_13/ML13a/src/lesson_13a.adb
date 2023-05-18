@@ -81,7 +81,9 @@ begin
       end loop;
 --        CLF :=  Train (Classifier, Data, Labels);
       CLF :=  Python_Class.Call (Classifier, "train", Data, Labels);
-      Put_Line (Program_Name & "trained");
+      Put_Line (Program_Name & "trained with data size" &
+                  Integer'Image (Integer (Data.Length)) & " x" &
+                  Integer'Image (Data.First_Element'Length));
    end loop;
 
    Env_Screen :=  Python_CLF.Call (Classifier, "render", Env);

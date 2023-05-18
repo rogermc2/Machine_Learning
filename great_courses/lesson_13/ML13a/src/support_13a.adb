@@ -7,13 +7,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 --  with Basic_Printing; use Basic_Printing;
-with Python_CLF;
+with Python_Class;
 
 package body Support_13A is
 
    function Action_Picker (Classifier  : Python.Module;
                            Env         : Python_API.PyObject;
-                           CLF         : Python_API.PyObject :=
+                           CLF         : Python_Class.PyTypeObject :=
                              System.Null_Address;
                            Observation : Real_Float_Vector;
                            Epsilon     : Float) return Natural is
@@ -34,8 +34,8 @@ package body Support_13A is
          Put_Line (Routine_Name & "calling predict ");
          declare
             Predictions : constant Real_Float_Matrix :=
-                            Python_CLF.Call (Classifier, "predict", Clf,
-                                             Examples);
+                            Python_Class.Call (Classifier, "predict", Clf,
+                                               Examples);
          begin
             if Predictions (2, 1) > Predictions (1, 1) then
                Action := 1;
