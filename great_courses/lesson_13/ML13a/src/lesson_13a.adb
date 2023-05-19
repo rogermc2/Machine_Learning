@@ -88,6 +88,7 @@ begin
    Put_Line (Program_Name & "epochs completed.");
 
    Env_Screen :=  Python_CLF.Call (Classifier, "render", Env);
+   Put_Line (Program_Name & "plot Env_Screen.");
    Python.Call (Classifier, "plot", Env_Screen);
    New_Line;
 
