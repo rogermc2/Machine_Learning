@@ -4,7 +4,7 @@ from sklearn import tree
 from matplotlib import pyplot as plt
 
 def init_gym(game):
-    return gym.make(game)
+    return gym.make(game, render_mode="rgb_array")
 
 #def init_decision_tree_regressor(max_leaf_nodes):
 #    return tree.DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes)
@@ -34,7 +34,7 @@ def predict(clf, features):
     return tuple(pred)
 
 def render(env):
-    return env.render(mode = 'rgb_array')
+    return env.render()
 
 def plot(env_screen):
     plt.imshow(env_screen)
