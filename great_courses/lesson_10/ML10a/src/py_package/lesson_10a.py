@@ -3,9 +3,6 @@ import numpy as np
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
 
-import matplotlib
-from matplotlib import pyplot as plt
-
 def init_mlp(nhidden):
     return MLPClassifier(hidden_layer_sizes=nhidden, max_iter = 50000)
 

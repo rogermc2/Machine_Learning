@@ -4,8 +4,6 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 
-import matplotlib
-from matplotlib import pyplot as plt
 
 def init_mlp():
     return MLPClassifier(hidden_layer_sizes=[], activation='identity', max_iter = 10000)

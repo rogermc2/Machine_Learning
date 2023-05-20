@@ -5,9 +5,6 @@ from matplotlib import pyplot as plt
 
 def init_gym(game):
     return gym.make(game, render_mode="rgb_array")
-
-#def init_decision_tree_regressor(max_leaf_nodes):
-#    return tree.DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes)
     
 def train(dat, lab):
   clf = tree.DecisionTreeRegressor(max_leaf_nodes = 6)
@@ -26,9 +23,6 @@ def step(env, action):
 def close(env):
     env.close()
 
-#def fit (clf, features, labels):
-#    clf.fit(features, labels)
-
 def predict(clf, features):
     pred=clf.predict(features)
     return tuple(pred)
@@ -36,5 +30,8 @@ def predict(clf, features):
 def render(env):
     return env.render()
 
-def plot(env_screen):
-    plt.imshow(env_screen)
+def plot(clf):
+    feats = ["holding", "dealer", "ace", "action"]
+    tree.plot_tree (clf, feature_names=feats, filled=True,
+                    rounded=True, fontsize=8)
+    plt.show()

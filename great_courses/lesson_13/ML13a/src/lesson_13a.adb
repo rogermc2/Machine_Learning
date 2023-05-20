@@ -1,3 +1,10 @@
+--  Each time the learner sees that game state S leads to game state S' when
+--  move M is taken, it uses its estimate of the value of the best move to take
+--  from S-prime to update Q(S,M).
+--  A decision tree is used to represent Q and is retrained periodically as
+--  more data becomes available.
+--  choose a random move epsilon equals 10% of the time. Epsilon strikes a
+--  tradeoff between exploring and exploiting.
 
 with System;
 
@@ -11,13 +18,15 @@ with ML_Types;
 with Python;
 with Python_API;
 with Python_Class;
-with Python_CLF;
+--  with Python_CLF;
 
 with Support_13A; use Support_13A;
 
 procedure Lesson_13A is
    use System;
    Program_Name     : constant String := "Lesson 13A ";
+   --  100,000 rounds makes sure that the data contains rare but important
+   --  events
    Rounds           : constant Positive := 10000;
    Epochs           : constant Positive := 4;
    Epsilon          : constant Float := 0.1;
@@ -34,7 +43,6 @@ procedure Lesson_13A is
    Target           : Float;
    Wins             : Natural;
    Done             : Boolean;
-   Env_Screen       : Python_API.PyObject;
 begin
    Put_Line (Program_Name);
    Python.Initialize;
@@ -79,6 +87,7 @@ begin
          end loop;
       end loop;
 
+      --  retrain evaluation function
       CLF :=  Python_Class.Call (Classifier, "train", Data, Labels);
       Put_Line (Program_Name & "trained with data size" &
                   Integer'Image (Integer (Data.Length)) & " x" &
@@ -87,9 +96,9 @@ begin
 
    Put_Line (Program_Name & "epochs completed.");
 
-   Env_Screen :=  Python_CLF.Call (Classifier, "render", Env);
-   Put_Line (Program_Name & "plot Env_Screen.");
-   Python.Call (Classifier, "plot", Env_Screen);
+   Put_Line (Program_Name & "wins:" & Integer'Image (Wins));
+
+   Python.Call (Classifier, "plot", CLF);
    New_Line;
 
    Python.Call (Classifier, "close", Env);
