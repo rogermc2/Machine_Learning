@@ -1,10 +1,23 @@
---  Each time the learner sees that game state S leads to game state S' when
---  move M is taken, it uses its estimate of the value of the best move to take
---  from S-prime to update Q(S,M).
+--
+--  The evaluation of a game state where the player has a choice is the
+--  maximum evaluation of the game states that can be reached in one move.
+--  A good estimate for those game states may not have been obtained yet but
+--  updates can be continued to make the game tree values more consistent from
+--  one step of the game to the next.
+--  The basic idea of the Q-learning approach is as follows:
+--  1. Let Q(S,M) be a function that maps a game state S and an action M to
+--  an initally, possibly random, value that represents the probability that
+
+--  after that.
+--  2. Then, each time the learner sees that the game state S leads to a game
+--  state S-prime when move M is taken, it uses its estimate of the value of
+--  the best move to take from S-prime to update Q(S,M).
 --  A decision tree is used to represent Q and is retrained periodically as
 --  more data becomes available.
---  choose a random move epsilon equals 10% of the time. Epsilon strikes a
---  tradeoff between exploring and exploiting.
+--  An important parameter is epsilon.
+--  To ensure that we get a chance to see how other moves work, choose a
+--  random move epsilon equals 10% of the time.
+--  Epsilon strikes a tradeoff between exploring and exploiting.
 
 with System;
 
@@ -18,7 +31,6 @@ with ML_Types;
 with Python;
 with Python_API;
 with Python_Class;
---  with Python_CLF;
 
 with Support_13A; use Support_13A;
 
@@ -51,18 +63,29 @@ begin
    Env := Python.Call (Classifier, "init_gym", "Blackjack-v1");
 
    for epoch in 0 .. Epochs loop
+      --  Gather a set of training examples consisting of the current game
+      --  state in Data and an improved estimate of its value from the
+      --  Q-update equation in Labels.
       Put_Line (Program_Name & "epoch: " & Integer'Image (epoch));
       Data.Clear;
       Labels.Clear;
       Wins := 0;
-      for count in 1 .. Rounds loop
+      for round in 1 .. Rounds loop
+         --  For each of round, we start off with an observation of the
+         --  initial game state which, in blackjack, comes from dealing one
+         --  card to the dealer and two to the player.
          Done := False;
          Python.Call (Classifier, "reset", Env);
          while not Done loop
+            --  Ask the learner to pick an action.
             Action :=
               Action_Picker (Classifier, Env, CLF, Observation, Epsilon);
+            --  Add the current game state and the current action to the
+            --  training data.
             Data_Item := (Observation (1), Observation (2), Float (Action));
             Data.Append (Data_Item);
+            --  Take a step in the environment following the selected action.
+
             Done := Call (Classifier, "step", Env, Action, Observation, Reward);
 
             if Done then
