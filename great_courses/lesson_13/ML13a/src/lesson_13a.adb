@@ -46,6 +46,7 @@ procedure Lesson_13A is
    Env              : Python_API.PyObject;
    CLF              : Python_Class.PyTypeObject :=
                         System.Null_Address;
+--     Graph            : Python_Class.PyTypeObject;
    Labels           : ML_Types.Integer_List;
    Action           : Natural := 0;
    Observation      : Real_Float_Vector (1 .. 2) := (0.0, 0.0);
@@ -112,19 +113,21 @@ begin
 
       --  retrain evaluation function
       CLF :=  Python_Class.Call (Classifier, "train", Data, Labels);
+
+--        Graph := Python_Class.Call (Classifier, "graph", Clf);
+      Python.Call (Classifier, "close", Env);
       Put_Line (Program_Name & "trained with data size" &
                   Integer'Image (Integer (Data.Length)) & " x" &
                   Integer'Image (Data.First_Element'Length));
+      Put_Line (Program_Name & "wins:" & Integer'Image (Wins));
    end loop;
 
-   Put_Line (Program_Name & "epochs completed.");
+   Put_Line (Program_Name & "All epochs completed.");
 
-   Put_Line (Program_Name & "wins:" & Integer'Image (Wins));
-
+--     Python_Class.Call (Classifier, "show_graph", Graph);
    Python.Call (Classifier, "plot", CLF);
    New_Line;
 
-   Python.Call (Classifier, "close", Env);
    Python.Close_Module (Classifier);
    Python.Finalize;
 

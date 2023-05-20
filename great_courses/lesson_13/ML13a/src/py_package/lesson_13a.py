@@ -1,6 +1,7 @@
 import numpy as np
 import gym
 from sklearn import tree
+import graphviz
 from matplotlib import pyplot as plt
 
 def init_gym(game):
@@ -27,8 +28,12 @@ def predict(clf, features):
     pred=clf.predict(features)
     return tuple(pred)
 
-def render(env):
-    return env.render()
+#def graph (clf):
+#    dot_data = tree.export_graphviz(clf, feature_names = ["holding", "dealer", "action"], filled=True, rounded=True)
+#    return graphviz.Source(dot_data)
+#
+#def show_graph(graph):
+#    graph
 
 def plot(clf):
     feats = ["holding", "dealer", "ace", "action"]

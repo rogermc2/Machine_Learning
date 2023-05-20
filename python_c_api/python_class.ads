@@ -10,6 +10,10 @@ package Python_Class is
 
    Interpreter_Error : exception;
 
+   procedure Call (M   : Python.Module; Function_Name : String;
+                   CLF : PyTypeObject);
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyTypeObject) return PyTypeObject;
    function Call (M : Python.Module; Function_Name : String; A : Positive)
                   return PyTypeObject;
    function Call (M : Python.Module; Function_Name : String;
@@ -20,6 +24,6 @@ package Python_Class is
                   return Real_Float_Matrix;
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyTypeObject;
-                  A : Real_Float_Matrix) return Real_Float_Vector;
+                  A   : Real_Float_Matrix) return Real_Float_Vector;
 
 end Python_Class;
