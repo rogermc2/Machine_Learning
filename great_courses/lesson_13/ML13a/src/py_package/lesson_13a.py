@@ -13,7 +13,7 @@ def train(dat, lab):
   return(clf)
   
 def reset(env):
-    env.reset()
+    return tuple (env.reset())
 
 def sample(env):
     return env.action_space.sample()

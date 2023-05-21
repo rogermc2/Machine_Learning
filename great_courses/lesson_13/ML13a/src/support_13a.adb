@@ -19,7 +19,7 @@ package body Support_13A is
                            Epsilon     : Float) return Boolean is
       use System;
       Routine_Name : constant String := "Support_13a.Action_Picker ";
-      Examples     : Integer_Matrix (1 .. 2, 1 .. Observation'Length);
+      Examples     : Integer_Matrix (1 .. 2, 1 .. Observation'Length + 1);
       Action       : Boolean;
    begin
       if CLF = Null_Address then

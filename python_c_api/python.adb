@@ -599,11 +599,11 @@ package body Python is
    begin
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("(O)"), A);
-
+      
+      PyResult := Call_Object (F, PyParams);
       Py_DecRef (F);
       Py_DecRef (PyParams);
       
-      PyResult := Call_Object (F, PyParams);
       declare
          Result : constant Integer_Array := Parsers.Parse_Tuple (PyResult);
       begin

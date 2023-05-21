@@ -53,7 +53,7 @@ procedure Lesson_13A is
    Program_Name     : constant String := "Lesson 13A ";
    --  100,000 rounds makes sure that the data contains rare but important
    --  events
---     Rounds           : constant Positive := 10000;
+   --     Rounds           : constant Positive := 10000;
    Rounds           : constant Positive := 20;
    Epochs           : constant Positive := 1;
    Epsilon          : constant Float := 0.1;
@@ -61,13 +61,13 @@ procedure Lesson_13A is
    Env              : Python_API.PyObject;
    CLF              : Python_Class.PyTypeObject :=
                         System.Null_Address;
---     Graph            : Python_Class.PyTypeObject;
+   --     Graph            : Python_Class.PyTypeObject;
    Labels           : ML_Types.Integer_List;
    Action           : Boolean := False;
    Int_Action       : Integer := 0;
-   Observation      : Integer_Array (1 .. 3) := (0, 0, 0);
+   Observation      : Integer_Array (1 .. 2) := (0, 0);
    Data             : Integer_Array_List;
-   Data_Item        : Integer_Array (1 .. Observation'Length);
+   Data_Item        : Integer_Array (1 .. Observation'Length + 1);
    Reward           : Integer; --  Win 1, Lose, -1, Draw 0
    Target           : Integer;
    Wins             : Natural;
@@ -115,6 +115,8 @@ begin
             else
                Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
                Print_Integer_Array_List (Program_Name & "Data", Data);
+               Print_Matrix_Dimensions (Program_Name & "Data matrix",
+                                        To_Integer_Matrix (Data));
                declare
                   Predictions : constant Integer_Array := Python_Class.Call
                     (Classifier, "predict", Clf, To_Integer_Matrix (Data));
@@ -133,7 +135,7 @@ begin
       --  retrain evaluation function
       CLF :=  Python_Class.Call (Classifier, "train", Data, Labels);
 
---        Graph := Python_Class.Call (Classifier, "graph", Clf);
+      --        Graph := Python_Class.Call (Classifier, "graph", Clf);
       Python.Call (Classifier, "close", Env);
       Put_Line (Program_Name & "trained with data size" &
                   Integer'Image (Integer (Data.Length)) & " x" &
@@ -143,7 +145,7 @@ begin
 
    Put_Line (Program_Name & "All epochs completed.");
 
---     Python_Class.Call (Classifier, "show_graph", Graph);
+   --     Python_Class.Call (Classifier, "show_graph", Graph);
    Python.Call (Classifier, "plot", CLF);
    New_Line;
 
