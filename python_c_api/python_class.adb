@@ -113,8 +113,103 @@ package body Python_Class is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyTypeObject;
+                  A   : Integer_Array) return Integer_Array is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; O1 : PyTypeObject;
+                              T1     : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      declare
+         Result : constant Integer_Array := Parsers.Parse_Tuple (PyResult);
+      begin
+         Py_DecRef (PyResult);
+
+         return Result;
+      end;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyTypeObject;
+                  A   : Integer_Matrix) return Integer_Array is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; O1 : PyTypeObject;
+                              T1     : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      declare
+         Result : constant Integer_Array := Parsers.Parse_Tuple (PyResult);
+      begin
+         Py_DecRef (PyResult);
+
+         return Result;
+      end;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    function Call (M : Python.Module; Function_Name : String;
                   A : Float_Vector_List; B : ML_Types.Integer_List)
+               return PyTypeObject is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; T1, T2: PyObject)
+                           return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject := To_Tuple (A);
+      B_Tuple  : constant PyObject := To_Tuple (B);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   function Call (M : Python.Module; Function_Name : String;
+                  A : Integer_Array_List; B : ML_Types.Integer_List)
                return PyTypeObject is
       use Interfaces.C;
 

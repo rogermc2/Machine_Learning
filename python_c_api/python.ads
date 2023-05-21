@@ -39,6 +39,8 @@ package Python is
                   return Python_API.PyObject;
    function Call (M : Module; Function_Name : String; A : Float)
                   return Python_API.PyObject;
+   function Call (M : Module; Function_Name : String; A : Python_API.PyObject)
+                  return Boolean;
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer)

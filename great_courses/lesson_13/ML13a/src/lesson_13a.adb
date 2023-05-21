@@ -1,4 +1,18 @@
+
+--  The Gymnasium interface is simple, pythonic,and can represent general RL
+--  problems and has a compatibility wrapper for old Gym environments:
+
+--  import gymnasium as gym
+--  env = gym.make("LunarLander-v2", render_mode="human")
+--  observation, info = env.reset(seed=42)
+--  for _ in range(1000):
+--     action = env.action_space.sample()  # this is where you would insert your policy
+--     observation, reward, terminated, truncated, info = env.step(action)
 --
+--     if terminated or truncated:
+--        observation, info = env.reset()
+--  env.close()
+
 --  The evaluation of a game state where the player has a choice is the
 --  maximum evaluation of the game states that can be reached in one move.
 --  A good estimate for those game states may not have been obtained yet but
@@ -48,12 +62,13 @@ procedure Lesson_13A is
                         System.Null_Address;
 --     Graph            : Python_Class.PyTypeObject;
    Labels           : ML_Types.Integer_List;
-   Action           : Natural := 0;
-   Observation      : Real_Float_Vector (1 .. 2) := (0.0, 0.0);
-   Data             : Float_Vector_List;
-   Data_Item        : Real_Float_Vector (1 .. Observation'Length + 1);
-   Reward           : Float;
-   Target           : Float;
+   Action           : Boolean := False;
+   Int_Action       : Integer := 0;
+   Observation      : Integer_Array (1 .. 3) := (0, 0, 0);
+   Data             : Integer_Array_List;
+   Data_Item        : Integer_Array (1 .. Observation'Length);
+   Reward           : Integer; --  Win 1, Lose, -1, Draw 0
+   Target           : Integer;
    Wins             : Natural;
    Done             : Boolean;
 begin
@@ -78,12 +93,15 @@ begin
          Done := False;
          Python.Call (Classifier, "reset", Env);
          while not Done loop
-            --  Ask the learner to pick an action.
             Action :=
               Action_Picker (Classifier, Env, CLF, Observation, Epsilon);
-            --  Add the current game state and the current action to the
-            --  training data.
-            Data_Item := (Observation (1), Observation (2), Float (Action));
+            if Action then
+               Int_Action := 1;
+            else
+               Int_Action := 0;
+            end if;
+
+            Data_Item := (Observation (1), Observation (2), Int_Action);
             Data.Append (Data_Item);
             --  Take a step in the environment following the selected action.
 
@@ -92,20 +110,20 @@ begin
             if Done then
                Target := Reward;
             elsif epoch = 0 then
-               Target := 0.0;
+               Target := 0;
             else
                Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
-               Data_Item := (Observation (1), Observation (2), 1.0);
+               Data_Item := (Observation (1), Observation (2), 1);
                declare
-                  Predictions : constant Real_Float_Vector := Python_Class.Call
-                    (Classifier, "predict", Clf, To_Real_Float_Matrix (Data));
+                  Predictions : constant Integer_Array := Python_Class.Call
+                    (Classifier, "predict", Clf, To_Integer_Matrix (Data));
                begin
                   Target := Support_13A.Max (Predictions);
                end;
             end if;
-            Labels.Append (Integer (Target));
+            Labels.Append (Target);
 
-            if Reward > 0.0 then
+            if Reward > 0 then
                Wins := Wins + 1;
             end if;
          end loop;

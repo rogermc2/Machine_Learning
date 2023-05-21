@@ -70,7 +70,7 @@ package body Parsers is
    --  -------------------------------------------------------------------------
 
    function Parse_Tuple (Tuple : PyObject) return Integer_Matrix  is
---        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
       Tuple_Row_Size : constant int :=
                          PyTuple_Size (PyTuple_GetItem (Tuple, 0));
@@ -94,8 +94,26 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
+   function Parse_Tuple (Tuple : PyObject) return Integer_Array is
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Array ";
+      Result       : Integer_Array (1 .. Integer (PyTuple_Size (Tuple)));
+   begin
+      --        Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
+      --                  "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
+      --                & " /= Vec'Length" & Integer'Image (Vec'Length));
+      for index in Result'Range loop
+         Result (index) := Integer (PyInt_AsLong (PyTuple_GetItem
+                                    (Tuple, int (index - 1))));
+      end loop;
+
+      return Result;
+
+   end Parse_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function Parse_Tuple (Tuple : PyObject) return Real_Float_Matrix  is
---        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
       Tuple_Row_Size : constant int :=
                          PyTuple_Size (PyTuple_GetItem (Tuple, 0));
@@ -120,12 +138,12 @@ package body Parsers is
    --  -------------------------------------------------------------------------
 
    function Parse_Tuple (Tuple : PyObject) return Real_Float_Vector is
---        Routine_Name : constant String := "Parsers.Parse_Tuple RFV ";
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple RFV ";
       Result       : Real_Float_Vector (1 .. Integer (PyTuple_Size (Tuple)));
    begin
---        Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
---                  "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
---                & " /= Vec'Length" & Integer'Image (Vec'Length));
+      --        Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
+      --                  "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
+      --                & " /= Vec'Length" & Integer'Image (Vec'Length));
       for index in Result'Range loop
          Result (index) := Float (PyFloat_AsDouble (PyTuple_GetItem
                                   (Tuple, int (index - 1))));

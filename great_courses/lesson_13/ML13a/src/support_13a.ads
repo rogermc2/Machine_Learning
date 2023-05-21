@@ -17,13 +17,13 @@ package Support_13A is
                            Env        : Python_API.PyObject;
                            CLF        : Python_API.PyObject :=
                              System.Null_Address;
-                           Observation : Real_Float_Vector;
-                           Epsilon     : Float) return Natural;
+                           Observation : Integer_Array;
+                           Epsilon     : Float) return Boolean;
    function Call (M           : Python.Module; Function_Name : String;
-                  Env         : Python_API.PyObject; Action : Integer;
-                  Observation : out Real_Float_Vector; Reward : out Float)
+                  Env         : Python_API.PyObject; Action : Boolean;
+                  Observation : out Integer_Array; Reward : out Integer)
                   return Boolean;
-   function Max (Values : Real_Float_Vector) return Float;
+   function Max (Values : Integer_Array) return Integer;
 --     function Train (Classifier : Python.Module; Data : Float_Array_List;
 --                     Labels : ML_Types.Integer_List) return Python_API.PyObject;
 

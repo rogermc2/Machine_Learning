@@ -15,12 +15,12 @@ package body Support_13A is
                            Env         : Python_API.PyObject;
                            CLF         : Python_Class.PyTypeObject :=
                              System.Null_Address;
-                           Observation : Real_Float_Vector;
-                           Epsilon     : Float) return Natural is
+                           Observation : Integer_Array;
+                           Epsilon     : Float) return Boolean is
       use System;
       Routine_Name : constant String := "Support_13a.Action_Picker ";
-      Examples     : Real_Float_Matrix (1 .. 2, 1 .. Observation'Length + 1);
-      Action       : Integer;
+      Examples     : Integer_Matrix (1 .. 2, 1 .. Observation'Length);
+      Action       : Boolean;
    begin
       if CLF = Null_Address then
          Action := Python.Call (Classifier, "sample", Env);
@@ -31,19 +31,15 @@ package body Support_13A is
             Examples (1, col) := Observation (col);
             Examples (2, col) := Observation (col);
          end loop;
-         Examples (1, Examples'Last (2)) := 0.0;
-         Examples (2, Examples'Last (2)) := 1.0;
+         Examples (1, Examples'Last (2)) := 0;
+         Examples (2, Examples'Last (2)) := 1;
 
          declare
-            Predictions : constant Real_Float_Vector :=
+            Predictions : constant Integer_Array :=
                             Python_Class.Call (Classifier, "predict", Clf,
                                                Examples);
          begin
-            if Predictions (2) > Predictions (1) then
-               Action := 1;
-            else
-               Action := 0;
-            end if;
+            Action := Predictions (2) > Predictions (1);
          end;
       end if;
 
@@ -59,26 +55,26 @@ package body Support_13A is
    --  -------------------------------------------------------------------------
 
    function Call (M           : Python.Module; Function_Name : String;
-                  Env         : Python_API.PyObject; Action : Integer;
-                  Observation : out Real_Float_Vector; Reward : out Float)
+                  Env         : Python_API.PyObject; Action : Boolean;
+                  Observation : out Integer_Array; Reward : out Integer)
                   return Boolean is
       use Interfaces.C;
       use Python;
       use Python_API;
 
       function Parse_Tuple (Tuple       : PyObject;
-                            Observation : out Real_Float_Vector;
-                            Reward      : out Float) return Boolean is
+                            Observation : out Integer_Array;
+                            Reward      : out Integer) return Boolean is
          Py_Obs : PyObject;
       begin
          Py_Obs := PyTuple_GetItem (Tuple, 0);
          Observation (1) :=
-           Float (PyFloat_AsDouble (PyTuple_GetItem (Py_Obs, 0)));
+           Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 0)));
          Observation (2) :=
-           Float (PyFloat_AsDouble (PyTuple_GetItem (Py_Obs, 1)));
-         Reward := Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, 1)));
+           Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 1)));
+         Reward := Integer (PyInt_AsLong (PyTuple_GetItem (Tuple, 1)));
 
-         return Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, 2))) /= 0.0;
+         return Integer (PyInt_AsLong (PyTuple_GetItem (Tuple, 2))) /= 0;
 
       end Parse_Tuple;
 
@@ -89,10 +85,14 @@ package body Support_13A is
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       PyParams : PyObject;
       PyResult : PyObject;
+      PyAction : int := 0;
       Result   : Boolean;
    begin
+      if Action then
+         PyAction := 1;
+      end if;
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("Oi"), Env, int (Action));
+        Py_BuildValue (Interfaces.C.To_C ("Oi"), Env, PyAction);
 
       PyResult := Call_Object (F, PyParams);
       Result := Parse_Tuple (PyResult, Observation, Reward);
@@ -107,8 +107,8 @@ package body Support_13A is
 
    --  -------------------------------------------------------------------------
 
-   function Max (Values : Real_Float_Vector) return Float is
-      Max_Value : Float := Values (Values'First);
+   function Max (Values : Integer_Array) return Integer is
+      Max_Value : Integer := Values (Values'First);
    begin
       for row in Values'Range loop
          if Values (row) > Max_Value then

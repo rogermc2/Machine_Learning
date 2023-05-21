@@ -262,6 +262,8 @@ package ML_Arrays_And_Matrices is
    function To_Integer_Array (List : ML_Types.Integer_List)
                                return Integer_Array;
    pragma Inline (To_Integer_Array);
+   function To_Integer_Matrix (List : Integer_Array_List)
+                                return Integer_Matrix;
    function To_Integer_Matrix (List : ML_Types.Integer_List_2D)
                                 return Integer_Matrix;
    function To_Integer_Matrix (List : ML_Types.Value_Data_Lists_2D)

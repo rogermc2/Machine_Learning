@@ -209,6 +209,32 @@ package body Python is
    -- --------------------------------------------------------------------------
 
    function Call (M : Module; Function_Name : String; A : Python_API.PyObject)
+                  return Boolean is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; A : Python_API.PyObject)
+                              return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : Boolean;
+   begin
+      PyParams := Py_BuildValue (To_C ("(O)"), A);
+      PyResult := Call_Object (F, PyParams);
+      Result := PyInt_AsLong (PyResult) /= 0;
+      
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Result;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+ 
+   function Call (M : Module; Function_Name : String; A : Python_API.PyObject)
                   return Integer is
       use Interfaces.C;
 
