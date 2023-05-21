@@ -13,7 +13,7 @@ package body Support_13A is
 
    function Action_Picker (Classifier  : Python.Module;
                            Env         : Python_API.PyObject;
-                           CLF         : Python_Class.PyTypeObject :=
+                           CLF         : Python_Class.PyClass :=
                              System.Null_Address;
                            Observation : Integer_Array;
                            Epsilon     : Float) return Boolean is

@@ -10,10 +10,10 @@ with Tuple_Builder; use Tuple_Builder;
 package body Python_Class is
 
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : PyTypeObject) is
+                   CLF : PyClass) is
       use Interfaces.C;
 
-      function Py_BuildValue (Format : char_array; O1 : PyTypeObject)
+      function Py_BuildValue (Format : char_array; O1 : PyClass)
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -33,16 +33,16 @@ package body Python_Class is
    -- --------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyTypeObject) return PyTypeObject is
+                  CLF : PyClass) return PyClass is
       use Interfaces.C;
 
-      function Py_BuildValue (Format   : char_array; O1 : PyTypeObject)
+      function Py_BuildValue (Format   : char_array; O1 : PyClass)
                               return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
       PyParams : PyObject;
-      PyResult : PyTypeObject;
+      PyResult : PyClass;
    begin
       PyParams := Py_BuildValue (To_C ("(O)"), CLF);
       PyResult := Python.Call_Object (F, PyParams);
@@ -57,7 +57,7 @@ package body Python_Class is
    -- --------------------------------------------------------------------------
 
    function Call (M : Python.Module; Function_Name : String; A : Positive)
-               return PyTypeObject is
+               return PyClass is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; A : int) return PyObject;
@@ -65,7 +65,7 @@ package body Python_Class is
 
       F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
       PyParams : PyObject;
-      PyResult : PyTypeObject;
+      PyResult : PyClass;
    begin
       PyParams := Py_BuildValue (To_C ("(i)"), int (A));
       PyResult := Python.Call_Object (F, PyParams);
@@ -79,13 +79,13 @@ package body Python_Class is
 
    -- --------------------------------------------------------------------------
 
-   function Call (M : Python.Module; Function_Name : String; CLF : PyTypeObject;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyClass;
                   A : Float_Vector_List) return Real_Float_Matrix is
       use Interfaces.C;
 
       --        Routine_Name : constant String := "Python_Class.Call FVL ";
 
-      function Py_BuildValue (Format : char_array; O1 : PyTypeObject; T1 : PyObject)
+      function Py_BuildValue (Format : char_array; O1 : PyClass; T1 : PyObject)
                            return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -114,11 +114,11 @@ package body Python_Class is
    -- --------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyTypeObject;
+                  CLF : PyClass;
                   A   : Integer_Array) return Integer_Array is
       use Interfaces.C;
 
-      function Py_BuildValue (Format : char_array; O1 : PyTypeObject;
+      function Py_BuildValue (Format : char_array; O1 : PyClass;
                               T1     : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -147,11 +147,11 @@ package body Python_Class is
    -- --------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyTypeObject;
+                  CLF : PyClass;
                   A   : Integer_Matrix) return Integer_Array is
       use Interfaces.C;
 
-      function Py_BuildValue (Format : char_array; O1 : PyTypeObject;
+      function Py_BuildValue (Format : char_array; O1 : PyClass;
                               T1     : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -181,7 +181,7 @@ package body Python_Class is
 
    function Call (M : Python.Module; Function_Name : String;
                   A : Float_Vector_List; B : ML_Types.Integer_List)
-               return PyTypeObject is
+               return PyClass is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; T1, T2: PyObject)
@@ -210,7 +210,7 @@ package body Python_Class is
 
    function Call (M : Python.Module; Function_Name : String;
                   A : Integer_Array_List; B : ML_Types.Integer_List)
-               return PyTypeObject is
+               return PyClass is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; T1, T2: PyObject)
@@ -238,11 +238,11 @@ package body Python_Class is
    -- --------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyTypeObject;
+                  CLF : PyClass;
                   A   : Real_Float_Matrix) return Real_Float_Vector is
       use Interfaces.C;
 
-      function Py_BuildValue (Format : char_array; O1 : PyTypeObject;
+      function Py_BuildValue (Format : char_array; O1 : PyClass;
                               T1     : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 

@@ -6,33 +6,31 @@ with Python;
 
 package Python_Class is
 
-   subtype PyTypeObject is System.Address;
+   --  PyClass is Python TypeObject
+   subtype PyClass is System.Address;
 
    Interpreter_Error : exception;
 
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : PyTypeObject);
+                   CLF : PyClass);
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyTypeObject) return PyTypeObject;
+                  CLF : PyClass) return PyClass;
    function Call (M : Python.Module; Function_Name : String; A : Positive)
-                  return PyTypeObject;
+                  return PyClass;
    function Call (M : Python.Module; Function_Name : String;
                   A : Float_Vector_List; B : ML_Types.Integer_List)
-                  return PyTypeObject;
+                  return PyClass;
    function Call (M : Python.Module; Function_Name : String;
                   A : Integer_Array_List; B : ML_Types.Integer_List)
-                  return PyTypeObject;
+                  return PyClass;
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyTypeObject;
-                  A   : Integer_Array) return Integer_Array;
+                  CLF : PyClass; A : Integer_Array) return Integer_Array;
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyTypeObject;
-                  A   : Integer_Matrix) return Integer_Array;
+                  CLF : PyClass; A : Integer_Matrix) return Integer_Array;
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyTypeObject; A : Float_Vector_List)
+                  CLF : PyClass; A : Float_Vector_List)
                   return Real_Float_Matrix;
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyTypeObject;
-                  A   : Real_Float_Matrix) return Real_Float_Vector;
+                  CLF : PyClass; A : Real_Float_Matrix) return Real_Float_Vector;
 
 end Python_Class;

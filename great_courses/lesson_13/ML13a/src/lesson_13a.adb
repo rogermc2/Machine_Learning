@@ -59,9 +59,9 @@ procedure Lesson_13A is
    Epsilon          : constant Float := 0.1;
    Classifier       : Python.Module;
    Env              : Python_API.PyObject;
-   CLF              : Python_Class.PyTypeObject :=
+   CLF              : Python_Class.PyClass :=
                         System.Null_Address;
-   --     Graph            : Python_Class.PyTypeObject;
+   --     Graph            : Python_Class.PyClass;
    Labels           : ML_Types.Integer_List;
    Action           : Boolean := False;
    Int_Action       : Integer := 0;
