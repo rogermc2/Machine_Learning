@@ -9,6 +9,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
 --  with Basic_Printing; use Basic_Printing;
+with Parsers;
 with Python_API; use Python_API;
 with Tuple_Builder; use Tuple_Builder;
 
@@ -172,8 +173,8 @@ package body Python is
                   return Python_API.PyObject is
       use System;
       Routine_Name : constant String := "Python.Call function only ";
-      Func     : PyObject;
-      PyResult : PyObject;
+      Func         : PyObject;
+      PyResult     : PyObject;
    begin
       Func := Get_Symbol (M, Function_Name);
       PyResult := PyObject_CallObject (Func, System.Null_Address);
@@ -584,6 +585,36 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   function Call (M : Module; Function_Name : String; A : Python_API.PyObject)
+                  return ML_Arrays_And_Matrices.Integer_Array is
+      use ML_Arrays_And_Matrices;
+      
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              O1     : PyObject) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A);
+
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      
+      PyResult := Call_Object (F, PyParams);
+      declare
+         Result : constant Integer_Array := Parsers.Parse_Tuple (PyResult);
+      begin
+         Py_DecRef (PyResult);
+         return Result;
+      end;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix) is
 
@@ -758,22 +789,6 @@ package body Python is
    function Call (M : Module; Function_Name : String;
                   A : ML_Arrays_And_Matrices.Real_Float_List)
                   return ML_Arrays_And_Matrices.Real_Float_Vector is
-      use ML_Arrays_And_Matrices;
-      
-      procedure Parse_Tuple (Tuple : PyObject; Vec : in out Real_Float_Vector) is
-         use Interfaces.C;
-         T_Row : PyObject;
-      begin
-         Assert (Vec'Length = Integer (PyTuple_Size (Tuple)),
-                 "Python.Parse_Tuple Real_Float_List Tuple Size" &
-                   int'Image (PyTuple_Size (Tuple))
-                 & " /= Vec Length" & Integer'Image (Vec'Length));
-         for row in 1 .. PyTuple_Size (Tuple) loop
-            T_Row := PyTuple_GetItem (Tuple, row - 1);
-            Vec (Integer (row)) :=
-              Float (PyLong_AsLong (PyTuple_GetItem (T_Row, 0)));
-         end loop;
-      end Parse_Tuple;
       
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               T1     : PyObject) return PyObject;
@@ -790,7 +805,7 @@ package body Python is
         Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
 
       PyResult := Call_Object (F, PyParams);
-      Parse_Tuple (PyResult, Result);
+      Result := Parsers.Parse_Tuple (PyResult);
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
@@ -1048,17 +1063,6 @@ package body Python is
       use ML_Arrays_And_Matrices;
       Routine_Name : constant String := "Python.Call RFM2 IA"; 
       
-      procedure Parse_Tuple (Tuple : PyObject; Vec : in out Integer_Array) is
-      begin
-         Assert (Vec'Length = Integer (PyTuple_Size (Tuple)), Routine_Name &
-                   ".Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
-                 & " /= Vec Length" & Integer'Image (Vec'Length));
-         for index in 1 .. PyTuple_Size (Tuple) loop
-            Vec (Integer (index)) :=
-              Integer (PyLong_AsLong (PyTuple_GetItem (Tuple, index - 1)));
-         end loop;
-      end Parse_Tuple;
-      
       function Py_BuildValue (Format     : Interfaces.C.char_array;
                               T1, T2, T3 : PyObject) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -1071,18 +1075,18 @@ package body Python is
       PyResult : PyObject;
       Result   : ML_Arrays_And_Matrices.Integer_Array (B'Range);
    begin
---        Print_Matrix_Dimensions (Routine_Name & "A", A);
---        Print_Matrix_Dimensions (Routine_Name & "B", B);
---        Put_Line (Routine_Name & "C length" & Integer'Image (C'Length));
+      --        Print_Matrix_Dimensions (Routine_Name & "A", A);
+      --        Print_Matrix_Dimensions (Routine_Name & "B", B);
+      --        Put_Line (Routine_Name & "C length" & Integer'Image (C'Length));
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOO"), A_Tuple, B_Tuple, C_Tuple);
 
       PyResult := Call_Object (F, PyParams);
---        Assert (PyError_Occurred /= Null_Address, Routine_Name &
---                  " PyError_Occurred");      
+      --        Assert (PyError_Occurred /= Null_Address, Routine_Name &
+      --                  " PyError_Occurred");      
       Assert (PyTuple_Size (PyResult) > 0, Routine_Name &
                 " invalid Tuple Size: " & int'Image (PyTuple_Size (PyResult)));
-      Parse_Tuple (PyResult, Result);
+      Result := Parsers.Parse_Tuple (PyResult);
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);
@@ -1233,42 +1237,7 @@ package body Python is
                    C : in out ML_Arrays_And_Matrices.Real_Float_Matrix;
                    D : in out ML_Arrays_And_Matrices.Integer_Matrix) is
       use Interfaces.C;
-      use ML_Arrays_And_Matrices; 
-      Routine_Name : constant String := "Python.Call ABCD out ";
-
-      procedure Parse_Tuple (Tuple : PyObject; M : in out Real_Float_Matrix) is
-         T_Row : PyObject;
-         T_Col : PyObject;
-      begin
-         Assert (M'Length = integer ( PyTuple_Size (Tuple) ), Routine_Name &
-                   "Parse_Tuple Tuple Size" & int'Image (PyTuple_Size (Tuple))
-                 & " /= M'Length" & Integer'Image (M'Length));
-         for row in 1 .. PyTuple_Size (Tuple) loop
-            T_Row := PyTuple_GetItem (Tuple, row - 1);
-            for col in 1 .. PyTuple_Size (T_Row) loop
-               T_Col := PyTuple_GetItem (T_Row, col - 1);
-               M (Integer (row), Integer (col)) :=
-                 Float (PyFloat_AsDouble (PyTuple_GetItem (T_Col, 0)));
-            end loop;
-         end loop;
-      end Parse_Tuple;
-      
-      procedure Parse_Tuple (Tuple : PyObject; M : in out Integer_Matrix) is
-         T_Row : PyObject;
-         T_Col : PyObject;
-      begin
-         Assert (M'Length = integer ( PyTuple_Size (Tuple) ), Routine_Name &
-                   "Parse_Tuple Tuple Size" & int'Image (PyTuple_Size (Tuple))
-                 & " /= M'Length" & Integer'Image (M'Length));
-         for row in 1 .. PyTuple_Size (Tuple) loop
-            T_Row := PyTuple_GetItem (Tuple, row - 1);
-            for col in 1 .. PyTuple_Size (T_Row) loop
-               T_Col := PyTuple_GetItem (T_Row, col - 1);
-               M (Integer (row), Integer (col)) :=
-                 Integer (PyLong_AsLong (PyTuple_GetItem (T_Col, 0)));
-            end loop;
-         end loop;
-      end Parse_Tuple;
+--        Routine_Name : constant String := "Python.Call ABCD out ";
       
       function Py_BuildValue (Format : char_array;
                               T1, T2 : int) return PyObject;
@@ -1298,10 +1267,10 @@ package body Python is
       C_Tuple := PyTuple_GetItem (PyResult, 2);
       D_Tuple := PyTuple_GetItem (PyResult, 3);
       
-      Parse_Tuple (A_Tuple, A);
-      Parse_Tuple (B_Tuple, B);
-      Parse_Tuple (C_Tuple, C);
-      Parse_Tuple (D_Tuple, D);
+      A := Parsers.Parse_Tuple (A_Tuple);
+      B := Parsers.Parse_Tuple (B_Tuple);
+      C := Parsers.Parse_Tuple (C_Tuple);
+      D := Parsers.Parse_Tuple (D_Tuple);
       
       Py_DecRef (PyResult);
       Py_DecRef (A_Tuple);

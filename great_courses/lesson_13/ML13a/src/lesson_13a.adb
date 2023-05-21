@@ -39,7 +39,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use  Basic_Printing;
+with Basic_Printing; use  Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;
@@ -53,8 +53,9 @@ procedure Lesson_13A is
    Program_Name     : constant String := "Lesson 13A ";
    --  100,000 rounds makes sure that the data contains rare but important
    --  events
-   Rounds           : constant Positive := 10000;
-   Epochs           : constant Positive := 4;
+--     Rounds           : constant Positive := 10000;
+   Rounds           : constant Positive := 20;
+   Epochs           : constant Positive := 1;
    Epsilon          : constant Float := 0.1;
    Classifier       : Python.Module;
    Env              : Python_API.PyObject;
@@ -91,7 +92,7 @@ begin
          --  initial game state which, in blackjack, comes from dealing one
          --  card to the dealer and two to the player.
          Done := False;
-         Python.Call (Classifier, "reset", Env);
+         Observation := Python.Call (Classifier, "reset", Env);
          while not Done loop
             Action :=
               Action_Picker (Classifier, Env, CLF, Observation, Epsilon);
@@ -113,7 +114,7 @@ begin
                Target := 0;
             else
                Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
-               Data_Item := (Observation (1), Observation (2), 1);
+               Print_Integer_Array_List (Program_Name & "Data", Data);
                declare
                   Predictions : constant Integer_Array := Python_Class.Call
                     (Classifier, "predict", Clf, To_Integer_Matrix (Data));
