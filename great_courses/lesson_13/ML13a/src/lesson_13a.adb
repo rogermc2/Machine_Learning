@@ -54,7 +54,7 @@ procedure Lesson_13A is
    --  100,000 rounds makes sure that the data contains rare but important
    --  events
    Rounds           : constant Positive := 10000;
-   Epochs           : constant Positive := 4;
+   Epochs           : constant Positive := 1;
    Epsilon          : constant Float := 0.1;
    Classifier       : Python.Module;
    Env              : Python_API.PyObject;
