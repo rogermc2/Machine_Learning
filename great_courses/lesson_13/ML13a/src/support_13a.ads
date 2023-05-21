@@ -23,7 +23,7 @@ package Support_13A is
                   Env         : Python_API.PyObject; Action : Boolean;
                   Observation : out Integer_Array; Reward : out Integer)
                   return Boolean;
-   function Max (Values : Integer_Array) return Integer;
+   function Max (Values : Real_Float_Vector) return Float;
 --     function Train (Classifier : Python.Module; Data : Float_Array_List;
 --                     Labels : ML_Types.Integer_List) return Python_API.PyObject;
 

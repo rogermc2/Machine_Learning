@@ -107,8 +107,8 @@ package body Support_13A is
 
    --  -------------------------------------------------------------------------
 
-   function Max (Values : Integer_Array) return Integer is
-      Max_Value : Integer := Values (Values'First);
+   function Max (Values : Real_Float_Vector) return Float is
+      Max_Value : Float := Values (Values'First);
    begin
       for row in Values'Range loop
          if Values (row) > Max_Value then

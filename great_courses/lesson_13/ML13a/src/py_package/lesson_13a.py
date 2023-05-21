@@ -8,8 +8,7 @@ def init_gym(game):
     
 def train(dat, lab):
   clf = tree.DecisionTreeRegressor(max_leaf_nodes = 6)
-  clf = clf.fit(dat, lab)
-  return(clf)
+  return(clf.fit(dat, lab))
   
 def reset(env):
     return tuple (env.reset())
@@ -25,6 +24,7 @@ def close(env):
 
 def predict(clf, features):
     pred=clf.predict(features)
+    print("predict pred", pred)
     return tuple(pred)
 
 def plot(clf):

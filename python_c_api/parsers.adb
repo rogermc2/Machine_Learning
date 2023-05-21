@@ -94,13 +94,25 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
+   function Parse_Tuple (Tuple : PyObject) return Float_Array is
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple Float_Array ";
+      Result       : Float_Array (1 .. Integer (PyTuple_Size (Tuple)));
+   begin
+      for index in Result'Range loop
+         Result (index) := Float (PyFloat_AsDouble (PyTuple_GetItem
+                                    (Tuple, int (index - 1))));
+      end loop;
+
+      return Result;
+
+   end Parse_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function Parse_Tuple (Tuple : PyObject) return Integer_Array is
       --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Array ";
       Result       : Integer_Array (1 .. Integer (PyTuple_Size (Tuple)));
    begin
-      --        Assert (Vec'Length = integer (PyTuple_Size (Tuple)), Routine_Name &
-      --                  "Parse_Tuple Tuple Size " & int'Image (PyTuple_Size (Tuple))
-      --                & " /= Vec'Length" & Integer'Image (Vec'Length));
       for index in Result'Range loop
          Result (index) := Integer (PyInt_AsLong (PyTuple_GetItem
                                     (Tuple, int (index - 1))));
