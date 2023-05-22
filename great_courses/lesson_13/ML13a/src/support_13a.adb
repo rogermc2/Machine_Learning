@@ -54,10 +54,10 @@ package body Support_13A is
 
    --  -------------------------------------------------------------------------
 
-   function Call (M           : Python.Module; Function_Name : String;
-                  Env         : Python_API.PyObject; Action : Boolean;
-                  Observation : out Integer_Array; Reward : out Integer)
-                  return Boolean is
+   function Call_Step (M           : Python.Module; Function_Name : String;
+                       Env         : Python_API.PyObject; Action : Boolean;
+                       Observation : out Integer_Array; Reward : out Integer)
+                       return Boolean is
       use Interfaces.C;
       use Python;
       use Python_API;
@@ -67,6 +67,8 @@ package body Support_13A is
                             Reward      : out Integer) return Boolean is
          Py_Obs : PyObject;
       begin
+         --  step returns observation, reward, ?, done, info
+         --               next_state, reward, terminated, truncated , info
          Py_Obs := PyTuple_GetItem (Tuple, 0);
          Observation (1) :=
            Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 0)));
@@ -103,7 +105,7 @@ package body Support_13A is
 
       return Result;
 
-   end Call;
+   end Call_Step;
 
    --  -------------------------------------------------------------------------
 

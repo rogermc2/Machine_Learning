@@ -17,13 +17,15 @@ def sample(env):
     return env.action_space.sample()
 
 def step(env, action):
-    return env.step(action)
+    result= tuple(env.step(action))
+    print("predict result", result)
+    return result
 
 def close(env):
     env.close()
 
 def predict(clf, features):
-    print("predict features", features)
+#    print("predict features", features)
     pred=clf.predict(features)
     return tuple(pred)
 

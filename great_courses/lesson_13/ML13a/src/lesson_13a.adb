@@ -106,7 +106,8 @@ begin
             Data_Item := (Observation (1), Observation (2), Int_Action);
             Data.Append (Data_Item);
             --  Take a step in the environment following the selected action.
-            Done := Call (Classifier, "step", Env, Action, Observation, Reward);
+            Done := Call_Step (Classifier, "step", Env, Action, Observation,
+                               Reward);
 
             if Done then
                Target := Reward;

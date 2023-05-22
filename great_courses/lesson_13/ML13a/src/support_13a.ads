@@ -13,18 +13,18 @@ package Support_13A is
       Labels   : Integer_Matrix (1 .. Rows, 1 .. 1);
    end record;
 
-   function Action_Picker (Classifier : Python.Module;
-                           Env        : Python_API.PyObject;
-                           CLF        : Python_API.PyObject :=
+   function Action_Picker (Classifier  : Python.Module;
+                           Env         : Python_API.PyObject;
+                           CLF         : Python_API.PyObject :=
                              System.Null_Address;
                            Observation : Integer_Array;
                            Epsilon     : Float) return Boolean;
-   function Call (M           : Python.Module; Function_Name : String;
-                  Env         : Python_API.PyObject; Action : Boolean;
-                  Observation : out Integer_Array; Reward : out Integer)
-                  return Boolean;
+   function Call_Step (M           : Python.Module; Function_Name : String;
+                       Env         : Python_API.PyObject; Action : Boolean;
+                       Observation : out Integer_Array; Reward : out Integer)
+                       return Boolean;
    function Max (Values : Real_Float_Vector) return Float;
---     function Train (Classifier : Python.Module; Data : Float_Array_List;
---                     Labels : ML_Types.Integer_List) return Python_API.PyObject;
+   --     function Train (Classifier : Python.Module; Data : Float_Array_List;
+   --                     Labels : ML_Types.Integer_List) return Python_API.PyObject;
 
 end Support_13A;
