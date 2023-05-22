@@ -102,7 +102,7 @@ begin
                Int_Action := 0;
             end if;
 
-            Print_Integer_Array (Program_Name & "Observation", Observation);
+--              Print_Integer_Array (Program_Name & "Observation", Observation);
             Data_Item := (Observation (1), Observation (2), Int_Action);
             Data.Append (Data_Item);
             --  Take a step in the environment following the selected action.

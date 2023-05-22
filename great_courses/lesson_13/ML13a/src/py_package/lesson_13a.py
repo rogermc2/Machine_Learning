@@ -11,7 +11,6 @@ def train(dat, lab):
   return(clf.fit(dat, lab))
   
 def reset(env):
-    print("reset", env.reset()[0])
     return tuple (env.reset()[0])
 
 def sample(env):
@@ -24,6 +23,7 @@ def close(env):
     env.close()
 
 def predict(clf, features):
+    print("predict features", features)
     pred=clf.predict(features)
     return tuple(pred)
 
