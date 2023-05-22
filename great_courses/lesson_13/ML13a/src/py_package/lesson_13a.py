@@ -17,20 +17,16 @@ def sample(env):
     return env.action_space.sample()
 
 def step(env, action):
-    result= tuple(env.step(action))
-    print("predict result", result)
-    return result
+    return tuple(env.step(action))
 
 def close(env):
     env.close()
 
 def predict(clf, features):
-#    print("predict features", features)
-    pred=clf.predict(features)
-    return tuple(pred)
+    return tuple(clf.predict(features))
 
 def plot(clf):
-    feats = ["holding", "dealer", "ace", "action"]
+    feats = ["holding", "dealer", "action", "ace"]
     tree.plot_tree (clf, feature_names=feats, filled=True,
                     rounded=True, fontsize=8)
     plt.show()

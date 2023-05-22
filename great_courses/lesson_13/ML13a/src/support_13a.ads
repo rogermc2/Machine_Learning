@@ -19,9 +19,9 @@ package Support_13A is
                              System.Null_Address;
                            Observation : Integer_Array;
                            Epsilon     : Float) return Boolean;
-   function Step (M           : Python.Module; Function_Name : String;
-                  Env         : Python_API.PyObject; Action : Boolean;
-                  Observation : out Integer_Array; Reward : out Integer)
+   function Step (M          : Python.Module; Function_Name : String;
+                  Env        : Python_API.PyObject; Action : Boolean;
+                  Next_State : out Integer_Array; Reward : out Integer)
                   return Boolean;
    function Max (Values : Real_Float_Vector) return Float;
    --     function Train (Classifier : Python.Module; Data : Float_Array_List;

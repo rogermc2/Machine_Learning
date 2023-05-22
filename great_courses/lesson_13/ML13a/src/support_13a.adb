@@ -36,8 +36,8 @@ package body Support_13A is
 
          declare
             Predictions : constant Integer_Array :=
-              Python_Class.Call (Classifier, "predict", Clf,
-                                 Examples);
+                            Python_Class.Call (Classifier, "predict", Clf,
+                                               Examples);
          begin
             Action := Predictions (2) > Predictions (1);
          end;
@@ -54,29 +54,32 @@ package body Support_13A is
 
    --  -------------------------------------------------------------------------
 
-   function Step (M           : Python.Module; Function_Name : String;
-                  Env         : Python_API.PyObject; Action : Boolean;
-                  Observation : out Integer_Array; Reward : out Integer)
+   function Step (M          : Python.Module; Function_Name : String;
+                  Env        : Python_API.PyObject; Action : Boolean;
+                  Next_State : out Integer_Array; Reward : out Integer)
                   return Boolean is
       use Interfaces.C;
       use Python;
       use Python_API;
+      --        Routine_Name : constant String := "Support_13a.Step ";
 
-      function Parse_Tuple (Tuple       : PyObject;
-                            Observation : out Integer_Array;
-                            Reward      : out Integer) return Boolean is
+      function Parse_Tuple (Tuple  : PyObject; State : out Integer_Array;
+                            Reward : out Integer) return Boolean is
          Py_Obs : PyObject;
       begin
-         --  step returns observation, reward, ?, done, info
-         --               next_state, reward, terminated, truncated , info
+         --  step returns next_state, reward, terminated, truncated , info
          Py_Obs := PyTuple_GetItem (Tuple, 0);
-         Observation (1) :=
+         State (1) :=
            Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 0)));
-         Observation (2) :=
+         State (2) :=
            Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 1)));
-         Reward := Integer (PyInt_AsLong (PyTuple_GetItem (Tuple, 1)));
+         State (3) :=
+           Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 2)));
 
-         return Integer (PyInt_AsLong (PyTuple_GetItem (Tuple, 2))) /= 0;
+         Reward := Integer (PyFloat_AsDouble (PyTuple_GetItem (Tuple, 1)));
+
+         return Integer (PyInt_AsLong (PyTuple_GetItem (Tuple, 2))) /= 0 or
+           Integer (PyInt_AsLong (PyTuple_GetItem (Tuple, 3))) /= 0;
 
       end Parse_Tuple;
 
@@ -97,7 +100,7 @@ package body Support_13A is
         Py_BuildValue (Interfaces.C.To_C ("Oi"), Env, PyAction);
 
       PyResult := Call_Object (F, PyParams);
-      Result := Parse_Tuple (PyResult, Observation, Reward);
+      Result := Parse_Tuple (PyResult, Next_State, Reward);
 
       Py_DecRef (F);
       Py_DecRef (PyParams);
