@@ -63,10 +63,10 @@ procedure Lesson_13A is
    --     Graph            : Python_Class.PyClass;
    Labels           : ML_Types.Integer_List;
    Action           : Boolean := False;
-   Int_Action       : Integer := 0;
+   Int_Action       : Natural := 0;
    Observation      : Integer_Array (1 .. 2) := (0, 0);
    Data             : Integer_Array_List;
-   Example          : Integer_Matrix  (1 .. 2, 1 .. 3);
+   Current          : Integer_Matrix  (1 .. 2, 1 .. 3);
    Data_Item        : Integer_Array (1 .. Observation'Length + 1);
    Reward           : Integer; --  Win 1, Lose, -1, Draw 0
    Target           : Integer;
@@ -113,12 +113,14 @@ begin
                Target := 0;
             else
                Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
-               Example := ((Observation (1), Observation (2), 0),
+               --  Ask the classifier what it predicts from the current board
+               --  combined with both of the two possible actions.
+               Current := ((Observation (1), Observation (2), 0),
                            (Observation (1), Observation (2), 1));
-               Print_Integer_Matrix (Program_Name & "Example", Example);
+               Print_Integer_Matrix (Program_Name & "Current", Current);
                declare
                   Predictions : constant Real_Float_Vector := Python_Class.Call
-                    (Classifier, "predict", Clf, Example);
+                    (Classifier, "predict", Clf, Current);
                begin
                   Print_Float_Vector (Program_Name & "Predictions",
                                       Predictions);

@@ -24,6 +24,7 @@ def close(env):
 
 def predict(clf, features):
     pred=clf.predict(features)
+    print("predict features", features)
     print("predict pred", pred)
     return tuple(pred)
 

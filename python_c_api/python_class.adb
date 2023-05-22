@@ -147,8 +147,8 @@ package body Python_Class is
    -- --------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyClass;
-                  A   : Integer_Matrix) return Real_Float_Vector is
+                  CLF : PyClass; A : Integer_Matrix)
+                  return Real_Float_Vector is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; O1 : PyClass;
