@@ -36,8 +36,8 @@ package body Support_13A is
 
          declare
             Predictions : constant Integer_Array :=
-                            Python_Class.Call (Classifier, "predict", Clf,
-                                               Examples);
+              Python_Class.Call (Classifier, "predict", Clf,
+                                 Examples);
          begin
             Action := Predictions (2) > Predictions (1);
          end;
@@ -54,10 +54,10 @@ package body Support_13A is
 
    --  -------------------------------------------------------------------------
 
-   function Call_Step (M           : Python.Module; Function_Name : String;
-                       Env         : Python_API.PyObject; Action : Boolean;
-                       Observation : out Integer_Array; Reward : out Integer)
-                       return Boolean is
+   function Step (M           : Python.Module; Function_Name : String;
+                  Env         : Python_API.PyObject; Action : Boolean;
+                  Observation : out Integer_Array; Reward : out Integer)
+                  return Boolean is
       use Interfaces.C;
       use Python;
       use Python_API;
@@ -105,7 +105,7 @@ package body Support_13A is
 
       return Result;
 
-   end Call_Step;
+   end Step;
 
    --  -------------------------------------------------------------------------
 
