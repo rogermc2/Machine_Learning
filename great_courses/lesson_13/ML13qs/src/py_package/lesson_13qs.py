@@ -17,9 +17,6 @@ def train(dat, lab):
 def reset(env):
     return tuple (env.reset())
 
-def sample(env):
-    return env.action_space.sample()
-
 def step(env, action):
     return tuple(env.step(action))
 
