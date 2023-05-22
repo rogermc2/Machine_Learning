@@ -5,7 +5,7 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 with Python_API;
 
-package Support_13A is
+package Support_13QS is
 
    type Data_Items (Rows : Positive) is record
       Features : Integer_Array_List;
@@ -24,4 +24,4 @@ package Support_13A is
                   return Boolean;
    function Max (Values : Real_Float_Vector) return Float;
 
-end Support_13A;
+end Support_13QS;
