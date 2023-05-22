@@ -1,27 +1,15 @@
 
-with System;
-
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 with Python_API;
 
 package Support_13QS is
 
-   type Data_Items (Rows : Positive) is record
-      Features : Integer_Array_List;
-      Labels   : Integer_Matrix (1 .. Rows, 1 .. 1);
-   end record;
-
-   function Action_Picker (Classifier  : Python.Module;
-                           Env         : Python_API.PyObject;
-                           CLF         : Python_API.PyObject :=
-                             System.Null_Address;
-                           Observation : Integer_Array;
-                           Epsilon     : Float) return Boolean;
+   function Arg_Max (Values : Real_Float_Vector) return Integer;
+   function Max (Values : Real_Float_Vector) return Float;
    function Step (M          : Python.Module; Function_Name : String;
-                  Env        : Python_API.PyObject; Action : Boolean;
+                  Env        : Python_API.PyObject; Action : Integer;
                   Next_State : out Integer_Array; Reward : out Integer)
                   return Boolean;
-   function Max (Values : Real_Float_Vector) return Float;
 
 end Support_13QS;

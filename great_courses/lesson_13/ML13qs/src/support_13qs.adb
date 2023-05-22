@@ -1,67 +1,52 @@
 
 with Interfaces.C;
 
-with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
-
 --  with Basic_Printing; use Basic_Printing;
-with Python_Class;
 
 package body Support_13QS is
 
-   function Action_Picker (Classifier  : Python.Module;
-                           Env         : Python_API.PyObject;
-                           CLF         : Python_Class.PyClass :=
-                             System.Null_Address;
-                           Observation : Integer_Array;
-                           Epsilon     : Float) return Boolean is
-      use System;
-      Routine_Name : constant String := "Support_13QS.Action_Picker ";
-      Examples     : Integer_Matrix (1 .. 2, Observation'Range);
-      Action       : Boolean;
+   function Arg_Max (Values : Real_Float_Vector) return Integer is
+      Max_Index : Integer := Values'First;
+      Max_Value : Float := Values (Max_Index);
    begin
-      if CLF = Null_Address then
-         Action := Python.Call (Classifier, "sample", Env);
-      else
-         Assert (CLF /= Null_Address, Routine_Name & "CLF is null!");
+      for row in Values'Range loop
+         if Values (row) > Max_Value then
+            Max_Index := row;
+            Max_Value := Values (Max_Index);
+         end if;
+      end loop;
 
-         for col in Observation'Range loop
-            Examples (1, col) := Observation (col);
-            Examples (2, col) := Observation (col);
-         end loop;
-         Examples (1, Examples'Last (2)) := 0;
-         Examples (2, Examples'Last (2)) := 1;
+      return Max_Index;
 
-         declare
-            Predictions : constant Integer_Array :=
-                            Python_Class.Call (Classifier, "predict", Clf,
-                                               Examples);
-         begin
-            Action := Predictions (2) > Predictions (1);
-         end;
-      end if;
+   end Arg_Max;
 
-      --  Random_Float range 0.0 .. 1.0
-      if Maths.Random_Float < Epsilon then
-         Action := Python.Call (Classifier, "sample", Env);
-      end if;
+   --  -------------------------------------------------------------------------
 
-      return Action;
+   function Max (Values : Real_Float_Vector) return Float is
+      Max_Value : Float := Values (Values'First);
+   begin
+      for row in Values'Range loop
+         if Values (row) > Max_Value then
+            Max_Value := Values (row);
+         end if;
+      end loop;
 
-   end Action_Picker;
+      return Max_Value;
+
+   end Max;
 
    --  -------------------------------------------------------------------------
 
    function Step (M          : Python.Module; Function_Name : String;
-                  Env        : Python_API.PyObject; Action : Boolean;
+                  Env        : Python_API.PyObject; Action : Integer;
                   Next_State : out Integer_Array; Reward : out Integer)
                   return Boolean is
       use Interfaces.C;
       use Python;
       use Python_API;
-      --        Routine_Name : constant String := "Support_13QS.Step ";
+      --        Routine_Name : constant String := "Support_13a.Step ";
 
       function Parse_Tuple (Tuple  : PyObject; State : out Integer_Array;
                             Reward : out Integer) return Boolean is
@@ -90,14 +75,10 @@ package body Support_13QS is
       F        : constant PyObject := Get_Symbol (M, Function_Name);
       PyParams : PyObject;
       PyResult : PyObject;
-      PyAction : int := 0;
       Result   : Boolean;
    begin
-      if Action then
-         PyAction := 1;
-      end if;
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("Oi"), Env, PyAction);
+        Py_BuildValue (Interfaces.C.To_C ("Oi"), Env, int (Action));
 
       PyResult := Call_Object (F, PyParams);
       Result := Parse_Tuple (PyResult, Next_State, Reward);
@@ -109,21 +90,6 @@ package body Support_13QS is
       return Result;
 
    end Step;
-
-   --  -------------------------------------------------------------------------
-
-   function Max (Values : Real_Float_Vector) return Float is
-      Max_Value : Float := Values (Values'First);
-   begin
-      for row in Values'Range loop
-         if Values (row) > Max_Value then
-            Max_Value := Values (row);
-         end if;
-      end loop;
-
-      return Max_Value;
-
-   end Max;
 
    --  -------------------------------------------------------------------------
 

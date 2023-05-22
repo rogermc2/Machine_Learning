@@ -23,8 +23,13 @@ package Python_Class is
    function Call (M : Python.Module; Function_Name : String;
                   A : Integer_Array_List; B : ML_Types.Integer_List)
                   return PyClass;
+   function Call (M : Python.Module; Function_Name : String;
+                  A : Integer_Array_List; B : Real_Float_List)
+                  return PyClass;
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyClass; A : Integer_Array) return Integer_Array;
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyClass; A : Integer_Array) return Real_Float_Vector;
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyClass; A : Integer_Matrix) return Integer_Array;
    function Call (M   : Python.Module; Function_Name : String;

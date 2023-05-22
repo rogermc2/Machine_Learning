@@ -1,18 +1,4 @@
 
---  The Gymnasium interface is simple, pythonic,and can represent general RL
---  problems and has a compatibility wrapper for old Gym environments:
-
---  import gymnasium as gym
---  env = gym.make("LunarLander-v2", render_mode="human")
---  observation, info = env.reset(seed=42)
---  for _ in range(1000):
---     action = env.action_space.sample()  # this is where you would insert your policy
---     observation, reward, terminated, truncated, info = env.step(action)
---
---     if terminated or truncated:
---        observation, info = env.reset()
---  env.close()
-
 --  The evaluation of a game state where the player has a choice is the
 --  maximum evaluation of the game states that can be reached in one move.
 --  A good estimate for those game states may not have been obtained yet but
@@ -38,9 +24,11 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Maths;
+
 --  with Basic_Printing; use  Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with ML_Types;
+--  with ML_Types;
 with Python;
 with Python_API;
 with Python_Class;
@@ -54,29 +42,27 @@ procedure Lesson_13QS is
    --  events
    Rounds           : constant Positive := 10000;
    Epochs           : constant Positive := 4;
+   Gamma            : constant Float := 0.9;
    Epsilon          : constant Float := 0.1;
    Classifier       : Python.Module;
    Env              : Python_API.PyObject;
    CLF              : Python_Class.PyClass :=
                         System.Null_Address;
-   Labels           : ML_Types.Integer_List;
-   Action           : Boolean := False;
-   Int_Action       : Natural := 0;
+   Labels           : Real_Float_List;
+   Action           : Integer;
    Current_State    : Integer_Array (1 .. 3) := (0, 0, 0);
    Data             : Integer_Array_List;
-   Test             : Integer_Matrix  (1 .. 2, 1 .. 3);
    Data_Item        : Integer_Array (Current_State'Range);
    Reward           : Integer; --  Win 1, Lose, -1, Draw 0
-   Target           : Integer;
-   Wins             : Natural;
-   Count            : Natural;
+   Ret              : Integer;
+   Target           : Float;
    Done             : Boolean;
 begin
    Put_Line (Program_Name);
    Python.Initialize;
 
-   Classifier := Python.Import_File ("lesson_13a");
-   Env := Python.Call (Classifier, "init_gym", "Blackjack-v1");
+   Classifier := Python.Import_File ("lesson_13qs");
+   Env := Python.Call (Classifier, "init_gym", "Roulette-v0");
 
    for epoch in 0 .. Epochs loop
       --  Gather a set of training examples consisting of the current game
@@ -86,52 +72,53 @@ begin
       Put_Line (Program_Name & "epoch: " & Integer'Image (epoch));
       Data.Clear;
       Labels.Clear;
-      Wins := 0;
-      Count := 0;
+
       for round in 1 .. Rounds loop
-         --  For each of round, we start off with an observation of the
-         --  initial game state which, in blackjack, comes from dealing one
-         --  card to the dealer and two to the player.
          Done := False;
+         Ret := 0;
          Current_State := Python.Call (Classifier, "reset", Env);
+
          while not Done loop
-            Action :=
-              Action_Picker (Classifier, Env, CLF, Current_State, Epsilon);
-            if Action then
-               Int_Action := 1;
+            if epoch = 0 then
+               Action := Python.Call (Classifier, "action", Env);
             else
-               Int_Action := 0;
+               Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
+               declare
+                  Predictions : constant Real_Float_Vector := Python_Class.Call
+                    (Classifier, "predict", Clf, Current_State);
+               begin
+                  --  Negative predictions imply loss
+                  Action := Support_13QS.Arg_Max (Predictions);
+               end;
             end if;
 
-            Data_Item := (Current_State (1), Current_State (2), Int_Action);
+            if Maths.Random_Float < Epsilon then
+               Action := Python.Call (Classifier, "action", Env);
+            end if;
+
+            Data_Item := (Current_State (1), Current_State (2), Action);
             Data.Append (Data_Item);
+
             --  Take a step in the environment following the selected action.
             Done := Step (Classifier, "step", Env, Action,
                           Current_State, Reward);
+            Ret := Ret + Reward;
 
             if Done then
-               Target := Reward;
+               Target := Float (Reward);
             elsif epoch = 0 then
-               Target := 0;
+               Target := 0.0;
             else
-               Assert (CLF /= Null_Address, Program_Name & "CLF is null!");
-               --  Ask the classifier what it predicts from the current board
-               --  combined with both of the two possible actions.
-               Test := ((Current_State (1), Current_State (2), 0),
-                           (Current_State (1), Current_State (2), 1));
                declare
                   Predictions : constant Real_Float_Vector := Python_Class.Call
-                    (Classifier, "predict", Clf, Test);
+                    (Classifier, "predict", Clf, Current_State);
                begin
                   --  Negative predictions imply loss
-                  Target := Integer (Support_13QS.Max (Predictions));
+                  Target := Float (Reward) +
+                    Gamma * Support_13QS.Max (Predictions);
                end;
-            end if;
-            Labels.Append (Target);
 
-            Count := Count + 1;
-            if Reward > 0 then
-               Wins := Wins + 1;
+               Labels.Append (Target);
             end if;
          end loop;
       end loop;
@@ -143,8 +130,6 @@ begin
       Put_Line (Program_Name & "trained with data size" &
                   Integer'Image (Integer (Data.Length)) & " x" &
                   Integer'Image (Data.First_Element'Length));
-      Put_Line (Program_Name & "wins:" &
-                  Float'Image (100.0 * Float (Wins) / Float (Count)) & "%");
    end loop;
 
    Put_Line (Program_Name & "All epochs completed.");

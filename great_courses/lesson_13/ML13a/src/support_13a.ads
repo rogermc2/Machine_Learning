@@ -7,11 +7,6 @@ with Python_API;
 
 package Support_13A is
 
-   type Data_Items (Rows : Positive) is record
-      Features : Integer_Array_List;
-      Labels   : Integer_Matrix (1 .. Rows, 1 .. 1);
-   end record;
-
    function Action_Picker (Classifier  : Python.Module;
                            Env         : Python_API.PyObject;
                            CLF         : Python_API.PyObject :=
