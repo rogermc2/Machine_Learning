@@ -64,10 +64,10 @@ procedure Lesson_13A is
    Labels           : ML_Types.Integer_List;
    Action           : Boolean := False;
    Int_Action       : Natural := 0;
-   Observation      : Integer_Array (1 .. 2) := (0, 0);
+   Observation      : Integer_Array (1 .. 3) := (0, 0, 0);
    Data             : Integer_Array_List;
    Current          : Integer_Matrix  (1 .. 2, 1 .. 3);
-   Data_Item        : Integer_Array (1 .. Observation'Length + 1);
+   Data_Item        : Integer_Array (Observation'Range);
    Reward           : Integer; --  Win 1, Lose, -1, Draw 0
    Target           : Integer;
    Wins             : Natural;
@@ -102,6 +102,7 @@ begin
                Int_Action := 0;
             end if;
 
+            Print_Integer_Array (Program_Name & "Observation", Observation);
             Data_Item := (Observation (1), Observation (2), Int_Action);
             Data.Append (Data_Item);
             --  Take a step in the environment following the selected action.
