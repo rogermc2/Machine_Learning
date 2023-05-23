@@ -147,6 +147,36 @@ package body Python_Class is
    -- --------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyClass; A : Integer) return Real_Float_Vector is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; O1 : PyClass;
+                              I1     : int) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams := Py_BuildValue (To_C ("Oi"), CLF, int (A));
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+
+      declare
+         Result : constant Real_Float_Vector := Parsers.Parse_Tuple (PyResult);
+      begin
+         Py_DecRef (PyResult);
+
+         return Result;
+      end;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyClass; A : Integer_Array) return Real_Float_Vector is
       use Interfaces.C;
 

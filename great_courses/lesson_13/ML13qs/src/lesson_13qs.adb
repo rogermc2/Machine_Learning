@@ -49,10 +49,10 @@ procedure Lesson_13QS is
    CLF              : Python_Class.PyClass :=
                         System.Null_Address;
    Labels           : Real_Float_List;
-   Action           : Integer;
-   Current_State    : Integer_Array (1 .. 3) := (0, 0, 0);
+   Action           : Natural;
+   Current_State    : Integer := 0;
    Data             : Integer_Array_List;
-   Data_Item        : Integer_Array (Current_State'Range);
+--     Data_Item        : Integer_Array (Current_State'Range);
    Reward           : Integer; --  Win 1, Lose, -1, Draw 0
    Ret              : Integer;
    Target           : Float;
