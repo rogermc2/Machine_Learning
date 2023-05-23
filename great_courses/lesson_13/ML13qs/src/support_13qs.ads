@@ -9,7 +9,7 @@ package Support_13QS is
    function Max (Values : Real_Float_Vector) return Float;
    function Step (M          : Python.Module; Function_Name : String;
                   Env        : Python_API.PyObject; Action : Integer;
-                  Next_State : out Integer_Array; Reward : out Integer)
+                  Next_State : out Integer; Reward : out Integer)
                   return Boolean;
 
 end Support_13QS;

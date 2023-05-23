@@ -19,6 +19,7 @@ def reset(env):
     return tuple (env.reset())[0]
 
 def step(env, action):
+    print ("step", env.step(action))
     return tuple(env.step(action))
 
 def close(env):

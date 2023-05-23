@@ -41,25 +41,20 @@ package body Support_13QS is
 
    function Step (M          : Python.Module; Function_Name : String;
                   Env        : Python_API.PyObject; Action : Integer;
-                  Next_State : out Integer_Array; Reward : out Integer)
+                  Next_State : out Integer; Reward : out Integer)
                   return Boolean is
       use Interfaces.C;
       use Python;
       use Python_API;
       --        Routine_Name : constant String := "Support_13a.Step ";
 
-      function Parse_Tuple (Tuple  : PyObject; State : out Integer_Array;
+      function Parse_Tuple (Tuple  : PyObject; State : out Integer;
                             Reward : out Integer) return Boolean is
          Py_Obs : PyObject;
       begin
          --  step returns next_state, reward, terminated, truncated , info
          Py_Obs := PyTuple_GetItem (Tuple, 0);
-         State (1) :=
-           Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 0)));
-         State (2) :=
-           Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 1)));
-         State (3) :=
-           Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 2)));
+         State := Integer (PyInt_AsLong (PyTuple_GetItem (Py_Obs, 0)));
 
          Reward := Integer (PyFloat_AsDouble (PyTuple_GetItem (Tuple, 1)));
 

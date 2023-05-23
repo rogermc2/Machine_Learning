@@ -52,7 +52,7 @@ procedure Lesson_13QS is
    Action           : Natural;
    Current_State    : Integer := 0;
    Data             : Integer_Array_List;
---     Data_Item        : Integer_Array (Current_State'Range);
+   Data_Item        : Integer_Array (1 .. 2);
    Reward           : Integer; --  Win 1, Lose, -1, Draw 0
    Ret              : Integer;
    Target           : Float;
@@ -96,7 +96,7 @@ begin
                Action := Python.Call (Classifier, "action", Env);
             end if;
 
-            Data_Item := (Current_State (1), Current_State (2), Action);
+            Data_Item := (Current_State, Action);
             Data.Append (Data_Item);
 
             --  Take a step in the environment following the selected action.
