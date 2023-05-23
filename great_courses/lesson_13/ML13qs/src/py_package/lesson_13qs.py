@@ -15,7 +15,8 @@ def train(dat, lab):
   return(clf.fit(dat, lab))
   
 def reset(env):
-    return tuple (env.reset())
+    print ("reset(env)", tuple (env.reset())[0])
+    return tuple (env.reset())[0]
 
 def step(env, action):
     return tuple(env.step(action))
