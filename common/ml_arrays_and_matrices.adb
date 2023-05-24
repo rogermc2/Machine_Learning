@@ -1652,6 +1652,35 @@ package body ML_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Integer_Matrix (List : Integer_Array_List)
+                               return Integer_Matrix is
+   begin
+      if not List.Is_Empty then
+         declare
+            List_Row : Integer_Array (1 .. List.Element (1)'Length);
+            Result   : Integer_Matrix
+              (List.First_Index .. List.Last_Index, List_Row'range);
+         begin
+            for row in Result'Range loop
+               List_Row := List (row);
+               for col in Result'Range (2) loop
+                  Result (row, col) := List_Row (col);
+               end loop;
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Integer_Matrix (1 .. 0, 1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
+
+   end To_Integer_Matrix;
+
+   --  ------------------------------------------------------------------------
+
    function To_Integer_Matrix (List : ML_Types.Integer_List_2D)
                                return Integer_Matrix is
    begin

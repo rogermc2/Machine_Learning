@@ -8,7 +8,13 @@ with Python_API; use Python_API;
 
 package Tuple_Builder is
 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array) 
+                      return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array) 
+                      return PyObject;
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array_List)
+                      return PyObject;
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Matrix_List)
                       return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array_List)
                       return PyObject;
@@ -35,6 +41,8 @@ package Tuple_Builder is
                       return PyObject;
    function To_Tuple (Data : ML_Types.Indef_String_List) return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Vector_List)
+                      return PyObject;
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Vector_List)
                       return PyObject;
    function To_Tuple (Data : ML_Types.Unbounded_List) return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Unbounded_String_Array)

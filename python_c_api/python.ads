@@ -30,9 +30,17 @@ package Python is
    procedure Call (M : Module; Function_Name : String);
    function Call (M : Module; Function_Name : String)
                   return Python_API.PyObject;
+   procedure Call (M : Module; Function_Name : String;
+                   A : Python_API.PyObject);
+   function Call (M : Module; Function_Name : String; A : Python_API.PyObject)
+                  return Integer;
    procedure Call (M : Module; Function_Name, A : String);
+   function Call (M : Module; Function_Name, A : String)
+                  return Python_API.PyObject;
    function Call (M : Module; Function_Name : String; A : Float)
                   return Python_API.PyObject;
+   function Call (M : Module; Function_Name : String; A : Python_API.PyObject)
+                  return Boolean;
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer)
@@ -53,7 +61,10 @@ package Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Types.Integer_List);
    procedure Call (M    : Module; Function_Name : String;
-                   A : ML_Types.Integer_List; B : Integer);
+                   A    : ML_Types.Integer_List; B : Integer);
+   function Call (M : Module; Function_Name : String;
+                  A : Python_API.PyObject)
+                  return ML_Arrays_And_Matrices.Integer_Array;
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix);
    procedure Call (M    : Module; Function_Name : String;
