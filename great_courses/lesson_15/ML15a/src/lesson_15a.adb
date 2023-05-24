@@ -17,17 +17,29 @@ with Support_15A; use Support_15A;
 procedure Lesson_15A is
    use System;
    Program_Name     : constant String := "Lesson 15A ";
---     Train_Data       : constant Data_Record :=
---                          Get_Data ("../../imgs/tiny-imagenet-200/train/
---     Test_Data        : constant Data_Record :=
---                          Get_Data ("../../imgs/tiny-imagenet-200/test/");
+
+   Cats_1 : String_9_array (1 .. 36) :=
+     ("n01443537", "n01629819", "n01641577", "n01644900", "n01698640", "n01742172",
+      "n01855672", "n01882714", "n02002724", "n02056570", "n02058221", "n02074367",
+      "n02085620", "n02094433", "n02099601", "n02099712", "n02106662", "n02113799",
+      "n02123045", "n02123394", "n02124075", "n02125311", "n02129165", "n02132136",
+      "n02364673", "n02395406", "n02403003", "n02410509", "n02415577", "n02423022",
+      "n02437312", "n02480495", "n02481823", "n02486410", "n02504458", "n02509815");
+   Cats_2  : String_9_array (1 .. 12) :=
+     ("n01770393", "n01774384", "n01774750", "n01784675", "n02165456", "n02190166",
+      "n02206856", "n02226429", "n02231487", "n02233338", "n02236044", "n02268443",
+      "n02279972", "n02281406");
+   --     Train_Data       : constant Data_Record :=
+   --                          Get_Data ("../../imgs/tiny-imagenet-200/train/
+   --     Test_Data        : constant Data_Record :=
+   --                          Get_Data ("../../imgs/tiny-imagenet-200/test/");
    Rounds           : constant Positive := 10000;
    Epochs           : constant Positive := 4;
    Epsilon          : constant Float := 0.1;
    Classifier       : Python.Module;
    Env              : Python_API.PyObject;
    CLF              : Python_Class.PyClass :=
-                        System.Null_Address;
+     System.Null_Address;
    Labels           : ML_Types.Integer_List;
    Action           : Boolean := False;
    Int_Action       : Natural := 0;
@@ -81,7 +93,7 @@ begin
                --  Ask the classifier what it predicts from the current board
                --  combined with both of the two possible actions.
                Test := ((Current_State (1), Current_State (2), 0),
-                           (Current_State (1), Current_State (2), 1));
+                        (Current_State (1), Current_State (2), 1));
                declare
                   Predictions : constant Real_Float_Vector := Python_Class.Call
                     (Classifier, "predict", Clf, Test);
