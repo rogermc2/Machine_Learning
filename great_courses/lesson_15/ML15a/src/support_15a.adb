@@ -1,56 +1,83 @@
 
 with Interfaces;
+with Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
-
 --  with Basic_Printing; use Basic_Printing;
-with Python_Class;
+with Python_API;
 
 package body Support_15A is
 
-   function Action_Picker (Classifier  : Python.Module;
-                           Env         : Python_API.PyObject;
-                           CLF         : Python_Class.PyClass :=
-                             System.Null_Address;
-                           Observation : Integer_Array;
-                           Epsilon     : Float) return Boolean is
-      use System;
-      Routine_Name : constant String := "Support_16a.Action_Picker ";
-      Examples     : Integer_Matrix (1 .. 2, Observation'Range);
-      Action       : Boolean;
-   begin
-      if CLF = Null_Address then
-         Action := Python.Call (Classifier, "sample", Env);
-      else
-         Assert (CLF /= Null_Address, Routine_Name & "CLF is null!");
+   type Image_Array is array (Integer range 1 .. 64, Integer range 1 .. 64,
+                              Integer range 1 .. 3) of Interfaces.Unsigned_8;
+   type Image_Vector is array (Integer range <>) of Image_Array;
 
-         for col in Observation'Range loop
-            Examples (1, col) := Observation (col);
-            Examples (2, col) := Observation (col);
+   --  -------------------------------------------------------------------------
+
+   function Call (M : Python.Module; Function_Name, A : String)
+                  return Image_Vector is
+      use Python;
+      use Python_API;
+
+      function Parse_Tuple (Tuple : PyObject) return Image_Vector is
+         use Interfaces.C;
+         --        Routine_Name : constant String := "Support_15A.Parse_Tuple ";
+         Tuple_Size     : constant int := PyTuple_Size (Tuple);
+         Tuple_Image    : PyObject;
+         Tuple_Row      : PyObject;
+         Tuple_Col      : PyObject;
+         Tuple_RGB      : PyObject;
+         Image          : Image_Array;
+         Result         : Image_Vector (1 .. Integer (Tuple_Size));
+      begin
+         for img in 0 .. Tuple_Size - 1 loop
+            Tuple_Image := PyTuple_GetItem (Tuple, img);
+            for row in 0 .. 63 loop
+               Tuple_Row := PyTuple_GetItem (Tuple_Image, int (row));
+               for col in 0 .. 63 loop
+                  Tuple_Col := PyTuple_GetItem (Tuple_Row, int (col));
+                  for rgb in 0 .. 2 loop
+                     Tuple_RGB := PyTuple_GetItem (Tuple_Col, int (rgb));
+                     Image (row + 1, col + 1, rgb + 1) :=
+                       Interfaces.Unsigned_8 (PyInt_AsLong (Tuple_RGB));
+                  end loop;
+               end loop;
+            end loop;
+            Result (Integer (img + 1)) := Image;
          end loop;
-         Examples (1, Examples'Last (2)) := 0;
-         Examples (2, Examples'Last (2)) := 1;
 
-         declare
-            Predictions : constant Integer_Array :=
-              Python_Class.Call (Classifier, "predict", Clf,
-                                 Examples);
-         begin
-            Action := Predictions (2) > Predictions (1);
-         end;
-      end if;
+         return Result;
 
-      --  Random_Float range 0.0 .. 1.0
-      if Maths.Random_Float < Epsilon then
-         Action := Python.Call (Classifier, "sample", Env);
-      end if;
+      end Parse_Tuple;
 
-      return Action;
+      --  -------------------------------------------------------------------------
 
-   end Action_Picker;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              A      : Interfaces.C.char_array) return PyObject;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject := Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(s)"),
+                       Interfaces.C.To_C (A));
+
+      PyResult := Call_Object (F, PyParams);
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+
+      declare
+         Result : constant Image_Vector := Parse_Tuple (PyResult);
+      begin
+         Py_DecRef (PyResult);
+         return Result;
+      end;
+
+   end Call;
 
    --  -------------------------------------------------------------------------
 
@@ -69,19 +96,17 @@ package body Support_15A is
 
    --  -------------------------------------------------------------------------
 
-   function Read_Cats (M : Python.Module; Cats : String_9_Array; Labels : Labels_Array;
+   function Read_Cats (M                     : Python.Module; Cats : String_9_Array; Labels : Labels_Array;
                        Train_Size, Test_Size : Positive) return Boolean is
-      type Image_Array is array (Integer range 1 .. 64, Integer range 1 .. 64,
-                                 Integer range 1 .. 3) of Interfaces.Unsigned_8;
-      type Image_Vector is array (Integer range <>) of Image_Array;
       Image_Directory : constant String :=
-        "../../great_courses_ml/imgs/tiny-imagenet-200/train/images/";
-      Num_Samples    :constant  Positive := 500;
-      Images         : Image_Vector (1 .. Num_Samples);
-      Image_File_Dir : String_9;
+                          "../../great_courses_ml/imgs/tiny-imagenet-200/train/images/";
+      Num_Samples     :constant  Positive := 500;
+      Images          : Image_Vector (1 .. Num_Samples);
+      Image_File_Dir  : String_9;
    begin
       for cat in Images'Range loop
-         Python.Call (M, "load_image", Image_Directory & String (Image_File_Dir));
+         Images := Call (M, "load_image",
+                         Image_Directory & String (Image_File_Dir));
       end loop;
 
       return False;
@@ -91,7 +116,7 @@ package body Support_15A is
    --  -------------------------------------------------------------------------
 
    procedure Train_Test_Split
-     (X : Real_Float_Matrix; Y : Integer_Array;
+     (X          : Real_Float_Matrix; Y : Integer_Array;
       Train_Size : Natural; Test_Size : Natural;
       Train_X    : out Real_Float_Matrix; Train_Y : out Integer_Array;
       Test_X     : out Real_Float_Matrix; Test_Y : out Integer_Array) is
