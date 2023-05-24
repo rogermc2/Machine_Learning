@@ -1,54 +1,48 @@
 
-with Interfaces;
 with Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 with Python_API;
 
 package body Support_15A is
 
-   type Image_Array is array (Integer range 1 .. 64, Integer range 1 .. 64,
-                              Integer range 1 .. 3) of Interfaces.Unsigned_8;
-   type Image_Vector is array (Integer range <>) of Image_Array;
+   procedure Train_Test_Split
+     (X          : Image_Vector; Y : Integer_Array;
+      Train_Size : Float; Test_Size : Float;
+      Train_X    : out Image_Vector; Train_Y : out Integer_Array;
+      Test_X     : out Image_Vector; Test_Y : out Integer_Array);
 
    --  -------------------------------------------------------------------------
 
    function Call (M : Python.Module; Function_Name, A : String)
-                  return Image_Vector is
+                  return Image_Array is
       use Python;
       use Python_API;
 
-      function Parse_Tuple (Tuple : PyObject) return Image_Vector is
+      function Parse_Tuple (Tuple : PyObject) return Image_Array is
          use Interfaces.C;
          --        Routine_Name : constant String := "Support_15A.Parse_Tuple ";
-         Tuple_Size     : constant int := PyTuple_Size (Tuple);
-         Tuple_Image    : PyObject;
          Tuple_Row      : PyObject;
          Tuple_Col      : PyObject;
          Tuple_RGB      : PyObject;
          Image          : Image_Array;
-         Result         : Image_Vector (1 .. Integer (Tuple_Size));
       begin
-         for img in 0 .. Tuple_Size - 1 loop
-            Tuple_Image := PyTuple_GetItem (Tuple, img);
-            for row in 0 .. 63 loop
-               Tuple_Row := PyTuple_GetItem (Tuple_Image, int (row));
-               for col in 0 .. 63 loop
-                  Tuple_Col := PyTuple_GetItem (Tuple_Row, int (col));
-                  for rgb in 0 .. 2 loop
-                     Tuple_RGB := PyTuple_GetItem (Tuple_Col, int (rgb));
-                     Image (row + 1, col + 1, rgb + 1) :=
-                       Interfaces.Unsigned_8 (PyInt_AsLong (Tuple_RGB));
-                  end loop;
+         for row in 0 .. 63 loop
+            Tuple_Row := PyTuple_GetItem (Tuple, int (row));
+            for col in 0 .. 63 loop
+               Tuple_Col := PyTuple_GetItem (Tuple_Row, int (col));
+               for rgb in 0 .. 2 loop
+                  Tuple_RGB := PyTuple_GetItem (Tuple_Col, int (rgb));
+                  Image (row + 1, col + 1, rgb + 1) :=
+                    Interfaces.Unsigned_8 (PyInt_AsLong (Tuple_RGB));
                end loop;
             end loop;
-            Result (Integer (img + 1)) := Image;
          end loop;
 
-         return Result;
+         return Image;
 
       end Parse_Tuple;
 
@@ -71,10 +65,10 @@ package body Support_15A is
       Py_DecRef (PyParams);
 
       declare
-         Result : constant Image_Vector := Parse_Tuple (PyResult);
+         Image : constant Image_Array := Parse_Tuple (PyResult);
       begin
          Py_DecRef (PyResult);
-         return Result;
+         return Image;
       end;
 
    end Call;
@@ -96,49 +90,83 @@ package body Support_15A is
 
    --  -------------------------------------------------------------------------
 
-   function Read_Cats (M                     : Python.Module; Cats : String_9_Array; Labels : Labels_Array;
-                       Train_Size, Test_Size : Positive) return Boolean is
-      Image_Directory : constant String :=
-                          "../../great_courses_ml/imgs/tiny-imagenet-200/train/images/";
+   procedure Read_Cats (M                     : Python.Module;
+                        Cats                  : String_9_Array;
+                        Label                 : Natural;
+                        Train_Size, Test_Size : Float;
+                        Train_X, Test_X     : out Image_Vector;
+                        Train_Y, Test_Y     : out Integer_Array) is
+      Routine_Name    : constant String := "Support_15A.Read_Cats ";
+      Train_Directory : constant String :=
+                          "../../imgs/tiny-imagenet-200/train/";
       Num_Samples     :constant  Positive := 500;
       Images          : Image_Vector (1 .. Num_Samples);
+      Labels          : Integer_Array (1 .. Num_Samples);
       Image_File_Dir  : String_9;
    begin
-      for cat in Images'Range loop
-         Images := Call (M, "load_image",
-                         Image_Directory & String (Image_File_Dir));
+      Put_Line (Routine_Name & "reading training files.");
+      for cat in Cats'Range loop
+         Image_File_Dir := Cats (cat);
+         for index in 0 .. Num_Samples - 1 loop
+            Images (cat + index) :=
+              Call (M, "load_image", Train_Directory &
+                      String (Image_File_Dir) & "images" &
+                      String (Image_File_Dir) & "_" & Integer'Image (index) &
+                      ".JPEG");
+            Labels (cat + index) := Label;
+         end loop;
       end loop;
+      Put_Line (Routine_Name & "training files read.");
 
-      return False;
+      Train_Test_Split (Images, Labels, Train_Size, Test_Size,
+                        Train_X, Train_Y, Test_X, Test_Y);
 
    end Read_Cats;
 
    --  -------------------------------------------------------------------------
 
    procedure Train_Test_Split
-     (X          : Real_Float_Matrix; Y : Integer_Array;
-      Train_Size : Natural; Test_Size : Natural;
-      Train_X    : out Real_Float_Matrix; Train_Y : out Integer_Array;
-      Test_X     : out Real_Float_Matrix; Test_Y : out Integer_Array) is
-      Routine_Name : constant String := "CSV_Data_Loader.Train_Test_Split ";
+     (X          : Image_Vector; Y : Integer_Array;
+      Train_Size : Float; Test_Size : Float;
+      Train_X    : out Image_Vector; Train_Y : out Integer_Array;
+      Test_X     : out Image_Vector; Test_Y : out Integer_Array) is
+      Routine_Name : constant String := "Support_15A.Train_Test_Split ";
       Num_Samples  : constant Positive := X'Length;
+      Num_Train    : constant Positive :=
+                       Positive (Train_Size * Float (Num_Samples));
+      Num_Test     : constant Positive :=
+                       Positive (Test_Size * Float (Num_Samples));
+      Image_In     : Image_Array;
+      Image_Out    : Image_Array;
    begin
       Assert (Natural (Y'Length) = Num_Samples, Routine_Name &
                 "Y length" & Integer'Image (Integer (Y'Length)) &
                 " is different to X length" & Natural'Image (Num_Samples));
 
-      for row in 1 .. Train_Size loop
-         for col in X'Range (2) loop
-            Train_X (row, col) := X (row, col);
+      for img in 1 .. Num_Train loop
+         Image_In := X (img);
+         for row in Image_In'Range loop
+            for col in Image_In'Range (2) loop
+               for rgb in Image_In'Range (3) loop
+                  Image_Out (row, col, rgb) := Image_In (row, col, rgb);
+               end loop;
+               Train_Y (row) := Y (row);
+            end loop;
          end loop;
-         Train_Y (row) := Y (row);
+         Train_X (img) := Image_Out;
       end loop;
 
-      for row in 1 .. Test_Size loop
-         for col in X'Range (2) loop
-            Test_X (row, col) := X (row + Train_Size, col);
+      for img in 0 .. Num_Test - 1 loop
+         Image_In := X (Num_Train + img);
+         for row in Image_In'Range loop
+            for col in Image_In'Range (2) loop
+               for rgb in Image_In'Range (3) loop
+                  Image_Out (row, col, rgb) := Image_In (row + Num_Train, col, rgb);
+               end loop;
+               Test_Y (row) := Y (row + Num_Train);
+            end loop;
          end loop;
-         Test_Y (row) := Y (row + Train_Size);
+         Test_X (img) := Image_Out;
       end loop;
 
    end Train_Test_Split;
