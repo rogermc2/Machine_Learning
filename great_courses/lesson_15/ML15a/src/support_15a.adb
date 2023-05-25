@@ -1,4 +1,6 @@
 
+with System;
+
 with Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
@@ -12,22 +14,24 @@ with Python_API;
 package body Support_15A is
 
    procedure Train_Test_Split
-     (X          : Image_Vector; Y : Integer_Array;
+     (X                     : Image_Vector; Y : Integer_Array;
       Train_Size, Test_Size : Positive;
-      Train_X    : out Image_Vector; Train_Y : out Integer_Array;
-      Test_X     : out Image_Vector; Test_Y : out Integer_Array);
+      Train_X               : out Image_Vector; Train_Y : out Integer_Array;
+      Test_X                : out Image_Vector; Test_Y : out Integer_Array);
 
    --  -------------------------------------------------------------------------
 
-   function Call (M : Python.Module; Function_Name, A : String)
-                  return Image_Array is
+   function Call_Python (M : Python.Module; Function_Name, A : String)
+                         return Image_Array is
+      use System;
       use Interfaces.C;
       use Python;
       use Python_API;
---        Routine_Name : constant String := "Support_15A.Call ";
+      Routine_Name : constant String := "Support_15A.Call_Python ";
 
-      function Parse_Tuple (Tuple : PyObject) return Image_Array is
-         --        Routine_Name : constant String := "Support_15A.Call.Parse_Tuple ";
+      function Parse_Image_Tuple (Tuple : PyObject) return Image_Array is
+         Routine_Name   : constant String :=
+                            "Support_15A.Call.Parse_Image_Tuple ";
          Tuple_Row      : PyObject;
          Tuple_Col      : PyObject;
          Tuple_RGB      : PyObject;
@@ -35,9 +39,14 @@ package body Support_15A is
       begin
          for row in 0 .. 63 loop
             Tuple_Row := PyTuple_GetItem (Tuple, int (row));
+            Put_Line (Routine_Name & "Tuple_Row size: " &
+                        int'Image (PyTuple_Size (Tuple_Row)));
             for col in 0 .. 63 loop
                Tuple_Col := PyTuple_GetItem (Tuple_Row, int (col));
+               Put_Line (Routine_Name & "Tuple_Col size: " &
+                           int'Image (PyTuple_Size (Tuple_Col)));
                for rgb in 0 .. 2 loop
+                  Put_Line (Routine_Name & "rgb");
                   Tuple_RGB := PyTuple_GetItem (Tuple_Col, int (rgb));
                   Image (row + 1, col + 1, rgb + 1) :=
                     Interfaces.Unsigned_8 (PyInt_AsLong (Tuple_RGB));
@@ -47,7 +56,7 @@ package body Support_15A is
 
          return Image;
 
-      end Parse_Tuple;
+      end Parse_Image_Tuple;
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               A      : Interfaces.C.char_array) return PyObject;
@@ -60,17 +69,21 @@ package body Support_15A is
         Py_BuildValue (To_C ("(s)"), To_C (A));
 
       PyResult := Call_Object (F, PyParams);
+
       Py_DecRef (F);
       Py_DecRef (PyParams);
 
+      Assert (PyResult /= Null_Address, Routine_Name &
+                "PyResult is null");
+
       declare
-         Image : constant Image_Array := Parse_Tuple (PyResult);
+         Image : constant Image_Array := Parse_Image_Tuple (PyResult);
       begin
          Py_DecRef (PyResult);
          return Image;
       end;
 
-   end Call;
+   end Call_Python;
 
    --  -------------------------------------------------------------------------
 
@@ -101,7 +114,7 @@ package body Support_15A is
       Train_Size      : constant Positive := Train_X'Length;
       Test_Size       : constant Positive := Test_X'Length;
       Train_Directory : constant String :=
-                          "/Ada_Projects/machine_learning/great_courses/imgs/tiny-imagenet-200/train/";
+                          "../../../../imgs/tiny-imagenet-200/train/";
       Images          : Image_Vector (1 .. Num_Samples);
       Labels          : Integer_Array (1 .. Num_Samples);
       Image_File_Dir  : String_9;
@@ -110,13 +123,11 @@ package body Support_15A is
       for cat in Cats_Dir'Range loop
          Image_File_Dir := Cats_Dir (cat);
          for img in 0 .. Num_Samples - 1 loop
-            Images (cat + img) := Call (M, "load_image",
-                      "/Ada_Projects/machine_learning/great_courses/imgs/tiny-imagenet-200/train/n01443537/images/n01443537_0.JPEG");
---                Call (M, "load_image", Train_Directory &
---                        String (Image_File_Dir) & "images" &
---                        String (Image_File_Dir) & "_" &
---                        Trim (Integer'Image (img), Both) &
---                        ".JPEG");
+            Images (cat + img) :=
+              Call_Python (M, "load_image", Train_Directory &
+                             String (Image_File_Dir) & "/images/" &
+                             String (Image_File_Dir) & "_" &
+                             Trim (Integer'Image (img), Both) & ".JPEG");
             Labels (cat + img) := Label;
          end loop;
       end loop;
@@ -130,10 +141,10 @@ package body Support_15A is
    --  -------------------------------------------------------------------------
 
    procedure Train_Test_Split
-     (X          : Image_Vector; Y : Integer_Array;
+     (X                     : Image_Vector; Y : Integer_Array;
       Train_Size, Test_Size : Positive;
-      Train_X    : out Image_Vector; Train_Y : out Integer_Array;
-      Test_X     : out Image_Vector; Test_Y : out Integer_Array) is
+      Train_X               : out Image_Vector; Train_Y : out Integer_Array;
+      Test_X                : out Image_Vector; Test_Y : out Integer_Array) is
       Routine_Name : constant String := "Support_15A.Train_Test_Split ";
       Num_Samples  : constant Positive := X'Length;
       Image_In     : Image_Array;
