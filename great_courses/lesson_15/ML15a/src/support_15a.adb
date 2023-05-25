@@ -2,6 +2,8 @@
 with Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Strings;
+with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
@@ -19,12 +21,13 @@ package body Support_15A is
 
    function Call (M : Python.Module; Function_Name, A : String)
                   return Image_Array is
+      use Interfaces.C;
       use Python;
       use Python_API;
+--        Routine_Name : constant String := "Support_15A.Call ";
 
       function Parse_Tuple (Tuple : PyObject) return Image_Array is
-         use Interfaces.C;
-         --        Routine_Name : constant String := "Support_15A.Parse_Tuple ";
+         --        Routine_Name : constant String := "Support_15A.Call.Parse_Tuple ";
          Tuple_Row      : PyObject;
          Tuple_Col      : PyObject;
          Tuple_RGB      : PyObject;
@@ -46,8 +49,6 @@ package body Support_15A is
 
       end Parse_Tuple;
 
-      --  -------------------------------------------------------------------------
-
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               A      : Interfaces.C.char_array) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
@@ -56,8 +57,7 @@ package body Support_15A is
       PyResult : PyObject;
    begin
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("(s)"),
-                       Interfaces.C.To_C (A));
+        Py_BuildValue (To_C ("(s)"), To_C (A));
 
       PyResult := Call_Object (F, PyParams);
       Py_DecRef (F);
@@ -95,11 +95,13 @@ package body Support_15A is
                         Num_Samples         : Positive;
                         Train_X, Test_X     : out Image_Vector;
                         Train_Y, Test_Y     : out Integer_Array) is
+      use Ada.Strings;
+      use Ada.Strings.Fixed;
       Routine_Name    : constant String := "Support_15A.Read_Cats ";
       Train_Size      : constant Positive := Train_X'Length;
       Test_Size       : constant Positive := Test_X'Length;
       Train_Directory : constant String :=
-                          "../../imgs/tiny-imagenet-200/train/";
+                          "/Ada_Projects/machine_learning/great_courses/imgs/tiny-imagenet-200/train/";
       Images          : Image_Vector (1 .. Num_Samples);
       Labels          : Integer_Array (1 .. Num_Samples);
       Image_File_Dir  : String_9;
@@ -108,11 +110,13 @@ package body Support_15A is
       for cat in Cats_Dir'Range loop
          Image_File_Dir := Cats_Dir (cat);
          for img in 0 .. Num_Samples - 1 loop
-            Images (cat + img) :=
-              Call (M, "load_image", Train_Directory &
-                      String (Image_File_Dir) & "images" &
-                      String (Image_File_Dir) & "_" & Integer'Image (img) &
-                      ".JPEG");
+            Images (cat + img) := Call (M, "load_image",
+                      "/Ada_Projects/machine_learning/great_courses/imgs/tiny-imagenet-200/train/n01443537/images/n01443537_0.JPEG");
+--                Call (M, "load_image", Train_Directory &
+--                        String (Image_File_Dir) & "images" &
+--                        String (Image_File_Dir) & "_" &
+--                        Trim (Integer'Image (img), Both) &
+--                        ".JPEG");
             Labels (cat + img) := Label;
          end loop;
       end loop;
