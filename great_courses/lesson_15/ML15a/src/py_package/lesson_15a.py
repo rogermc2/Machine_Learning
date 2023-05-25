@@ -7,12 +7,14 @@ def load_image (file_name):
     img = Image.open(file_name)
     print("load_image file opened")
     img_arr = np.array(img)
-    img_tuple = ()
+    img_tuple = tuple()
     test = tuple(map(tuple, map(tuple,img_arr[0])))
     print ("test length", len(test), len(test[0]))
     for i in range(len(img_arr)):
-        img_tuple = img_tuple + tuple(map(tuple,img_arr[i]))
-    print ("img_arr", img_arr.shape)
+        img_2d  = tuple(map(tuple, map(tuple,img_arr[i])))
+        img_tuple = img_tuple + img_2d
+    print ("img_2d length", len(img_2d), len(img_2d[0]))
+    print ("img_tuple length", len(img_tuple))
     print ("img_tuple length", len(img_tuple))
     print ("img_tuple[0] length", len(img_tuple[0]))
 #    print ("img_tuple[0][0] length",  len(img_tuple[0][0]))
