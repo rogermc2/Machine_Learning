@@ -30,8 +30,8 @@ package body Support_15A is
       Routine_Name : constant String := "Support_15A.Call_Python ";
 
       function Parse_Image_Tuple (Tuple : PyObject) return Image_Array is
-         Routine_Name   : constant String :=
-                            "Support_15A.Call.Parse_Image_Tuple ";
+--           Routine_Name   : constant String :=
+--                              "Support_15A.Call.Parse_Image_Tuple ";
          Tuple_Row      : PyObject;
          Tuple_Col      : PyObject;
          Tuple_RGB      : PyObject;
@@ -39,14 +39,14 @@ package body Support_15A is
       begin
          for row in 0 .. 63 loop
             Tuple_Row := PyTuple_GetItem (Tuple, int (row));
-            Put_Line (Routine_Name & "Tuple_Row size: " &
-                        int'Image (PyTuple_Size (Tuple_Row)));
+--              Put_Line (Routine_Name & "Tuple_Row size: " &
+--                          int'Image (PyTuple_Size (Tuple_Row)));
             for col in 0 .. 63 loop
                Tuple_Col := PyTuple_GetItem (Tuple_Row, int (col));
-               Put_Line (Routine_Name & "Tuple_Col size: " &
-                           int'Image (PyTuple_Size (Tuple_Col)));
+--                 Put_Line (Routine_Name & "Tuple_Col size: " &
+--                             int'Image (PyTuple_Size (Tuple_Col)));
                for rgb in 0 .. 2 loop
-                  Put_Line (Routine_Name & "rgb");
+--                    Put_Line (Routine_Name & "rgb");
                   Tuple_RGB := PyTuple_GetItem (Tuple_Col, int (rgb));
                   Image (row + 1, col + 1, rgb + 1) :=
                     Interfaces.Unsigned_8 (PyInt_AsLong (Tuple_RGB));
@@ -122,7 +122,10 @@ package body Support_15A is
       Put_Line (Routine_Name & "reading training files.");
       for cat in Cats_Dir'Range loop
          Image_File_Dir := Cats_Dir (cat);
+         Put_Line (Routine_Name & "reading " & String (Image_File_Dir));
          for img in 0 .. Num_Samples - 1 loop
+            Put_Line (Routine_Name & "reading image " &
+                        Integer'Image (cat + img));
             Images (cat + img) :=
               Call_Python (M, "load_image", Train_Directory &
                              String (Image_File_Dir) & "/images/" &
