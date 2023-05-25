@@ -39,14 +39,9 @@ package body Support_15A is
       begin
          for row in 0 .. 63 loop
             Tuple_Row := PyTuple_GetItem (Tuple, int (row));
---              Put_Line (Routine_Name & "Tuple_Row size: " &
---                          int'Image (PyTuple_Size (Tuple_Row)));
             for col in 0 .. 63 loop
                Tuple_Col := PyTuple_GetItem (Tuple_Row, int (col));
---                 Put_Line (Routine_Name & "Tuple_Col size: " &
---                             int'Image (PyTuple_Size (Tuple_Col)));
                for rgb in 0 .. 2 loop
---                    Put_Line (Routine_Name & "rgb");
                   Tuple_RGB := PyTuple_GetItem (Tuple_Col, int (rgb));
                   Image (row + 1, col + 1, rgb + 1) :=
                     Interfaces.Unsigned_8 (PyInt_AsLong (Tuple_RGB));
@@ -65,16 +60,13 @@ package body Support_15A is
       PyParams : PyObject;
       PyResult : PyObject;
    begin
-      PyParams :=
-        Py_BuildValue (To_C ("(s)"), To_C (A));
-
+      PyParams := Py_BuildValue (To_C ("(s)"), To_C (A));
       PyResult := Call_Object (F, PyParams);
 
       Py_DecRef (F);
       Py_DecRef (PyParams);
 
-      Assert (PyResult /= Null_Address, Routine_Name &
-                "PyResult is null");
+      Assert (PyResult /= Null_Address, Routine_Name & "PyResult is null");
 
       declare
          Image : constant Image_Array := Parse_Image_Tuple (PyResult);
