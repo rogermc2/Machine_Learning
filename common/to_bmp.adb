@@ -55,24 +55,25 @@ package body To_BMP is
    function Do_JPG (Height, Width : Positive) return Image_Array is
       Image_Data   : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
       Col_Rot      : Natural;
-      Buffer_Index : Natural := 0;
+      Buffer_Index : Natural := 1;
    begin
       for row in reverse Image_Data'Range loop
          for col in Image_Data'Range (2) loop
             Col_Rot :=
               (col + Height - row) mod Width + 1;
             for pix in Image_Data'Range (3) loop
-               Buffer_Index := Buffer_Index + 1;
                if pix = 1 then
                   Image_Data (row, Col_Rot, pix) :=
-                    img_buf_ptr (Buffer_Index + 1);
+                    img_buf_ptr (Buffer_Index + 2);
                elsif pix = 2 then
                   Image_Data (row, Col_Rot, pix) :=
-                    img_buf_ptr (Buffer_Index - 1);
+                    img_buf_ptr (Buffer_Index);
                else
-                  Image_Data (row, Col_Rot, pix) := img_buf_ptr (Buffer_Index);
+                  Image_Data (row, Col_Rot, pix) :=
+                    img_buf_ptr.all (Buffer_Index + 1);
                end if;
             end loop;
+            Buffer_Index := Buffer_Index + 3;
          end loop;
       end loop;
 
@@ -187,7 +188,6 @@ package body To_BMP is
       Dummy           : Image_Array (1 .. 1, 1 .. 1, 1 .. 1);
       in_file_id      : Ada.Streams.Stream_IO.File_Type;
       image_desc      : GID.Image_descriptor;
-      --        Image_Format    : Unbounded_String;
       Width           : Positive;
       Height          : Positive;
       next_frame      : Ada.Calendar.Day_Duration := 0.0;
