@@ -15,7 +15,7 @@ procedure Lesson_15A is
    Program_Name    : constant String := "Lesson 15A ";
    Num_Samples     : constant  Positive := 120;
    Test_Size       : constant  Positive := Positive (0.1 * Float (Num_Samples));
-   Train_Size      : constant  Positive := 2 * Test_Size;
+   Train_Size      : constant  Positive := Positive (0.2 * Float (Num_Samples));
 
    Cats_1 : constant String_9_array (1 .. 36) :=
      ("n01443537", "n01629819", "n01641577", "n01644900", "n01698640", "n01742172",
@@ -29,8 +29,8 @@ procedure Lesson_15A is
       "n02206856", "n02226429", "n02231487", "n02233338", "n02236044", "n02268443",
       "n02279972", "n02281406");
    Train_X       :  Image_Vector (1 .. Train_Size);
-   Train_Y       :  Integer_Array (1 .. Test_Size);
-   Test_X        :  Image_Vector (1 .. Train_Size);
+   Train_Y       :  Integer_Array (1 .. Train_Size);
+   Test_X        :  Image_Vector (1 .. Test_Size);
    Test_Y        :  Integer_Array (1 .. Test_Size);
 
    Classifier       : Python.Module;

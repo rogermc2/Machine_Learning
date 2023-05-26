@@ -8,6 +8,7 @@ package To_BMP is
 
    Unsupported_Image_Format : exception;
 
-   function Process (Image_File_Name : String) return Image_Array;
+   function Process (Image_File_Name : String; Show_Name : Boolean := True)
+                     return Image_Array;
 
 end To_BMP;

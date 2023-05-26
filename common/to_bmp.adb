@@ -97,7 +97,8 @@ package body To_BMP is
 
    --  -------------------------------------------------------------------------
 
-   function Process (Image_File_Name : String) return Image_Array is
+   function Process (Image_File_Name : String; Show_Name : Boolean := True)
+                     return Image_Array is
       Routine_Name    : constant String := "To_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
       File_Kind       : constant String :=
@@ -110,7 +111,9 @@ package body To_BMP is
       next_frame      : Ada.Calendar.Day_Duration := 0.0;
       Buffer_Index    : Natural := 0;
    begin
-      Put_Line (Routine_Name & "processing " & Image_File_Name);
+      if Show_Name then
+         Put_Line (Routine_Name & "processing " & Image_File_Name);
+      end if;
       --  Load the image in its original format
       Open (in_file_id, In_File, Image_File_Name);
 
