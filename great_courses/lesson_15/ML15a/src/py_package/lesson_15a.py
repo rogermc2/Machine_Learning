@@ -21,3 +21,10 @@ def plot(clf):
     tree.plot_tree (clf, feature_names=feats, filled=True,
                     rounded=True, fontsize=8)
     plt.show()
+
+def show_bitmap(bitmap, Row_Size):
+    bm_array = np.asarray(bitmap)
+    num_rows = int (len(bitmap) / Row_Size)
+    bm_array = bm_array.reshape(num_rows, Row_Size, 3)
+    plt.imshow(bm_array)
+    plt.show()

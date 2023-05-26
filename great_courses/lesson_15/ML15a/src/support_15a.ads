@@ -1,15 +1,11 @@
 
-with Interfaces;
-
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
---  with Python;
 
 package Support_15A is
 
    type String_9 is new String (1 .. 9);
    type String_9_Array is array (Integer range <>) of String_9;
-   type Image_Array is array (Integer range 1 .. 64, Integer range 1 .. 64,
-                              Integer range 1 .. 3) of Interfaces.Unsigned_8;
+   subtype Image_Array is Unsigned_8_Array_3D (1 .. 64, 1 .. 64, 1 .. 3);
    type Image_Vector is array (Integer range <>) of Image_Array;
    type Labels_Array is array (Integer range <>) of Integer;
 

@@ -32,14 +32,16 @@ procedure Lesson_15A is
    Train_Y       :  Integer_Array (1 .. Train_Size);
    Test_X        :  Image_Vector (1 .. Test_Size);
    Test_Y        :  Integer_Array (1 .. Test_Size);
-
-   Classifier       : Python.Module;
+   Classifier    : Python.Module;
+   Test          : Image_Array;
 begin
    Put_Line (Program_Name);
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_15a");
    Read_Cats (Cats_1, 0, Num_Samples, Train_X, Test_X, Train_Y, Test_Y);
+   Test := Train_X (1);
+   Python.Call (Classifier, "show_bitmap", Test);
 
    New_Line;
 
