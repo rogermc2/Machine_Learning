@@ -9,9 +9,8 @@ with Ada.Strings;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with To_BMP;
---  with Python_API;
 
 package body Support_15A is
 
@@ -19,64 +18,6 @@ package body Support_15A is
      (X                     : Image_Vector; Y : Integer_Array;
       Train_X               : out Image_Vector; Train_Y : out Integer_Array;
       Test_X                : out Image_Vector; Test_Y : out Integer_Array);
-
-   --  -------------------------------------------------------------------------
-
-   --     function Call_Python (M : Python.Module; Function_Name, A : String)
-   --                           return Image_Array is
-   --        use System;
-   --        use Interfaces.C;
-   --        use Python;
-   --        use Python_API;
-   --        Routine_Name : constant String := "Support_15A.Call_Python ";
-   --
-   --        function Parse_Image_Tuple (Tuple : PyObject) return Image_Array is
-   --  --           Routine_Name   : constant String :=
-   --  --                              "Support_15A.Call.Parse_Image_Tuple ";
-   --           Tuple_Row      : PyObject;
-   --           Tuple_Col      : PyObject;
-   --           Tuple_RGB      : PyObject;
-   --           Image          : Image_Array;
-   --        begin
-   --           for row in 0 .. 63 loop
-   --              Tuple_Row := PyTuple_GetItem (Tuple, int (row));
-   --              for col in 0 .. 63 loop
-   --                 Tuple_Col := PyTuple_GetItem (Tuple_Row, int (col));
-   --                 for rgb in 0 .. 2 loop
-   --                    Tuple_RGB := PyTuple_GetItem (Tuple_Col, int (rgb));
-   --                    Image (row + 1, col + 1, rgb + 1) :=
-   --                      Interfaces.Unsigned_8 (PyInt_AsLong (Tuple_RGB));
-   --                 end loop;
-   --              end loop;
-   --           end loop;
-   --
-   --           return Image;
-   --
-   --        end Parse_Image_Tuple;
-   --
-   --        function Py_BuildValue (Format : Interfaces.C.char_array;
-   --                                A      : Interfaces.C.char_array) return PyObject;
-   --        pragma Import (C, Py_BuildValue, "Py_BuildValue");
-   --        F        : constant PyObject := Get_Symbol (M, Function_Name);
-   --        PyParams : PyObject;
-   --        PyResult : PyObject;
-   --     begin
-   --        PyParams := Py_BuildValue (To_C ("(s)"), To_C (A));
-   --        PyResult := Call_Object (F, PyParams);
-   --
-   --        Py_DecRef (F);
-   --        Py_DecRef (PyParams);
-   --
-   --        Assert (PyResult /= Null_Address, Routine_Name & "PyResult is null");
-   --
-   --        declare
-   --           Image : constant Image_Array := Parse_Image_Tuple (PyResult);
-   --        begin
-   --           Py_DecRef (PyResult);
-   --           return Image;
-   --        end;
-   --
-   --     end Call_Python;
 
    --  -------------------------------------------------------------------------
 
@@ -88,7 +29,6 @@ package body Support_15A is
       File_Kind       : constant String :=
                           File_Name_Upper
                             (File_Name_Upper'Last - 4 .. File_Name_Upper'Last);
-      --        Swap            : Interfaces.Unsigned_8;
    begin
       if File_Kind = ".PNG" then
          declare
@@ -167,19 +107,24 @@ package body Support_15A is
       Put_Line (Routine_Name & "reading training files.");
       for cat in Cats_Dir'Range loop
          Image_File_Dir := Cats_Dir (cat);
---           Put_Line (Routine_Name & "reading " & String (Image_File_Dir));
+         --           Put_Line (Routine_Name & "reading " & String (Image_File_Dir));
          for img in 0 .. Num_Samples - 1 loop
             --              Put_Line (Routine_Name & "reading image " &
             --                          Integer'Image (cat + img));
             declare
-               Image_Data  : constant Unsigned_8_Array_3D :=
-                               Get_Picture (Train_Directory &
-                                                          String (Image_File_Dir) & "/images/" &
-                                              String (Image_File_Dir) & "_" &
-                                              Trim (Integer'Image (img), Both) & ".JPEG",
-                                            False);
+               Image_Data  : constant Unsigned_8_Array_3D
+                 := Get_Picture (Train_Directory & String (Image_File_Dir) &
+                                   "/images/" & String (Image_File_Dir) & "_" &
+                                   Trim (Integer'Image (img), Both) & ".JPEG",
+                                 False);
             begin
-               null;
+               Put_Line (Routine_Name & "cat + img " &
+                           Integer'Image (cat + img));
+               Put_Line (Routine_Name & "Images length " &
+                           Integer'Image (Images'Length));
+               Print_Matrix_Dimensions (Routine_Name & "Image_Data",
+                                        Image_Data);
+               Images (cat + img) := Image_Array (Image_Data);
             end;
             --              Images (cat + img) :=
             --                Call_Python (M, "load_image", Train_Directory &
@@ -204,7 +149,6 @@ package body Support_15A is
       Routine_Name : constant String := "Support_15A.Train_Test_Split ";
       Num_Samples  : constant Positive := X'Length;
       Train_Size   : constant Positive := Train_X'Length;
-      Test_Size    : constant Positive := Test_X'Length;
       Image_In     : Image_Array;
       Image_Out    : Image_Array;
    begin
@@ -225,7 +169,7 @@ package body Support_15A is
          Train_Y (img) := Y (img);
       end loop;
 
-      for img in 1 .. Test_X'Length loop
+      for img in Test_X'Range loop
          Image_In := X (Train_Size + img);
          for row in Image_In'Range loop
             for col in Image_In'Range (2) loop

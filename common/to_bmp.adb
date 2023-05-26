@@ -3,14 +3,13 @@
 
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
-with GID;
-
 with Ada.Calendar;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
+
+with GID;
 
 with ML_Arrays_And_Matrices;
 
@@ -23,6 +22,59 @@ package body To_BMP is
 
    procedure Dispose is new Ada.Unchecked_Deallocation
      (ML_Arrays_And_Matrices.Byte_Array, p_Byte_Array);
+
+   --  ---------------------------------------------------------------------------------------
+
+   function Do_JPG (Height, Width : Positive) return Image_Array is
+      Image_Data   : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
+      Col_Rot      : Natural;
+      Buffer_Index : Natural := 0;
+   begin
+      for row in reverse Image_Data'Range loop
+         for col in Image_Data'Range (2) loop
+            Col_Rot :=
+              (col + Height - row) mod Width + 1;
+            for pix in Image_Data'Range (3) loop
+               Buffer_Index := Buffer_Index + 1;
+               if pix = 1 then
+                  Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index + 1);
+               elsif pix = 2 then
+                  Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index - 1);
+               else
+                  Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index);
+               end if;
+            end loop;
+         end loop;
+      end loop;
+
+      return Image_Data;
+
+   end Do_JPG;
+
+   --  ---------------------------------------------------------------------------------------
+
+   function Do_PNG (Height, Width : Positive) return Image_Array is
+      Image_Data   : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
+      Buffer_Index : Natural := 0;
+   begin
+      for row in reverse Image_Data'Range loop
+         for col in Image_Data'Range (2) loop
+            for pix in Image_Data'Range (3) loop
+               Buffer_Index := Buffer_Index + 1;
+               if pix = 1 then
+                  Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
+               elsif pix = 2 then
+                  Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
+               else
+                  Image_Data (row, col, pix) := img_buf (Buffer_Index);
+               end if;
+            end loop;
+         end loop;
+      end loop;
+
+      return Image_Data;
+
+   end Do_PNG;
 
    --  ---------------------------------------------------------------------------------------
 
@@ -101,15 +153,15 @@ package body To_BMP is
                      return Image_Array is
       Routine_Name    : constant String := "To_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
-      File_Kind       : constant String :=
-                          File_Name_Upper (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
+      File_Kind       : constant String := File_Name_Upper
+        (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
+      Dummy           : Image_Array (1 .. 1, 1 .. 1, 1 .. 1);
       in_file_id      : Ada.Streams.Stream_IO.File_Type;
       image_desc      : GID.Image_descriptor;
       --        Image_Format    : Unbounded_String;
       Width           : Positive;
       Height          : Positive;
       next_frame      : Ada.Calendar.Day_Duration := 0.0;
-      Buffer_Index    : Natural := 0;
    begin
       if Show_Name then
          Put_Line (Routine_Name & "processing " & Image_File_Name);
@@ -128,54 +180,30 @@ package body To_BMP is
       Load_raw_image (image_desc, img_buf, next_frame);
       Close (in_file_id);
 
+      Put_Line (Routine_Name & "File_Kind " & File_Kind);
+
       Assert (next_frame = 0.0, Routine_Name & "animation is not supported ");
 
       Width := GID.Pixel_width (image_desc);
       Height := GID.Pixel_height (image_desc);
 
-      declare
-         Image_Data : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
-         Col_Rot    : Natural;
-      begin
-         if File_Kind = ".PNG" then
-            for row in reverse Image_Data'Range loop
-               for col in Image_Data'Range (2) loop
-                  for pix in Image_Data'Range (3) loop
-                     Buffer_Index := Buffer_Index + 1;
-                     if pix = 1 then
-                        Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
-                     elsif pix = 2 then
-                        Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
-                     else
-                        Image_Data (row, col, pix) := img_buf (Buffer_Index);
-                     end if;
-                  end loop;
-               end loop;
-            end loop;
+      --        declare
+      --           Image_Data : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
+      --           Col_Rot    : Natural;
+      --        begin
+      if File_Kind = ".PNG" then
+         return Do_PNG (Height, Width);
 
-         elsif File_Kind = ".JPG" or File_Kind = "JPEG" then
-            for row in reverse Image_Data'Range loop
-               for col in Image_Data'Range (2) loop
-                  Col_Rot :=
-                    (col + Height - row) mod Width + 1;
-                  for pix in Image_Data'Range (3) loop
-                     Buffer_Index := Buffer_Index + 1;
-                     if pix = 1 then
-                        Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index + 1);
-                     elsif pix = 2 then
-                        Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index - 1);
-                     else
-                        Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index);
-                     end if;
-                  end loop;
-               end loop;
-            end loop;
-         else
-            Put_Line (Routine_Name & "unsupported image format " & File_Kind);
-         end if;
+      elsif File_Kind = ".JPG" then
+         return Do_JPG (Height, Width);
 
-         return Image_Data;
-      end;  --  declare block
+      else
+         Assert (False, Routine_Name & "unsupported image format " &
+                   File_Kind);
+         return Dummy;
+      end if;
+
+      --        end;  --  declare block
 
    exception
       when GID.unknown_image_format =>
