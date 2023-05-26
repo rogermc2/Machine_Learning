@@ -25,6 +25,31 @@ package body To_BMP is
 
    --  ---------------------------------------------------------------------------------------
 
+   function Do_JPEG (Height, Width : Positive) return Image_Array is
+      Image_Data   : Image_Array (1 .. Height, 1 .. Width, 1 .. 3);
+      Buffer_Index : Natural := 0;
+   begin
+      for row in reverse Image_Data'Range loop
+         for col in Image_Data'Range (2) loop
+            for pix in Image_Data'Range (3) loop
+               if pix = 1 then
+                  Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
+               elsif pix = 2 then
+                  Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
+               else
+                  Image_Data (row, col, pix) := img_buf (Buffer_Index);
+               end if;
+               Buffer_Index := Buffer_Index + 1;
+            end loop;
+         end loop;
+      end loop;
+
+      return Image_Data;
+
+   end Do_JPEG;
+
+   --  ---------------------------------------------------------------------------------------
+
    function Do_JPG (Height, Width : Positive) return Image_Array is
       Image_Data   : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
       Col_Rot      : Natural;
@@ -174,36 +199,29 @@ package body To_BMP is
          try_tga =>
            Image_File_Name'Length >= 4 and then
          File_Kind = ".TGA");
-      --        Image_Format := To_Unbounded_String (GID.Image_format_type'Image
-      --                                             (GID.Format (image_desc)));
 
       Load_raw_image (image_desc, img_buf, next_frame);
       Close (in_file_id);
-
-      Put_Line (Routine_Name & "File_Kind " & File_Kind);
 
       Assert (next_frame = 0.0, Routine_Name & "animation is not supported ");
 
       Width := GID.Pixel_width (image_desc);
       Height := GID.Pixel_height (image_desc);
 
-      --        declare
-      --           Image_Data : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
-      --           Col_Rot    : Natural;
-      --        begin
       if File_Kind = ".PNG" then
          return Do_PNG (Height, Width);
 
       elsif File_Kind = ".JPG" then
          return Do_JPG (Height, Width);
 
+      elsif File_Kind = "JPEG" then
+         return  Do_JPEG (Height, Width);
+
       else
          Assert (False, Routine_Name & "unsupported image format " &
                    File_Kind);
          return Dummy;
       end if;
-
-      --        end;  --  declare block
 
    exception
       when GID.unknown_image_format =>

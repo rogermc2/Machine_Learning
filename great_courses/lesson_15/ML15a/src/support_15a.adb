@@ -9,7 +9,7 @@ with Ada.Strings;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with To_BMP;
 
 package body Support_15A is
@@ -87,7 +87,6 @@ package body Support_15A is
 
    --  -------------------------------------------------------------------------
 
-   --     procedure Read_Cats (M                   : Python.Module;
    procedure Read_Cats (Cats_Dir            : String_9_Array;
                         Label               : Natural;
                         Num_Samples         : Positive;
@@ -96,8 +95,6 @@ package body Support_15A is
       use Ada.Strings;
       use Ada.Strings.Fixed;
       Routine_Name    : constant String := "Support_15A.Read_Cats ";
-      --        Train_Size      : constant Positive := Train_X'Length;
-      --        Test_Size       : constant Positive := Test_X'Length;
       Train_Directory : constant String :=
                           "../../../../imgs/tiny-imagenet-200/train/";
       Images          : Image_Vector (1 .. Cats_Dir'Length * Num_Samples);
@@ -118,12 +115,12 @@ package body Support_15A is
                                    Trim (Integer'Image (img), Both) & ".JPEG",
                                  False);
             begin
-               Put_Line (Routine_Name & "cat + img " &
-                           Integer'Image (cat + img));
-               Put_Line (Routine_Name & "Images length " &
-                           Integer'Image (Images'Length));
-               Print_Matrix_Dimensions (Routine_Name & "Image_Data",
-                                        Image_Data);
+--                 Put_Line (Routine_Name & "cat + img " &
+--                             Integer'Image (cat + img));
+--                 Put_Line (Routine_Name & "Images length " &
+--                             Integer'Image (Images'Length));
+--                 Print_Matrix_Dimensions (Routine_Name & "Image_Data",
+--                                          Image_Data);
                Images (cat + img) := Image_Array (Image_Data);
             end;
             --              Images (cat + img) :=

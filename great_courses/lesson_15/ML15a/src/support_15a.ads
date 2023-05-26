@@ -13,7 +13,6 @@ package Support_15A is
    type Image_Vector is array (Integer range <>) of Image_Array;
    type Labels_Array is array (Integer range <>) of Integer;
 
---     procedure Read_Cats (M                    : Python.Module;
    procedure Read_Cats (Cats_Dir              : String_9_Array;
                         Label                 : Natural;
                         Num_Samples           : Positive;
