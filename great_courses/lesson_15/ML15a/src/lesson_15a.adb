@@ -28,10 +28,14 @@ procedure Lesson_15A is
      ("n01770393", "n01774384", "n01774750", "n01784675", "n02165456", "n02190166",
       "n02206856", "n02226429", "n02231487", "n02233338", "n02236044", "n02268443",
       "n02279972", "n02281406");
-   Train_X       :  Image_Vector (1 .. Train_Size);
-   Train_Y       :  Integer_Array (1 .. Train_Size);
-   Test_X        :  Image_Vector (1 .. Test_Size);
-   Test_Y        :  Integer_Array (1 .. Test_Size);
+   Train_X1       :  Image_Vector (1 .. Train_Size);
+   Train_Y1      :  Integer_Array (1 .. Train_Size);
+   Test_X1        :  Image_Vector (1 .. Test_Size);
+   Test_Y1        :  Integer_Array (1 .. Test_Size);
+   Train_X2       :  Image_Vector (1 .. Train_Size);
+   Train_Y2      :  Integer_Array (1 .. Train_Size);
+   Test_X2        :  Image_Vector (1 .. Test_Size);
+   Test_Y2        :  Integer_Array (1 .. Test_Size);
    Classifier    : Python.Module;
    Test          : Image_Array;
 begin
@@ -39,8 +43,9 @@ begin
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_15a");
-   Read_Cats (Cats_1, 0, Num_Samples, Train_X, Test_X, Train_Y, Test_Y);
-   Test := Train_X (1);
+   Read_Cats (Cats_1, 0, Num_Samples, Train_X1, Test_X1, Train_Y1, Test_Y1);
+   Read_Cats (Cats_2, 1, Num_Samples, Train_X2, Test_X2, Train_Y2, Test_Y2);
+   Test := Train_X1 (1);
    Python.Call (Classifier, "show_bitmap", Test);
 
    New_Line;
