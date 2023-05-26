@@ -2,7 +2,6 @@
 --  Derived from gid/test/To_BMP
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Calendar;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
@@ -18,6 +17,7 @@ package body To_BMP is
 
    type p_Byte_Array is access ML_Arrays_And_Matrices.Byte_Array;
 
+   --  Pointer to raw data array of bytes
    img_buf_ptr : p_Byte_Array := null;
 
    procedure Dispose is new Ada.Unchecked_Deallocation
@@ -33,14 +33,16 @@ package body To_BMP is
          for col in Image_Data'Range (2) loop
             for pix in Image_Data'Range (3) loop
                if pix = 1 then
-                  Image_Data (row, col, pix) := img_buf_ptr (Buffer_Index + 1);
+                  Image_Data (row, col, pix) :=
+                    img_buf_ptr.all (Buffer_Index + 2);
                elsif pix = 2 then
-                  Image_Data (row, col, pix) := img_buf_ptr (Buffer_Index - 1);
+                  Image_Data (row, col, pix) :=
+                    img_buf_ptr.all (Buffer_Index + 1);
                else
-                  Image_Data (row, col, pix) := img_buf_ptr (Buffer_Index);
+                  Image_Data (row, col, pix) := img_buf_ptr.all (Buffer_Index);
                end if;
-               Buffer_Index := Buffer_Index + 1;
             end loop;
+            Buffer_Index := Buffer_Index + 3;
          end loop;
       end loop;
 
@@ -48,7 +50,7 @@ package body To_BMP is
 
    end Do_JPEG;
 
-   --  ---------------------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
    function Do_JPG (Height, Width : Positive) return Image_Array is
       Image_Data   : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
@@ -62,9 +64,11 @@ package body To_BMP is
             for pix in Image_Data'Range (3) loop
                Buffer_Index := Buffer_Index + 1;
                if pix = 1 then
-                  Image_Data (row, Col_Rot, pix) := img_buf_ptr (Buffer_Index + 1);
+                  Image_Data (row, Col_Rot, pix) :=
+                    img_buf_ptr (Buffer_Index + 1);
                elsif pix = 2 then
-                  Image_Data (row, Col_Rot, pix) := img_buf_ptr (Buffer_Index - 1);
+                  Image_Data (row, Col_Rot, pix) :=
+                    img_buf_ptr (Buffer_Index - 1);
                else
                   Image_Data (row, Col_Rot, pix) := img_buf_ptr (Buffer_Index);
                end if;
@@ -101,7 +105,7 @@ package body To_BMP is
 
    end Do_PNG;
 
-   --  ---------------------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
    procedure Load_raw_image (image      : in out GID.Image_descriptor;
                              buffer     : out p_Byte_Array;
