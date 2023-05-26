@@ -80,7 +80,7 @@ package body Support_5A is
 
    function Get_Picture (File_Name : String) return Unsigned_8_Array_3D is
       use Ada.Characters.Handling;
-      Routine_Name    : constant String := "Support_5A.Get_Pixels ";
+      Routine_Name    : constant String := "Support_5A.Get_Picture ";
       File_Name_Upper : constant String := To_Upper (File_Name);
       File_Kind       : constant String :=
                           File_Name_Upper

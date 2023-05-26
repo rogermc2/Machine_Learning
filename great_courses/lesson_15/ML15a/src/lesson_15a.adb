@@ -13,7 +13,7 @@ with Support_15A; use Support_15A;
 
 procedure Lesson_15A is
    Program_Name    : constant String := "Lesson 15A ";
-   Num_Samples     : constant  Positive := 500;
+   Num_Samples     : constant  Positive := 120;
    Test_Size       : constant  Positive := Positive (0.1 * Float (Num_Samples));
    Train_Size      : constant  Positive := 2 * Test_Size;
 
@@ -39,7 +39,7 @@ begin
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_15a");
-   Read_Cats (Classifier, Cats_1, 0, Num_Samples, Train_X, Test_X, Train_Y, Test_Y);
+   Read_Cats (Cats_1, 0, Num_Samples, Train_X, Test_X, Train_Y, Test_Y);
 
    New_Line;
 

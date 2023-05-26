@@ -150,7 +150,7 @@ package body To_BMP is
                end loop;
             end loop;
 
-         elsif File_Kind = ".JPG" then
+         elsif File_Kind = ".JPG" or File_Kind = "JPEG" then
             for row in reverse Image_Data'Range loop
                for col in Image_Data'Range (2) loop
                   Col_Rot :=
