@@ -18,7 +18,7 @@ package body To_BMP is
 
    type p_Byte_Array is access ML_Arrays_And_Matrices.Byte_Array;
 
-   img_buf : p_Byte_Array := null;
+   img_buf_ptr : p_Byte_Array := null;
 
    procedure Dispose is new Ada.Unchecked_Deallocation
      (ML_Arrays_And_Matrices.Byte_Array, p_Byte_Array);
@@ -33,11 +33,11 @@ package body To_BMP is
          for col in Image_Data'Range (2) loop
             for pix in Image_Data'Range (3) loop
                if pix = 1 then
-                  Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
+                  Image_Data (row, col, pix) := img_buf_ptr (Buffer_Index + 1);
                elsif pix = 2 then
-                  Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
+                  Image_Data (row, col, pix) := img_buf_ptr (Buffer_Index - 1);
                else
-                  Image_Data (row, col, pix) := img_buf (Buffer_Index);
+                  Image_Data (row, col, pix) := img_buf_ptr (Buffer_Index);
                end if;
                Buffer_Index := Buffer_Index + 1;
             end loop;
@@ -62,11 +62,11 @@ package body To_BMP is
             for pix in Image_Data'Range (3) loop
                Buffer_Index := Buffer_Index + 1;
                if pix = 1 then
-                  Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index + 1);
+                  Image_Data (row, Col_Rot, pix) := img_buf_ptr (Buffer_Index + 1);
                elsif pix = 2 then
-                  Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index - 1);
+                  Image_Data (row, Col_Rot, pix) := img_buf_ptr (Buffer_Index - 1);
                else
-                  Image_Data (row, Col_Rot, pix) := img_buf (Buffer_Index);
+                  Image_Data (row, Col_Rot, pix) := img_buf_ptr (Buffer_Index);
                end if;
             end loop;
          end loop;
@@ -87,11 +87,11 @@ package body To_BMP is
             for pix in Image_Data'Range (3) loop
                Buffer_Index := Buffer_Index + 1;
                if pix = 1 then
-                  Image_Data (row, col, pix) := img_buf (Buffer_Index + 1);
+                  Image_Data (row, col, pix) := img_buf_ptr (Buffer_Index + 1);
                elsif pix = 2 then
-                  Image_Data (row, col, pix) := img_buf (Buffer_Index - 1);
+                  Image_Data (row, col, pix) := img_buf_ptr (Buffer_Index - 1);
                else
-                  Image_Data (row, col, pix) := img_buf (Buffer_Index);
+                  Image_Data (row, col, pix) := img_buf_ptr (Buffer_Index);
                end if;
             end loop;
          end loop;
@@ -200,7 +200,7 @@ package body To_BMP is
            Image_File_Name'Length >= 4 and then
          File_Kind = ".TGA");
 
-      Load_raw_image (image_desc, img_buf, next_frame);
+      Load_raw_image (image_desc, img_buf_ptr, next_frame);
       Close (in_file_id);
 
       Assert (next_frame = 0.0, Routine_Name & "animation is not supported ");
