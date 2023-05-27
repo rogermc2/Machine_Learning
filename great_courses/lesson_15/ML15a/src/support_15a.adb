@@ -14,10 +14,89 @@ with To_BMP;
 
 package body Support_15A is
 
+   function Concatenate (X1, X2 : Integer_Array) return Integer_Array;
+   function Concatenate (X1, X2 : Image_Vector) return Image_Vector;
+   procedure Read_Cats (Cats_Dir        : String_9_Array;
+                        Label           : Natural;
+                        Num_Samples     : Positive;
+                        Train_X, Test_X : out Image_Vector;
+                        Train_Y, Test_Y : out Integer_Array);
    procedure Train_Test_Split
      (X                     : Image_Vector; Y : Integer_Array;
       Train_X               : out Image_Vector; Train_Y : out Integer_Array;
       Test_X                : out Image_Vector; Test_Y : out Integer_Array);
+
+   --  -------------------------------------------------------------------------
+
+   procedure Build_Data (Num_Samples, Train_Size, Test_Size : Positive;
+                         Train_X, Test_X : out Image_Vector;
+                         Train_Y, Test_Y : out Integer_Array) is
+
+      Cats_1 : constant String_9_array (1 .. 36) :=
+        ("n01443537", "n01629819", "n01641577", "n01644900", "n01698640", "n01742172",
+         "n01855672", "n01882714", "n02002724", "n02056570", "n02058221", "n02074367",
+         "n02085620", "n02094433", "n02099601", "n02099712", "n02106662", "n02113799",
+         "n02123045", "n02123394", "n02124075", "n02125311", "n02129165", "n02132136",
+         "n02364673", "n02395406", "n02403003", "n02410509", "n02415577", "n02423022",
+         "n02437312", "n02480495", "n02481823", "n02486410", "n02504458", "n02509815");
+      Cats_2  : constant String_9_array (1 .. 14) :=
+        ("n01770393", "n01774384", "n01774750", "n01784675", "n02165456", "n02190166",
+         "n02206856", "n02226429", "n02231487", "n02233338", "n02236044", "n02268443",
+         "n02279972", "n02281406");
+      Train_X1       :  Image_Vector (1 .. Train_Size);
+      Train_Y1      :  Integer_Array (1 .. Train_Size);
+      Test_X1        :  Image_Vector (1 .. Test_Size);
+      Test_Y1        :  Integer_Array (1 .. Test_Size);
+      Train_X2       :  Image_Vector (1 .. Train_Size);
+      Train_Y2      :  Integer_Array (1 .. Train_Size);
+      Test_X2        :  Image_Vector (1 .. Test_Size);
+      Test_Y2        :  Integer_Array (1 .. Test_Size);
+   begin
+      Read_Cats (Cats_1, 0, Num_Samples, Train_X1, Test_X1, Train_Y1, Test_Y1);
+      Read_Cats (Cats_2, 1, Num_Samples, Train_X2, Test_X2, Train_Y2, Test_Y2);
+
+      Train_X := Concatenate (Train_X1, Train_X2);
+      Test_X := Concatenate (Test_X1, Test_X2);
+      Train_Y := Concatenate (Train_Y1, Train_Y2);
+      Test_Y := Concatenate (Test_Y1, Test_Y2);
+
+   end Build_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Concatenate (X1, X2 : Integer_Array) return Integer_Array is
+
+      X : Integer_Array (1 .. X1'Length + X2'Length);
+   begin
+      for index in X'Range loop
+         if index <= X1'Length then
+            X (index) := X1  (index);
+         else
+            X (index) := X2 (index - X1'Length);
+         end if;
+      end loop;
+
+      return X;
+
+   end Concatenate;
+
+   --  -------------------------------------------------------------------------
+
+   function Concatenate (X1, X2 : Image_Vector) return Image_Vector is
+
+      X : Image_Vector (1 .. X1'Length + X2'Length);
+   begin
+      for index in X'Range loop
+         if index <= X1'Length then
+            X (index) := X1  (index);
+         else
+            X (index) := X2 (index - X1'Length);
+         end if;
+      end loop;
+
+      return X;
+
+   end Concatenate;
 
    --  -------------------------------------------------------------------------
 
@@ -27,13 +106,13 @@ package body Support_15A is
       Routine_Name    : constant String := "Support_5A.Get_Picture ";
       File_Name_Upper : constant String := To_Upper (File_Name);
       File_Kind       : constant String :=
-                          File_Name_Upper
-                            (File_Name_Upper'Last - 4 .. File_Name_Upper'Last);
+        File_Name_Upper
+          (File_Name_Upper'Last - 4 .. File_Name_Upper'Last);
    begin
       if File_Kind = ".PNG" then
          declare
             Initial : constant Unsigned_8_Array_3D :=
-                        Unsigned_8_Array_3D (To_BMP.Process (File_Name));
+              Unsigned_8_Array_3D (To_BMP.Process (File_Name));
             Clipped : Unsigned_8_Array_3D
               (1 .. Initial'Length - 15, 1 .. Initial'Length (2) - 1,
                Initial'Range (3));
@@ -62,7 +141,7 @@ package body Support_15A is
          Put_Line (Routine_Name & "unsupported image format " & File_Kind);
          declare
             Dummy : constant Unsigned_8_Array_3D (1 .. 1, 1 .. 1, 1 .. 1) :=
-                      (1 => (1 => (1 => 0)));
+              (1 => (1 => (1 => 0)));
          begin
             return Dummy;
          end;
@@ -96,7 +175,7 @@ package body Support_15A is
       use Ada.Strings.Fixed;
       Routine_Name    : constant String := "Support_15A.Read_Cats ";
       Train_Directory : constant String :=
-                          "../../../../imgs/tiny-imagenet-200/train/";
+        "../../../../imgs/tiny-imagenet-200/train/";
       Images          : Image_Vector (1 .. Cats_Dir'Length * Num_Samples);
       Labels          : Integer_Array (1 .. Cats_Dir'Length * Num_Samples);
       Image_File_Dir  : String_9;
@@ -115,12 +194,12 @@ package body Support_15A is
                                    Trim (Integer'Image (img), Both) & ".JPEG",
                                  False);
             begin
---                 Put_Line (Routine_Name & "cat + img " &
---                             Integer'Image (cat + img));
---                 Put_Line (Routine_Name & "Images length " &
---                             Integer'Image (Images'Length));
---                 Print_Matrix_Dimensions (Routine_Name & "Image_Data",
---                                          Image_Data);
+               --                 Put_Line (Routine_Name & "cat + img " &
+               --                             Integer'Image (cat + img));
+               --                 Put_Line (Routine_Name & "Images length " &
+               --                             Integer'Image (Images'Length));
+               --                 Print_Matrix_Dimensions (Routine_Name & "Image_Data",
+               --                                          Image_Data);
                Images (cat + img) := Image_Array (Image_Data);
             end;
             --              Images (cat + img) :=
