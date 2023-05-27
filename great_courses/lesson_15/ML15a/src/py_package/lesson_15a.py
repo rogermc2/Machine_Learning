@@ -34,6 +34,7 @@ def show_bitmap(bitmap, Row_Size):
     bm_array = bm_array.reshape(num_rows, Row_Size, 3)
     plt.imshow(bm_array)
     plt.show()
+
 def build_network():
     input_shape = (64, 64, 3)
     #Instantiate an empty model
@@ -61,3 +62,6 @@ def build_network():
     model.add(Dense(4096, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     return(model)
+
+def compile(model):
+    model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])

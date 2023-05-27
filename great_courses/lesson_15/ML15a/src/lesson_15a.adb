@@ -6,6 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use  Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
+with Python_API;
 
 with Support_15A; use Support_15A;
 
@@ -19,15 +20,21 @@ procedure Lesson_15A is
    Test_X       :  Image_Vector (1 .. 2 * Test_Size);
    Test_Y       :  Integer_Array (1 .. 2 * Test_Size);
    Classifier   : Python.Module;
+   Model        : Python_API.PyObject;
    Test         : Image_Array;
 begin
-   Put_Line (Program_Name);
+   Put_Line (Program_Name & "initializing Python.");
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_15a");
    Build_Data (Num_Samples, Train_Size, Test_Size, Train_X, Test_X, Train_Y, Test_Y);
    Test := Train_X (1);
+
    Python.Call (Classifier, "show_bitmap", Test);
+
+   Put_Line (Program_Name & "building network");
+   Model := Python.Call (Classifier, "build_network");
+   Python.Call (Classifier, "compile", Model);
 
    New_Line;
 

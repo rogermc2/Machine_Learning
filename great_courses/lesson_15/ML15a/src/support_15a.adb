@@ -1,8 +1,4 @@
 
---  with System;
-
---  with Interfaces.C;
-
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Handling;
 with Ada.Strings;
@@ -29,26 +25,26 @@ package body Support_15A is
    --  -------------------------------------------------------------------------
 
    procedure Build_Data (Num_Samples, Train_Size, Test_Size : Positive;
-                         Train_X, Test_X : out Image_Vector;
-                         Train_Y, Test_Y : out Integer_Array) is
+                         Train_X, Test_X                    : out Image_Vector;
+                         Train_Y, Test_Y                    : out Integer_Array) is
 
-      Cats_1 : constant String_9_array (1 .. 36) :=
-        ("n01443537", "n01629819", "n01641577", "n01644900", "n01698640", "n01742172",
-         "n01855672", "n01882714", "n02002724", "n02056570", "n02058221", "n02074367",
-         "n02085620", "n02094433", "n02099601", "n02099712", "n02106662", "n02113799",
-         "n02123045", "n02123394", "n02124075", "n02125311", "n02129165", "n02132136",
-         "n02364673", "n02395406", "n02403003", "n02410509", "n02415577", "n02423022",
-         "n02437312", "n02480495", "n02481823", "n02486410", "n02504458", "n02509815");
-      Cats_2  : constant String_9_array (1 .. 14) :=
-        ("n01770393", "n01774384", "n01774750", "n01784675", "n02165456", "n02190166",
-         "n02206856", "n02226429", "n02231487", "n02233338", "n02236044", "n02268443",
-         "n02279972", "n02281406");
+      Cats_1         : constant String_9_array (1 .. 36) :=
+                         ("n01443537", "n01629819", "n01641577", "n01644900", "n01698640", "n01742172",
+                          "n01855672", "n01882714", "n02002724", "n02056570", "n02058221", "n02074367",
+                          "n02085620", "n02094433", "n02099601", "n02099712", "n02106662", "n02113799",
+                          "n02123045", "n02123394", "n02124075", "n02125311", "n02129165", "n02132136",
+                          "n02364673", "n02395406", "n02403003", "n02410509", "n02415577", "n02423022",
+                          "n02437312", "n02480495", "n02481823", "n02486410", "n02504458", "n02509815");
+      Cats_2         : constant String_9_array (1 .. 14) :=
+                         ("n01770393", "n01774384", "n01774750", "n01784675", "n02165456", "n02190166",
+                          "n02206856", "n02226429", "n02231487", "n02233338", "n02236044", "n02268443",
+                          "n02279972", "n02281406");
       Train_X1       :  Image_Vector (1 .. Train_Size);
-      Train_Y1      :  Integer_Array (1 .. Train_Size);
+      Train_Y1       :  Integer_Array (1 .. Train_Size);
       Test_X1        :  Image_Vector (1 .. Test_Size);
       Test_Y1        :  Integer_Array (1 .. Test_Size);
       Train_X2       :  Image_Vector (1 .. Train_Size);
-      Train_Y2      :  Integer_Array (1 .. Train_Size);
+      Train_Y2       :  Integer_Array (1 .. Train_Size);
       Test_X2        :  Image_Vector (1 .. Test_Size);
       Test_Y2        :  Integer_Array (1 .. Test_Size);
    begin
@@ -106,13 +102,13 @@ package body Support_15A is
       Routine_Name    : constant String := "Support_5A.Get_Picture ";
       File_Name_Upper : constant String := To_Upper (File_Name);
       File_Kind       : constant String :=
-        File_Name_Upper
-          (File_Name_Upper'Last - 4 .. File_Name_Upper'Last);
+                          File_Name_Upper
+                            (File_Name_Upper'Last - 4 .. File_Name_Upper'Last);
    begin
       if File_Kind = ".PNG" then
          declare
             Initial : constant Unsigned_8_Array_3D :=
-              Unsigned_8_Array_3D (To_BMP.Process (File_Name));
+                        Unsigned_8_Array_3D (To_BMP.Process (File_Name));
             Clipped : Unsigned_8_Array_3D
               (1 .. Initial'Length - 15, 1 .. Initial'Length (2) - 1,
                Initial'Range (3));
@@ -122,9 +118,6 @@ package body Support_15A is
                   for pix in Clipped'Range (3) loop
                      Clipped (row, col, pix) := Initial (row, col, pix);
                   end loop;
-                  --                    Swap := Clipped (row, col, 2);
-                  --                    Clipped (row, col, 2) := Clipped (row, col, 3);
-                  --                    Clipped (row, col, 3) := Swap;
                end loop;
             end loop;
 
@@ -141,7 +134,7 @@ package body Support_15A is
          Put_Line (Routine_Name & "unsupported image format " & File_Kind);
          declare
             Dummy : constant Unsigned_8_Array_3D (1 .. 1, 1 .. 1, 1 .. 1) :=
-              (1 => (1 => (1 => 0)));
+                      (1 => (1 => (1 => 0)));
          begin
             return Dummy;
          end;
@@ -175,7 +168,7 @@ package body Support_15A is
       use Ada.Strings.Fixed;
       Routine_Name    : constant String := "Support_15A.Read_Cats ";
       Train_Directory : constant String :=
-        "../../../../imgs/tiny-imagenet-200/train/";
+                          "../../../../imgs/tiny-imagenet-200/train/";
       Images          : Image_Vector (1 .. Cats_Dir'Length * Num_Samples);
       Labels          : Integer_Array (1 .. Cats_Dir'Length * Num_Samples);
       Image_File_Dir  : String_9;
@@ -202,11 +195,6 @@ package body Support_15A is
                --                                          Image_Data);
                Images (cat + img) := Image_Array (Image_Data);
             end;
-            --              Images (cat + img) :=
-            --                Call_Python (M, "load_image", Train_Directory &
-            --                               String (Image_File_Dir) & "/images/" &
-            --                               String (Image_File_Dir) & "_" &
-            --                               Trim (Integer'Image (img), Both) & ".JPEG");
             Labels (cat + img) := Label;
          end loop;
       end loop;
