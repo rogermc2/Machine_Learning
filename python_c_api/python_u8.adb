@@ -1,6 +1,8 @@
 
 with Interfaces.C;
-with Tuple_Builder; use Tuple_Builder;
+
+with Tuple_Builder;
+with U8_Tuple_Builder; use U8_Tuple_Builder;
 
 package body Python_U8 is
    use Python_API;
@@ -40,6 +42,7 @@ package body Python_U8 is
                    A : Python_API.PyObject; B : Image_64_Vector;
                    C : Integer_Array; D : Image_64_Vector;
                    E : Integer_Array) is
+      use Tuple_Builder;
 
       function Py_BuildValue (Format             : Interfaces.C.char_array;
                               O1, T1, T2, T3, T4 : PyObject) return PyObject;
