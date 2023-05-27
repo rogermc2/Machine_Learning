@@ -1,9 +1,9 @@
 
 with Interfaces.C;
+with Python_API;
 with Tuple_Builder; use Tuple_Builder;
 
 package body Python_U8 is
-   use Python;
    use Python_API;
 
    procedure Call (M : Python.Module; Function_Name : String;
@@ -36,31 +36,5 @@ package body Python_U8 is
    end Call;
 
    --  -------------------------------------------------------------------------
-
-   function Call (M : Python.Module; Function_Name : String; A : Integer;
-                  B : ML_Arrays_And_Matrices.Real_Float_Matrix)
-                  return Python_API.PyObject is
-      use Interfaces.C;
-
-      function Py_BuildValue (Format  : char_array; A : int;
-                              T1      : PyObject) return PyObject;
-      pragma Import (C, Py_BuildValue, "Py_BuildValue");
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (B);
-      PyParams : PyObject;
-      PyResult : PyObject;
-   begin
-      PyParams := Py_BuildValue (To_C ("iO"), int (A), A_Tuple);
-      PyResult := Call_Object (F, PyParams);
-
-      Py_DecRef (F);
-      Py_DecRef (A_Tuple);
-      Py_DecRef (PyParams);
-
-      return PyResult;
-
-   end Call;
-
-   -- --------------------------------------------------------------------------
 
 end Python_U8;

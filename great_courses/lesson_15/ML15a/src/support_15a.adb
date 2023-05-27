@@ -11,23 +11,25 @@ with To_BMP;
 package body Support_15A is
 
    function Concatenate (X1, X2 : Integer_Array) return Integer_Array;
-   function Concatenate (X1, X2 : Image_Vector) return Image_Vector;
+   function Concatenate (X1, X2 : ML_U8_Types.Image_Vector)
+                         return ML_U8_Types.Image_Vector;
    procedure Read_Cats (Cats_Dir        : String_9_Array;
                         Label           : Natural;
                         Num_Samples     : Positive;
-                        Train_X, Test_X : out Image_Vector;
+                        Train_X, Test_X : out ML_U8_Types.Image_Vector;
                         Train_Y, Test_Y : out Integer_Array);
    procedure Train_Test_Split
-     (X                     : Image_Vector; Y : Integer_Array;
-      Train_X               : out Image_Vector; Train_Y : out Integer_Array;
-      Test_X                : out Image_Vector; Test_Y : out Integer_Array);
+     (X       : ML_U8_Types.Image_Vector; Y : Integer_Array;
+      Train_X : out ML_U8_Types.Image_Vector; Train_Y : out Integer_Array;
+      Test_X  : out ML_U8_Types.Image_Vector; Test_Y : out Integer_Array);
 
    --  -------------------------------------------------------------------------
 
-   procedure Build_Data (Num_Samples, Train_Size, Test_Size : Positive;
-                         Train_X, Test_X                    : out Image_Vector;
-                         Train_Y, Test_Y                    : out Integer_Array) is
-
+   procedure Build_Data
+     (Num_Samples, Train_Size, Test_Size : Positive;
+      Train_X, Test_X                    : out ML_U8_Types.Image_Vector;
+      Train_Y, Test_Y                    : out Integer_Array) is
+      use ML_U8_Types;
       Cats_1         : constant String_9_array (1 .. 36) :=
                          ("n01443537", "n01629819", "n01641577", "n01644900", "n01698640", "n01742172",
                           "n01855672", "n01882714", "n02002724", "n02056570", "n02058221", "n02074367",
@@ -78,9 +80,10 @@ package body Support_15A is
 
    --  -------------------------------------------------------------------------
 
-   function Concatenate (X1, X2 : Image_Vector) return Image_Vector is
+   function Concatenate (X1, X2 : ML_U8_Types.Image_Vector)
+                         return ML_U8_Types.Image_Vector is
 
-      X : Image_Vector (1 .. X1'Length + X2'Length);
+      X : ML_U8_Types.Image_Vector (1 .. X1'Length + X2'Length);
    begin
       for index in X'Range loop
          if index <= X1'Length then
@@ -163,7 +166,7 @@ package body Support_15A is
    procedure Read_Cats (Cats_Dir            : String_9_Array;
                         Label               : Natural;
                         Num_Samples         : Positive;
-                        Train_X, Test_X     : out Image_Vector;
+                        Train_X, Test_X     : out ML_U8_Types.Image_Vector;
                         Train_Y, Test_Y     : out Integer_Array) is
       use Ada.Strings;
       use Ada.Strings.Fixed;
@@ -209,14 +212,14 @@ package body Support_15A is
    --  -------------------------------------------------------------------------
 
    procedure Train_Test_Split
-     (X                     : Image_Vector; Y : Integer_Array;
-      Train_X               : out Image_Vector; Train_Y : out Integer_Array;
-      Test_X                : out Image_Vector; Test_Y : out Integer_Array) is
+     (X       : ML_U8_Types.Image_Vector; Y : Integer_Array;
+      Train_X : out ML_U8_Types.Image_Vector; Train_Y : out Integer_Array;
+      Test_X  : out ML_U8_Types.Image_Vector; Test_Y : out Integer_Array) is
       Routine_Name : constant String := "Support_15A.Train_Test_Split ";
       Num_Samples  : constant Positive := X'Length;
       Train_Size   : constant Positive := Train_X'Length;
-      Image_In     : Image_Array;
-      Image_Out    : Image_Array;
+      Image_In     : ML_U8_Types.Image_Array;
+      Image_Out    : ML_U8_Types.Image_Array;
    begin
       Assert (Natural (Y'Length) = Num_Samples, Routine_Name &
                 "Y length" & Integer'Image (Integer (Y'Length)) &

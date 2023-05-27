@@ -5,6 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_U8_Types;
 with Python;
 with Python_API;
 with Python_U8;
@@ -16,20 +17,20 @@ procedure Lesson_15A is
    Num_Samples  : constant  Positive := 120;
    Test_Size    : constant  Positive := Positive (0.1 * Float (Num_Samples));
    Train_Size   : constant  Positive := Positive (0.2 * Float (Num_Samples));
-   Train_X      :  Image_Vector (1 .. 2 * Train_Size);
-   Train_Y      :  Integer_Array (1 .. 2 * Train_Size);
-   Test_X       :  Image_Vector (1 .. 2 * Test_Size);
-   Test_Y       :  Integer_Array (1 .. 2 * Test_Size);
+   Train_X      : ML_U8_Types.Image_Vector (1 .. 2 * Train_Size);
+   Train_Y      : Integer_Array (1 .. 2 * Train_Size);
+   Test_X       : ML_U8_Types.Image_Vector (1 .. 2 * Test_Size);
+   Test_Y       : Integer_Array (1 .. 2 * Test_Size);
    Classifier   : Python.Module;
    Model        : Python_API.PyObject;
-   Test         : Image_Array;
+   Test         : ML_U8_Types.Image_Array;
 begin
    Put_Line (Program_Name & "initializing Python.");
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_15a");
    Build_Data (Num_Samples, Train_Size, Test_Size, Train_X, Test_X, Train_Y, Test_Y);
---     Test := Train_X (1);
+   Test := Train_X (1);
 
    Python_U8.Call (Classifier, "show_bitmap", Test);
 
