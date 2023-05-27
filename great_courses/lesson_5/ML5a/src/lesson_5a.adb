@@ -4,7 +4,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_U8_Types;
 with Python; use Python;
+with Python_U8;
 
 with Maths;
 
@@ -21,15 +23,15 @@ procedure Lesson_5A is
    Project_Name           : constant String := "Lesson_5A ";
    Green_File_Name        : constant String := "../greenML.png";
    Forest_File_Name       : constant String := "../forest.jpg";
-   Image_Data             : constant Unsigned_8_Array_3D :=
+   Image_Data             : constant ML_U8_Types.Unsigned_8_Array_3D :=
                               Get_Picture (Green_File_Name);
-   Forest_Image_Data      : constant Unsigned_8_Array_3D :=
+   Forest_Image_Data      : constant ML_U8_Types.Unsigned_8_Array_3D :=
                               Get_Picture (Forest_File_Name);
-   Green_Data             : constant Unsigned_8_Array_3D :=
+   Green_Data             : constant ML_U8_Types.Unsigned_8_Array_3D :=
                               Get_Pixels (Image_Data, Image_Data'First,
                                           Image_Data'Last, Image_Data'First (2),
                                           Image_Data'First (2) + 359);
-   Fore_Data              : constant Unsigned_8_Array_3D :=
+   Fore_Data              : constant ML_U8_Types.Unsigned_8_Array_3D :=
                               Get_Pixels (Image_Data, 31, Image_Data'Last,
                                           547, 619);
    Flat_Data              : constant Integer_Matrix :=
@@ -64,9 +66,9 @@ begin
 
    Python.Initialize;
    Py_Module := Import_File ("lesson_5a");
-   Call (Py_Module, "show_bitmap", Image_Data);
-   Call (Py_Module, "show_bitmap", Green_Data);
-   Call (Py_Module, "show_bitmap", Fore_Data);
+   Python_U8.Call (Py_Module, "show_bitmap", Image_Data);
+   Python_U8.Call (Py_Module, "show_bitmap", Green_Data);
+   Python_U8.Call (Py_Module, "show_bitmap", Fore_Data);
 
    for index in Yes_List'Range loop
       for col in Pixel_Colour'Range loop
@@ -101,13 +103,13 @@ begin
    Print_Float_Vector ("Fitted weights", Weights);
 
    declare
-      New_Array : constant Unsigned_8_Array_3D :=
+      New_Array : constant ML_U8_Types.Unsigned_8_Array_3D :=
                     To_Picture (Flat_Data, Image_Data'Length,
                                 Image_Data'Length (2), Weights);
    begin
-      Call (Py_Module, "show_bitmap", New_Array);
-      Call (Py_Module, "show_bitmap", Forest_Image_Data);
-      Call (Py_Module, "show_bitmap",
+      Python_U8.Call (Py_Module, "show_bitmap", New_Array);
+      Python_U8.Call (Py_Module, "show_bitmap", Forest_Image_Data);
+      Python_U8.Call (Py_Module, "show_bitmap",
             Ml.Composite (New_Array, Image_Data, Forest_Image_Data));
    end;
 

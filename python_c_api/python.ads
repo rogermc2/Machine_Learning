@@ -45,8 +45,6 @@ package Python is
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Python_API.PyObject;
-   procedure Call (M : Python.Module; Function_Name : String;
-                   A : ML_Arrays_And_Matrices.Unsigned_8_Array_3D);
    function Call (M : Module; Function_Name : String; A : Integer;
                   B : ML_Arrays_And_Matrices.Real_Float_Matrix)
                   return Python_API.PyObject;

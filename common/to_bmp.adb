@@ -10,18 +10,18 @@ with Ada.Unchecked_Deallocation;
 
 with GID;
 
-with ML_Arrays_And_Matrices;
+with ML_U8_Types;
 
 package body To_BMP is
    use Interfaces;
 
-   type p_Byte_Array is access ML_Arrays_And_Matrices.Byte_Array;
+   type p_Byte_Array is access ML_U8_Types.Byte_Array;
 
    --  Pointer to raw data array of bytes
    img_buf_ptr : p_Byte_Array := null;
 
    procedure Dispose is new Ada.Unchecked_Deallocation
-     (ML_Arrays_And_Matrices.Byte_Array, p_Byte_Array);
+     (ML_U8_Types.Byte_Array, p_Byte_Array);
 
    --  ---------------------------------------------------------------------------------------
 
@@ -171,7 +171,7 @@ package body To_BMP is
    begin  --  Load_raw_image
       Dispose (buffer);
       --  GID.Unchanged | GID.Rotation_180 =>
-      buffer := new ML_Arrays_And_Matrices.Byte_Array
+      buffer := new ML_U8_Types.Byte_Array
         (0 .. padded_line_size_x * GID.Pixel_height (image) - 1);
       BMP24_Load (image, next_frame);
 

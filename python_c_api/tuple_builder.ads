@@ -4,6 +4,7 @@
 with ML_Arrays_And_Matrices;
 with ML_Types;
 with NL_Types;
+with ML_U8_Types;
 with Python_API; use Python_API;
 
 package Tuple_Builder is
@@ -25,8 +26,7 @@ package Tuple_Builder is
                       return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Boolean_Array) 
                       return PyObject;
-   function To_Tuple (Data : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) 
-                      return PyObject;
+   function To_Tuple (Data : ML_U8_Types.Unsigned_8_Array_3D) return PyObject;
    function To_Tuple (Data : NL_Types.Boolean_List) return PyObject;
    function To_Tuple (Data : NL_Types.Boolean_List_2D) return PyObject;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Real_Float_List_2D)

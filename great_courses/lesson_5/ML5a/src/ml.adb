@@ -18,8 +18,8 @@ package body ML is
    --  -------------------------------------------------------------------------
 
    function Composite
-     (Mask, Foreground : Unsigned_8_Array_3D; Background : Unsigned_8_Array_3D)
-      return Unsigned_8_Array_3D is
+     (Mask, Foreground, Background : ML_U8_Types.Unsigned_8_Array_3D)
+      return ML_U8_Types.Unsigned_8_Array_3D is
       use Interfaces;
       --        Routine_Name : constant String := "ML.Composite ";
       Shift        : constant Positive := 157;
@@ -28,7 +28,7 @@ package body ML is
       Last_Col     : constant Positive :=
                        Integer'Min (Background'Length (2), Foreground'Length (2));
       FG_Row       : Integer;
-      Result       : Unsigned_8_Array_3D := Background;
+      Result       : ML_U8_Types.Unsigned_8_Array_3D := Background;
    begin
       for row in 1 .. Last_Row loop
          for col in 1 .. Last_Col loop

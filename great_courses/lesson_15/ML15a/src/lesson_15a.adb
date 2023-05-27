@@ -7,6 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
 with Python_API;
+with Python_U8;
 
 with Support_15A; use Support_15A;
 
@@ -28,9 +29,9 @@ begin
 
    Classifier := Python.Import_File ("lesson_15a");
    Build_Data (Num_Samples, Train_Size, Test_Size, Train_X, Test_X, Train_Y, Test_Y);
-   Test := Train_X (1);
+--     Test := Train_X (1);
 
-   Python.Call (Classifier, "show_bitmap", Test);
+   Python_U8.Call (Classifier, "show_bitmap", Test);
 
    Put_Line (Program_Name & "building network");
    Model := Python.Call (Classifier, "build_network");

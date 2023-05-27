@@ -283,7 +283,7 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
 
-   function To_Tuple (Data : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) 
+   function To_Tuple (Data : ML_U8_Types.Unsigned_8_Array_3D) 
                       return PyObject is
       use ML_Arrays_And_Matrices;
       --        Routine_Name : constant String := "Python.To_Tuple Integer_Array_3D ";

@@ -97,8 +97,9 @@ package body Support_15A is
    --  -------------------------------------------------------------------------
 
    function Get_Picture (File_Name : String; Show_Name : Boolean := True)
-                         return Unsigned_8_Array_3D is
+                         return ML_U8_Types.Unsigned_8_Array_3D is
       use Ada.Characters.Handling;
+      use ML_U8_Types;
       Routine_Name    : constant String := "Support_5A.Get_Picture ";
       File_Name_Upper : constant String := To_Upper (File_Name);
       File_Kind       : constant String :=
@@ -166,6 +167,7 @@ package body Support_15A is
                         Train_Y, Test_Y     : out Integer_Array) is
       use Ada.Strings;
       use Ada.Strings.Fixed;
+      use ML_U8_Types;
       Routine_Name    : constant String := "Support_15A.Read_Cats ";
       Train_Directory : constant String :=
                           "../../../../imgs/tiny-imagenet-200/train/";
