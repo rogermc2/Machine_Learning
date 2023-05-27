@@ -9,7 +9,7 @@ package Support_15A is
    type Labels_Array is array (Integer range <>) of Integer;
 
    procedure Build_Data (Num_Samples, Train_Size, Test_Size : Positive;
-                         Train_X, Test_X : out ML_U8_Types.Image_Vector;
+                         Train_X, Test_X : out ML_U8_Types.Image_64_Vector;
                          Train_Y, Test_Y : out Integer_Array);
    function Max (Values : Real_Float_Vector) return Float;
 

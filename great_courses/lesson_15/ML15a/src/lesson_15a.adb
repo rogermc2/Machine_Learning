@@ -17,13 +17,13 @@ procedure Lesson_15A is
    Num_Samples  : constant  Positive := 120;
    Test_Size    : constant  Positive := Positive (0.1 * Float (Num_Samples));
    Train_Size   : constant  Positive := Positive (0.2 * Float (Num_Samples));
-   Train_X      : ML_U8_Types.Image_Vector (1 .. 2 * Train_Size);
+   Train_X      : ML_U8_Types.Image_64_Vector (1 .. 2 * Train_Size);
    Train_Y      : Integer_Array (1 .. 2 * Train_Size);
-   Test_X       : ML_U8_Types.Image_Vector (1 .. 2 * Test_Size);
+   Test_X       : ML_U8_Types.Image_64_Vector (1 .. 2 * Test_Size);
    Test_Y       : Integer_Array (1 .. 2 * Test_Size);
    Classifier   : Python.Module;
    Model        : Python_API.PyObject;
-   Test         : ML_U8_Types.Image_Array;
+   Test         : ML_U8_Types.Image_64_Array;
 begin
    Put_Line (Program_Name & "initializing Python.");
    Python.Initialize;

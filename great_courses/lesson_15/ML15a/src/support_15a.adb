@@ -11,23 +11,23 @@ with To_BMP;
 package body Support_15A is
 
    function Concatenate (X1, X2 : Integer_Array) return Integer_Array;
-   function Concatenate (X1, X2 : ML_U8_Types.Image_Vector)
-                         return ML_U8_Types.Image_Vector;
+   function Concatenate (X1, X2 : ML_U8_Types.Image_64_Vector)
+                         return ML_U8_Types.Image_64_Vector;
    procedure Read_Cats (Cats_Dir        : String_9_Array;
                         Label           : Natural;
                         Num_Samples     : Positive;
-                        Train_X, Test_X : out ML_U8_Types.Image_Vector;
+                        Train_X, Test_X : out ML_U8_Types.Image_64_Vector;
                         Train_Y, Test_Y : out Integer_Array);
    procedure Train_Test_Split
-     (X       : ML_U8_Types.Image_Vector; Y : Integer_Array;
-      Train_X : out ML_U8_Types.Image_Vector; Train_Y : out Integer_Array;
-      Test_X  : out ML_U8_Types.Image_Vector; Test_Y : out Integer_Array);
+     (X       : ML_U8_Types.Image_64_Vector; Y : Integer_Array;
+      Train_X : out ML_U8_Types.Image_64_Vector; Train_Y : out Integer_Array;
+      Test_X  : out ML_U8_Types.Image_64_Vector; Test_Y : out Integer_Array);
 
    --  -------------------------------------------------------------------------
 
    procedure Build_Data
      (Num_Samples, Train_Size, Test_Size : Positive;
-      Train_X, Test_X                    : out ML_U8_Types.Image_Vector;
+      Train_X, Test_X                    : out ML_U8_Types.Image_64_Vector;
       Train_Y, Test_Y                    : out Integer_Array) is
       use ML_U8_Types;
       Cats_1         : constant String_9_array (1 .. 36) :=
@@ -41,13 +41,13 @@ package body Support_15A is
                          ("n01770393", "n01774384", "n01774750", "n01784675", "n02165456", "n02190166",
                           "n02206856", "n02226429", "n02231487", "n02233338", "n02236044", "n02268443",
                           "n02279972", "n02281406");
-      Train_X1       :  Image_Vector (1 .. Train_Size);
+      Train_X1       :  Image_64_Vector (1 .. Train_Size);
       Train_Y1       :  Integer_Array (1 .. Train_Size);
-      Test_X1        :  Image_Vector (1 .. Test_Size);
+      Test_X1        :  Image_64_Vector (1 .. Test_Size);
       Test_Y1        :  Integer_Array (1 .. Test_Size);
-      Train_X2       :  Image_Vector (1 .. Train_Size);
+      Train_X2       :  Image_64_Vector (1 .. Train_Size);
       Train_Y2       :  Integer_Array (1 .. Train_Size);
-      Test_X2        :  Image_Vector (1 .. Test_Size);
+      Test_X2        :  Image_64_Vector (1 .. Test_Size);
       Test_Y2        :  Integer_Array (1 .. Test_Size);
    begin
       Read_Cats (Cats_1, 0, Num_Samples, Train_X1, Test_X1, Train_Y1, Test_Y1);
@@ -80,10 +80,10 @@ package body Support_15A is
 
    --  -------------------------------------------------------------------------
 
-   function Concatenate (X1, X2 : ML_U8_Types.Image_Vector)
-                         return ML_U8_Types.Image_Vector is
+   function Concatenate (X1, X2 : ML_U8_Types.Image_64_Vector)
+                         return ML_U8_Types.Image_64_Vector is
 
-      X : ML_U8_Types.Image_Vector (1 .. X1'Length + X2'Length);
+      X : ML_U8_Types.Image_64_Vector (1 .. X1'Length + X2'Length);
    begin
       for index in X'Range loop
          if index <= X1'Length then
@@ -163,18 +163,18 @@ package body Support_15A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Read_Cats (Cats_Dir            : String_9_Array;
-                        Label               : Natural;
-                        Num_Samples         : Positive;
-                        Train_X, Test_X     : out ML_U8_Types.Image_Vector;
-                        Train_Y, Test_Y     : out Integer_Array) is
+   procedure Read_Cats (Cats_Dir        : String_9_Array;
+                        Label           : Natural;
+                        Num_Samples     : Positive;
+                        Train_X, Test_X : out ML_U8_Types.Image_64_Vector;
+                        Train_Y, Test_Y : out Integer_Array) is
       use Ada.Strings;
       use Ada.Strings.Fixed;
       use ML_U8_Types;
       Routine_Name    : constant String := "Support_15A.Read_Cats ";
       Train_Directory : constant String :=
                           "../../../../imgs/tiny-imagenet-200/train/";
-      Images          : Image_Vector (1 .. Cats_Dir'Length * Num_Samples);
+      Images          : Image_64_Vector (1 .. Cats_Dir'Length * Num_Samples);
       Labels          : Integer_Array (1 .. Cats_Dir'Length * Num_Samples);
       Image_File_Dir  : String_9;
    begin
@@ -198,7 +198,7 @@ package body Support_15A is
                --                             Integer'Image (Images'Length));
                --                 Print_Matrix_Dimensions (Routine_Name & "Image_Data",
                --                                          Image_Data);
-               Images (cat + img) := Image_Array (Image_Data);
+               Images (cat + img) := Image_64_Array (Image_Data);
             end;
             Labels (cat + img) := Label;
          end loop;
@@ -212,14 +212,14 @@ package body Support_15A is
    --  -------------------------------------------------------------------------
 
    procedure Train_Test_Split
-     (X       : ML_U8_Types.Image_Vector; Y : Integer_Array;
-      Train_X : out ML_U8_Types.Image_Vector; Train_Y : out Integer_Array;
-      Test_X  : out ML_U8_Types.Image_Vector; Test_Y : out Integer_Array) is
+     (X       : ML_U8_Types.Image_64_Vector; Y : Integer_Array;
+      Train_X : out ML_U8_Types.Image_64_Vector; Train_Y : out Integer_Array;
+      Test_X  : out ML_U8_Types.Image_64_Vector; Test_Y : out Integer_Array) is
       Routine_Name : constant String := "Support_15A.Train_Test_Split ";
       Num_Samples  : constant Positive := X'Length;
       Train_Size   : constant Positive := Train_X'Length;
-      Image_In     : ML_U8_Types.Image_Array;
-      Image_Out    : ML_U8_Types.Image_Array;
+      Image_In     : ML_U8_Types.Image_64_Array;
+      Image_Out    : ML_U8_Types.Image_64_Array;
    begin
       Assert (Natural (Y'Length) = Num_Samples, Routine_Name &
                 "Y length" & Integer'Image (Integer (Y'Length)) &

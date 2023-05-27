@@ -1,6 +1,8 @@
 
 --  Derived from gid/test/To_BMP
 
+with Interfaces;
+
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Calendar;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
@@ -9,8 +11,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
 with GID;
-
-with ML_U8_Types;
 
 package body To_BMP is
    use Interfaces;
@@ -25,8 +25,8 @@ package body To_BMP is
 
    --  ---------------------------------------------------------------------------------------
 
-   function Do_JPEG (Height, Width : Positive) return Image_Array is
-      Image_Data   : Image_Array (1 .. Height, 1 .. Width, 1 .. 3);
+   function Do_JPEG (Height, Width : Positive) return ML_U8_Types.Image_Array is
+      Image_Data   : ML_U8_Types.Image_Array (1 .. Height, 1 .. Width, 1 .. 3);
       Buffer_Index : Natural := 0;
    begin
       for row in reverse Image_Data'Range loop
@@ -52,8 +52,9 @@ package body To_BMP is
 
    --  -------------------------------------------------------------------------
 
-   function Do_JPG (Height, Width : Positive) return Image_Array is
-      Image_Data   : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
+   function Do_JPG (Height, Width : Positive) return ML_U8_Types.Image_Array is
+      Image_Data   : ML_U8_Types.Image_Array (1 .. Height - 1, 1 .. Width + 1,
+                                              1 .. 3);
       Col_Rot      : Natural;
       Buffer_Index : Natural := 1;
    begin
@@ -83,8 +84,9 @@ package body To_BMP is
 
    --  ---------------------------------------------------------------------------------------
 
-   function Do_PNG (Height, Width : Positive) return Image_Array is
-      Image_Data   : Image_Array (1 .. Height - 1, 1 .. Width + 1, 1 .. 3);
+   function Do_PNG (Height, Width : Positive) return ML_U8_Types.Image_Array is
+      Image_Data   : ML_U8_Types.Image_Array (1 .. Height - 1, 1 .. Width + 1,
+                                              1 .. 3);
       Buffer_Index : Natural := 0;
    begin
       for row in reverse Image_Data'Range loop
@@ -180,12 +182,12 @@ package body To_BMP is
    --  -------------------------------------------------------------------------
 
    function Process (Image_File_Name : String; Show_Name : Boolean := True)
-                     return Image_Array is
+                     return ML_U8_Types.Image_Array is
       Routine_Name    : constant String := "To_BMP.Process ";
       File_Name_Upper : constant String := To_Upper (Image_File_Name);
       File_Kind       : constant String := File_Name_Upper
         (File_Name_Upper'Last - 3 .. File_Name_Upper'Last);
-      Dummy           : Image_Array (1 .. 1, 1 .. 1, 1 .. 1);
+      Dummy           : ML_U8_Types.Image_Array (1 .. 1, 1 .. 1, 1 .. 1);
       in_file_id      : Ada.Streams.Stream_IO.File_Type;
       image_desc      : GID.Image_descriptor;
       Width           : Positive;
