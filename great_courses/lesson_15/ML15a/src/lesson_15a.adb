@@ -29,14 +29,17 @@ begin
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_15a");
-   Build_Data (Num_Samples, Train_Size, Test_Size, Train_X, Test_X, Train_Y, Test_Y);
+   Build_Data (Num_Samples, Train_Size, Test_Size, Train_X, Test_X,
+               Train_Y, Test_Y);
    Test := Train_X (1);
 
+   Put_Line (Program_Name & "show_bitmap");
    Python_U8.Call (Classifier, "show_bitmap", Test);
 
    Put_Line (Program_Name & "building network");
    Model := Python.Call (Classifier, "build_network");
    Python.Call (Classifier, "compile", Model);
+   Put_Line (Program_Name & "fitting.");
    Python_U8.Call (Classifier, "fit", Model, Train_X, Train_Y, Test_X, Test_Y);
 
    New_Line;

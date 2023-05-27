@@ -206,6 +206,7 @@ package body Support_15A is
       Put_Line (Routine_Name & "training files read.");
 
       Train_Test_Split (Images, Labels, Train_X, Train_Y, Test_X, Test_Y);
+      Put_Line (Routine_Name & "done.");
 
    end Read_Cats;
 
