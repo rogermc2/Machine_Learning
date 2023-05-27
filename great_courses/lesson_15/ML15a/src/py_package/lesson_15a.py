@@ -19,6 +19,9 @@ def load_image (file_name):
     img.close()
     return tuple(img_list);
 
+def fit(model, X_train,y_train, X_test,y_test):
+    model.fit(X_train,y_train, validation_data=(X_test,y_test))
+
 def predict(clf, features):
     return tuple(clf.predict(features))
 
