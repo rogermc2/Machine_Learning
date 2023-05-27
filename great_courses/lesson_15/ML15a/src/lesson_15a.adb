@@ -37,6 +37,7 @@ begin
    Put_Line (Program_Name & "building network");
    Model := Python.Call (Classifier, "build_network");
    Python.Call (Classifier, "compile", Model);
+   Python_U8.Call (Classifier, "fit", Model, Train_X, Train_Y, Test_X, Test_Y);
 
    New_Line;
 
