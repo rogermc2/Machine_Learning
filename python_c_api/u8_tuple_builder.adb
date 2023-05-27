@@ -38,10 +38,12 @@ package body U8_Tuple_Builder is
 --        Routine_Name : constant String :=
 --                         "U8_Tuple_Builder.To_Tuple Image_64_Vector ";
       Tuple_3D  : constant PyObject := PyTuple_New (int (Data'Length));
+      Py_Index  : int := 0;
    begin
       for index in Data'Range loop
-         PyTuple_SetItem (Tuple_3D, int (index - 1),
+         PyTuple_SetItem (Tuple_3D, Py_Index,
                           To_Tuple (Unsigned_8_Array_3D (Data (index))));
+         Py_Index := Py_Index + 1;
       end loop;
 
       return Tuple_3D;
