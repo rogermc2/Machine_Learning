@@ -20,20 +20,20 @@ def load_image (file_name):
     return tuple(img_list);
 
 def fit(model, X_train,Y_train, X_test,Y_test):
-    print("fit", np.array(X_train).shape)
+    print("fit X_train length", len(X_train))
+    print("fit X_train", np.array(X_train).shape)
     model.fit(np.array(X_train), np.array(Y_train), validation_data=(np.array(X_test),np.array(Y_test)))
 
 def predict(clf, features):
     return tuple(clf.predict(features))
 
-def plot(clf):
-    feats = ["holding", "dealer", "action", "ace"]
-    tree.plot_tree (clf, feature_names=feats, filled=True,
-                    rounded=True, fontsize=8)
-    plt.show()
+#def plot(clf):
+#    feats = ["holding", "dealer", "action", "ace"]
+#    tree.plot_tree (clf, feature_names=feats, filled=True,
+#                    rounded=True, fontsize=8)
+#    plt.show()
 
 def show_bitmap(bitmap, Row_Size):
-    print(show_bitmap)
     bm_array = np.asarray(bitmap)
     num_rows = int (len(bitmap) / Row_Size)
     bm_array = bm_array.reshape(num_rows, Row_Size, 3)
