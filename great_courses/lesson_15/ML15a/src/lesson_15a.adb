@@ -38,12 +38,14 @@ begin
    Put_Line (Program_Name & "show_bitmap");
    Python_U8.Call (Classifier, "show_bitmap", Test);
 
+   New_Line;
    Put_Line (Program_Name & "building network");
    Model := Python.Call (Classifier, "build_network");
+   New_Line;
    Python.Call (Classifier, "compile", Model);
+
    Put_Line (Program_Name & "fitting.");
    Python_U8.Call (Classifier, "fit", Model, Train_X, Train_Y, Test_X, Test_Y);
-
    New_Line;
 
    Python.Close_Module (Classifier);

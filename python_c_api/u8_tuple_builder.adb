@@ -39,12 +39,12 @@ package body U8_Tuple_Builder is
    function To_Tuple (Data : ML_U8_Types.Image_64_Vector)
                       return PyObject is
       use Interfaces.C;
-      Routine_Name   : constant String :=
+      Routine_Name : constant String :=
                          "U8_Tuple_Builder.To_Tuple Image_64_Vector ";
-      Image          : Image_64_Array;
-      Length_2D      : constant int := int (Image'Length (2));
-      Length_3D      : constant int := int (Image'Length);
-      Tuple_4D       : constant PyObject := PyTuple_New (int (Data'Length));
+      Image        : Image_64_Array;
+      Length_2D    : constant int := int (Image'Length (3));
+      Length_3D    : constant int := int (Image'Length (2));
+      Tuple_4D     : constant PyObject := PyTuple_New (int (Data'Length));
 
       function Do_Column (row : Positive) return PyObject is
          Tuple_2D       : constant PyObject := PyTuple_New (Length_2D);
@@ -81,9 +81,12 @@ package body U8_Tuple_Builder is
 
       end Do_Row;
 
-      Py_Index       : int := 0;
+      Py_Index : int := 0;
    begin
-      Put_Line (Routine_Name);
+      Put_Line (Routine_Name & "Data Length" & Integer'Image (Data'Length));
+      Put_Line (Routine_Name & "Image Length" & Integer'Image (Image'Length));
+      Put_Line (Routine_Name & "Length_3D" & int'Image (Length_3D));
+      Put_Line (Routine_Name & "Length_2D" & int'Image (Length_2D));
       for index in Data'Range loop
          Image := Data (index);
 --           Put_Line (Routine_Name & "Py_Index" & int'Image (Py_Index));

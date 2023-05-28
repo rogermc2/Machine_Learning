@@ -27,20 +27,17 @@ def fit(model, X_train,Y_train, X_test,Y_test):
 #    print("fit X_train [0][0][1]", X_train[0][0][1])
 #    print("fit X_train [0][0][2]", X_train[0][0][2])
     for i in range(len(X_train)):
-        print("fit X_train[i]", len(X_train[i]))
+#        print("fit X_train[i]", len(X_train[i]))
         for j in range(len(X_train[i])):
-            print("fit X_train[i][j]", len(X_train[i][j]))
-            print("fit X_train[i][j]", type(X_train[i][j]))
+#            print("fit X_train[i][j]", len(X_train[i][j]))
             tup=X_train[i][j]
-            print("fit tup length", len(tup))
+#            print("fit tup length", len(tup))
             print("fit tup", tup)
             for k in range(len(X_train[i][j])):
-                print("fit X_train[i][j][k]", X_train[i][j][k])
+#                print("fit X_train[i][j][k]", X_train[i][j][k])
                 img_2d  = np.array(X_train[i][j])
 #        img_list.append(img_2d)
     print("fit img_2d", img_2d.shape)
-    print("fit Y_train", np.asarray(Y_train).shape)
-    print("fit Y_test", np.array(Y_test).shape)
     print("fit X_train", np.asarray(X_train).shape)
     model.fit(np.asarray(X_train), np.asarray(Y_train), validation_data=(np.asarray(X_test),np.asarray(Y_test)))
     print("fit done")
