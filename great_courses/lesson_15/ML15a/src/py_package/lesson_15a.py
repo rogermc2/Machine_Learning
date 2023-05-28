@@ -21,9 +21,17 @@ def load_image (file_name):
 
 def fit(model, X_train,Y_train, X_test,Y_test):
     print("fit X_train length", len(X_train))
+    print("fit Y_train length", len(Y_train))
+    print("fit X_test length", len(X_test))
+    print("fit Y_test length", len(Y_test))
     print("fit X_train length[0]", len(X_train[0]))
     print("fit X_train length[0][0]", len(X_train[0][0]))
-#    print("fit X_train", np.array(X_train).shape)
+    print("fit X_train [0][0][0]", X_train[0][0][0])
+    print("fit X_train [0][0][1]", X_train[0][0][1])
+    print("fit X_train [0][0][2]", X_train[0][0][2])
+    print("fit Y_train", np.array(Y_train).shape)
+    print("fit Y_test", np.array(Y_test).shape)
+    print("fit X_train", np.array(X_train).shape)
     model.fit(np.array(X_train), np.array(Y_train), validation_data=(np.array(X_test),np.array(Y_test)))
     print("fit done")
 
