@@ -20,6 +20,7 @@ def load_image (file_name):
     return tuple(img_list);
 
 def fit(model, X_train,Y_train, X_test,Y_test):
+    print("fit", np.array(X_train).shape)
     model.fit(np.array(X_train), np.array(Y_train), validation_data=(np.array(X_test),np.array(Y_test)))
 
 def predict(clf, features):
