@@ -14,11 +14,11 @@ with Support_15A; use Support_15A;
 
 procedure Lesson_15A is
    Program_Name : constant String := "Lesson 15A ";
-   Num_Samples  : constant  Positive := 5;
---     Test_Size    : constant  Positive := Positive (0.1 * Float (Num_Samples));
---     Train_Size   : constant  Positive := Positive (0.2 * Float (Num_Samples));
-   Test_Size    : constant  Positive := 1;
-   Train_Size   : constant  Positive := 3;
+   Num_Samples  : constant  Positive := 10;
+   Test_Size    : constant  Positive := Positive (0.1 * Float (Num_Samples));
+   Train_Size   : constant  Positive := Positive (0.2 * Float (Num_Samples));
+--     Test_Size    : constant  Positive := 1;
+--     Train_Size   : constant  Positive := 3;
    Train_X      : ML_U8_Types.Image_64_Vector (1 .. 2 * Train_Size);
    Train_Y      : Integer_Array (1 .. 2 * Train_Size);
    Test_X       : ML_U8_Types.Image_64_Vector (1 .. 2 * Test_Size);

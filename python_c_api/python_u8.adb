@@ -1,6 +1,8 @@
 
 with Interfaces.C;
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Tuple_Builder;
 with U8_Tuple_Builder; use U8_Tuple_Builder;
 
@@ -18,23 +20,28 @@ package body Python_U8 is
                               I1      : int) return PyObject;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      --        Routine_Name : constant String := "Python.Call U8_3D ";
+      Routine_Name : constant String := "Python.Call U8_3D ";
       F            : PyObject;
       Row_Length   : constant int := int (A'Length (2));
       A_Tuple      : PyObject;
       PyParams     : PyObject;
       PyResult     : PyObject;
    begin
+      Put_Line (Routine_Name);
       F := Python.Get_Symbol (M, Function_Name);
       A_Tuple := To_Tuple (A);
-      PyParams := Py_BuildValue (Interfaces.C.To_C ("Oi"),
-                                 A_Tuple, Row_Length);
+      Put_Line (Routine_Name & "A_Tuple set");
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("Oi"), A_Tuple, Row_Length);
+      Py_DecRef (A_Tuple);
+      Put_Line (Routine_Name & "PyParams set");
+
       PyResult := Python.Call_Object (F, PyParams);
+      Put_Line (Routine_Name & "PyResult set");
 
       Py_DecRef (F);
-      Py_DecRef (A_Tuple);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
+      Put_Line (Routine_Name & "done");
 
    end Call;
 
@@ -66,13 +73,14 @@ package body Python_U8 is
       E_Tuple := To_Tuple (E);
       PyParams := Py_BuildValue (Interfaces.C.To_C ("OOOOO"),
                                  A, B_Tuple, C_Tuple, D_Tuple, E_Tuple);
-      PyResult := Python.Call_Object (F, PyParams);
-
-      Py_DecRef (F);
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
       Py_DecRef (D_Tuple);
       Py_DecRef (E_Tuple);
+
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
