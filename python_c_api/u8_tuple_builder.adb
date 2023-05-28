@@ -48,6 +48,7 @@ package body U8_Tuple_Builder is
 
       function Do_Column (row : Positive) return PyObject is
          Tuple_2D       : constant PyObject := PyTuple_New (Length_2D);
+         Tuple_3D       : constant PyObject := PyTuple_New (Length_3D);
          Py_Col_Index   : int := 0;
          Py_Depth_Index : int;
       begin
@@ -58,9 +59,13 @@ package body U8_Tuple_Builder is
                                 (long (Image (row, col, depth))));
                Py_Depth_Index := Py_Depth_Index + 1;
             end loop;
+            PyTuple_SetItem (Tuple_3D, Py_Col_Index, Tuple_2D);
             Py_Col_Index := Py_Col_Index + 1;
          end loop;
-         return Tuple_2D;
+
+         Py_DecRef (Tuple_2D);
+         return Tuple_3D;
+
       end Do_Column;
 
       function Do_Row return PyObject is
