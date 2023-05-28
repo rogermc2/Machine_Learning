@@ -14,7 +14,7 @@ with Support_15A; use Support_15A;
 
 procedure Lesson_15A is
    Program_Name : constant String := "Lesson 15A ";
-   Num_Samples  : constant  Positive := 10;
+   Num_Samples  : constant  Positive := 50;
    Test_Size    : constant  Positive := Positive (0.1 * Float (Num_Samples));
    Train_Size   : constant  Positive := Positive (0.2 * Float (Num_Samples));
 --     Test_Size    : constant  Positive := 1;

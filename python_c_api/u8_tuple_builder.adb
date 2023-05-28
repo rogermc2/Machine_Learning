@@ -46,12 +46,12 @@ package body U8_Tuple_Builder is
       Length_3D      : constant int := int (Image'Length);
       Tuple_4D       : constant PyObject := PyTuple_New (int (Data'Length));
 
-      function Do_Column (row : Positive; Py_Row_Index : int) return PyObject is
+      function Do_Column (row : Positive) return PyObject is
          Tuple_2D : constant PyObject := PyTuple_New (Length_2D);
          Py_Col_Index   : int := 0;
          Py_Depth_Index : int;
       begin
-         Put_Line (Routine_Name & "Do_Column Py_Row_Index" & int'Image (Py_Row_Index));
+--           Put_Line (Routine_Name & "Do_Column Py_Row_Index" & int'Image (Py_Row_Index));
          for col in Image'Range (2) loop
             Py_Depth_Index := 0;
             --                 Put_Line (Routine_Name & "Py_Col_Index" & int'Image (Py_Col_Index));
@@ -82,7 +82,7 @@ package body U8_Tuple_Builder is
                --              Put_Line (Routine_Name & "Py_Row_Index" & int'Image (Py_Row_Index));
                Py_Col_Index := 0;
 
-               PyTuple_SetItem (Tuple_3D, Py_Col_Index, Do_Column (row, Py_Row_Index));
+               PyTuple_SetItem (Tuple_3D, Py_Col_Index, Do_Column (row));
                Py_Row_Index := Py_Row_Index + 1;
             end loop;
             PyTuple_SetItem (Tuple_4D, Py_Index, Tuple_3D);

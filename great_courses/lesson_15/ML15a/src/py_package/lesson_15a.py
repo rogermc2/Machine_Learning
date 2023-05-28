@@ -21,8 +21,11 @@ def load_image (file_name):
 
 def fit(model, X_train,Y_train, X_test,Y_test):
     print("fit X_train length", len(X_train))
-    print("fit X_train", np.array(X_train).shape)
+    print("fit X_train length[0]", len(X_train[0]))
+    print("fit X_train length[0][0]", len(X_train[0][0]))
+#    print("fit X_train", np.array(X_train).shape)
     model.fit(np.array(X_train), np.array(Y_train), validation_data=(np.array(X_test),np.array(Y_test)))
+    print("fit done")
 
 def predict(clf, features):
     return tuple(clf.predict(features))
