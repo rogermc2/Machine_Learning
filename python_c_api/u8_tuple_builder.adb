@@ -86,7 +86,7 @@ package body U8_Tuple_Builder is
       Put_Line (Routine_Name);
       for index in Data'Range loop
          Image := Data (index);
-         Put_Line (Routine_Name & "Py_Index" & int'Image (Py_Index));
+--           Put_Line (Routine_Name & "Py_Index" & int'Image (Py_Index));
          PyTuple_SetItem (Tuple_4D, Py_Index, Do_Row);
          Py_Index := Py_Index + 1;
       end loop;
