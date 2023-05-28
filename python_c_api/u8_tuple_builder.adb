@@ -44,7 +44,8 @@ package body U8_Tuple_Builder is
       Image        : Image_64_Array;
       Length_2D    : constant int := int (Image'Length (3));
       Length_3D    : constant int := int (Image'Length (2));
-      Tuple_4D     : constant PyObject := PyTuple_New (int (Data'Length));
+      Length_4D    : constant int := int (Data'Length);
+      Tuple_4D     : constant PyObject := PyTuple_New (Length_4D);
 
       function Do_Column (row : Positive) return PyObject is
          Tuple_2D       : constant PyObject := PyTuple_New (Length_2D);
