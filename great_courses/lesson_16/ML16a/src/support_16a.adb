@@ -67,12 +67,12 @@ package body Support_16A is
       Num_Lines    : Natural := 0;
    begin
       Open (File_ID, In_File, File_Name);
-      while not End_Of_File (File_ID) loop
-         Num_Lines := Num_Lines + 1;
-         Skip_Line (File_ID);
-      end loop;
-
-      Reset (File_ID);
+--        while not End_Of_File (File_ID) loop
+--           Num_Lines := Num_Lines + 1;
+--           Skip_Line (File_ID);
+--        end loop;
+--
+--        Reset (File_ID);
       Put_Line (Routine_Name & "processing " & File_Name & ", Num Lines:" &
                   Integer'Image (Num_Lines));
       declare
@@ -91,13 +91,14 @@ package body Support_16A is
 
             declare
                aLine : constant String := Get_Line (File_ID);
-               --  Token arrays are of varying length
-               Token : constant Integer_Array := Tokenize (aLine (3 .. aLine'Last));
---                           Tokenize (aLine (3 .. aLine'Last), Dictionary);
+--                 --  Token arrays are of varying length
+--                 Token : constant Integer_Array := Tokenize (aLine (3 .. aLine'Last));
+--  --                           Tokenize (aLine (3 .. aLine'Last), Dictionary);
             begin
-               --                 Delay (3.0);
-               Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
-               Data.Features.Append (Token);
+               null;
+--                 --                 Delay (3.0);
+--                 Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
+--                 Data.Features.Append (Token);
             end;
 
          end loop;

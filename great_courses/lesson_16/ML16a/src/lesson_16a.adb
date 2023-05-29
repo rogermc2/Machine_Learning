@@ -3,7 +3,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
-with ML_Types;
+--  with ML_Types;
 with Python;
 
 with Support_16A; use Support_16A;
@@ -14,26 +14,16 @@ procedure Lesson_16A is
 --       Read_Vocabulary ("../../data/vocab2.txt");
    --  CB_Data is (dat, labs)
    CB_Data          : constant Data_Items :=
-     Get_Data ("../../data/glove.6B.100d.txt");
-   Rounds           : constant Positive := 1000;
+     Get_Data ("../../data/glove.6B/glove.6B.100d.txt");
    Classifier       : Python.Module;
-   Alpha            : Positive := 5;
-   Alphas           : ML_Types.Integer_List;
-   Result           : ML_Types.Integer_List;
 begin
    Put_Line (Program_Name);
    Python.Initialize;
 
    Classifier := Python.Import_File ("lesson_12a");
-   while Alpha < 200 loop
-      Put ("*");
-      Alpha := Alpha + 5;
-      Alphas.Append (Alpha);
-      Result.Append (Play_Game (Classifier, Rounds, CB_Data, Alpha));
-   end loop;
    New_Line;
 
-   Python.Call (Classifier, "plot", Alphas, Result);
+--     Python.Call (Classifier, "plot", Alphas, Result);
 
    Python.Close_Module (Classifier);
    Python.Finalize;
