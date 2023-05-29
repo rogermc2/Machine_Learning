@@ -217,6 +217,8 @@ package body Tuple_Builder is
          end loop;
       end if;
       
+      Py_DecRef (Item);
+      
       return Result;
 
    end To_Tuple;

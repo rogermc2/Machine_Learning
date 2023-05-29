@@ -1,6 +1,4 @@
 
---  with System;
-
 with Interfaces.C;
 
 with Ada.Text_IO; use Ada.Text_IO;

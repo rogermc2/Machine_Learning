@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from PIL import Image
 from sklearn import tree
@@ -19,27 +20,28 @@ def load_image (file_name):
     img.close()
     return tuple(img_list);
 
+def flatten(atuple, count):
+    count=count+1
+    print(count)
+    if isinstance(atuple, tuple) and len(atuple) == 2 and not isinstance(atuple[0], tuple):
+        res = [atuple]
+        return tuple(res)
+ 
+    res = []
+    for sub in atuple:
+        res += flatten(sub, count)
+    return tuple(res)
+    
 def fit(model, X_train,Y_train, X_test,Y_test):
     print("fit X_train length", len(X_train))
     print("fit X_train[0] length", len(X_train[0]))
     print("fit X_train[0][0] length", len(X_train[0][0]))
     print("fit X_train[0][0][0] length", len(X_train[0][0][0]))
     print("fit X_train [0][0][0] length printed")
-#    print("fit X_train [0][0][0]", X_train[0][0][0])
-#    print("fit X_train [0][0][1]", X_train[0][0][1])
-#    print("fit X_train [0][0][2]", X_train[0][0][2])
-#    for i in range(len(X_train)):
-#        print("fit X_train[i]", len(X_train[i]))
-#        for j in range(len(X_train[i])):
-#            print("fit X_train[i][j]", len(X_train[i][j]))
-#            tup=X_train[i][j]
-#            print("fit tup length", len(tup))
-#            print("fit tup", tup)
-#            for k in range(len(X_train[i][j])):
-#                print("fit X_train[i][j][k]", X_train[i][j][k])
-#                img_2d  = np.array(X_train[i][j])
-#        img_list.append(img_2d)
-#    print("fit img_2d", img_2d.shape)
+
+    sys.setrecursionlimit(14000)
+    print("flatten recursionlimit set")
+    flat = flatten(X_train, 0)
     X3=X_train[0][0][0]
     print("fit X3 type", type(X3))
     print("fit X3 length", len(X3))
