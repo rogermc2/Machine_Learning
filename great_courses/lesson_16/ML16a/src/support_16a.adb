@@ -1,8 +1,13 @@
 
 with System;
 
+with Interfaces.C;
+
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Streams;
+with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -18,9 +23,9 @@ package body Support_16A is
    Num_Known   : Natural := 0;
    Num_Unknown : Natural := 0;
 
-   function Tokenize (aLine : String; Dictionary : Dictionary_List)
-                      return Integer_Array;
-   pragma Inline (Tokenize);
+   --     function Tokenize (aLine : String; Dictionary : Dictionary_List)
+   --                        return Integer_Array;
+   --     pragma Inline (Tokenize);
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
@@ -39,6 +44,102 @@ package body Support_16A is
    pragma Inline (Arg_Max);
 
    --  -------------------------------------------------------------------------
+
+   function Call_Object (PyFunc : Python_API.PyObject)
+                         return Python_API.PyObject is
+      use Interfaces.C;
+      use type System.Address;
+      use Python_API;
+      Routine_Name : constant String := "Support_16A.Call_Object ";
+      PyParams     : PyObject;
+      PyResult     : PyObject;
+   begin
+      Assert (PyFunc /= System.Null_Address, Routine_Name & "PyFunc is null.");
+      Assert (PyCallable_Check (PyFunc) /= 0, Routine_Name &
+                "PyCallable_Check is null.");
+      PyResult := PyObject_CallObject (PyFunc, PyParams);
+
+      if PyResult = System.Null_Address then
+         New_Line;
+         Put_Line (Routine_Name & "Python error message:");
+         PyErr_Print;
+         raise Python_CLF.Interpreter_Error with Routine_Name & "failed.";
+      end if;
+
+      return PyResult;
+
+   exception
+      when E : others =>
+         raise Python_CLF.Interpreter_Error with Routine_Name & "exception: " &
+           Exception_Message (E);
+
+   end Call_Object;
+
+   --  -------------------------------------------------------------------------
+
+   function Call_Python (M : Python.Module; Function_Name : String)
+                         return Newsgroups_Record is
+      use Interfaces.C;
+      use Python_API;
+
+      --        function Py_BuildValue (Format : char_array; A : PyObject)
+      --                                return PyObject;
+      --        pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      function Parse_Tuple (Tuple : PyObject) return Newsgroups_Record is
+         --           use ML_Types;
+         --           Routine_Name : constant String := "Parsers.Parse_Tuple IL2D  ";
+         --           Tuple_Size     : constant int := PyTuple_Size (Tuple);
+         --           Tuple_Row_Size : constant int := PyTuple_Size (PyTuple_GetItem (Tuple, 1));
+         --           Tuple_Row      : PyObject;
+         --           Tuple_Item     : PyObject;
+         --           Result_Row     : Integer_List;
+         --           Value          : Integer;
+         Result         : Newsgroups_Record;
+      begin
+         Result.Data := PyTuple_GetItem (Tuple, 0);
+         Result.Target := PyTuple_GetItem (Tuple, 1);
+         Result.File_Names := PyTuple_GetItem (Tuple, 2);
+         Result.Descr := PyTuple_GetItem (Tuple, 3);
+         Result.Target_Names := PyTuple_GetItem (Tuple, 4);
+         --           for row in 0 .. Tuple_Size - 1 loop
+         --              Tuple_Row := PyTuple_GetItem (Tuple, row);
+         --              Result_Row.Clear;
+         --              for col in 0 .. Tuple_Row_Size - 1 loop
+         --                 Tuple_Item := PyTuple_GetItem (Tuple_Row, col);
+         --                 Value := Integer (PyLong_AsLong (Tuple_Item));
+         --                 Result_Row.Append (Value);
+         --              end loop;
+
+         --              Result.Append (Result_Row);
+         --           end loop;
+
+         return Result;
+
+      end Parse_Tuple;
+
+      --  ----------------------------------------------------------------------
+
+      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
+      PyParams : PyObject;
+      PyResult : PyObject;
+      Result   : Newsgroups_Record;
+   begin
+      --        PyParams := Py_BuildValue (To_C ("(O)"), A);
+      --        PyResult := Python.Call_Object (F, PyParams);
+      PyResult := Call_Object (F);
+
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+
+      Result := Parse_Tuple (PyResult);
+
+      Py_DecRef (PyResult);
+      return Result;
+
+   end Call_Python;
+
+   -- --------------------------------------------------------------------------
 
    function Find_Item
      (Dictionary : Dictionary_List; Key : Unbounded_String;
@@ -91,14 +192,14 @@ package body Support_16A is
 
             declare
                aLine : constant String := Get_Line (File_ID);
---                 --  Token arrays are of varying length
---                 Token : constant Integer_Array := Tokenize (aLine (3 .. aLine'Last));
---  --                           Tokenize (aLine (3 .. aLine'Last), Dictionary);
+               --                 --  Token arrays are of varying length
+               --                 Token : constant Integer_Array := Tokenize (aLine (3 .. aLine'Last));
+               --  --                           Tokenize (aLine (3 .. aLine'Last), Dictionary);
             begin
                null;
---                 --                 Delay (3.0);
---                 Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
---                 Data.Features.Append (Token);
+               --                 --                 Delay (3.0);
+               --                 Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
+               --                 Data.Features.Append (Token);
             end;
 
          end loop;
@@ -112,54 +213,6 @@ package body Support_16A is
       end;
 
    end Get_Data;
-
-   --  -------------------------------------------------------------------------
-   --  For alpha days the selections are random.
-   function Play_Game (Classifier       : Python.Module; Rounds : Positive;
-                       Labeled_Examples : Data_Items; Alpha : Integer)
-                       return Natural is
-      use System;
-      use ML_Types;
-      Routine_Name : constant String := "Support_16A.Play_Game ";
-      Num_Items    : constant Positive := 5;  -- b
-      Clf          : constant Python_API.PyObject :=
-                       Python.Call (Classifier, "init_multinomialnb1");
-      Train_Set    : Integer_List_2D;
-      Train_Labels : Integer_List;
-      Current_Item : Positive := 1;
-      Item         : Integer;
-      Chosen_Label : Natural;
-      Score        : Natural := 0;
-   begin
-      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-
-      while Current_Item < Rounds loop
-         Item := ProbA_Chooser
-           (Classifier, Current_Item, Num_Items, Labeled_Examples, Train_Set,
-            Train_Labels, Alpha, Clf);
-         Chosen_Label := Labeled_Examples.Labels (Item, 1);
-         Score := Score + Chosen_Label;
-         Train_Labels.Append (Chosen_Label);
-
-         declare
-            Features   : constant Integer_Array :=
-                           Labeled_Examples.Features (Item);
-            Train_Item : Integer_List;
-         begin
-            for col in Features'Range loop
-               Train_Item.Append (Features (col));
-            end loop;
-
-            --  Maximum length of Train_Set is Rounds / B
-            Train_Set.Append (Train_Item);
-         end;
-
-         Current_Item := Current_Item + Num_Items;
-      end loop;
-
-      return Score;
-
-   end Play_Game;
 
    --  -------------------------------------------------------------------------
    --  ProbA_Chooser chooses between B options.
@@ -259,6 +312,24 @@ package body Support_16A is
       return Vocab_Dictionary;
 
    end Read_Vocabulary;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Save_Data (Data : Newsgroups_Record; File_Name : String) is
+      use Ada.Streams.Stream_IO;
+      Routine_Name : constant String := "Support_16A.Save_Data ";
+      File_ID      : Ada.Streams.Stream_IO.File_Type;
+      Data_Stream  : Stream_Access;
+   begin
+      Create (File_ID, Out_File, File_Name);
+      Data_Stream := Stream (File_ID);
+      Newsgroups_Record'Write (Data_Stream, Data);
+      Close (File_ID);
+      pragma Unreferenced (File_ID);
+
+      Put_Line (Routine_Name & File_Name & " written");
+
+   end Save_Data;
 
    --  -------------------------------------------------------------------------
 
