@@ -217,6 +217,8 @@ package body Tuple_Builder is
          end loop;
       end if;
       
+      Py_DecRef (Item);
+      
       return Result;
 
    end To_Tuple;
@@ -278,28 +280,6 @@ package body Tuple_Builder is
       when E : others =>
          Put_Line (Routine_Name & "error" & Exception_Message (E));
          raise;
-
-   end To_Tuple;
-
-   --  -------------------------------------------------------------------------
-
-   function To_Tuple (Data : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) 
-                      return PyObject is
-      use ML_Arrays_And_Matrices;
-      --        Routine_Name : constant String := "Python.To_Tuple Integer_Array_3D ";
-      Array_Length : constant Positive := Data'Length (1) * Data'Length (2);
-      Array_2D     : Integer_Matrix (1 .. Array_Length, Data'Range (3));
-   begin
-      for row in Data'Range loop
-         for col in Data'Range (2) loop
-            for depth in Data'Range (3) loop
-               Array_2D ((row - 1) * Data'Length (2) + col, depth) :=
-                 Integer (Data (row, col, depth));
-            end loop;
-         end loop;
-      end loop;
-
-      return To_Tuple (Array_2D);
 
    end To_Tuple;
 

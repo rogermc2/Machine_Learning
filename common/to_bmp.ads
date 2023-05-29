@@ -1,13 +1,11 @@
 
-with Interfaces;
+with ML_U8_Types;
 
 package To_BMP is
 
-   type Image_Array is array (Integer range <>, Integer range <>,
-                              Integer range <>) of Interfaces.Unsigned_8;
-
    Unsupported_Image_Format : exception;
 
-   function Process (Image_File_Name : String) return Image_Array;
+   function Process (Image_File_Name : String; Show_Name : Boolean := True)
+                     return ML_U8_Types.Image_Array;
 
 end To_BMP;

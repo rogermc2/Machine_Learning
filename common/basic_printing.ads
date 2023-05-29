@@ -2,6 +2,7 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with ML_Types;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_U8_Types;
 with NL_Types;
 
 package Basic_Printing is
@@ -12,7 +13,7 @@ package Basic_Printing is
                                  aList : NL_Types.Boolean_List);
    procedure Print_Boolean_Array (Name  : String; anArray : Boolean_Array;
                                   Start : Positive := 1; Finish : Natural := 0);
-   procedure Print_Byte_Array (Name  : String; anArray : Byte_Array;
+   procedure Print_Byte_Array (Name  : String; anArray : ML_U8_Types.Byte_Array;
                                Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
                                 Start : Positive := 1; Finish : Natural := 0);
@@ -63,8 +64,8 @@ package Basic_Printing is
                                       aMatrix : Integer_Matrix);
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Real_Float_Matrix);
-   procedure Print_Matrix_Dimensions (Name    : String;
-                                      aMatrix : Unsigned_8_Array_3D);
+   procedure Print_Matrix_Dimensions
+     (Name    : String; aMatrix : ML_U8_Types.Unsigned_8_Array_3D);
    procedure Print_Real_Float_List
      (Name  : String; aList : Real_Float_List;
       Start : Positive := 1; Finish : Natural := 0);

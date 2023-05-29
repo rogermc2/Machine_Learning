@@ -1,11 +1,12 @@
 
 with ML_Arrays_And_Matrices; use  ML_Arrays_And_Matrices;
+with ML_U8_Types;
 
 package ML is
 
-   function Composite (Mask, Foreground : Unsigned_8_Array_3D;
-                       Background : Unsigned_8_Array_3D)
-                       return Unsigned_8_Array_3D;
+   function Composite
+     (Mask, Foreground, Background : ML_U8_Types.Unsigned_8_Array_3D)
+      return ML_U8_Types.Unsigned_8_Array_3D;
 
    procedure Fit (Weights : in out Real_Float_Vector; All_Data: Integer_Matrix;
                   Labels  : Integer_Array; Verbose : Boolean := False);

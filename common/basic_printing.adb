@@ -85,7 +85,7 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Byte_Array (Name  : String; anArray : Byte_Array;
+   procedure Print_Byte_Array (Name  : String; anArray : ML_U8_Types.Byte_Array;
                                Start : Positive := 1; Finish : Natural := 0) is
       Last  : Positive;
       Count : Positive := 1;
@@ -594,8 +594,8 @@ package body Basic_Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Matrix_Dimensions (Name    : String;
-                                      aMatrix : Unsigned_8_Array_3D) is
+   procedure Print_Matrix_Dimensions
+     (Name    : String; aMatrix : ML_U8_Types.Unsigned_8_Array_3D) is
    begin
       Put (Name & " dimensions:");
       Put_Line (Integer'Image (aMatrix'Length) & "  x" &

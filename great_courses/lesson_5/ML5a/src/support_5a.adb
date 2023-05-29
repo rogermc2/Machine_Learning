@@ -1,56 +1,21 @@
 
-with Interfaces.C;
+--  with Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Handling;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Python_API;
 with To_BMP;
-with Tuple_Builder;
 
 package body Support_5A is
 
-   procedure Call (M : Python.Module; Function_Name : String;
-                   A : ML_Arrays_And_Matrices.Unsigned_8_Array_3D) is
-      use Interfaces.C;
-      use Python_API;
-      use Tuple_Builder;
-
-      function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              T1      : PyObject;
-                              I1      : int) return PyObject;
-      pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      --        Routine_Name : constant String := "Python.Call U8_3D ";
-      F            : PyObject;
-      Row_Length   : constant int := int (A'Length (2));
-      A_Tuple      : PyObject;
-      PyParams     : PyObject;
-      PyResult     : PyObject;
-   begin
-      F := Python.Get_Symbol (M, Function_Name);
-      A_Tuple := To_Tuple (A);
-      PyParams := Py_BuildValue (Interfaces.C.To_C ("Oi"),
-                                 A_Tuple, Row_Length);
-      PyResult := Python.Call_Object (F, PyParams);
-
-      Py_DecRef (F);
-      Py_DecRef (A_Tuple);
-      Py_DecRef (PyParams);
-      Py_DecRef (PyResult);
-
-   end Call;
-
-   --  -------------------------------------------------------------------------
-
    function Get_Pixels
-     (Image                     : Unsigned_8_Array_3D;
+     (Image                     : ML_U8_Types.Unsigned_8_Array_3D;
       First_Row, Last_Row       : Positive;
       First_Column, Last_Column : Positive; D3 : Positive := 3)
-      return Unsigned_8_Array_3D is
+      return ML_U8_Types.Unsigned_8_Array_3D is
       Routine_Name : constant String := "Support_5A.Get_Pixels ";
-      Part         : Unsigned_8_Array_3D
+      Part         : ML_U8_Types.Unsigned_8_Array_3D
         (1 .. Last_Row - First_Row + 1, 1 .. Last_Column - First_Column + 1,
          1 .. D3);
       Part_Row     : Natural := 0;
@@ -78,9 +43,11 @@ package body Support_5A is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Picture (File_Name : String) return Unsigned_8_Array_3D is
+   function Get_Picture (File_Name : String)
+                         return ML_U8_Types.Unsigned_8_Array_3D is
       use Ada.Characters.Handling;
-      Routine_Name    : constant String := "Support_5A.Get_Pixels ";
+      use ML_U8_Types;
+      Routine_Name    : constant String := "Support_5A.Get_Picture ";
       File_Name_Upper : constant String := To_Upper (File_Name);
       File_Kind       : constant String :=
                           File_Name_Upper
@@ -150,7 +117,8 @@ package body Support_5A is
 
    --  -------------------------------------------------------------------------
 
-   function To_2D (From : Unsigned_8_Array_3D) return Integer_Matrix is
+   function To_2D (From : ML_U8_Types.Unsigned_8_Array_3D)
+                   return Integer_Matrix is
       M2 : Integer_Matrix (1 .. From'Length * From'Length (2), From'Range (3));
    begin
       for row in From'Range loop
@@ -183,12 +151,13 @@ package body Support_5A is
 
    function To_Picture (Flat_Data     : Integer_Matrix;
                         Height, Width : Positive; Weights : Real_Float_Vector)
-                     return Unsigned_8_Array_3D is
+                     return ML_U8_Types.Unsigned_8_Array_3D is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Support_5A.To_Picture ";
       Out_Data     : constant Boolean_Array :=
                        To_Boolean (To_Real_Float_Matrix (Flat_Data) * Weights);
-      Result       : Unsigned_8_Array_3D (1 .. Height, 1 .. Width, 1 .. 3);
+      Result       : ML_U8_Types.Unsigned_8_Array_3D
+        (1 .. Height, 1 .. Width, 1 .. 3);
    begin
       for row in Result'Range loop
          for col in Result'Range (2) loop
