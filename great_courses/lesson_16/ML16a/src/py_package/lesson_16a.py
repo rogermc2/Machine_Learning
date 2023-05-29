@@ -9,7 +9,7 @@ from keras.models import Model
 from keras.initializers import Constant
 from matplotlib import pyplot as plt
 
-def fetch_newsgroups();
+def fetch_newsgroups():
     groups = ['rec.sport.baseball', 'rec.sport.hockey']
     return fetch_20newsgroups(subset='all', remove = ['headers', 'footers', 'quotes'], categories = groups)
 

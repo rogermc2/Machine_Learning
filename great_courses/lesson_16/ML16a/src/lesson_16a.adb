@@ -20,7 +20,7 @@ begin
    Put_Line (Program_Name);
    Python.Initialize;
 
-   Classifier := Python.Import_File ("lesson_12a");
+   Classifier := Python.Import_File ("lesson_16a");
    New_Line;
 
 --     Python.Call (Classifier, "plot", Alphas, Result);

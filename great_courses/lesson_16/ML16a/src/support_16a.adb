@@ -67,12 +67,12 @@ package body Support_16A is
       Num_Lines    : Natural := 0;
    begin
       Open (File_ID, In_File, File_Name);
---        while not End_Of_File (File_ID) loop
---           Num_Lines := Num_Lines + 1;
---           Skip_Line (File_ID);
---        end loop;
---
---        Reset (File_ID);
+      while not End_Of_File (File_ID) loop
+         Num_Lines := Num_Lines + 1;
+         Skip_Line (File_ID);
+      end loop;
+
+      Reset (File_ID);
       Put_Line (Routine_Name & "processing " & File_Name & ", Num Lines:" &
                   Integer'Image (Num_Lines));
       declare
@@ -85,7 +85,7 @@ package body Support_16A is
          while not End_Of_File (File_ID) loop
             Row := Row + 1;
             Num_Lines := Num_Lines + 1;
-            if Num_Lines mod 100 = 0 then
+            if Num_Lines mod 1000 = 0 then
                Put ("*");
             end if;
 
