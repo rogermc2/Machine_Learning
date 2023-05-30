@@ -168,6 +168,7 @@ package body Support_16A is
       File_ID      : File_Type;
       Num_Lines    : Natural := 0;
    begin
+      Put_Line (Routine_Name & "reading " & File_Name);
       Open (File_ID, In_File, File_Name);
       while not End_Of_File (File_ID) loop
          Num_Lines := Num_Lines + 1;
