@@ -31,8 +31,6 @@ package Support_16A is
      Ada.Containers.Doubly_Linked_Lists (Dictionary_Record);
    subtype Dictionary_List is Dictionary_Package.List;
 
-   function Call_Python (M : Python.Module; Function_Name : String)
-                         return Newsgroups_Record;
    function ProbA_Chooser
      (Classifier       : Python.Module;
       Current_Item     : Positive; Num_Items : Positive;
