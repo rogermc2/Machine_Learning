@@ -16,7 +16,8 @@ def fetch_newsgroups():
     print ("fetch_newsgroups newsgroups loaded")
     print ("newsgroups", newsgroups.__dir__())
     print("newsgroups dir", dir())
-    return (newsgroups)
+    print("newsgroups type", type(newsgroups))
+    return tuple(newsgroups)
 
 def init_multinomialnb1():
     return MultinomialNB()

@@ -3,6 +3,7 @@ with System;
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Directories; use Ada.Directories;
 --  with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Streams;
 with Ada.Streams.Stream_IO;
@@ -12,6 +13,7 @@ with Maths;
 
 --  with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
+with Python_16A;
 with Python_CLF;
 
 package body Support_16A is
@@ -120,7 +122,8 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
-   function Load_Data (File_Name : String) return Newsgroups_Record is
+   function Load_Data (Classifier : Python.Module; File_Name : String;
+                       Reload : Boolean := False) return Newsgroups_Record is
       use Ada.Streams;
       use Stream_IO;
       Routine_Name  : constant String := "Support_16A.Load_Data ";
@@ -128,11 +131,18 @@ package body Support_16A is
       aStream       : Stream_Access;
       Data          : Newsgroups_Record;
    begin
-      Put_Line (Routine_Name & "restoring from " & File_Name);
-      Open (File_ID, In_File, File_Name);
-      aStream := Stream (File_ID);
-      Newsgroups_Record'Read (aStream, Data);
-      Close (File_ID);
+      if Exists (File_Name) and not Reload then
+         Put_Line (Routine_Name & "restoring from " & File_Name);
+         Open (File_ID, In_File, File_Name);
+         aStream := Stream (File_ID);
+         Newsgroups_Record'Read (aStream, Data);
+         Close (File_ID);
+
+      else
+         Put_Line (Routine_Name & "reading " & File_Name);
+         Save_Data (Python_16A.Call (Classifier, "fetch_newsgroups"),
+                    File_Name);
+      end if;
 
       return Data;
 
@@ -161,8 +171,8 @@ package body Support_16A is
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);
       NIM1             : constant Natural := Num_Items - 1;
       Examples_Batch   : constant Integer_Array_List :=
-        Slice (Labeled_Examples.Features,
-               Current_Item, Current_Item + NIM1);
+                           Slice (Labeled_Examples.Features,
+                                  Current_Item, Current_Item + NIM1);
       --  Y_Hat predictions
       Y_Hat            : Real_Float_Matrix (1 .. Num_Items, 1 .. 2);
       Indices          : Integer_Array (Y_Hat'Range);
@@ -214,11 +224,11 @@ package body Support_16A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant Unbounded_String :=
-              To_Unbounded_String (Get_Line (File_ID));
+                      To_Unbounded_String (Get_Line (File_ID));
             Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
             Token : constant Unbounded_String :=
-              To_Unbounded_String
-                (Slice (aLine, 6, Length (aLine) - 1));
+                      To_Unbounded_String
+                        (Slice (aLine, 6, Length (aLine) - 1));
          begin
             if Count > 1 then
                Item :=  (Token, Lexicon_Size);
@@ -271,7 +281,7 @@ package body Support_16A is
       Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
       Unknown_Val  : constant Integer := Item.Value;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-        (others => 0);
+                       (others => 0);
       Word         : Unbounded_String;
    begin
       pragma Warnings (Off, Unknown_Item);
