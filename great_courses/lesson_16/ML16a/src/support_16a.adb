@@ -48,6 +48,7 @@ package body Support_16A is
    function Call_Object (PyFunc : Python_API.PyObject)
                          return Python_API.PyObject is
       use Interfaces.C;
+--        use Ada.Assertions;
       use type System.Address;
       use Python_API;
       Routine_Name : constant String := "Support_16A.Call_Object ";
@@ -130,7 +131,7 @@ package body Support_16A is
       PyResult := Call_Object (F);
 
       Py_DecRef (F);
-      Py_DecRef (PyParams);
+      --        Py_DecRef (PyParams);
 
       Result := Parse_Tuple (PyResult);
 
@@ -215,6 +216,26 @@ package body Support_16A is
    end Get_Data;
 
    --  -------------------------------------------------------------------------
+
+   function Load_Data (File_Name : String) return Newsgroups_Record is
+      use Ada.Streams;
+      use Stream_IO;
+      Routine_Name  : constant String := "Support_16A.Load_Data ";
+      File_ID       : Stream_IO.File_Type;
+      aStream       : Stream_Access;
+      Data          : Newsgroups_Record;
+   begin
+      Put_Line (Routine_Name & "restoring from " & File_Name);
+      Open (File_ID, In_File, File_Name);
+      aStream := Stream (File_ID);
+      Newsgroups_Record'Read (aStream, Data);
+      Close (File_ID);
+
+      return Data;
+
+   end Load_Data;
+
+   --  -------------------------------------------------------------------------
    --  ProbA_Chooser chooses between B options.
    --  Current_Item is the initial item to consider.
    --  Train_Set represents the results of previous selections.
@@ -236,8 +257,8 @@ package body Support_16A is
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);
       NIM1             : constant Natural := Num_Items - 1;
       Examples_Batch   : constant Integer_Array_List :=
-                           Slice (Labeled_Examples.Features,
-                                  Current_Item, Current_Item + NIM1);
+        Slice (Labeled_Examples.Features,
+               Current_Item, Current_Item + NIM1);
       --  Y_Hat predictions
       Y_Hat            : Real_Float_Matrix (1 .. Num_Items, 1 .. 2);
       Indices          : Integer_Array (Y_Hat'Range);
@@ -289,11 +310,11 @@ package body Support_16A is
       while not End_Of_File (File_ID) loop
          declare
             aLine : constant Unbounded_String :=
-                      To_Unbounded_String (Get_Line (File_ID));
+              To_Unbounded_String (Get_Line (File_ID));
             Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
             Token : constant Unbounded_String :=
-                      To_Unbounded_String
-                        (Slice (aLine, 6, Length (aLine) - 1));
+              To_Unbounded_String
+                (Slice (aLine, 6, Length (aLine) - 1));
          begin
             if Count > 1 then
                Item :=  (Token, Lexicon_Size);
@@ -346,7 +367,7 @@ package body Support_16A is
       Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
       Unknown_Val  : constant Integer := Item.Value;
       Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-                       (others => 0);
+        (others => 0);
       Word         : Unbounded_String;
    begin
       pragma Warnings (Off, Unknown_Item);

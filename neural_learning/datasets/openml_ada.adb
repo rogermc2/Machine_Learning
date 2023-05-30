@@ -244,8 +244,6 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    procedure Get_OML (File_Name : String;
-                      --                        X_Indices : out Integer_List;
-                      --                        Y_Indices : out Integer_List;
                       Bunch     : out Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
@@ -256,8 +254,6 @@ package body Openml_Ada is
       Put_Line (Routine_Name & "Reading OML file " & File_Name);
       Open (File_ID, In_File, File_Name);
       aStream := Stream (File_ID);
-      --        Integer_List'Read (aStream, X_Indices);
-      --        Integer_List'Read (aStream, Y_Indices);
       Bunch_Data'Read (aStream, Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);

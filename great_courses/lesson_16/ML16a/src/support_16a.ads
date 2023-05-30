@@ -41,6 +41,7 @@ package Support_16A is
       Train_Labels     : ML_Types.Integer_List; Alpha : Integer;
       Clf              : Python_API.PyObject) return Integer;
    function Get_Data (File_Name : String) return Data_Items;
+   function Load_Data (File_Name : String) return Newsgroups_Record;
    function Read_Vocabulary (File_Name : String) return Dictionary_List;
    procedure Save_Data (Data : Newsgroups_Record; File_Name : String);
 

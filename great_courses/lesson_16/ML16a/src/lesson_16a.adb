@@ -20,16 +20,17 @@ procedure Lesson_16A is
 begin
    Put_Line (Program_Name);
    Python.Initialize;
-
    Classifier := Python.Import_File ("lesson_16a");
+
    if Exists (Newsgroups_File) then
-      null;
+      Newsgroups := Load_Data (Newsgroups_File);
+
    else
-      Put_Line (Program_Name & "Reading data file " & Newsgroups_File);
+      Put_Line (Program_Name & "reading " & Newsgroups_File);
       Newsgroups := Call_Python (Classifier, "fetch_newsgroups");
       Save_Data (Newsgroups, Newsgroups_File);
-      Put_Line (Program_Name & Newsgroups_File & " file read");
    end if;
+   Put_Line (Program_Name  & " Newsgroups file read");
    New_Line;
 
 --     Python.Call (Classifier, "plot", Alphas, Result);
