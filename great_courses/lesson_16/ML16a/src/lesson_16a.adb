@@ -3,7 +3,7 @@ with Ada.Directories; use Ada.Directories;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use  Basic_Printing;
+with Basic_Printing; use  Basic_Printing;
 with Python;
 
 with Python_16A;
@@ -30,7 +30,10 @@ begin
       Newsgroups := Python_16A.Call (Classifier, "fetch_newsgroups");
       Save_Data (Newsgroups, Newsgroups_File);
    end if;
-   Put_Line (Program_Name  & " Newsgroups file read");
+   Put_Line (Program_Name  & "Newsgroups file read");
+   Put_Line (Program_Name  & "Newsgroups.Data length" &
+               Integer'Image (Integer (Newsgroups.Data.Length)));
+   Print_Unbound_List (Program_Name & "Newsgroups.Data", Newsgroups.Data);
    New_Line;
 
 --     Python.Call (Classifier, "plot", Alphas, Result);

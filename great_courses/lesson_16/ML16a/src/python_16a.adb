@@ -87,18 +87,16 @@ package body Python_16A is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use Python_API;
-      Tuple_Size     : constant int := PyTuple_Size (Tuple);
---        Tuple_Row_Size : constant int := PyTuple_Size (PyTuple_GetItem (Tuple, 1));
---        Tuple_Row      : PyObject;
-      Tuple_Item     : PyObject;
---        Result_Row     : Integer_List;
-      Value_Ptr : access char_array;
-      Value     : Unbounded_String;
-      Data_List : Unbounded_List;
+--        Routine_Name : constant String := "Python_16A.Parse_Tuple  ";¿
+      Tuple_Size   : constant int := PyTuple_Size (Tuple);
+      Tuple_Item    : PyObject;
+      Value_Ptr     : access char_array;
+      Data_List     : Unbounded_List;
    begin
       for index in 0 .. Tuple_Size - 1 loop
          Tuple_Item := PyTuple_GetItem (Tuple, index);
          Value_Ptr := PyBytes_AsString (Tuple_Item);
+         Data_List.Append (To_Unbounded_String (To_Ada (Value_Ptr.all)));
       end loop;
 
       return Data_List;
@@ -109,9 +107,8 @@ package body Python_16A is
 
    function Parse_Tuple (Tuple : Python_API.PyObject)
                          return Support_16A.Newsgroups_Record is
-      --           use ML_Types;
       use Python_API;
-      --           Routine_Name : constant String := "Parsers.Parse_Tuple IL2D  ";
+      --           Routine_Name : constant String := "Python_16A.Parse_Tuple  ";
       Result         : Support_16A.Newsgroups_Record;
    begin
       Result.Data := Parse_Text_Tuple (PyTuple_GetItem (Tuple, 0));
@@ -119,17 +116,6 @@ package body Python_16A is
       Result.File_Names := PyTuple_GetItem (Tuple, 2);
       Result.Descr := PyTuple_GetItem (Tuple, 3);
       Result.Target_Names := PyTuple_GetItem (Tuple, 4);
-      --           for row in 0 .. Tuple_Size - 1 loop
-      --              Tuple_Row := PyTuple_GetItem (Tuple, row);
-      --              Result_Row.Clear;
-      --              for col in 0 .. Tuple_Row_Size - 1 loop
-      --                 Tuple_Item := PyTuple_GetItem (Tuple_Row, col);
-      --                 Value := Integer (PyLong_AsLong (Tuple_Item));
-      --                 Result_Row.Append (Value);
-      --              end loop;
-
-      --              Result.Append (Result_Row);
-      --           end loop;
 
       return Result;
 
