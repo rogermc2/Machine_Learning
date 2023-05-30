@@ -21,7 +21,7 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_16a");
 
-   Newsgroups := Load_Data (Classifier, Newsgroups_File);
+   Newsgroups := Load_Data (Classifier, Newsgroups_File, True);
 
    Put_Line (Program_Name  & "Newsgroups file read");
    Put_Line (Program_Name  & "Newsgroups.Data length" &

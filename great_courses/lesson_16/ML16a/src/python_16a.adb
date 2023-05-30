@@ -83,20 +83,51 @@ package body Python_16A is
 
    function Parse_Text_Tuple (Tuple : Python_API.PyObject_Ptr)
                               return ML_Types.Unbounded_List is
+      use System;
       use Interfaces.C;
       use Ada.Strings.Unbounded;
       use ML_Types;
       use Python_API;
---        Routine_Name : constant String := "Python_16A.Parse_Tuple  ";¿
+      Routine_Name : constant String := "Python_16A.Parse_Text_Tuple  ";
       Tuple_Size   : constant int := PyTuple_Size (Tuple);
-      Tuple_Item    : PyObject_Ptr;
-      Value_Ptr     : access char_array;
-      Data_List     : Unbounded_List;
+      Tuple_Item   : PyObject_Ptr;
+      Value_Ptr    : access char_array;
+      aChar        : String (1 .. 1);
+      Char_1       : String (1 .. 1);
+      Text         : Unbounded_String;
+      Data_List    : Unbounded_List;
+      Done         : Boolean := False;
    begin
+      Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
+      Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuple_Size));
       for index in 0 .. Tuple_Size - 1 loop
+         Put_Line (Routine_Name & "index" & int'Image (index));
          Tuple_Item := PyTuple_GetItem (Tuple, index);
+         Put_Line (Routine_Name & "Tuple_Item set");
          Value_Ptr := PyBytes_AsString (Tuple_Item);
-         Data_List.Append (To_Unbounded_String (To_Ada (Value_Ptr.all)));
+         Put_Line (Routine_Name & "Value_Ptr set");
+         aChar (1) := To_Ada (Value_Ptr(1));
+         Append (Text, aChar);
+         while not Done loop
+            if aChar /= "/" then
+               Append (Text, aChar);
+               Value_Ptr := Value_Ptr + 1;
+               aChar (1) := To_Ada (Value_Ptr(1));
+            else
+               Value_Ptr := Value_Ptr + 1;
+               Char_1 (1) := To_Ada (Value_Ptr(1));
+               Done := Char_1 = "0";
+               if not Done then
+                  Append (Text, aChar);
+                  Append (Text, Char_1);
+                  Value_Ptr := Value_Ptr + 1;
+                  aChar (1) := To_Ada (Value_Ptr(1));
+               end if;
+            end if;
+         end loop;
+
+         Data_List.Append (Text);
+         Put_Line (Routine_Name & "data addedd to Data_List");
       end loop;
 
       return Data_List;
@@ -107,15 +138,18 @@ package body Python_16A is
 
    function Parse_Tuple (Tuple : Python_API.PyObject_Ptr)
                          return Support_16A.Newsgroups_Record is
+      use Interfaces.C;
       use Python_API;
-      --           Routine_Name : constant String := "Python_16A.Parse_Tuple  ";
-      Result         : Support_16A.Newsgroups_Record;
+      Routine_Name : constant String := "Python_16A.Parse_Tuple  ";
+      Tuple_Size   : constant int := PyTuple_Size (Tuple);
+      Result       : Support_16A.Newsgroups_Record;
    begin
+      Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuple_Size));
       Result.Data := Parse_Text_Tuple (PyTuple_GetItem (Tuple, 0));
       Result.Target := PyTuple_GetItem (Tuple, 1);
-      Result.File_Names := PyTuple_GetItem (Tuple, 2);
-      Result.Descr := PyTuple_GetItem (Tuple, 3);
-      Result.Target_Names := PyTuple_GetItem (Tuple, 4);
+--        Result.File_Names := PyTuple_GetItem (Tuple, 2);
+--        Result.Descr := PyTuple_GetItem (Tuple, 3);
+--        Result.Target_Names := PyTuple_GetItem (Tuple, 4);
 
       return Result;
 

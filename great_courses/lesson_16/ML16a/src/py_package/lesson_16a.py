@@ -17,7 +17,10 @@ def fetch_newsgroups():
     print ("newsgroups", newsgroups.__dir__())
     print("newsgroups dir", dir())
     print("newsgroups type", type(newsgroups))
-    return tuple(newsgroups)
+    print("newsgroups length", len(newsgroups))
+    print("newsgroups length[0]", len(newsgroups['data']))
+    print("newsgroups length[1]", len(newsgroups['filenames']))
+    return (tuple(newsgroups['data']),tuple(newsgroups['filenames']))
 
 def init_multinomialnb1():
     return MultinomialNB()
