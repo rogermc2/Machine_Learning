@@ -15,19 +15,19 @@ with Python_CLF;
 
 package body Python_16A is
 
-   function Parse_Tuple (Tuple : Python_API.PyObject) return Support_16A.Newsgroups_Record;
+   function Parse_Tuple (Tuple : Python_API.PyObject_Ptr) return Support_16A.Newsgroups_Record;
 
    --  -------------------------------------------------------------------------
 
-   function Call_Object (PyFunc : Python_API.PyObject)
-                         return Python_API.PyObject is
+   function Call_Object (PyFunc : Python_API.PyObject_Ptr)
+                         return Python_API.PyObject_Ptr is
       use Interfaces.C;
       --        use Ada.Assertions;
       use type System.Address;
       use Python_API;
       Routine_Name : constant String := "Support_16A.Call_Object ";
-      PyParams     : PyObject;
-      PyResult     : PyObject;
+      PyParams     : PyObject_Ptr;
+      PyResult     : PyObject_Ptr;
    begin
       Assert (PyFunc /= System.Null_Address, Routine_Name & "PyFunc is null.");
       Assert (PyCallable_Check (PyFunc) /= 0, Routine_Name &
@@ -56,13 +56,13 @@ package body Python_16A is
                   return Support_16A.Newsgroups_Record is
       use Python_API;
 
-      --        function Py_BuildValue (Format : char_array; A : PyObject)
-      --                                return PyObject;
+      --        function Py_BuildValue (Format : char_array; A : PyObject_Ptr)
+      --                                return PyObject_Ptr;
       --        pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
       Result   : Support_16A.Newsgroups_Record;
    begin
       --        PyParams := Py_BuildValue (To_C ("(O)"), A);
@@ -81,7 +81,7 @@ package body Python_16A is
 
    -- --------------------------------------------------------------------------
 
-   function Parse_Text_Tuple (Tuple : Python_API.PyObject)
+   function Parse_Text_Tuple (Tuple : Python_API.PyObject_Ptr)
                               return ML_Types.Unbounded_List is
       use Interfaces.C;
       use Ada.Strings.Unbounded;
@@ -89,7 +89,7 @@ package body Python_16A is
       use Python_API;
 --        Routine_Name : constant String := "Python_16A.Parse_Tuple  ";¿
       Tuple_Size   : constant int := PyTuple_Size (Tuple);
-      Tuple_Item    : PyObject;
+      Tuple_Item    : PyObject_Ptr;
       Value_Ptr     : access char_array;
       Data_List     : Unbounded_List;
    begin
@@ -105,7 +105,7 @@ package body Python_16A is
 
    -- --------------------------------------------------------------------------
 
-   function Parse_Tuple (Tuple : Python_API.PyObject)
+   function Parse_Tuple (Tuple : Python_API.PyObject_Ptr)
                          return Support_16A.Newsgroups_Record is
       use Python_API;
       --           Routine_Name : constant String := "Python_16A.Parse_Tuple  ";

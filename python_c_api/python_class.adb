@@ -14,12 +14,12 @@ package body Python_Class is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; O1 : PyClass)
-                              return PyObject;
+                              return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("(O)"), CLF);
       PyResult := Python.Call_Object (F, PyParams);
@@ -37,11 +37,11 @@ package body Python_Class is
       use Interfaces.C;
 
       function Py_BuildValue (Format   : char_array; O1 : PyClass)
-                              return PyObject;
+                              return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      PyParams : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      PyParams : PyObject_Ptr;
       PyResult : PyClass;
    begin
       PyParams := Py_BuildValue (To_C ("(O)"), CLF);
@@ -60,11 +60,11 @@ package body Python_Class is
                   return PyClass is
       use Interfaces.C;
 
-      function Py_BuildValue (Format : char_array; A : int) return PyObject;
+      function Py_BuildValue (Format : char_array; A : int) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      PyParams : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      PyParams : PyObject_Ptr;
       PyResult : PyClass;
    begin
       PyParams := Py_BuildValue (To_C ("(i)"), int (A));
@@ -85,14 +85,15 @@ package body Python_Class is
 
       --        Routine_Name : constant String := "Python_Class.Call FVL ";
 
-      function Py_BuildValue (Format : char_array; O1 : PyClass; T1 : PyObject)
-                              return PyObject;
+      function Py_BuildValue (Format : char_array; O1 : PyClass;
+                              T1     : PyObject_Ptr) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F            : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple      : constant PyObject := To_Tuple (A);
-      PyParams     : PyObject;
-      Py_Result    : PyObject;
+      F            : constant PyObject_Ptr :=
+                       Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
+      PyParams     : PyObject_Ptr;
+      Py_Result    : PyObject_Ptr;
    begin
       --        Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
@@ -119,13 +120,13 @@ package body Python_Class is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; O1 : PyClass;
-                              T1     : PyObject) return PyObject;
+                              T1     : PyObject_Ptr) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
       PyResult := Python.Call_Object (F, PyParams);
@@ -151,12 +152,12 @@ package body Python_Class is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; O1 : PyClass;
-                              I1     : int) return PyObject;
+                              I1     : int) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("Oi"), CLF, int (A));
       PyResult := Python.Call_Object (F, PyParams);
@@ -181,13 +182,13 @@ package body Python_Class is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; O1 : PyClass;
-                              T1     : PyObject) return PyObject;
+                              T1     : PyObject_Ptr) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
       PyResult := Python.Call_Object (F, PyParams);
@@ -214,13 +215,13 @@ package body Python_Class is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; O1 : PyClass;
-                              T1     : PyObject) return PyObject;
+                              T1     : PyObject_Ptr) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
       PyResult := Python.Call_Object (F, PyParams);
@@ -247,13 +248,13 @@ package body Python_Class is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; O1 : PyClass;
-                              T1     : PyObject) return PyObject;
+                              T1     : PyObject_Ptr) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
       PyResult := Python.Call_Object (F, PyParams);
@@ -279,15 +280,15 @@ package body Python_Class is
                   return PyClass is
       use Interfaces.C;
 
-      function Py_BuildValue (Format : char_array; T1, T2: PyObject)
-                              return PyObject;
+      function Py_BuildValue (Format : char_array; T1, T2: PyObject_Ptr)
+                              return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      B_Tuple  : constant PyObject := To_Tuple (B);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      B_Tuple  : constant PyObject_Ptr := To_Tuple (B);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
       PyResult := Python.Call_Object (F, PyParams);
@@ -308,15 +309,15 @@ package body Python_Class is
                   return PyClass is
       use Interfaces.C;
 
-      function Py_BuildValue (Format : char_array; T1, T2: PyObject)
-                              return PyObject;
+      function Py_BuildValue (Format : char_array; T1, T2: PyObject_Ptr)
+                              return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      B_Tuple  : constant PyObject := To_Tuple (B);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      B_Tuple  : constant PyObject_Ptr := To_Tuple (B);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
       PyResult := Python.Call_Object (F, PyParams);
@@ -337,15 +338,15 @@ package body Python_Class is
                   return PyClass is
       use Interfaces.C;
 
-      function Py_BuildValue (Format : char_array; T1, T2: PyObject)
-                              return PyObject;
+      function Py_BuildValue (Format : char_array; T1, T2: PyObject_Ptr)
+                              return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      B_Tuple  : constant PyObject := To_Tuple (B);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      B_Tuple  : constant PyObject_Ptr := To_Tuple (B);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
       PyResult := Python.Call_Object (F, PyParams);
@@ -367,13 +368,13 @@ package body Python_Class is
       use Interfaces.C;
 
       function Py_BuildValue (Format : char_array; O1 : PyClass;
-                              T1     : PyObject) return PyObject;
+                              T1     : PyObject_Ptr) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject := Python.Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject := To_Tuple (A);
-      PyParams : PyObject;
-      PyResult : PyObject;
+      F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
    begin
       PyParams := Py_BuildValue (To_C ("OO"), CLF, A_Tuple);
       PyResult := Python.Call_Object (F, PyParams);

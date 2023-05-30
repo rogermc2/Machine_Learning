@@ -21,10 +21,10 @@ package Support_16A is
 
    type Newsgroups_Record is record
       Data         : ML_Types.Unbounded_List;
-      Target       : Python_API.PyObject;
-      File_Names   : Python_API.PyObject;
-      Descr        : Python_API.PyObject;
-      Target_Names : Python_API.PyObject;
+      Target       : Python_API.PyObject_Ptr;
+      File_Names   : Python_API.PyObject_Ptr;
+      Descr        : Python_API.PyObject_Ptr;
+      Target_Names : Python_API.PyObject_Ptr;
    end record;
 
    package Dictionary_Package is new
@@ -37,7 +37,7 @@ package Support_16A is
       Labeled_Examples : Data_Items;
       Train_Set        : ML_Types.Integer_List_2D;
       Train_Labels     : ML_Types.Integer_List; Alpha : Integer;
-      Clf              : Python_API.PyObject) return Integer;
+      Clf              : Python_API.PyObject_Ptr) return Integer;
    function Get_Data (File_Name : String) return Data_Items;
    function Load_Data (File_Name : String) return Newsgroups_Record;
    function Read_Vocabulary (File_Name : String) return Dictionary_List;

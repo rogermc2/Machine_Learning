@@ -9,7 +9,7 @@ package Python_U8 is
    procedure Call (M : Python.Module; Function_Name : String;
                    A : Unsigned_8_Array_3D);
    procedure Call (M : Python.Module; Function_Name : String;
-                   A : Python_API.PyObject; B : Image_64_Vector;
+                   A : Python_API.PyObject_Ptr; B : Image_64_Vector;
                    C : Integer_Array; D : Image_64_Vector;
                    E : Integer_Array);
 

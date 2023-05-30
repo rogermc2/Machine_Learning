@@ -154,7 +154,8 @@ package body Support_16A is
       Labeled_Examples : Data_Items;
       Train_Set        : ML_Types.Integer_List_2D;
       Train_Labels     : ML_Types.Integer_List;
-      Alpha            : Integer;  Clf : Python_API.PyObject) return Integer is
+      Alpha            : Integer;  Clf : Python_API.PyObject_Ptr)
+      return Integer is
       use System;
       Routine_Name     : constant String := "Support_16.ProbA_Chooser ";
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);

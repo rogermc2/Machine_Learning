@@ -16,20 +16,21 @@ package body Python_U8 is
       use Interfaces.C;
 
       function Py_BuildValue (Format  : Interfaces.C.char_array;
-                              T1      : PyObject;
-                              I1      : int) return PyObject;
+                              T1      : PyObject_Ptr;
+                              I1      : int) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
 --        Routine_Name : constant String := "Python_U8.Call U8_3D ";
-      F            : PyObject;
+      F            : PyObject_Ptr;
       Row_Length   : constant int := int (A'Length (2));
-      A_Tuple      : PyObject;
-      PyParams     : PyObject;
-      PyResult     : PyObject;
+      A_Tuple      : PyObject_Ptr;
+      PyParams     : PyObject_Ptr;
+      PyResult     : PyObject_Ptr;
    begin
       F := Python.Get_Symbol (M, Function_Name);
       A_Tuple := To_Tuple (A);
-      PyParams := Py_BuildValue (Interfaces.C.To_C ("Oi"), A_Tuple, Row_Length);
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("Oi"), A_Tuple, Row_Length);
       Py_DecRef (A_Tuple);
 
       PyResult := Python.Call_Object (F, PyParams);
@@ -43,23 +44,24 @@ package body Python_U8 is
    --  -------------------------------------------------------------------------
 
    procedure Call (M : Python.Module; Function_Name : String;
-                   A : Python_API.PyObject; B : Image_64_Vector;
+                   A : Python_API.PyObject_Ptr; B : Image_64_Vector;
                    C : Integer_Array; D : Image_64_Vector;
                    E : Integer_Array) is
       use Tuple_Builder;
 
       function Py_BuildValue (Format             : Interfaces.C.char_array;
-                              O1, T1, T2, T3, T4 : PyObject) return PyObject;
+                              O1, T1, T2, T3, T4 : PyObject_Ptr)
+                              return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       --        Routine_Name : constant String := "Python_U8.Call ABCD ";
-      F            : PyObject;
-      B_Tuple      : PyObject;
-      C_Tuple      : PyObject;
-      D_Tuple      : PyObject;
-      E_Tuple      : PyObject;
-      PyParams     : PyObject;
-      PyResult     : PyObject;
+      F            : PyObject_Ptr;
+      B_Tuple      : PyObject_Ptr;
+      C_Tuple      : PyObject_Ptr;
+      D_Tuple      : PyObject_Ptr;
+      E_Tuple      : PyObject_Ptr;
+      PyParams     : PyObject_Ptr;
+      PyResult     : PyObject_Ptr;
    begin
       F := Python.Get_Symbol (M, Function_Name);
       B_Tuple := To_Tuple (B);

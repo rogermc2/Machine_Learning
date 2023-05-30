@@ -10,94 +10,94 @@ package Python_CLF is
 
    Interpreter_Error : exception;
    
-   function Call (M : Python.Module; Function_Name : String; A : PyObject)
-                  return PyObject;
+   function Call (M : Python.Module; Function_Name : String; A : PyObject_Ptr)
+                  return PyObject_Ptr;
    function Call (M : Python.Module; Function_Name : String; A : Positive)
-                  return PyObject;
-   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                  return PyObject_Ptr;
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                    A : Float_Array_List; B : ML_Types.Integer_List);
-   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                    A : Float_Vector_List; B : ML_Types.Integer_List);
    function Call (M   : Python.Module; Function_Name : String;
-                  Obj : PyObject; A : Integer) return Float;
+                  Obj : PyObject_Ptr; A : Integer) return Float;
    function Call (M : Python.Module; Function_Name : String; A, B : Integer)
-                  return PyObject;
+                  return PyObject_Ptr;
    function Call (M   : Python.Module; Function_Name : String;
-                  Obj : PyObject; A, B : Integer) return Float;
-   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                  Obj : PyObject_Ptr; A, B : Integer) return Float;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                   A : Integer_Array_List) return Integer_Matrix;
-   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                   A : Integer_Array_List) return Real_Float_Matrix;
-   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                   A : Float_Vector_List) return Real_Float_Matrix;
-   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                   A : Real_Float_Matrix) return Real_Float_Matrix;
-   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                    A : ML_Types.Integer_List_2D);
-   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                   A : ML_Types.Integer_List_2D) return Integer_Matrix;
-   procedure Call (M    : Python.Module; Function_Name : String; CLF : PyObject;
+   procedure Call (M    : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                    A, B : ML_Types.Integer_List_2D);
-   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                   A : Float_Array_List; B : ML_Types.Integer_List)
-                  return PyObject;
+                  return PyObject_Ptr;
    function Call (M : Python.Module; Function_Name : String;
                   A : Float_Matrix_List; B : ML_Types.Integer_List)
-                  return PyObject;
-   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+                  return PyObject_Ptr;
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                    A : ML_Types.Integer_List_2D; B : ML_Types.Integer_List);
-   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject);
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr);
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject) return Integer_Array;
+                  CLF : PyObject_Ptr) return Integer_Array;
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject; A : Integer_Array_List)
+                  CLF : PyObject_Ptr; A : Integer_Array_List)
                   return Integer_Array;
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject; A : ML_Types.Integer_List)
+                  CLF : PyObject_Ptr; A : ML_Types.Integer_List)
                   return Integer_Array;
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : in out PyObject; A : Integer_Array_List;
+                   CLF : in out PyObject_Ptr; A : Integer_Array_List;
                    B   : ML_Types.Integer_List);
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : in out PyObject; A, B : ML_Types.Integer_List);
+                   CLF : in out PyObject_Ptr; A, B : ML_Types.Integer_List);
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : PyObject; A : Real_Float_List);
+                   CLF : PyObject_Ptr; A : Real_Float_List);
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : PyObject; A : Real_Float_Matrix);
+                   CLF : PyObject_Ptr; A : Real_Float_Matrix);
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : PyObject; A : Real_Float_Matrix;
+                   CLF : PyObject_Ptr; A : Real_Float_Matrix;
                    B   : Boolean_Array); 
-   function Call (M : Python.Module; Function_Name : String; CLF : PyObject;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                   A : Real_Float_Matrix) return Boolean_Array;
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : PyObject; A : Real_Float_Matrix;
+                   CLF : PyObject_Ptr; A : Real_Float_Matrix;
                    B   : Integer_Matrix);
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject; A : Real_Float_Matrix;
+                  CLF : PyObject_Ptr; A : Real_Float_Matrix;
                   B   : Integer_Matrix) return Float;
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : PyObject; A : Real_Float_Matrix;
+                   CLF : PyObject_Ptr; A : Real_Float_Matrix;
                    B   : Real_Float_Vector);
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject; A : Real_Float_List)
+                  CLF : PyObject_Ptr; A : Real_Float_List)
                   return Real_Float_Vector;
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject; A : Float_Array) return Real_Float_Matrix;
+                  CLF : PyObject_Ptr; A : Float_Array) return Real_Float_Matrix;
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject; A : Real_Float_Matrix)
+                  CLF : PyObject_Ptr; A : Real_Float_Matrix)
                   return Real_Float_Vector;
    procedure Call (M   : Python.Module; Function_Name : String;
-                   CLF : in out PyObject; A : ML_Types.Indef_String_List);
-   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject; 
+                   CLF : in out PyObject_Ptr; A : ML_Types.Indef_String_List);
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr; 
                    A : Real_Float_Matrix; B : Integer_Array);
-   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject; 
+   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr; 
                    A : Real_Float_Vector; B : Integer_Array);
-   function Call (M  : Python.Module; Function_Name : String; CLF : PyObject; 
+   function Call (M  : Python.Module; Function_Name : String; CLF : PyObject_Ptr; 
                   A  : Real_Float_Matrix; B : Integer_Array) return Float;
    function Call (M : Python.Module; Function_Name : String;
                   A : Real_Float_Matrix; B : Integer_Array)
-                  return PyObject;
-   function Get_Attribute (CLF : PyObject; Attribute : String)
-                           return PyObject;
+                  return PyObject_Ptr;
+   function Get_Attribute (CLF : PyObject_Ptr; Attribute : String)
+                           return PyObject_Ptr;
    
 end Python_CLF;

@@ -8,9 +8,9 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   procedure Parse_Tuple (Tuple : PyObject; Vec : in out Boolean_Array) is
+   procedure Parse_Tuple (Tuple : PyObject_Ptr; Vec : in out Boolean_Array) is
       Routine_Name : constant String := "Parsers.Parse_Tuple Boolean_Array ";
-      T_Row        : PyObject;
+      T_Row        : PyObject_Ptr;
    begin
       Assert (Vec'Length = Integer (PyTuple_Size (Tuple)), Routine_Name &
                 " Tuple Size " &
@@ -24,9 +24,9 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   procedure Parse_Tuple (Tuple : PyObject; Vec : in out Integer_Array) is
+   procedure Parse_Tuple (Tuple : PyObject_Ptr; Vec : in out Integer_Array) is
       Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Array ";
-      Value        : PyObject;
+      Value        : PyObject_Ptr;
    begin
       Assert (Vec'Length = Integer (PyTuple_Size (Tuple)), Routine_Name &
                 " Tuple Size " &
@@ -40,13 +40,13 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   function Parse_Tuple (Tuple : PyObject) return ML_Types.Integer_List_2D is
+   function Parse_Tuple (Tuple : PyObject_Ptr) return ML_Types.Integer_List_2D is
       use ML_Types;
       --           Routine_Name : constant String := "Parsers.Parse_Tuple IL2D  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
       Tuple_Row_Size : constant int := PyTuple_Size (PyTuple_GetItem (Tuple, 1));
-      Tuple_Row      : PyObject;
-      Tuple_Item     : PyObject;
+      Tuple_Row      : PyObject_Ptr;
+      Tuple_Item     : PyObject_Ptr;
       Result_Row     : Integer_List;
       Value          : Integer;
       Result         : Integer_List_2D;
@@ -69,13 +69,13 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   function Parse_Tuple (Tuple : PyObject) return Integer_Matrix  is
+   function Parse_Tuple (Tuple : PyObject_Ptr) return Integer_Matrix  is
       --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
       Tuple_Row_Size : constant int :=
                          PyTuple_Size (PyTuple_GetItem (Tuple, 0));
-      Tuple_Row      : PyObject;
-      Tuple_Item     : PyObject;
+      Tuple_Row      : PyObject_Ptr;
+      Tuple_Item     : PyObject_Ptr;
       Result         : Integer_Matrix (1 .. Integer (Tuple_Size),
                                        1 .. Integer (Tuple_Row_Size));
    begin
@@ -94,7 +94,7 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   function Parse_Tuple (Tuple : PyObject) return Float_Array is
+   function Parse_Tuple (Tuple : PyObject_Ptr) return Float_Array is
       --        Routine_Name : constant String := "Parsers.Parse_Tuple Float_Array ";
       Result       : Float_Array (1 .. Integer (PyTuple_Size (Tuple)));
    begin
@@ -109,7 +109,7 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   function Parse_Tuple (Tuple : PyObject) return Integer_Array is
+   function Parse_Tuple (Tuple : PyObject_Ptr) return Integer_Array is
       --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Array ";
       Result       : Integer_Array (1 .. Integer (PyTuple_Size (Tuple)));
    begin
@@ -124,13 +124,13 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   function Parse_Tuple (Tuple : PyObject) return Real_Float_Matrix  is
+   function Parse_Tuple (Tuple : PyObject_Ptr) return Real_Float_Matrix  is
       --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
       Tuple_Row_Size : constant int :=
                          PyTuple_Size (PyTuple_GetItem (Tuple, 0));
-      Tuple_Row      : PyObject;
-      Tuple_Item     : PyObject;
+      Tuple_Row      : PyObject_Ptr;
+      Tuple_Item     : PyObject_Ptr;
       Result         : Real_Float_Matrix (1 .. Integer (Tuple_Size),
                                           1 .. Integer (Tuple_Row_Size));
    begin
@@ -149,7 +149,7 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
-   function Parse_Tuple (Tuple : PyObject) return Real_Float_Vector is
+   function Parse_Tuple (Tuple : PyObject_Ptr) return Real_Float_Vector is
       --        Routine_Name : constant String := "Parsers.Parse_Tuple RFV ";
       Result       : Real_Float_Vector (1 .. Integer (PyTuple_Size (Tuple)));
    begin
