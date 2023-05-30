@@ -1,6 +1,7 @@
 with System;
 
 with Interfaces.C;
+with Interfaces.C.Strings;
 
 package Python_API is
    
@@ -16,7 +17,9 @@ package Python_API is
    function PyBool_FromLong (Val : Interfaces.C.long) return PyObject;
    pragma Import (C, PyBool_FromLong, "PyBool_FromLong");
    
-   function PyBytes_AsString (Text : Interfaces.C.char_array) return PyObject;
+   --  PyBytes_AsString returns a pointer to the contents of Obj.
+   function PyBytes_AsString (Obj : PyObject)
+                              return Interfaces.C.Strings.char_array_access;
    pragma Import (C, PyBytes_AsString, "PyBytes_AsString");
    
    function PyBytes_FromString (Text : Interfaces.C.char_array) return PyObject;

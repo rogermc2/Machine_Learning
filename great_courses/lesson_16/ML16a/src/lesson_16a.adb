@@ -6,6 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use  Basic_Printing;
 with Python;
 
+with Python_16A;
 with Support_16A; use Support_16A;
 
 procedure Lesson_16A is
@@ -24,10 +25,9 @@ begin
 
    if Exists (Newsgroups_File) then
       Newsgroups := Load_Data (Newsgroups_File);
-
    else
       Put_Line (Program_Name & "reading " & Newsgroups_File);
-      Newsgroups := Call_Python (Classifier, "fetch_newsgroups");
+      Newsgroups := Python_16A.Call (Classifier, "fetch_newsgroups");
       Save_Data (Newsgroups, Newsgroups_File);
    end if;
    Put_Line (Program_Name  & " Newsgroups file read");

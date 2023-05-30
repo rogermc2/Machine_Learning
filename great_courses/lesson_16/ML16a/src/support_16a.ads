@@ -20,7 +20,7 @@ package Support_16A is
    end record;
 
    type Newsgroups_Record is record
-      Data         : Python_API.PyObject;
+      Data         : ML_Types.Unbounded_List;
       Target       : Python_API.PyObject;
       File_Names   : Python_API.PyObject;
       Descr        : Python_API.PyObject;
