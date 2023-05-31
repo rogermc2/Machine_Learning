@@ -19,6 +19,9 @@ package Python_API is
    function PyBool_FromLong (Val : Interfaces.C.long) return PyObject_Ptr;
    pragma Import (C, PyBool_FromLong, "PyBool_FromLong");
    
+   function PyBytes_FromObject (Obj : PyObject_Ptr) return PyObject_Ptr;
+   pragma Import (C, PyBytes_FromObject, "PyBytes_FromObject");
+   
    --  PyBytes_AsString returns a pointer to the contents of Obj.
    function PyBytes_AsString (Obj : PyObject_Ptr)
                               return Interfaces.C.Strings.char_array_access;
@@ -28,6 +31,9 @@ package Python_API is
                                 return PyObject_Ptr;
    pragma Import (C, PyBytes_FromString, "PyBytes_FromString");
 
+   function PyBytes_Size (Tuple : PyObject_Ptr) return Interfaces.C.int;
+   pragma Import (C, PyBytes_Size, "PyBytes_Size");
+   
    function PyCallable_Check (Obj : PyObject_Ptr) return Interfaces.C.Int;
    pragma Import (C, PyCallable_Check, "PyCallable_Check");
    
@@ -151,7 +157,8 @@ package Python_API is
    function PyTuple_Size (Tuple : PyObject_Ptr) return Interfaces.C.int;
    pragma Import (C, PyTuple_Size, "PyTuple_Size");
    
-   function PyUnicode_AsEncodedString (Unicode: PyObject_Ptr) return PyObject_Ptr;
+   function PyUnicode_AsEncodedString (Unicode: PyObject_Ptr)
+                                       return PyObject_Ptr;
    pragma Import (C, PyUnicode_AsEncodedString, "PyUnicode_AsEncodedString");
    
 end Python_API;

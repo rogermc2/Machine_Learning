@@ -97,10 +97,10 @@ package body Support_16A is
             end if;
 
             declare
-               aLine : constant String := Get_Line (File_ID);
-               --                 --  Token arrays are of varying length
-               --                 Token : constant Integer_Array := Tokenize (aLine (3 .. aLine'Last));
-               --  --                           Tokenize (aLine (3 .. aLine'Last), Dictionary);
+               --  aLine : constant String := Get_Line (File_ID);
+               --  Token arrays are of varying length
+               --  Token : constant Integer_Array := Tokenize (aLine (3 .. aLine'Last));
+               --  Tokenize (aLine (3 .. aLine'Last), Dictionary);
             begin
                null;
                --                 --                 Delay (3.0);
