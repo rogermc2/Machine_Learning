@@ -16,7 +16,7 @@ with Python_CLF;
 
 package body Python_16A is
 
-   function Parse_Tuple (Tuple : Python_API.PyObject_Ptr) return Support_16A.Newsgroups_Record;
+   function Parse_Tuples (Tuples : Python_API.PyObject_Ptr) return Support_16A.Newsgroups_Record;
 
    --  -------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ package body Python_16A is
       Py_DecRef (F);
       --        Py_DecRef (PyParams);
 
-      Result := Parse_Tuple (PyResult);
+      Result := Parse_Tuples (PyResult);
 
       Py_DecRef (PyResult);
       return Result;
@@ -150,16 +150,16 @@ package body Python_16A is
 
    -- --------------------------------------------------------------------------
 
-   function Parse_Tuple (Tuple : Python_API.PyObject_Ptr)
-                         return Support_16A.Newsgroups_Record is
+   function Parse_Tuples (Tuples : Python_API.PyObject_Ptr)
+                          return Support_16A.Newsgroups_Record is
       use Interfaces.C;
       use Python_API;
-      Routine_Name : constant String := "Python_16A.Parse_Tuple  ";
-      Tuple_Size   : constant int := PyTuple_Size (Tuple);
+      Routine_Name : constant String := "Python_16A.Parse_Tuples  ";
+      Tuples_Size  : constant int := PyTuple_Size (Tuples);
       Result       : Support_16A.Newsgroups_Record;
    begin
-      Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuple_Size));
-      Result.Data := Parse_Text_Tuple (PyTuple_GetItem (Tuple, 0));
+      Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuples_Size));
+      Result.Data := Parse_Text_Tuple (PyTuple_GetItem (Tuples, 0));
       --        Result.Target := PyTuple_GetItem (Tuple, 1);
       --        Result.File_Names := PyTuple_GetItem (Tuple, 2);
       --        Result.Descr := PyTuple_GetItem (Tuple, 3);
@@ -167,7 +167,7 @@ package body Python_16A is
 
       return Result;
 
-   end Parse_Tuple;
+   end Parse_Tuples;
 
    --  ----------------------------------------------------------------------
 
