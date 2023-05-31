@@ -27,7 +27,7 @@ package body Python_16A is
       use type System.Address;
       use Python_API;
       Routine_Name : constant String := "Support_16A.Call_Object ";
-      PyParams     : PyObject_Ptr;
+      PyParams     : constant PyObject_Ptr := System.Null_Address;
       PyResult     : PyObject_Ptr;
    begin
       Assert (PyFunc /= System.Null_Address, Routine_Name & "PyFunc is null.");
@@ -62,7 +62,7 @@ package body Python_16A is
       --        pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
-      PyParams : PyObject_Ptr;
+--        PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
       Result   : Support_16A.Newsgroups_Record;
    begin
