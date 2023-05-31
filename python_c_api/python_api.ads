@@ -114,10 +114,10 @@ package Python_API is
    --                                   return PyObject_Ptr;
    --     pragma Import (C, PyObject_VectorCall, "PyObject_Vectorcall");
    
-   function PyParse_Tuple
+   function PyArgParse_Tuple
      (Args : PyObject_Ptr; Index : Interfaces.C.char_array; Obj : PyObject_Ptr)
       return Interfaces.C.int;  --  returns Boolean
-   pragma Import (C, PyParse_Tuple, "PyArg_ParseTuple");
+   pragma Import (C, PyArgParse_Tuple, "PyArg_ParseTuple");
      
    function PyRun_SimpleString (Command : Interfaces.C.char_array)
                                 return Interfaces.C.int;
@@ -150,5 +150,8 @@ package Python_API is
 
    function PyTuple_Size (Tuple : PyObject_Ptr) return Interfaces.C.int;
    pragma Import (C, PyTuple_Size, "PyTuple_Size");
+   
+   function PyUnicode_AsEncodedString (Unicode: PyObject_Ptr) return PyObject_Ptr;
+   pragma Import (C, PyUnicode_AsEncodedString, "PyUnicode_AsEncodedString");
    
 end Python_API;

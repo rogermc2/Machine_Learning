@@ -2,6 +2,7 @@
 with System;
 
 with Interfaces.C;
+with Interfaces.C.Strings;
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Exceptions; use Ada.Exceptions;
@@ -85,50 +86,63 @@ package body Python_16A is
                               return ML_Types.Unbounded_List is
       use System;
       use Interfaces.C;
+      use Interfaces.C.Strings;
       use Ada.Strings.Unbounded;
       use ML_Types;
       use Python_API;
       Routine_Name : constant String := "Python_16A.Parse_Text_Tuple  ";
       Tuple_Size   : constant int := PyTuple_Size (Tuple);
       Tuple_Item   : PyObject_Ptr;
-      Value_Ptr    : access char_array;
-      aChar        : String (1 .. 1);
-      Char_1       : String (1 .. 1);
+      Value_Ptr    : chars_ptr;
+      Text_Length  : size_t;
+--        aChar        : String (1 .. 1);
+--        Char_1       : String (1 .. 1);
       Text         : Unbounded_String;
       Data_List    : Unbounded_List;
-      Done         : Boolean := False;
+--        Done         : Boolean := False;
    begin
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
       Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuple_Size));
-      for index in 0 .. Tuple_Size - 1 loop
-         Put_Line (Routine_Name & "index" & int'Image (index));
-         Tuple_Item := PyTuple_GetItem (Tuple, index);
-         Put_Line (Routine_Name & "Tuple_Item set");
-         Value_Ptr := PyBytes_AsString (Tuple_Item);
+
+--        for index in 0 .. Tuple_Size - 1 loop
+--           Put_Line (Routine_Name & "index" & int'Image (index));
+         Tuple_Item := PyTuple_GetItem (Tuple, 0);
+         Assert (Tuple_Item /= System.Null_Address, Routine_Name &
+                   "Tuple_Item is null");
+         Value_Ptr := PyObject_String (Tuple);
+         Put_Line (Routine_Name & "Tuple_Item size: " &
+                     int'Image (PyTuple_Size (Tuple_Item)));
+         Assert (PyBytes_AsString (Tuple) /= Null, Routine_Name &
+                   "string pointer is null");
+--           Value_Ptr := To_Chars_Ptr (PyBytes_AsString (Tuple), True);
+         Assert (Value_Ptr /= Null_Ptr, Routine_Name & "Value_Ptr is null");
          Put_Line (Routine_Name & "Value_Ptr set");
-         aChar (1) := To_Ada (Value_Ptr(1));
-         Append (Text, aChar);
-         while not Done loop
-            if aChar /= "/" then
-               Append (Text, aChar);
-               Value_Ptr := Value_Ptr + 1;
-               aChar (1) := To_Ada (Value_Ptr(1));
-            else
-               Value_Ptr := Value_Ptr + 1;
-               Char_1 (1) := To_Ada (Value_Ptr(1));
-               Done := Char_1 = "0";
-               if not Done then
-                  Append (Text, aChar);
-                  Append (Text, Char_1);
-                  Value_Ptr := Value_Ptr + 1;
-                  aChar (1) := To_Ada (Value_Ptr(1));
-               end if;
-            end if;
-         end loop;
+         Text_Length := Strlen (Value_Ptr);
+         Put_Line (Routine_Name & "Text_Length" & size_t'Image (Text_Length));
+         Text := To_Unbounded_String (Value (Value_Ptr, Text_Length));
+         Put_Line (Routine_Name & To_String (Text));
+--           Append (Text, aChar);
+--           while not Done loop
+--              if aChar /= "/" then
+--                 Append (Text, aChar);
+--                 Value_Ptr := Value_Ptr + 1;
+--                 aChar (1) := To_Ada (Value_Ptr(1));
+--              else
+--                 Value_Ptr := Value_Ptr + 1;
+--                 Char_1 (1) := To_Ada (Value_Ptr(1));
+--                 Done := Char_1 = "0";
+--                 if not Done then
+--                    Append (Text, aChar);
+--                    Append (Text, Char_1);
+--                    Value_Ptr := Value_Ptr + 1;
+--                    aChar (1) := To_Ada (Value_Ptr(1));
+--                 end if;
+--              end if;
+--           end loop;
 
          Data_List.Append (Text);
          Put_Line (Routine_Name & "data addedd to Data_List");
-      end loop;
+--        end loop;
 
       return Data_List;
 
@@ -146,7 +160,7 @@ package body Python_16A is
    begin
       Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuple_Size));
       Result.Data := Parse_Text_Tuple (PyTuple_GetItem (Tuple, 0));
-      Result.Target := PyTuple_GetItem (Tuple, 1);
+--        Result.Target := PyTuple_GetItem (Tuple, 1);
 --        Result.File_Names := PyTuple_GetItem (Tuple, 2);
 --        Result.Descr := PyTuple_GetItem (Tuple, 3);
 --        Result.Target_Names := PyTuple_GetItem (Tuple, 4);
