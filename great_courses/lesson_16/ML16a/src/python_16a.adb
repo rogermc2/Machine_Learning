@@ -4,7 +4,7 @@ with System.Address_To_Access_Conversions;
 
 with Interfaces.C;
 with Interfaces.C.Pointers;
-with Interfaces.C.Strings;
+--  with Interfaces.C.Strings;
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Exceptions; use Ada.Exceptions;
@@ -93,7 +93,6 @@ package body Python_16A is
                               return ML_Types.Unbounded_List is
       use System;
       use Interfaces.C;
-      use Interfaces.C.Strings;
       use Ada.Strings.Unbounded;
       use ML_Types;
       use Python_API;
@@ -134,7 +133,7 @@ package body Python_16A is
                  Chars (Chars'First)'access;
       begin
          for index in 0 .. Tuple_Item_Size - 1 loop
-            Py_Item := PyTuple_GetItem (Tuple_Item, 0);
+            Py_Item := PyTuple_GetItem (Tuple_Item, int (index));
             Assert (Py_Item /= System.Null_Address, Routine_Name &
                       "Py_Item is null");
             Char_Ptr := Convert.To_Pointer (Tuple_Item);
