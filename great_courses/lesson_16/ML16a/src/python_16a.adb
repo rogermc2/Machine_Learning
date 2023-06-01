@@ -99,13 +99,14 @@ package body Python_16A is
       use Python_API;
       Routine_Name : constant String := "Python_16A.Parse_Text_Tuple  ";
       Tuple_Size   : constant int := PyTuple_Size (Tuple);
+--        Char_Array_Ptr : Interfaces.C.Strings.char_array_access;
       Tuple_Item   : PyObject_Ptr;
       Tuple_Item_Size : Integer;
       Py_Item      : PyObject_Ptr;
       --        aByte        : unsigned_char;
       aChar        : char;
-      Value_Ptr    : chars_ptr;
-      Text_Length  : size_t;
+--        Value_Ptr    : chars_ptr;
+--        Text_Length  : size_t;
       Char_Ptr     : access char;
       --        aChar        : String (1 .. 1);
       --        Char_1       : String (1 .. 1);
@@ -139,7 +140,7 @@ package body Python_16A is
             Char_Ptr := Convert.To_Pointer (Tuple_Item);
             aChar := Char_Ptr.all;
             Put_Line (Routine_Name & "aChar: " & Character (aChar));
-            Pointer_Arithmetic.Increment (Char_Ptr);
+--              Pointer_Arithmetic.Increment (Char_Ptr);
          end loop;
       end;
 
