@@ -25,6 +25,7 @@ def fetch_newsgroups():
     print("newsgroups['data'][0] ", newsgroups['data'][0])
     print("newsgroups['data'][0] type", type(newsgroups['data'][0]))
     print("newsgroups length['data'][0]", len(newsgroups['data'][0]))
+    print("newsgroups.filenames", newsgroups.filenames.shape)
     return (tuple(map (tuple, newsgroups['data'])), tuple(map (tuple, newsgroups['filenames'])))
 
 def init_multinomialnb1():

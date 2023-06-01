@@ -70,8 +70,14 @@ package Python_API is
    function PyImport_Import (Obj : PyObject_Ptr) return PyObject_Ptr;
    pragma Import (C, PyImport_Import, "PyImport_Import");
    
-   function PyList_Check (Obj : PyObject_Ptr) return Interfaces.C.Int;
-   pragma Import (C, PyList_Check, "PyList_Check");
+--     function PyList_Check (Obj : PyObject_Ptr) return Interfaces.C.Int;
+--     pragma Import (C, PyList_Check, "PyList_Check");
+   
+--     function PyInt_Check (Obj : PyObject_Ptr) return Interfaces.C.int;
+--     pragma Import (C, PyInt_Check, "PyInt_Check");
+
+   function PyNumber_Check (Obj : PyObject_Ptr) return Interfaces.C.int;
+   pragma Import (C, PyNumber_Check, "PyNumber_Check");
    
    function PyList_New (Length : Interfaces.C.int) return PyObject_Ptr;
    pragma Import (C, PyList_New, "PyList_New");

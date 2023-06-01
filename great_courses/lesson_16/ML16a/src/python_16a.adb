@@ -11,6 +11,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 with ML_Types;
+with ML_U8_Types;
 with Python_API;
 with Python_CLF;
 
@@ -111,6 +112,19 @@ package body Python_16A is
                 "Tuple_Item is null");
       Put_Line (Routine_Name & "Tuple_Item size: " &
                   int'Image (PyTuple_Size (Tuple_Item)));
+      Put_Line (Routine_Name & "Tuple_Item PyNumber_Check: " &
+                  int'Image (PyNumber_Check (Tuple_Item)));
+      declare
+         Bytes   : ML_U8_Types.Unsigned_8_Array
+           (1 .. Integer (PyTuple_Size (Tuple_Item)));
+         PyBytes : PyObject_Ptr :=
+           PyBytes_FromObject (PyTuple_GetItem (Tuple_Item, 0));
+         Item_Ptr : chars_ptr;
+      begin
+         Put_Line (Routine_Name & "PyBytes set");
+         Item_Ptr := To_Chars_Ptr (PyBytes_AsString (PyBytes));
+      end;
+
       Put_Line (Routine_Name & "asserting PyBytes_AsString");
       Assert (PyBytes_AsString (Tuple_Item) /= Null, Routine_Name &
                 "Tuple_Item string pointer is null");

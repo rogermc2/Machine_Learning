@@ -12,7 +12,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 --  with Basic_Printing; use Basic_Printing;
-with Neural_Utilities;
+--  with Neural_Utilities;
 with Python_16A;
 with Python_CLF;
 
@@ -20,8 +20,8 @@ package body Support_16A is
 
    Lex_Size    : constant Unbounded_String := To_Unbounded_String ("@size");
    Unknown     : constant Unbounded_String := To_Unbounded_String ("@unk");
-   Num_Known   : Natural := 0;
-   Num_Unknown : Natural := 0;
+--     Num_Known   : Natural := 0;
+--     Num_Unknown : Natural := 0;
 
    --     function Tokenize (aLine : String; Dictionary : Dictionary_List)
    --                        return Integer_Array;
@@ -45,24 +45,24 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
-   function Find_Item
-     (Dictionary : Dictionary_List; Key : Unbounded_String;
-      Item       : out Dictionary_Record) return Boolean is
-      use Dictionary_Package;
-      --        Routine_Name : constant String := "Support_16A.Find_Item ";
-      Curs  : Cursor := Dictionary.First;
-      Found : Boolean := False;
-   begin
-      while Has_Element (Curs) and not Found loop
-         Item := Element (Curs);
-         Found := Item.Key = Key;
-         Next (Curs);
-      end loop;
-
-      return Found;
-
-   end Find_Item;
-   pragma Inline (Find_Item);
+--     function Find_Item
+--       (Dictionary : Dictionary_List; Key : Unbounded_String;
+--        Item       : out Dictionary_Record) return Boolean is
+--        use Dictionary_Package;
+--        --        Routine_Name : constant String := "Support_16A.Find_Item ";
+--        Curs  : Cursor := Dictionary.First;
+--        Found : Boolean := False;
+--     begin
+--        while Has_Element (Curs) and not Found loop
+--           Item := Element (Curs);
+--           Found := Item.Key = Key;
+--           Next (Curs);
+--        end loop;
+--
+--        return Found;
+--
+--     end Find_Item;
+--     pragma Inline (Find_Item);
 
    --  -------------------------------------------------------------------------
 
@@ -268,44 +268,44 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
-   function Tokenize (aLine : String; Dictionary : Dictionary_List)
-                      return Integer_Array is
-      use Neural_Utilities;
-      use ML_Types;
-      use String_Package;
-      --        Routine_Name : constant String := "Support_16A.Tokenize ";
-      Words        : ML_Types.String_List;
-      Word_Cursor  : String_Package.Cursor;
-      Index        : Natural;
-      Item         : Dictionary_Record;
-      Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
-      Unknown_Val  : constant Integer := Item.Value;
-      Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-                       (others => 0);
-      Word         : Unbounded_String;
-   begin
-      pragma Warnings (Off, Unknown_Item);
-      Words := Split_String_On_Spaces (aLine);
-      Word_Cursor := Words.First;
-      while Has_Element (Word_Cursor) loop
-         Word := Element (Word_Cursor);
-         if Find_Item (Dictionary, Word, Item) then
-            --  the word has a feature so add one to the corresponding feature
-            Num_Known := Num_Known + 1;
-            Index := Item.Value;
-         else
-            --  add one to the Unknown count
-            Num_Unknown := Num_Unknown + 1;
-            Index := Unknown_Val;
-         end if;
-
-         Vec (Index) := Vec (Index) + 1;
-         Next  (Word_Cursor);
-      end loop;
-
-      return Vec;
-
-   end Tokenize;
+--     function Tokenize (aLine : String; Dictionary : Dictionary_List)
+--                        return Integer_Array is
+--        use Neural_Utilities;
+--        use ML_Types;
+--        use String_Package;
+--        --        Routine_Name : constant String := "Support_16A.Tokenize ";
+--        Words        : ML_Types.String_List;
+--        Word_Cursor  : String_Package.Cursor;
+--        Index        : Natural;
+--        Item         : Dictionary_Record;
+--        Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
+--        Unknown_Val  : constant Integer := Item.Value;
+--        Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
+--                         (others => 0);
+--        Word         : Unbounded_String;
+--     begin
+--        pragma Warnings (Off, Unknown_Item);
+--        Words := Split_String_On_Spaces (aLine);
+--        Word_Cursor := Words.First;
+--        while Has_Element (Word_Cursor) loop
+--           Word := Element (Word_Cursor);
+--           if Find_Item (Dictionary, Word, Item) then
+--              --  the word has a feature so add one to the corresponding feature
+--              Num_Known := Num_Known + 1;
+--              Index := Item.Value;
+--           else
+--              --  add one to the Unknown count
+--              Num_Unknown := Num_Unknown + 1;
+--              Index := Unknown_Val;
+--           end if;
+--
+--           Vec (Index) := Vec (Index) + 1;
+--           Next  (Word_Cursor);
+--        end loop;
+--
+--        return Vec;
+--
+--     end Tokenize;
 
    --  -------------------------------------------------------------------------
 
