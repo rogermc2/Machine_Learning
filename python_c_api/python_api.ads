@@ -34,6 +34,9 @@ package Python_API is
    function PyBytes_Size (Tuple : PyObject_Ptr) return Interfaces.C.int;
    pragma Import (C, PyBytes_Size, "PyBytes_Size");
    
+--     function PyByteArray_Check (Obj : PyObject_Ptr) return Interfaces.C.Int;
+--     pragma Import (C, PyByteArray_Check, "PyByteArray_Check");
+   
    function PyCallable_Check (Obj : PyObject_Ptr) return Interfaces.C.Int;
    pragma Import (C, PyCallable_Check, "PyCallable_Check");
    

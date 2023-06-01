@@ -11,7 +11,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 with ML_Types;
-with ML_U8_Types;
+--  with ML_U8_Types;
 with Python_API;
 with Python_CLF;
 
@@ -63,7 +63,7 @@ package body Python_16A is
       --        pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
---        PyParams : PyObject_Ptr;
+      --        PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
       Result   : Support_16A.Newsgroups_Record;
    begin
@@ -94,8 +94,11 @@ package body Python_16A is
       Routine_Name : constant String := "Python_16A.Parse_Text_Tuple  ";
       Tuple_Size   : constant int := PyTuple_Size (Tuple);
       Tuple_Item   : PyObject_Ptr;
+      Py_Item      : PyObject_Ptr;
+--        aByte        : unsigned_char;
       Value_Ptr    : chars_ptr;
       Text_Length  : size_t;
+--        Char_Ptr     : access Character;
       --        aChar        : String (1 .. 1);
       --        Char_1       : String (1 .. 1);
       Text         : Unbounded_String;
@@ -105,54 +108,40 @@ package body Python_16A is
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
       Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
 
-      --        for index in 0 .. Tuple_Size - 1 loop
-      --           Put_Line (Routine_Name & "index" & int'Image (index));
       Tuple_Item := PyTuple_GetItem (Tuple, 0);
       Assert (Tuple_Item /= System.Null_Address, Routine_Name &
                 "Tuple_Item is null");
       Put_Line (Routine_Name & "Tuple_Item size: " &
                   int'Image (PyTuple_Size (Tuple_Item)));
-      Put_Line (Routine_Name & "Tuple_Item PyNumber_Check: " &
-                  int'Image (PyNumber_Check (Tuple_Item)));
-      declare
-         Bytes   : ML_U8_Types.Unsigned_8_Array
-           (1 .. Integer (PyTuple_Size (Tuple_Item)));
-         PyBytes : PyObject_Ptr :=
-           PyBytes_FromObject (PyTuple_GetItem (Tuple_Item, 0));
-         Item_Ptr : chars_ptr;
-      begin
-         Put_Line (Routine_Name & "PyBytes set");
-         Item_Ptr := To_Chars_Ptr (PyBytes_AsString (PyBytes));
-      end;
 
-      Put_Line (Routine_Name & "asserting PyBytes_AsString");
-      Assert (PyBytes_AsString (Tuple_Item) /= Null, Routine_Name &
-                "Tuple_Item string pointer is null");
-      Value_Ptr := To_Chars_Ptr (PyBytes_AsString (Tuple_Item), True);
-      Assert (Value_Ptr /= Null_Ptr, Routine_Name & "Value_Ptr is null");
-      Put_Line (Routine_Name & "Value_Ptr set");
-      Text_Length := Strlen (Value_Ptr);
-      Put_Line (Routine_Name & "Text_Length" & size_t'Image (Text_Length));
-      Text := To_Unbounded_String (Value (Value_Ptr, Text_Length));
-      Put_Line (Routine_Name & To_String (Text));
-      --           Append (Text, aChar);
-      --           while not Done loop
-      --              if aChar /= "/" then
-      --                 Append (Text, aChar);
-      --                 Value_Ptr := Value_Ptr + 1;
-      --                 aChar (1) := To_Ada (Value_Ptr(1));
-      --              else
-      --                 Value_Ptr := Value_Ptr + 1;
-      --                 Char_1 (1) := To_Ada (Value_Ptr(1));
-      --                 Done := Char_1 = "0";
-      --                 if not Done then
-      --                    Append (Text, aChar);
-      --                    Append (Text, Char_1);
-      --                    Value_Ptr := Value_Ptr + 1;
-      --                    aChar (1) := To_Ada (Value_Ptr(1));
-      --                 end if;
-      --              end if;
-      --           end loop;
+      Py_Item := PyTuple_GetItem (Tuple_Item, 0);
+      Assert (Py_Item /= System.Null_Address, Routine_Name &
+                "Py_Item is null");
+
+      for index in 0 .. PyTuple_Size (Tuple_Item) - 1 loop
+         Put_Line (Routine_Name & "index" & int'Image (index));
+         Text_Length := Strlen (Value_Ptr);
+         Put_Line (Routine_Name & "Text_Length" & size_t'Image (Text_Length));
+         Text := To_Unbounded_String (Value (Value_Ptr, Text_Length));
+         Put_Line (Routine_Name & To_String (Text));
+         --           Append (Text, aChar);
+         --           while not Done loop
+         --              if aChar /= "/" then
+         --                 Append (Text, aChar);
+         --                 Value_Ptr := Value_Ptr + 1;
+         --                 aChar (1) := To_Ada (Value_Ptr(1));
+         --              else
+         --                 Value_Ptr := Value_Ptr + 1;
+         --                 Char_1 (1) := To_Ada (Value_Ptr(1));
+         --                 Done := Char_1 = "0";
+         --                 if not Done then
+         --                    Append (Text, aChar);
+         --                    Append (Text, Char_1);
+         --                    Value_Ptr := Value_Ptr + 1;
+         --                    aChar (1) := To_Ada (Value_Ptr(1));
+         --                 end if;
+         --              end if;
+      end loop;
 
       Data_List.Append (Text);
       Put_Line (Routine_Name & "data addedd to Data_List");
