@@ -20,8 +20,8 @@ package body Support_16A is
 
    Lex_Size    : constant Unbounded_String := To_Unbounded_String ("@size");
    Unknown     : constant Unbounded_String := To_Unbounded_String ("@unk");
---     Num_Known   : Natural := 0;
---     Num_Unknown : Natural := 0;
+   Num_Known   : Natural := 0;
+   Num_Unknown : Natural := 0;
 
    --     function Tokenize (aLine : String; Dictionary : Dictionary_List)
    --                        return Integer_Array;
@@ -45,24 +45,24 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
---     function Find_Item
---       (Dictionary : Dictionary_List; Key : Unbounded_String;
---        Item       : out Dictionary_Record) return Boolean is
---        use Dictionary_Package;
---        --        Routine_Name : constant String := "Support_16A.Find_Item ";
---        Curs  : Cursor := Dictionary.First;
---        Found : Boolean := False;
---     begin
---        while Has_Element (Curs) and not Found loop
---           Item := Element (Curs);
---           Found := Item.Key = Key;
---           Next (Curs);
---        end loop;
---
---        return Found;
---
---     end Find_Item;
---     pragma Inline (Find_Item);
+   function Find_Item
+     (Dictionary : Dictionary_List; Key : Unbounded_String;
+      Item       : out Dictionary_Record) return Boolean is
+      use Dictionary_Package;
+      --        Routine_Name : constant String := "Support_16A.Find_Item ";
+      Curs  : Cursor := Dictionary.First;
+      Found : Boolean := False;
+   begin
+      while Has_Element (Curs) and not Found loop
+         Item := Element (Curs);
+         Found := Item.Key = Key;
+         Next (Curs);
+      end loop;
+
+      return Found;
+
+   end Find_Item;
+   pragma Inline (Find_Item);
 
    --  -------------------------------------------------------------------------
 

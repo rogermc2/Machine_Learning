@@ -19,7 +19,8 @@ with Python_CLF;
 
 package body Python_16A is
 
-   package Convert is new System.Address_To_Access_Conversions (Character);
+   package Convert is new System.Address_To_Access_Conversions
+     (Interfaces.C.char);
 
    function Parse_Tuples (Tuples : Python_API.PyObject_Ptr) return
      Support_16A.Newsgroups_Record;
@@ -102,10 +103,10 @@ package body Python_16A is
       Tuple_Item_Size : Integer;
       Py_Item      : PyObject_Ptr;
       --        aByte        : unsigned_char;
-      aChar        : Character;
+      aChar        : char;
       Value_Ptr    : chars_ptr;
       Text_Length  : size_t;
-      Char_Ptr     : access Character;
+      Char_Ptr     : access char;
       --        aChar        : String (1 .. 1);
       --        Char_1       : String (1 .. 1);
       Text         : Unbounded_String;
@@ -123,9 +124,13 @@ package body Python_16A is
                   Integer'Image (Tuple_Item_Size));
 
       declare
+         type Char_Array is array (int range <>) of aliased char;
          Text : String (1 .. Tuple_Item_Size);
          package Pointer_Arithmetic is new Interfaces.C.Pointers
-           (Integer, Character, String);
+           (int, char, Char_Array, nul);
+         Chars : Char_Array (0 .. int (Tuple_Item_Size - 1));
+         Var : Pointer_Arithmetic.Pointer :=
+                 Chars (Chars'First)'access;
       begin
          for index in 0 .. Tuple_Item_Size - 1 loop
             Py_Item := PyTuple_GetItem (Tuple_Item, 0);
@@ -133,10 +138,8 @@ package body Python_16A is
                       "Py_Item is null");
             Char_Ptr := Convert.To_Pointer (Tuple_Item);
             aChar := Char_Ptr.all;
-            Put_Line (Routine_Name & "aChar: " & aChar);
+            Put_Line (Routine_Name & "aChar: " & Character (aChar));
             Pointer_Arithmetic.Increment (Char_Ptr);
-            aChar := Char_Ptr.all;
-            Put_Line (Routine_Name & "aChar: " & aChar);
          end loop;
       end;
 
