@@ -89,6 +89,32 @@ package body Python_16A is
 
    -- --------------------------------------------------------------------------
 
+   function C_To_Ada_String( s : in System.ADDRESS ) return STRING is
+      procedure Move_Bytes( dst, src : in System.ADDRESS; count : in INTEGER );
+      pragma INTERFACE (C, Move_Bytes );
+      pragma INTERFACE_NAME (Move_Bytes, "memcpy" );
+
+      function Strlen (s : in System.ADDRESS ) return INTEGER;
+      pragma INTERFACE (C, Strlen );
+      pragma INTERFACE_NAME (Strlen, "strlen" );
+
+      length : constant INTEGER := Strlen(s);
+   begin
+      if length < 1 then
+         return "";
+      else
+         declare
+            ada_s : STRING (1..length);
+         begin
+            Move_Bytes (ada_s(1)'ADDRESS, s, length );
+            return ada_s;
+         end;
+      end if;
+
+   end C_To_Ada_String;
+
+   -- --------------------------------------------------------------------------
+
    function Parse_Text_Tuple (Tuple : Python_API.PyObject_Ptr)
                               return ML_Types.Unbounded_List is
       use System;
@@ -103,14 +129,10 @@ package body Python_16A is
       Tuple_Item_Size : Integer;
       Py_Str_Ptr      : PyObject_Ptr;
       Py_Str          : PyObject_Ptr;
-      --        aByte        : unsigned_char;
-      --        Value_Ptr    : chars_ptr;
-      --        Text_Length  : size_t;
+      aByte           : char;
       Char_Ptr        : access char;
-      --        Char_1       : String (1 .. 1);
       Text            : Unbounded_String;
       Data_List       : Unbounded_List;
-      --        Done         : Boolean := False;
    begin
       New_Line;
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
@@ -124,11 +146,11 @@ package body Python_16A is
                   Integer'Image (Tuple_Item_Size));
 
       declare
---           type Char_Array is array (int range <>) of aliased char;
+         --           type Char_Array is array (int range <>) of aliased char;
          Text : String (1 .. Tuple_Item_Size);
---           package Pointer_Arithmetic is new Interfaces.C.Pointers
---             (int, char, Char_Array, nul);
---           Chars : Char_Array (0 .. int (Tuple_Item_Size - 1));
+         --           package Pointer_Arithmetic is new Interfaces.C.Pointers
+         --             (int, char, Char_Array, nul);
+         --           Chars : Char_Array (0 .. int (Tuple_Item_Size - 1));
          --           Var : Pointer_Arithmetic.Pointer :=
          --                   Chars (Chars'First)'access;
          --           aChar        : String (1 .. 1);
@@ -137,45 +159,19 @@ package body Python_16A is
             Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
             Assert (Py_Str_Ptr /= System.Null_Address, Routine_Name &
                       "Py_Str_Ptr is null");
-            Put_Line (Routine_Name & "Py_Str_Ptr size: " &
-                        int'Image (PyObject_Size (Py_Str_Ptr)));
-            --  Indexing a string produces strings of length 1.
+            --  Py_Str_Ptr size = 1
+            --  Indexing a C string produces strings of length 1.
             Py_Str := PyObject_String (Py_Str_Ptr);
             Char_Ptr := Convert.To_Pointer (Py_Str);
-            Text (index + 1) := To_Ada (Char_Ptr.all);
+            aByte := Char_Ptr.all;
+            Text (index + 1) := To_Ada (aByte);
             Put_Line (Routine_Name & "Text (index + 1): " & Text (index + 1));
             --              Pointer_Arithmetic.Increment (Char_Ptr);
          end loop;
       end;
 
-      --        for index in 0 .. PyTuple_Size (Tuple_Item) - 1 loop
-      --           Put_Line (Routine_Name & "index" & int'Image (index));
-      --           Text_Length := Strlen (Value_Ptr);
-      --           Put_Line (Routine_Name & "Text_Length" & size_t'Image (Text_Length));
-      --           Text := To_Unbounded_String (Value (Value_Ptr, Text_Length));
-      --           Put_Line (Routine_Name & To_String (Text));
-      --           Append (Text, aChar);
-      --           while not Done loop
-      --              if aChar /= "/" then
-      --                 Append (Text, aChar);
-      --                 Value_Ptr := Value_Ptr + 1;
-      --                 aChar (1) := To_Ada (Value_Ptr(1));
-      --              else
-      --                 Value_Ptr := Value_Ptr + 1;
-      --                 Char_1 (1) := To_Ada (Value_Ptr(1));
-      --                 Done := Char_1 = "0";
-      --                 if not Done then
-      --                    Append (Text, aChar);
-      --                    Append (Text, Char_1);
-      --                    Value_Ptr := Value_Ptr + 1;
-      --                    aChar (1) := To_Ada (Value_Ptr(1));
-      --                 end if;
-      --              end if;
-      --        end loop;
-
       Data_List.Append (Text);
       Put_Line (Routine_Name & "data addedd to Data_List");
-      --        end loop;
 
       return Data_List;
 
