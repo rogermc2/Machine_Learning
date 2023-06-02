@@ -89,25 +89,29 @@ package body Python_16A is
 
    -- --------------------------------------------------------------------------
 
-   function C_To_Ada_String( s : in System.ADDRESS ) return STRING is
-      procedure Move_Bytes( dst, src : in System.ADDRESS; count : in INTEGER );
-      pragma INTERFACE (C, Move_Bytes );
-      pragma INTERFACE_NAME (Move_Bytes, "memcpy" );
+   function C_To_Ada_String (C_String_Ptr : Python_API.PyObject_Ptr) return String is
+      Routine_Name    : constant String := "Python_16A.C_To_Ada_String  ";
 
-      function Strlen (s : in System.ADDRESS ) return INTEGER;
-      pragma INTERFACE (C, Strlen );
-      pragma INTERFACE_NAME (Strlen, "strlen" );
+      procedure Move_Bytes( dst, src : Python_API.PyObject_Ptr; count : Positive );
+      pragma Interface (C, Move_Bytes );
+      pragma Interface_Name (Move_Bytes, "memcpy" );
 
-      length : constant INTEGER := Strlen(s);
+      function Strlen (C_String_Ptr : in Python_API.PyObject_Ptr ) return Natural;
+      pragma Interface (C, Strlen );
+      pragma Interface_Name (Strlen, "strlen" );
+
+      Length : constant Natural := Strlen (C_String_Ptr);
    begin
-      if length < 1 then
+      Put_Line (Routine_Name & "Length: " & Integer'Image (Length));
+      if Length < 1 then
          return "";
       else
          declare
-            ada_s : STRING (1..length);
+            Ada_String : String (1..Length);
          begin
-            Move_Bytes (ada_s(1)'ADDRESS, s, length );
-            return ada_s;
+            Move_Bytes (Ada_String(1)'address, C_String_Ptr, Length);
+            Put_Line (Routine_Name & "Ada_String (1): '" & Ada_String (1) &"'");
+            return Ada_String;
          end;
       end if;
 
@@ -146,19 +150,18 @@ package body Python_16A is
                   Integer'Image (Tuple_Item_Size));
 
       declare
-         --           type Char_Array is array (int range <>) of aliased char;
-         Text : String (1 .. Tuple_Item_Size);
-         --           package Pointer_Arithmetic is new Interfaces.C.Pointers
-         --             (int, char, Char_Array, nul);
-         --           Chars : Char_Array (0 .. int (Tuple_Item_Size - 1));
-         --           Var : Pointer_Arithmetic.Pointer :=
-         --                   Chars (Chars'First)'access;
-         --           aChar        : String (1 .. 1);
+         Text  : String (1 .. Tuple_Item_Size);
       begin
          for index in 0 .. Tuple_Item_Size - 1 loop
             Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
             Assert (Py_Str_Ptr /= System.Null_Address, Routine_Name &
                       "Py_Str_Ptr is null");
+            declare
+               aChar: String := C_To_Ada_String (Py_Str_Ptr);
+            begin
+               Put_Line (Routine_Name & "aChar: " & aChar);
+            end;
+
             --  Py_Str_Ptr size = 1
             --  Indexing a C string produces strings of length 1.
             Py_Str := PyObject_String (Py_Str_Ptr);
