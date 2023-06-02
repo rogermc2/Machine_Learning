@@ -22,15 +22,18 @@ def fetch_newsgroups():
 #    print("newsgroups length[1]", len(newsgroups['filenames']))
     print("newsgroups['data'] type", type(newsgroups['data']))
 #    print("newsgroups['filenames'] type", type(newsgroups['filenames']))
-    print("newsgroups['data'][0] ", newsgroups['data'][0])
+#   As there is no separate “character” type, indexing a string produces strings of length 1.
+#    print("newsgroups['data'][0] ", newsgroups['data'][0])
     print("newsgroups['data'][0] type", type(newsgroups['data'][0]))
     print("newsgroups length['data'][0]", len(newsgroups['data'][0]))
-    print("newsgroups['data'][0][0]", newsgroups['data'][0][0])
-    print("newsgroups['data'][0][1]", newsgroups['data'][0][1])
-    print("newsgroups['data'][0][2]", newsgroups['data'][0][2])
-    print("newsgroups['data'][0][0:40]", newsgroups['data'][0][0:40])
+#    print("newsgroups['data'][0][0]", newsgroups['data'][0][0])
+#    print("newsgroups['data'][0][1]", newsgroups['data'][0][1])
+#    print("newsgroups['data'][0][2]", newsgroups['data'][0][2])
+#    print("newsgroups['data'][0][0:40]", newsgroups['data'][0][0:40])
     print("newsgroups['data'][0][0] type", type(newsgroups['data'][0][0]))
+    print("newsgroups['data'][1][0] type", type(newsgroups['data'][0][0]))
     print("newsgroups['data'][0][0] length", len(newsgroups['data'][0][0]))
+    print("newsgroups['data'][1][0] length", len(newsgroups['data'][1][0]))
     return (tuple(map (tuple, newsgroups['data'])), tuple(map (tuple, newsgroups['filenames'])))
 
 def init_multinomialnb1():

@@ -3,7 +3,7 @@ with System;
 with System.Address_To_Access_Conversions;
 
 with Interfaces.C;
-with Interfaces.C.Pointers;
+--  with Interfaces.C.Pointers;
 --  with Interfaces.C.Strings;
 
 with Ada.Assertions; use Ada.Assertions;
@@ -96,21 +96,23 @@ package body Python_16A is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use Python_API;
-      Routine_Name : constant String := "Python_16A.Parse_Text_Tuple  ";
-      Tuple_Size   : constant int := PyTuple_Size (Tuple);
---        Char_Array_Ptr : Interfaces.C.Strings.char_array_access;
-      Tuple_Item   : PyObject_Ptr;
+      Routine_Name    : constant String := "Python_16A.Parse_Text_Tuple  ";
+      Tuple_Size      : constant int := PyTuple_Size (Tuple);
+      --        Char_Array_Ptr : Interfaces.C.Strings.char_array_access;
+      Tuple_Item      : PyObject_Ptr;
       Tuple_Item_Size : Integer;
-      Py_Item      : PyObject_Ptr;
+      Py_Str_Ptr      : PyObject_Ptr;
+      Py_Str          : PyObject_Ptr;
       --        aByte        : unsigned_char;
---        Value_Ptr    : chars_ptr;
---        Text_Length  : size_t;
-      Char_Ptr     : access char;
+      --        Value_Ptr    : chars_ptr;
+      --        Text_Length  : size_t;
+      Char_Ptr        : access char;
       --        Char_1       : String (1 .. 1);
-      Text         : Unbounded_String;
-      Data_List    : Unbounded_List;
+      Text            : Unbounded_String;
+      Data_List       : Unbounded_List;
       --        Done         : Boolean := False;
    begin
+      New_Line;
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
       Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
 
@@ -122,23 +124,27 @@ package body Python_16A is
                   Integer'Image (Tuple_Item_Size));
 
       declare
-         type Char_Array is array (int range <>) of aliased char;
+--           type Char_Array is array (int range <>) of aliased char;
          Text : String (1 .. Tuple_Item_Size);
-         package Pointer_Arithmetic is new Interfaces.C.Pointers
-           (int, char, Char_Array, nul);
-         Chars : Char_Array (0 .. int (Tuple_Item_Size - 1));
---           Var : Pointer_Arithmetic.Pointer :=
---                   Chars (Chars'First)'access;
---           aChar        : String (1 .. 1);
+--           package Pointer_Arithmetic is new Interfaces.C.Pointers
+--             (int, char, Char_Array, nul);
+--           Chars : Char_Array (0 .. int (Tuple_Item_Size - 1));
+         --           Var : Pointer_Arithmetic.Pointer :=
+         --                   Chars (Chars'First)'access;
+         --           aChar        : String (1 .. 1);
       begin
          for index in 0 .. Tuple_Item_Size - 1 loop
-            Py_Item := PyTuple_GetItem (Tuple_Item, int (index));
-            Assert (Py_Item /= System.Null_Address, Routine_Name &
-                      "Py_Item is null");
-            Char_Ptr := Convert.To_Pointer (Tuple_Item);
+            Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
+            Assert (Py_Str_Ptr /= System.Null_Address, Routine_Name &
+                      "Py_Str_Ptr is null");
+            Put_Line (Routine_Name & "Py_Str_Ptr size: " &
+                        int'Image (PyObject_Size (Py_Str_Ptr)));
+            --  Indexing a string produces strings of length 1.
+            Py_Str := PyObject_String (Py_Str_Ptr);
+            Char_Ptr := Convert.To_Pointer (Py_Str);
             Text (index + 1) := To_Ada (Char_Ptr.all);
-            Put_Line (Routine_Name & "aChar: " & Text (index + 1));
---              Pointer_Arithmetic.Increment (Char_Ptr);
+            Put_Line (Routine_Name & "Text (index + 1): " & Text (index + 1));
+            --              Pointer_Arithmetic.Increment (Char_Ptr);
          end loop;
       end;
 
