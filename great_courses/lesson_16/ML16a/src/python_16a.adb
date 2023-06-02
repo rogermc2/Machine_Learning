@@ -103,11 +103,9 @@ package body Python_16A is
       Tuple_Item_Size : Integer;
       Py_Item      : PyObject_Ptr;
       --        aByte        : unsigned_char;
-      aChar        : char;
 --        Value_Ptr    : chars_ptr;
 --        Text_Length  : size_t;
       Char_Ptr     : access char;
-      --        aChar        : String (1 .. 1);
       --        Char_1       : String (1 .. 1);
       Text         : Unbounded_String;
       Data_List    : Unbounded_List;
@@ -129,16 +127,17 @@ package body Python_16A is
          package Pointer_Arithmetic is new Interfaces.C.Pointers
            (int, char, Char_Array, nul);
          Chars : Char_Array (0 .. int (Tuple_Item_Size - 1));
-         Var : Pointer_Arithmetic.Pointer :=
-                 Chars (Chars'First)'access;
+--           Var : Pointer_Arithmetic.Pointer :=
+--                   Chars (Chars'First)'access;
+--           aChar        : String (1 .. 1);
       begin
          for index in 0 .. Tuple_Item_Size - 1 loop
             Py_Item := PyTuple_GetItem (Tuple_Item, int (index));
             Assert (Py_Item /= System.Null_Address, Routine_Name &
                       "Py_Item is null");
             Char_Ptr := Convert.To_Pointer (Tuple_Item);
-            aChar := Char_Ptr.all;
-            Put_Line (Routine_Name & "aChar: " & Character (aChar));
+            Text (index + 1) := To_Ada (Char_Ptr.all);
+            Put_Line (Routine_Name & "aChar: " & Text (index + 1));
 --              Pointer_Arithmetic.Increment (Char_Ptr);
          end loop;
       end;
