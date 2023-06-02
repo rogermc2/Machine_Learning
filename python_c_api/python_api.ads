@@ -166,8 +166,14 @@ package Python_API is
    function PyTuple_Size (Tuple : PyObject_Ptr) return Interfaces.C.int;
    pragma Import (C, PyTuple_Size, "PyTuple_Size");
    
+   function PyUnicode_AsUTF8 (Unicode: PyObject_Ptr) return PyObject_Ptr;
+   pragma Import (C, PyUnicode_AsUTF8, "PyUnicode_AsUTF8");
+   
    function PyUnicode_AsEncodedString (Unicode: PyObject_Ptr)
                                        return PyObject_Ptr;
    pragma Import (C, PyUnicode_AsEncodedString, "PyUnicode_AsEncodedString");
+   
+   function PyUnicode_FromObject (Unicode: PyObject_Ptr) return PyObject_Ptr;
+   pragma Import (C, PyUnicode_FromObject, "PyUnicode_FromObject");
    
 end Python_API;
