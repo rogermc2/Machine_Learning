@@ -138,8 +138,8 @@ package body Support_16A is
 
       else
          Put_Line (Routine_Name & "reading " & File_Name);
-         Save_Data (Python_16A.Call (Classifier, "fetch_newsgroups"),
-                    File_Name);
+         Data := Python_16A.Call (Classifier, "fetch_newsgroups");
+         Save_Data (Data, File_Name);
       end if;
 
       return Data;

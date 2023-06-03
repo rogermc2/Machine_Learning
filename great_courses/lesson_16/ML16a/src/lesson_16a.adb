@@ -26,7 +26,7 @@ begin
    Put_Line (Program_Name  & "Newsgroups file read");
    Put_Line (Program_Name  & "Newsgroups.Data length" &
                Integer'Image (Integer (Newsgroups.Data.Length)));
-   Print_Unbound_List (Program_Name & "Newsgroups.Data", Newsgroups.Data);
+--     Print_Unbound_List (Program_Name & "Newsgroups.Data", Newsgroups.Data);
    New_Line;
 
 --     Python.Call (Classifier, "plot", Alphas, Result);
