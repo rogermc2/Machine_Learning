@@ -17,11 +17,14 @@ def fetch_newsgroups():
     print ("newsgroups", newsgroups.__dir__())
     return (tuple(map (tuple, newsgroups['data'])), tuple(map (tuple, newsgroups['filenames'])), tuple(map (tuple, newsgroups['target_names'])))
 
-def init_multinomialnb1():
-    return MultinomialNB()
+def init_tokenizer(max_words):
+    return tf.keras.preprocessing.text.Tokenizer(num_words=max_words)
 
-def fit (clf, features, labels):
-    clf.fit(features, labels)
+def fit (tokenizer, newsgroups):
+    return tokenizer.fit_on_texts(newsgroups.data)
+
+def fit (tokenizer, newsgroups):
+    return tokenizer.texts_to_sequences(newsgroups.data)
 
 def predict_proba(clf, features):
     pred=clf.predict_proba(features)

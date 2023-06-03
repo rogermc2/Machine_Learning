@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
 with Python;
+with Python_API;
 
 with Support_16A; use Support_16A;
 
@@ -16,6 +17,7 @@ procedure Lesson_16A is
    Max_Sequence_Size    : constant Positive := 1000;
    Emmbedding_Dimension : constant Positive := 100;
    Classifier           : Python.Module;
+   Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
 begin
    Python.Initialize;
@@ -27,6 +29,7 @@ begin
    Put_Line (Program_Name  & "Newsgroups.Data length" &
                Integer'Image (Integer (Newsgroups.Data.Length)));
    New_Line;
+   Tokenizer := Python.Call (Classifier, "init_tokenizer", Max_Words);
 
 --     Python.Call (Classifier, "plot", Alphas, Result);
 
