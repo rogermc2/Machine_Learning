@@ -12,18 +12,20 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 --  with Basic_Printing; use Basic_Printing;
---  with Neural_Utilities;
+with Neural_Utilities;
 with Python_16A;
 with Python_CLF;
 
 package body Support_16A is
 
-   Lex_Size    : constant Unbounded_String := To_Unbounded_String ("@size");
-   Unknown     : constant Unbounded_String := To_Unbounded_String ("@unk");
+   --     Lex_Size    : constant Unbounded_String := To_Unbounded_String ("@size");
+   --     Unknown     : constant Unbounded_String := To_Unbounded_String ("@unk");
 
    --     function Tokenize (aLine : String; Dictionary : Dictionary_List)
    --                        return Integer_Array;
    --     pragma Inline (Tokenize);
+   function Process_Glove_Line (File_ID : File_Type) return Dictionary_Record;
+   pragma Inline (Process_Glove_Line);
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
@@ -43,88 +45,68 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
---     function Find_Item
---       (Dictionary : Dictionary_List; Key : Unbounded_String;
---        Item       : out Dictionary_Record) return Boolean is
---        use Dictionary_Package;
---        --        Routine_Name : constant String := "Support_16A.Find_Item ";
---        Curs  : Cursor := Dictionary.First;
---        Found : Boolean := False;
---     begin
---        while Has_Element (Curs) and not Found loop
---           Item := Element (Curs);
---           Found := Item.Key = Key;
---           Next (Curs);
---        end loop;
---
---        return Found;
---
---     end Find_Item;
---     pragma Inline (Find_Item);
+   --     function Find_Item
+   --       (Dictionary : Dictionary_List; Key : Unbounded_String;
+   --        Item       : out Dictionary_Record) return Boolean is
+   --        use Dictionary_Package;
+   --        --        Routine_Name : constant String := "Support_16A.Find_Item ";
+   --        Curs  : Cursor := Dictionary.First;
+   --        Found : Boolean := False;
+   --     begin
+   --        while Has_Element (Curs) and not Found loop
+   --           Item := Element (Curs);
+   --           Found := Item.Key = Key;
+   --           Next (Curs);
+   --        end loop;
+   --
+   --        return Found;
+   --
+   --     end Find_Item;
+   --     pragma Inline (Find_Item);
 
    --  -------------------------------------------------------------------------
 
-   function Get_Data (File_Name : String) return Data_Items is
-      Routine_Name : constant String := "Support_16A.Get_Data ";
+   function Get_Glove_Data (File_Name : String) return Dictionary_List is
+      Routine_Name : constant String := "Support_16A.Get_Glove_Data ";
       File_ID      : File_Type;
       Num_Lines    : Natural := 0;
+      Row          : Natural := 0;
+      Embeddings   : Dictionary_List;
    begin
       New_Line;
       Put_Line (Routine_Name & "reading " & File_Name);
       Open (File_ID, In_File, File_Name);
+      Put_Line (Routine_Name & "processing " & File_Name);
+      Put ("*");
+
       while not End_Of_File (File_ID) loop
+         Row := Row + 1;
          Num_Lines := Num_Lines + 1;
-         Skip_Line (File_ID);
+         if Num_Lines mod 5000 = 0 then
+            Put ("*");
+         end if;
+
+         Embeddings.Append (Process_Glove_Line (File_ID));
       end loop;
+      New_Line;
 
-      Reset (File_ID);
-      Put_Line (Routine_Name & "processing " & File_Name & ", Num Lines:" &
-                  Integer'Image (Num_Lines));
-      declare
-         Data : Data_Items (Num_Lines);
-         Row  : Natural := 0;
-      begin
-         Num_Lines := 0;
-         Put ("*");
+      Close (File_ID);
 
-         while not End_Of_File (File_ID) loop
-            Row := Row + 1;
-            Num_Lines := Num_Lines + 1;
-            if Num_Lines mod 1000 = 0 then
-               Put ("*");
-            end if;
+      Put_Line (Routine_Name & File_Name & " processed.");
+      Put_Line (Routine_Name & "found" &
+                  Integer'Image (Integer (Embeddings.Length)) &
+                  " word vectors.");
+      return Embeddings;
 
-            declare
-               --  aLine : constant String := Get_Line (File_ID);
-               --  Token arrays are of varying length
-               --  Token : constant Integer_Array := Tokenize (aLine (3 .. aLine'Last));
-               --  Tokenize (aLine (3 .. aLine'Last), Dictionary);
-            begin
-               null;
-               --                 --                 Delay (3.0);
-               --                 Data.Labels (Row, 1) := Integer'Value (aLine (1 .. 1));
-               --                 Data.Features.Append (Token);
-            end;
-
-         end loop;
-         New_Line;
-
-         Close (File_ID);
-
-         Put_Line (Routine_Name & File_Name & Integer'Image (Num_Lines) &
-                     " lines processed.");
-         return Data;
-      end;
-
-   end Get_Data;
+   end Get_Glove_Data;
 
    --  -------------------------------------------------------------------------
 
-   function Load_Data (Classifier : Python.Module; File_Name : String;
-                       Reload : Boolean := False) return Newsgroups_Record is
+   function Load_Newsgroups (Classifier : Python.Module; File_Name : String;
+                             Reload     : Boolean := False) return Newsgroups_Record is
       use Ada.Streams;
       use Stream_IO;
-      Routine_Name  : constant String := "Support_16A.Load_Data ";
+      Routine_Name  : constant String := "Support_16A.Load_Newsgroups ";
       File_ID       : Stream_IO.File_Type;
       aStream       : Stream_Access;
       Data          : Newsgroups_Record;
@@ -144,7 +126,7 @@ package body Support_16A is
 
       return Data;
 
-   end Load_Data;
+   end Load_Newsgroups;
 
    --  -------------------------------------------------------------------------
    --  ProbA_Chooser chooses between B options.
@@ -206,45 +188,73 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
-   function Read_Vocabulary (File_Name : String) return Dictionary_List is
-      Routine_Name     : constant String := "Support_16A.Read_Vocabulary ";
-      File_ID          : File_Type;
-      Lexicon_Size     : Natural := 0;  --  Token
-      Vocab_Dictionary : Dictionary_List;
-      Item             : Dictionary_Record;
+   function Process_Glove_Line (File_ID : File_Type) return Dictionary_Record is
+      use Neural_Utilities;
+      use ML_Types;
+      use String_Package;
+      --        Routine_Name  : constant String := "Support_16A.Process_Glove_Line ";
+      aLine         : constant String := Get_Line (File_ID);
+      Values        : ML_Types.String_List;
+      Values_Cursor : String_Package.Cursor;
+      Word          : Unbounded_String;
+      Coeffs        : NL_Types.Float_List;
    begin
-      Item := (Unknown, Lexicon_Size);
-      Vocab_Dictionary.Append (Item);
-      Lexicon_Size := Lexicon_Size + 1;
+      Values := Split_String_On_Spaces (aLine);
+      Values_Cursor := Values.First;
+      Word := Element (Values_Cursor);
+      Next (Values_Cursor);
 
-      Open (File_ID, In_File, File_Name);
-
-      while not End_Of_File (File_ID) loop
-         declare
-            aLine : constant Unbounded_String :=
-                      To_Unbounded_String (Get_Line (File_ID));
-            Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
-            Token : constant Unbounded_String :=
-                      To_Unbounded_String
-                        (Slice (aLine, 6, Length (aLine) - 1));
-         begin
-            if Count > 1 then
-               Item :=  (Token, Lexicon_Size);
-               Vocab_Dictionary.Append (Item);
-               Lexicon_Size := Lexicon_Size + 1;
-            end if;
-         end;
+      while Has_Element (Values_Cursor) loop
+         Coeffs.Append (Float'Value
+                        (To_String (Element ((Values_Cursor)))));
+         Next (Values_Cursor);
       end loop;
 
-      Close (File_ID);
+      return (Word, Coeffs);
 
-      Item :=  (Lex_Size, Lexicon_Size);
-      Vocab_Dictionary.Append (Item);
-      Put_Line (Routine_Name & File_Name & " processed.");
+   end Process_Glove_Line;
 
-      return Vocab_Dictionary;
+   --  -------------------------------------------------------------------------
 
-   end Read_Vocabulary;
+   --     function Read_Vocabulary (File_Name : String) return Dictionary_List is
+   --        Routine_Name     : constant String := "Support_16A.Read_Vocabulary ";
+   --        File_ID          : File_Type;
+   --        Lexicon_Size     : Natural := 0;  --  Token
+   --        Vocab_Dictionary : Dictionary_List;
+   --        Item             : Dictionary_Record;
+   --     begin
+   --        Item := (Unknown, Lexicon_Size);
+   --        Vocab_Dictionary.Append (Item);
+   --        Lexicon_Size := Lexicon_Size + 1;
+   --
+   --        Open (File_ID, In_File, File_Name);
+   --
+   --        while not End_Of_File (File_ID) loop
+   --           declare
+   --              aLine : constant Unbounded_String :=
+   --                        To_Unbounded_String (Get_Line (File_ID));
+   --              Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
+   --              Token : constant Unbounded_String :=
+   --                        To_Unbounded_String
+   --                          (Slice (aLine, 6, Length (aLine) - 1));
+   --           begin
+   --              if Count > 1 then
+   --                 Item := (Token, Lexicon_Size);
+   --                 Vocab_Dictionary.Append (Item);
+   --                 Lexicon_Size := Lexicon_Size + 1;
+   --              end if;
+   --           end;
+   --        end loop;
+   --
+   --        Close (File_ID);
+   --
+   --        Item :=  (Lex_Size, Lexicon_Size);
+   --        Vocab_Dictionary.Append (Item);
+   --        Put_Line (Routine_Name & File_Name & " processed.");
+   --
+   --        return Vocab_Dictionary;
+   --
+   --     end Read_Vocabulary;
 
    --  -------------------------------------------------------------------------
 
@@ -266,44 +276,44 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
---     function Tokenize (aLine : String; Dictionary : Dictionary_List)
---                        return Integer_Array is
---        use Neural_Utilities;
---        use ML_Types;
---        use String_Package;
---        --        Routine_Name : constant String := "Support_16A.Tokenize ";
---        Words        : ML_Types.String_List;
---        Word_Cursor  : String_Package.Cursor;
---        Index        : Natural;
---        Item         : Dictionary_Record;
---        Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
---        Unknown_Val  : constant Integer := Item.Value;
---        Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
---                         (others => 0);
---        Word         : Unbounded_String;
---     begin
---        pragma Warnings (Off, Unknown_Item);
---        Words := Split_String_On_Spaces (aLine);
---        Word_Cursor := Words.First;
---        while Has_Element (Word_Cursor) loop
---           Word := Element (Word_Cursor);
---           if Find_Item (Dictionary, Word, Item) then
---              --  the word has a feature so add one to the corresponding feature
---              Num_Known := Num_Known + 1;
---              Index := Item.Value;
---           else
---              --  add one to the Unknown count
---              Num_Unknown := Num_Unknown + 1;
---              Index := Unknown_Val;
---           end if;
---
---           Vec (Index) := Vec (Index) + 1;
---           Next  (Word_Cursor);
---        end loop;
---
---        return Vec;
---
---     end Tokenize;
+   --     function Tokenize (aLine : String; Dictionary : Dictionary_List)
+   --                        return Integer_Array is
+   --        use Neural_Utilities;
+   --        use ML_Types;
+   --        use String_Package;
+   --        --        Routine_Name : constant String := "Support_16A.Tokenize ";
+   --        Words        : ML_Types.String_List;
+   --        Word_Cursor  : String_Package.Cursor;
+   --        Index        : Natural;
+   --        Item         : Dictionary_Record;
+   --        Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
+   --        Unknown_Val  : constant Integer := Item.Value;
+   --        Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
+   --                         (others => 0);
+   --        Word         : Unbounded_String;
+   --     begin
+   --        pragma Warnings (Off, Unknown_Item);
+   --        Words := Split_String_On_Spaces (aLine);
+   --        Word_Cursor := Words.First;
+   --        while Has_Element (Word_Cursor) loop
+   --           Word := Element (Word_Cursor);
+   --           if Find_Item (Dictionary, Word, Item) then
+   --              --  the word has a feature so add one to the corresponding feature
+   --              Num_Known := Num_Known + 1;
+   --              Index := Item.Value;
+   --           else
+   --              --  add one to the Unknown count
+   --              Num_Unknown := Num_Unknown + 1;
+   --              Index := Unknown_Val;
+   --           end if;
+   --
+   --           Vec (Index) := Vec (Index) + 1;
+   --           Next  (Word_Cursor);
+   --        end loop;
+   --
+   --        return Vec;
+   --
+   --     end Tokenize;
 
    --  -------------------------------------------------------------------------
 

@@ -4,6 +4,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
+with NL_Types;
 with Python;
 with Python_API;
 
@@ -15,8 +16,8 @@ package Support_16A is
    end record;
 
    type Dictionary_Record is record
-      Key   : Unbounded_String;
-      Value : Natural := 0;
+      Key    : Unbounded_String;
+      Values : NL_Types.Float_List;
    end record;
 
    type Newsgroups_Record is record
@@ -38,10 +39,10 @@ package Support_16A is
       Train_Set        : ML_Types.Integer_List_2D;
       Train_Labels     : ML_Types.Integer_List; Alpha : Integer;
       Clf              : Python_API.PyObject_Ptr) return Integer;
-   function Get_Data (File_Name : String) return Data_Items;
-   function Load_Data (Classifier : Python.Module; File_Name : String;
+   function Get_Glove_Data (File_Name : String) return Dictionary_List;
+   function Load_Newsgroups (Classifier : Python.Module; File_Name : String;
                        Reload : Boolean := False) return Newsgroups_Record;
-   function Read_Vocabulary (File_Name : String) return Dictionary_List;
+--     function Read_Vocabulary (File_Name : String) return Dictionary_List;
    procedure Save_Data (Data : Newsgroups_Record; File_Name : String);
 
 end Support_16A;
