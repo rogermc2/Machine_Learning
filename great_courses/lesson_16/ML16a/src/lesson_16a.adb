@@ -8,12 +8,15 @@ with Python;
 with Support_16A; use Support_16A;
 
 procedure Lesson_16A is
-   Program_Name     : constant String := "Lesson 16A ";
-   Glove_Data          : constant Dictionary_List :=
+   Program_Name         : constant String := "Lesson 16A ";
+   Glove_Data           : constant Dictionary_List :=
      Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
-   Newsgroups_File  : constant String := "Newsgroups.data";
-   Classifier       : Python.Module;
-   Newsgroups       : Newsgroups_Record;
+   Newsgroups_File      : constant String := "Newsgroups.data";
+   Max_Words            : constant Positive := 20000;
+   Max_Sequence_Size    : constant Positive := 1000;
+   Emmbedding_Dimension : constant Positive := 100;
+   Classifier           : Python.Module;
+   Newsgroups           : Newsgroups_Record;
 begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_16a");
