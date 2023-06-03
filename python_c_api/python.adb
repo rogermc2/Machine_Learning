@@ -100,6 +100,34 @@ package body Python is
    end Close_Module;
 
    --  -------------------------------------------------------------------------
+  
+   function Py_String_To_Ada (C_String_Ptr : Python_API.PyObject_Ptr)
+                              return String is
+      --  Routine_Name    : constant String := "Python.Py_String_To_Ada  ";
+
+      procedure Move_Bytes (dst, src : PyObject_Ptr; Count : Positive);
+      pragma Import (C, Move_Bytes, "memcpy");
+
+      function Strlen (C_String_Ptr : PyObject_Ptr) return Natural;
+      pragma Import (C, Strlen, "strlen");
+
+      Unicode_Ptr : constant PyObject_Ptr := PyUnicode_AsUTF8 (C_String_Ptr);
+      Length      : constant Natural := Strlen (Unicode_Ptr);
+   begin
+      if Length < 1 then
+         return "";
+      else
+         declare
+            Ada_String : String (1..Length);
+         begin
+            Move_Bytes (Ada_String(1)'address, Unicode_Ptr, Length);
+            return Ada_String;
+         end;
+      end if;
+
+   end Py_String_To_Ada;
+
+   -- --------------------------------------------------------------------------
    --  helpers for use from all overloaded Call subprograms
    function Get_Symbol (M : in Module; Function_Name : in String)
                         return PyObject_Ptr is

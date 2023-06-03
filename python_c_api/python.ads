@@ -24,6 +24,8 @@ package Python is
    procedure Close_Module (M : Module);
    function Get_Symbol (M : in Module; Function_Name : in String)
                         return Python_API.PyObject_Ptr;
+   function Py_String_To_Ada (C_String_Ptr : Python_API.PyObject_Ptr)
+                              return String;
    
    --  Overloads for "all" needed combinations of parameters and return types:
    

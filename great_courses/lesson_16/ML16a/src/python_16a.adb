@@ -71,35 +71,6 @@ package body Python_16A is
 
    -- --------------------------------------------------------------------------
 
-   function C_To_Ada_String (C_String_Ptr : Python_API.PyObject_Ptr)
-                             return String is
-      --  Routine_Name    : constant String := "Python_16A.C_To_Ada_String  ";
-
-      procedure Move_Bytes (dst, src : Python_API.PyObject_Ptr;
-                            count    : Positive);
-      pragma Import (C, Move_Bytes, "memcpy");
-
-      function Strlen (C_String_Ptr : in Python_API.PyObject_Ptr )
-                       return Natural;
-      pragma Import (C, Strlen, "strlen");
-
-      Length : constant Natural := Strlen (C_String_Ptr);
-   begin
-      if Length < 1 then
-         return "";
-      else
-         declare
-            Ada_String : String (1..Length);
-         begin
-            Move_Bytes (Ada_String(1)'address, C_String_Ptr, Length);
-            return Ada_String;
-         end;
-      end if;
-
-   end C_To_Ada_String;
-
-   -- --------------------------------------------------------------------------
-
    function Parse_Text_Tuple (Tuple : Python_API.PyObject_Ptr)
                               return ML_Types.Unbounded_List is
       use System;
@@ -116,7 +87,7 @@ package body Python_16A is
    begin
       New_Line;
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
---        Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
+      --        Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
 
       for item in 0 .. Tuple_Size - 1 loop
          Tuple_Item := PyTuple_GetItem (Tuple, item);
@@ -128,31 +99,31 @@ package body Python_16A is
 
          declare
             Text          : String (1 .. Tuple_Item_Size);
---              Has_Long_Char : Boolean := False;
+            Has_Long_Char : Boolean := False;
          begin
             for index in 0 .. Tuple_Item_Size - 1 loop
                Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
                declare
                   aChar     : constant String :=
-                                C_To_Ada_String (PyUnicode_AsUTF8 (Py_Str_Ptr));
+                                Python.Py_String_To_Ada (Py_Str_Ptr);
                   Long_Char : constant Boolean := aChar'Length > 1;
                begin
                   if Long_Char then
---                       Has_Long_Char := True;
---                       Put_Line (Routine_Name & "Item, index" &
---                                   int'Image (item) & ","  &
---                                   Integer'Image (index) & ":");
---                       Put_Line ("String: " & aChar);
---                       Put_Line ("String (1): " & aChar (1));
+                     Has_Long_Char := True;
+                     --                       Put_Line (Routine_Name & "Item, index" &
+                     --                                   int'Image (item) & ","  &
+                     --                                   Integer'Image (index) & ":");
+                     --                       Put_Line ("String: " & aChar);
+                     --                       Put_Line ("String (1): " & aChar (1));
                      Text (index + 1) := '|';
                   else
                      Text (index + 1) := aChar (1);
                   end if;
                end;
 
---                 if Has_Long_Char then
---                    Put_Line (Text);
---                 end if;
+               if Has_Long_Char then
+                  Put_Line (Text);
+               end if;
             end loop;
             Data_List.Append (To_Unbounded_String (Text));
             --              Put_Line (Routine_Name & "Text: " & Text);
@@ -170,11 +141,11 @@ package body Python_16A is
                           return Support_16A.Newsgroups_Record is
       use Interfaces.C;
       use Python_API;
---        Routine_Name : constant String := "Python_16A.Parse_Tuples  ";
---        Tuples_Size  : constant int := PyTuple_Size (Tuples);
+      --        Routine_Name : constant String := "Python_16A.Parse_Tuples  ";
+      --        Tuples_Size  : constant int := PyTuple_Size (Tuples);
       Result       : Support_16A.Newsgroups_Record;
    begin
---        Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuples_Size));
+      --        Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuples_Size));
       Result.Data := Parse_Text_Tuple (PyTuple_GetItem (Tuples, 0));
       --        Result.Target := PyTuple_GetItem (Tuple, 1);
       --        Result.File_Names := PyTuple_GetItem (Tuple, 2);
