@@ -193,7 +193,13 @@ package Python is
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unbounded_String_Array);
    procedure Call (M : Module; Function_Name : String;
+                   A : ML_Types.Unbounded_List);
+   procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unbounded_String_Matrix);
+   function Call (M : Python.Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                  B : ML_Arrays_And_Matrices.Integer_Array)
+                  return Python_API.PyObject_Ptr;
    function Run_String (Script : String) return Python_API.PyObject_Ptr;
 
 end Python;

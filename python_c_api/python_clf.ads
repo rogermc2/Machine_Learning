@@ -82,21 +82,27 @@ package Python_CLF is
                   CLF : PyObject_Ptr; A : Real_Float_List)
                   return Real_Float_Vector;
    function Call (M   : Python.Module; Function_Name : String;
-                  CLF : PyObject_Ptr; A : Float_Array) return Real_Float_Matrix;
+                  CLF : PyObject_Ptr; A : Float_Array)
+                  return Real_Float_Matrix;
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject_Ptr; A : Real_Float_Matrix)
                   return Real_Float_Vector;
    procedure Call (M   : Python.Module; Function_Name : String;
                    CLF : in out PyObject_Ptr; A : ML_Types.Indef_String_List);
-   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr; 
-                   A : Real_Float_Matrix; B : Integer_Array);
-   procedure Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr; 
+   procedure Call (M : Python.Module; Function_Name : String;
+                   CLF : PyObject_Ptr; A : Real_Float_Matrix;
+                   B : Integer_Array);
+   procedure Call (M : Python.Module; Function_Name : String;
+                   CLF : PyObject_Ptr; 
                    A : Real_Float_Vector; B : Integer_Array);
-   function Call (M  : Python.Module; Function_Name : String; CLF : PyObject_Ptr; 
+   function Call (M  : Python.Module; Function_Name : String;
+                  CLF : PyObject_Ptr; 
                   A  : Real_Float_Matrix; B : Integer_Array) return Float;
    function Call (M : Python.Module; Function_Name : String;
                   A : Real_Float_Matrix; B : Integer_Array)
                   return PyObject_Ptr;
+   procedure Call (M   : Python.Module; Function_Name : String;
+                   CLF : PyObject_Ptr; A : ML_Types.Unbounded_List);
    function Get_Attribute (CLF : PyObject_Ptr; Attribute : String)
                            return PyObject_Ptr;
    

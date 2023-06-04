@@ -1404,6 +1404,40 @@ package body Python_CLF is
 
    -- --------------------------------------------------------------------------
 
+   procedure Call (M   : Python.Module; Function_Name : String;
+                   CLF : PyObject_Ptr; A : ML_Types.Unbounded_List) is
+      use Python;
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              O1, T1 : PyObject_Ptr) return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String :=
+                       "Python_CLF.Call Float_Matrix, Integer_Array ";
+      F            : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
+      PyParams     : PyObject_Ptr;
+      PyResult     : PyObject_Ptr;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
+      PyResult := Call_Object (F, PyParams);
+
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    function Get_Attribute (CLF : PyObject_Ptr; Attribute : String)
                            return PyObject_Ptr is
       use Interfaces.C;

@@ -2168,6 +2168,40 @@ package body Python is
    --  -------------------------------------------------------------------------
 
    procedure Call (M : Module; Function_Name : String;
+                   A : ML_Types.Unbounded_List) is
+      use System;
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject_Ptr)  return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python.Call Unbounded_List ";
+      PyFunc       : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
+      PyParams     : PyObject_Ptr;
+      PyResult     : PyObject_Ptr;
+   begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      PyResult := Call_Object (PyFunc, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unbounded_String_Matrix) is
       use System;
       function Py_BuildValue (Format : Interfaces.C.char_array;
@@ -2200,6 +2234,37 @@ package body Python is
    end Call;
 
    --  -------------------------------------------------------------------------
+
+   function Call (M : Python.Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                  B : ML_Arrays_And_Matrices.Integer_Array)
+                  return PyObject_Ptr is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; T1, T2 : PyObject_Ptr)
+                              return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject_Ptr :=
+                       Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
+      B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
+      PyParams     : PyObject_Ptr;
+      PyResult     : PyObject_Ptr;
+   begin
+      PyParams := Py_BuildValue (To_C ("OO"), A_Tuple, B_Tuple);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
 
    function Run_String (Script : String) return PyObject_Ptr is
       use System;

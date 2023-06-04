@@ -5,13 +5,14 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use  Basic_Printing;
 with Python;
 with Python_API;
+with Python_CLF;
 
 with Support_16A; use Support_16A;
 
 procedure Lesson_16A is
    Program_Name         : constant String := "Lesson 16A ";
-   Glove_Data           : constant Dictionary_List :=
-     Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
+--     Glove_Data           : constant Dictionary_List :=
+--       Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
    Newsgroups_File      : constant String := "Newsgroups.data";
    Max_Words            : constant Positive := 20000;
    Max_Sequence_Size    : constant Positive := 1000;
@@ -30,6 +31,7 @@ begin
                Integer'Image (Integer (Newsgroups.Data.Length)));
    New_Line;
    Tokenizer := Python.Call (Classifier, "init_tokenizer", Max_Words);
+   Python_CLF.Call (Classifier, "fit", Tokenizer, Newsgroups.Data);
 
 --     Python.Call (Classifier, "plot", Alphas, Result);
 
