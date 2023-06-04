@@ -3,6 +3,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
+with ML_Types;
 with Python;
 with Python_API;
 with Python_CLF;
@@ -20,6 +21,7 @@ procedure Lesson_16A is
    Classifier           : Python.Module;
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
+   Sequences            : ML_Types.Integer_List;
 begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_16a");
@@ -32,6 +34,8 @@ begin
    New_Line;
    Tokenizer := Python.Call (Classifier, "init_tokenizer", Max_Words);
    Python_CLF.Call (Classifier, "fit", Tokenizer, Newsgroups.Data);
+   Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
+                                 Newsgroups.Data);
 
 --     Python.Call (Classifier, "plot", Alphas, Result);
 

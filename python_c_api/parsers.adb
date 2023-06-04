@@ -73,7 +73,7 @@ package body Parsers is
       --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
       Tuple_Row_Size : constant int :=
-                         PyTuple_Size (PyTuple_GetItem (Tuple, 0));
+        PyTuple_Size (PyTuple_GetItem (Tuple, 0));
       Tuple_Row      : PyObject_Ptr;
       Tuple_Item     : PyObject_Ptr;
       Result         : Integer_Matrix (1 .. Integer (Tuple_Size),
@@ -100,7 +100,7 @@ package body Parsers is
    begin
       for index in Result'Range loop
          Result (index) := Float (PyFloat_AsDouble (PyTuple_GetItem
-                                    (Tuple, int (index - 1))));
+                                  (Tuple, int (index - 1))));
       end loop;
 
       return Result;
@@ -124,11 +124,29 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
+   function Parse_Tuple (Tuple : PyObject_Ptr) return ML_Types.Integer_List is
+      use ML_Types;
+      --           Routine_Name : constant String := "Parsers.Parse_Tuple Integer_List  ";
+      Tuple_Size     : constant int := PyTuple_Size (Tuple);
+      Value          : Integer;
+      Result         : Integer_List;
+   begin
+      for row in 0 .. Tuple_Size - 1 loop
+         Value := Integer (PyLong_AsLong (PyTuple_GetItem (Tuple, row)));
+         Result.Append (Value);
+      end loop;
+
+      return Result;
+
+   end Parse_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function Parse_Tuple (Tuple : PyObject_Ptr) return Real_Float_Matrix  is
       --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
       Tuple_Row_Size : constant int :=
-                         PyTuple_Size (PyTuple_GetItem (Tuple, 0));
+        PyTuple_Size (PyTuple_GetItem (Tuple, 0));
       Tuple_Row      : PyObject_Ptr;
       Tuple_Item     : PyObject_Ptr;
       Result         : Real_Float_Matrix (1 .. Integer (Tuple_Size),

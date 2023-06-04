@@ -129,7 +129,7 @@ package body Python_CLF is
 
       Routine_Name : constant String := "Python_CLF.Call Integers ";
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       PyParams     : PyObject_Ptr;
       PyResult     : PyObject_Ptr;
       Result       : Float;
@@ -164,7 +164,7 @@ package body Python_CLF is
 
       Routine_Name : constant String := "Python_CLF.Call Integers ";
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       PyParams     : PyObject_Ptr;
       PyResult     : PyObject_Ptr;
    begin
@@ -196,7 +196,7 @@ package body Python_CLF is
 
       Routine_Name : constant String := "Python_CLF.Call Integers ";
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       PyParams     : PyObject_Ptr;
       PyResult     : PyObject_Ptr;
       Result       : Float;
@@ -231,7 +231,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       PyParams     : PyObject_Ptr;
       Py_Result    : PyObject_Ptr;
@@ -265,7 +265,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       PyParams     : PyObject_Ptr;
       Py_Result    : PyObject_Ptr;
@@ -299,7 +299,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       PyParams     : PyObject_Ptr;
       Py_Result    : PyObject_Ptr;
@@ -333,7 +333,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       PyParams     : PyObject_Ptr;
       Py_Result    : PyObject_Ptr;
@@ -367,7 +367,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       PyParams     : PyObject_Ptr;
       PyResult     : PyObject_Ptr;
@@ -397,7 +397,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
       PyParams     : PyObject_Ptr;
@@ -435,7 +435,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
       PyParams     : PyObject_Ptr;
@@ -476,7 +476,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
       PyParams     : PyObject_Ptr;
@@ -516,7 +516,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
       PyParams     : PyObject_Ptr;
@@ -555,7 +555,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       PyParams     : PyObject_Ptr;
       Py_Result    : PyObject_Ptr;
@@ -750,7 +750,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String :=
-                       "Python_CLF.Call 4 * Integer_Array_List ";
+        "Python_CLF.Call 4 * Integer_Array_List ";
       PyFunc       : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
@@ -788,7 +788,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String :=
-                       "Python_CLF.Call 4 * Integer_Array_List ";
+        "Python_CLF.Call 4 * Integer_Array_List ";
       PyFunc       : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
@@ -1060,7 +1060,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String :=
-                       "Python_CLF.Call 2 * Real_Float_Vector ";
+        "Python_CLF.Call 2 * Real_Float_Vector ";
       PyFunc       : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
@@ -1098,7 +1098,7 @@ package body Python_CLF is
                   return Real_Float_Vector is
       use Python;
       Routine_Name : constant String :=
-                       "Python_CLF.Call Real_Float_List ";
+        "Python_CLF.Call Real_Float_List ";
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject_Ptr)  return PyObject_Ptr;
@@ -1143,7 +1143,7 @@ package body Python_CLF is
                   return Real_Float_Matrix is
       use Python;
       Routine_Name : constant String :=
-                       "Python_CLF.Call Float_Array ";
+        "Python_CLF.Call Float_Array ";
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject_Ptr)  return PyObject_Ptr;
@@ -1175,7 +1175,7 @@ package body Python_CLF is
 
       declare
          Result : constant Real_Float_Matrix :=
-                    Parsers.Parse_Tuple (PyResult);
+           Parsers.Parse_Tuple (PyResult);
       begin
          Py_DecRef (PyResult);
          return Result;
@@ -1190,7 +1190,7 @@ package body Python_CLF is
                   return Real_Float_Vector is
       use Python;
       Routine_Name : constant String :=
-                       "Python_CLF.Call 2 * Real_Float_Vector ";
+        "Python_CLF.Call 2 * Real_Float_Vector ";
 
       function Py_BuildValue (Format : Interfaces.C.char_array;
                               O1, T1 : PyObject_Ptr)  return PyObject_Ptr;
@@ -1275,7 +1275,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String :=
-                       "Python_CLF.Call Float_Matrix, Integer_Array ";
+        "Python_CLF.Call Float_Matrix, Integer_Array ";
       F            : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
@@ -1312,7 +1312,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String :=
-                       "Python_CLF.Call Float_Matrix, Integer_Array ";
+        "Python_CLF.Call Float_Matrix, Integer_Array ";
       F            : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
@@ -1384,7 +1384,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-                       Python.Get_Symbol (M, Function_Name);
+        Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
       PyParams     : PyObject_Ptr;
@@ -1413,7 +1413,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String :=
-                       "Python_CLF.Call Float_Matrix, Integer_Array ";
+        "Python_CLF.Call Float_Matrix, Integer_Array ";
       F            : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       PyParams     : PyObject_Ptr;
@@ -1438,13 +1438,54 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject_Ptr; A : ML_Types.Unbounded_List)
+                  return ML_Types.Integer_List is
+      use Python;
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              O1, T1 : PyObject_Ptr) return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String :=
+        "Python_CLF.Call Float_Matrix, Integer_Array ";
+      F            : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
+      PyParams     : PyObject_Ptr;
+      PyResult     : PyObject_Ptr;
+      Result       : ML_Types.Integer_List;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
+      PyResult := Call_Object (F, PyParams);
+
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      Result := Parsers.Parse_Tuple (PyResult);
+
+      Py_DecRef (PyResult);
+
+      return Result;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    function Get_Attribute (CLF : PyObject_Ptr; Attribute : String)
                            return PyObject_Ptr is
       use Interfaces.C;
       Routine_Name : constant String :=
-                       "Python_CLF.Get_Attribute Real_Float_Matrix ";
+        "Python_CLF.Get_Attribute Real_Float_Matrix ";
       PyString     : constant PyObject_Ptr :=
-                       PyString_FromString (To_C (Attribute));
+        PyString_FromString (To_C (Attribute));
       Py_Result    : PyObject_Ptr;
    begin
       Assert (CLF /= Null_Address, Routine_Name & "CLF is null");

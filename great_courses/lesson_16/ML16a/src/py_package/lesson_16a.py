@@ -23,8 +23,8 @@ def init_tokenizer(max_words):
 def fit (tokenizer, newsgroups_data):
     tokenizer.fit_on_texts(newsgroups_data)
 
-def get_swquences (tokenizer, newsgroups):
-    return tokenizer.texts_to_sequences(newsgroups_dataa)
+def get_sequences (tokenizer, newsgroups_data):
+    return tokenizer.texts_to_sequences(newsgroups_data)
 
 def predict_proba(clf, features):
     pred=clf.predict_proba(features)
