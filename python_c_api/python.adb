@@ -152,6 +152,36 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   function Call_Object (PyFunc : PyObject_Ptr) return PyObject_Ptr is
+      use Interfaces.C;
+      use type System.Address;
+      Routine_Name : constant String := "Support_16A.Call_Object ";
+      PyParams     : constant PyObject_Ptr := System.Null_Address;
+      PyResult     : PyObject_Ptr;
+   begin
+      Assert (PyFunc /= System.Null_Address, Routine_Name & "PyFunc is null.");
+      Assert (PyCallable_Check (PyFunc) /= 0, Routine_Name &
+                "PyCallable_Check is null.");
+      PyResult := PyObject_CallObject (PyFunc, PyParams);
+
+      if PyResult = System.Null_Address then
+         New_Line;
+         Put_Line (Routine_Name & "Python error message:");
+         PyErr_Print;
+         raise Python.Interpreter_Error with Routine_Name & "failed.";
+      end if;
+
+      return PyResult;
+
+   exception
+      when E : others =>
+         raise Python.Interpreter_Error with Routine_Name & "exception: " &
+           Exception_Message (E);
+
+   end Call_Object;
+
+   --  -------------------------------------------------------------------------
+
    function Call_Object (PyFunc, PyParams : PyObject_Ptr) return PyObject_Ptr is
       use Interfaces.C;
       use type System.Address;

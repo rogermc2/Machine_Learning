@@ -19,6 +19,8 @@ package Python is
     
    procedure Execute_String (Script : String);
    function Import_File (File_Name : String) return Module;
+   function Call_Object (PyFunc : Python_API.PyObject_Ptr)
+                         return Python_API.PyObject_Ptr;
    function Call_Object (PyFunc, PyParams : Python_API.PyObject_Ptr)
                          return Python_API.PyObject_Ptr;
    procedure Close_Module (M : Module);
