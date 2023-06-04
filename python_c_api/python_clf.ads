@@ -52,6 +52,8 @@ package Python_CLF is
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject_Ptr) return Integer_Array;
    function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject_Ptr) return ML_Types.Integer_List;
+   function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject_Ptr; A : Integer_Array_List)
                   return Integer_Array;
    function Call (M   : Python.Module; Function_Name : String;

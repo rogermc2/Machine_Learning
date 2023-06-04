@@ -686,6 +686,42 @@ package body Python_CLF is
    --  -------------------------------------------------------------------------
 
    function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject_Ptr) return ML_Types.Integer_List is
+      use Python;
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject_Ptr)  return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call Integer_Array ";
+      PyFunc       : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
+      PyParams     : PyObject_Ptr;
+      Py_Result    : PyObject_Ptr;
+      Result       : ML_Types.Integer_List;
+   begin
+      Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
+      PyParams := Py_BuildValue (Interfaces.C.To_C ("(O)"), CLF);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+
+      Py_Result := Call_Object (PyFunc, PyParams);
+      if Py_Result = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Py_DecRef (PyFunc);
+      Py_DecRef (PyParams);
+
+      Result := Parsers.Parse_Tuple (Py_Result);
+      Py_DecRef (Py_Result);
+
+      return Result;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject_Ptr; A : Integer_Array_List)
                   return Integer_Array is
       use Interfaces.C;

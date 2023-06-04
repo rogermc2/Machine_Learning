@@ -3,6 +3,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
+--  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;
 with Python_API;
@@ -12,8 +13,8 @@ with Support_16A; use Support_16A;
 
 procedure Lesson_16A is
    Program_Name         : constant String := "Lesson 16A ";
---     Glove_Data           : constant Dictionary_List :=
---       Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
+   Emmbeddings_Index     : constant Dictionary_List :=
+     Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
    Newsgroups_File      : constant String := "Newsgroups.data";
    Max_Words            : constant Positive := 20000;
    Max_Sequence_Size    : constant Positive := 1000;
@@ -22,7 +23,8 @@ procedure Lesson_16A is
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
    Sequences            : ML_Types.Integer_List;
-   Word_Index           : Integer;
+   Word_Index           : ML_Types.Integer_List;
+   Num_Words            : Natural;
 begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_16a");
@@ -38,6 +40,18 @@ begin
    Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
                                  Newsgroups.Data);
    Word_Index := Python_CLF.Call (Classifier, "get_word_index", Tokenizer);
+   Num_Words := Integer'Min (Max_Words, Integer (Word_Index.Length));
+
+   declare
+      Emmbedding_Matrix : array (1 .. Num_Words, 1 .. Emmbedding_Dimension)
+        of Integer := (others => (others => 0));
+   begin
+      for word in 1 .. Integer (Word_Index.Length) loop
+         if word < Max_Words then
+            null;
+         end if;
+      end loop;
+   end;
 
 --     Python.Call (Classifier, "plot", Alphas, Result);
 
