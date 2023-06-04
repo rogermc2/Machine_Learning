@@ -24,10 +24,14 @@ def fit (tokenizer, newsgroups_data):
     tokenizer.fit_on_texts(newsgroups_data)
 
 def get_sequences (tokenizer, newsgroups_data):
-    return tokenizer.texts_to_sequences(newsgroups_data)
+    return tuple (map(tuple,tokenizer.texts_to_sequences(newsgroups_data)))
 
 def get_word_index (tokenizer):
-    return tokenizer.word_index
+    print("get_word_index word_index type: ", type(tokenizer.word_index))
+    return tuple (tokenizer.word_index)
+
+def get_data (sequences, max_sequence_length):
+    return tuple (tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length))
     
 def predict_proba(clf, features):
     pred=clf.predict_proba(features)

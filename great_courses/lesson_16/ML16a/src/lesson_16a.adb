@@ -3,7 +3,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use  Basic_Printing;
+with Basic_Printing; use  Basic_Printing;
 --  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with NL_Types;
@@ -24,7 +24,7 @@ procedure Lesson_16A is
    Classifier           : Python.Module;
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
-   Sequences            : ML_Types.Integer_List;
+   Sequences            : ML_Types.Integer_List_2D;
    Word_Index           : ML_Types.Unbounded_List;
    Embedding_Vector     : NL_Types.Float_List;
    Num_Words            : Natural;
@@ -42,7 +42,10 @@ begin
    Python_CLF.Call (Classifier, "fit", Tokenizer, Newsgroups.Data);
    Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
                                  Newsgroups.Data);
+   Print_Integer_List_2D (Program_Name & "Sequences", Sequences, 1, 1);
    Word_Index := Python_CLF.Call (Classifier, "get_word_index", Tokenizer);
+   Put_Line (Program_Name & Integer'Image (Integer (Word_Index.Length)) &
+               " unique tokens found.");
    Num_Words := Integer'Min (Max_Words, Integer (Word_Index.Length));
 
    declare

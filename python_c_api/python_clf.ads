@@ -112,6 +112,9 @@ package Python_CLF is
    function Call (M   : Python.Module; Function_Name : String;
                   CLF : PyObject_Ptr; A : ML_Types.Unbounded_List)
                   return ML_Types.Integer_List;
+   function Call (M   : Python.Module; Function_Name : String;
+                  CLF : PyObject_Ptr; A : ML_Types.Unbounded_List)
+                  return ML_Types.Integer_List_2D;
    function Get_Attribute (CLF : PyObject_Ptr; Attribute : String)
                            return PyObject_Ptr;
    
