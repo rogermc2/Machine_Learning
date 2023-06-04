@@ -14,5 +14,6 @@ package Parsers is
    function Parse_Tuple (Tuple : PyObject_Ptr) return Integer_Matrix;
    function Parse_Tuple (Tuple : PyObject_Ptr) return Real_Float_Matrix;
    function Parse_Tuple (Tuple : PyObject_Ptr) return Real_Float_Vector;
+   function Parse_Tuple (Tuple : PyObject_Ptr) return ML_Types.Unbounded_List;
 
 end Parsers;

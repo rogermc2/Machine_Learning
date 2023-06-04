@@ -2,7 +2,10 @@
 with Interfaces.C; use Interfaces.C;
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Strings.Unbounded;
 --  with Ada.Text_IO; use Ada.Text_IO;
+
+with Python;
 
 package body Parsers is
 
@@ -174,6 +177,29 @@ package body Parsers is
       for index in Result'Range loop
          Result (index) := Float (PyFloat_AsDouble (PyTuple_GetItem
                                   (Tuple, int (index - 1))));
+      end loop;
+
+      return Result;
+
+   end Parse_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function Parse_Tuple (Tuple : PyObject_Ptr) return ML_Types.Unbounded_List is
+      use Ada.Strings.Unbounded;
+      use ML_Types;
+      --           Routine_Name : constant String := "Parsers.Parse_Tuple Integer_List  ";
+      Tuple_Size     : constant int := PyTuple_Size (Tuple);
+      Py_Rep         : PyObject_Ptr;
+      Py_String      : PyObject_Ptr;
+      Value          : Unbounded_String;
+      Result         : Unbounded_List;
+   begin
+      for row in 0 .. Tuple_Size - 1 loop
+         Py_Rep := PyObject_Repr (PyTuple_GetItem (Tuple, row));
+         Py_String := PyUnicode_AsUTF8 (Py_Rep);
+         Value := To_Unbounded_String (Python.Py_String_To_Ada (Py_String));
+         Result.Append (Value);
       end loop;
 
       return Result;

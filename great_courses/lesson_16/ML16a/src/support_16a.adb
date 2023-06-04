@@ -66,12 +66,13 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Glove_Data (File_Name : String) return Dictionary_List is
+   function Get_Glove_Data (File_Name : String) return Dictionary is
       Routine_Name : constant String := "Support_16A.Get_Glove_Data ";
       File_ID      : File_Type;
       Num_Lines    : Natural := 0;
       Row          : Natural := 0;
-      Embeddings   : Dictionary_List;
+      Item         : Dictionary_Record;
+      Embeddings   : Dictionary;
    begin
       New_Line;
       Put_Line (Routine_Name & "reading " & File_Name);
@@ -86,7 +87,8 @@ package body Support_16A is
             Put ("*");
          end if;
 
-         Embeddings.Append (Process_Glove_Line (File_ID));
+         Item := Process_Glove_Line (File_ID);
+         Embeddings.Insert (Item.Key, Item.Values);
       end loop;
       New_Line;
 
@@ -190,14 +192,13 @@ package body Support_16A is
 
    function Process_Glove_Line (File_ID : File_Type) return Dictionary_Record is
       use Neural_Utilities;
-      use ML_Types;
       use String_Package;
       --        Routine_Name  : constant String := "Support_16A.Process_Glove_Line ";
       aLine         : constant String := Get_Line (File_ID);
       Values        : ML_Types.String_List;
       Values_Cursor : String_Package.Cursor;
       Word          : Unbounded_String;
-      Coeffs        : NL_Types.Float_List;
+      Coeffs        : ML_Types.Integer_List;
    begin
       Values := Split_String_On_Spaces (aLine);
       Values_Cursor := Values.First;
@@ -205,7 +206,7 @@ package body Support_16A is
       Next (Values_Cursor);
 
       while Has_Element (Values_Cursor) loop
-         Coeffs.Append (Float'Value
+         Coeffs.Append (Integer'Value
                         (To_String (Element ((Values_Cursor)))));
          Next (Values_Cursor);
       end loop;

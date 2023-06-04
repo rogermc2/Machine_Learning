@@ -28,14 +28,15 @@ package ML_Types is
    subtype Question_Type is Class_Range;
 
    package Integer_Package is new
-      Ada.Containers.Vectors (Natural, Integer);
+     Ada.Containers.Vectors (Natural, Integer);
    subtype Integer_List is Integer_Package.Vector;
-    package Integer_Sorting is new Integer_Package.Generic_Sorting ("<");
+   package Integer_Sorting is new Integer_Package.Generic_Sorting ("<");
+   function "=" (L, R : Integer_List) return Boolean;
    type Array_Of_Integer_Lists is array (Integer range <>) of Integer_List;
 
    use Integer_Package;
    package Integer_Package_2D is new
-      Ada.Containers.Vectors (Natural, Integer_List);
+     Ada.Containers.Vectors (Natural, Integer_List);
    subtype Integer_List_2D is Integer_Package_2D.Vector;
 
    function Transpose (Values : Integer_List_2D) return  Integer_List_2D;
@@ -251,7 +252,7 @@ package ML_Types is
          when Float_Type => Float_Value         : Float := 0.0;
          when Boolean_Type => Boolean_Value     : Boolean := False;
          when UB_String_Type => UB_String_Value : Unbounded_String :=
-                                                       To_Unbounded_String ("");
+              To_Unbounded_String ("");
       end case;
    end record;
 

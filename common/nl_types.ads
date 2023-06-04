@@ -25,6 +25,7 @@ package NL_Types is
    subtype Float_List is Float_Package.Vector;
    package Float_Sorting is new Float_Package.Generic_Sorting ("<");
    function ">" (L, R : Float_List) return Boolean;
+   function "=" (L, R : Float_List) return Boolean;
    pragma Inline (">");
    function "+" (L, R : Float_List) return Float_List;
    pragma Inline ("+");

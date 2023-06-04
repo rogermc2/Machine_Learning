@@ -1,5 +1,6 @@
 
 with Ada.Exceptions; use Ada.Exceptions;
+--  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
@@ -13,7 +14,7 @@ with Support_16A; use Support_16A;
 
 procedure Lesson_16A is
    Program_Name         : constant String := "Lesson 16A ";
-   Emmbeddings_Index     : constant Dictionary_List :=
+   Emmbeddings_Index    : constant Dictionary :=
      Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
    Newsgroups_File      : constant String := "Newsgroups.data";
    Max_Words            : constant Positive := 20000;
@@ -23,7 +24,8 @@ procedure Lesson_16A is
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
    Sequences            : ML_Types.Integer_List;
-   Word_Index           : ML_Types.Integer_List;
+   Word_Index           : ML_Types.Unbounded_List;
+   Embedding_Vector     : ML_Types.Integer_List;
    Num_Words            : Natural;
 begin
    Python.Initialize;
@@ -43,12 +45,13 @@ begin
    Num_Words := Integer'Min (Max_Words, Integer (Word_Index.Length));
 
    declare
-      Emmbedding_Matrix : array (1 .. Num_Words, 1 .. Emmbedding_Dimension)
-        of Integer := (others => (others => 0));
+--        Emmbedding_Matrix : array (1 .. Num_Words, 1 .. Emmbedding_Dimension)
+      Emmbedding_Matrix : array (1 .. Num_Words) of ML_Types.Integer_List;
    begin
       for word in 1 .. Integer (Word_Index.Length) loop
          if word < Max_Words then
-            null;
+            Embedding_Vector := Emmbeddings_Index.Element (Word_Index (word));
+            Emmbedding_Matrix (word) := Embedding_Vector;
          end if;
       end loop;
    end;

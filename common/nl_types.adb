@@ -35,6 +35,19 @@ package body NL_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function "=" (L, R : Float_List) return Boolean is
+      Result : Boolean := True;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result := Result and L.Element (index) = R.Element (index);
+      end loop;
+
+      return Result;
+
+   end "=";
+
+   --  ----------------------------------------------------------------------------
+
    function "+" (L, R : Float_List) return Float_List is
       Result : Float_List;
    begin
