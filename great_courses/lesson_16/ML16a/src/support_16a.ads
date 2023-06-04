@@ -4,6 +4,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
+with NL_Types;
 with Python;
 with Python_API;
 
@@ -16,7 +17,7 @@ package Support_16A is
 
    type Dictionary_Record is record
       Key    : Unbounded_String;
-      Values : ML_Types.Integer_List;
+      Values : NL_Types.Float_List;
    end record;
 
    type Newsgroups_Record is record
@@ -27,9 +28,9 @@ package Support_16A is
       Target_Names : Python_API.PyObject_Ptr;
    end record;
 
-   use ML_Types;
+   use NL_Types;
    package Dictionary_Package is new
-     Ada.Containers.Ordered_Maps (Unbounded_String, ML_Types.Integer_List);
+     Ada.Containers.Ordered_Maps (Unbounded_String, Float_List);
    subtype Dictionary is Dictionary_Package.Map;
 
    function ProbA_Chooser

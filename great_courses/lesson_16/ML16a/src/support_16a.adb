@@ -192,13 +192,13 @@ package body Support_16A is
 
    function Process_Glove_Line (File_ID : File_Type) return Dictionary_Record is
       use Neural_Utilities;
-      use String_Package;
+      use ML_Types.String_Package;
       --        Routine_Name  : constant String := "Support_16A.Process_Glove_Line ";
       aLine         : constant String := Get_Line (File_ID);
       Values        : ML_Types.String_List;
-      Values_Cursor : String_Package.Cursor;
+      Values_Cursor : Cursor;
       Word          : Unbounded_String;
-      Coeffs        : ML_Types.Integer_List;
+      Coeffs        : NL_Types.Float_List;
    begin
       Values := Split_String_On_Spaces (aLine);
       Values_Cursor := Values.First;
@@ -206,7 +206,7 @@ package body Support_16A is
       Next (Values_Cursor);
 
       while Has_Element (Values_Cursor) loop
-         Coeffs.Append (Integer'Value
+         Coeffs.Append (Float'Value
                         (To_String (Element ((Values_Cursor)))));
          Next (Values_Cursor);
       end loop;

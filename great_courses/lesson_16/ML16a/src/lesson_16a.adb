@@ -6,6 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use  Basic_Printing;
 --  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
+with NL_Types;
 with Python;
 with Python_API;
 with Python_CLF;
@@ -25,7 +26,7 @@ procedure Lesson_16A is
    Newsgroups           : Newsgroups_Record;
    Sequences            : ML_Types.Integer_List;
    Word_Index           : ML_Types.Unbounded_List;
-   Embedding_Vector     : ML_Types.Integer_List;
+   Embedding_Vector     : NL_Types.Float_List;
    Num_Words            : Natural;
 begin
    Python.Initialize;
@@ -46,7 +47,7 @@ begin
 
    declare
 --        Emmbedding_Matrix : array (1 .. Num_Words, 1 .. Emmbedding_Dimension)
-      Emmbedding_Matrix : array (1 .. Num_Words) of ML_Types.Integer_List;
+      Emmbedding_Matrix : array (1 .. Num_Words) of NL_Types.Float_List;
    begin
       for word in 1 .. Integer (Word_Index.Length) loop
          if word < Max_Words then
