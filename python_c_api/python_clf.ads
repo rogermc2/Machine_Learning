@@ -10,6 +10,8 @@ package Python_CLF is
 
    Interpreter_Error : exception;
    
+   function Call (M   : Python.Module; Function_Name : String;
+                  Obj : PyObject_Ptr) return Integer;
    function Call (M : Python.Module; Function_Name : String; A : PyObject_Ptr)
                   return PyObject_Ptr;
    function Call (M : Python.Module; Function_Name : String; A : Positive)

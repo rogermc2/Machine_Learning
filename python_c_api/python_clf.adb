@@ -15,6 +15,41 @@ package body Python_CLF is
 
    --  -------------------------------------------------------------------------
 
+   function Call (M   : Python.Module; Function_Name : String;
+                  Obj : PyObject_Ptr) return Integer is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; O1 : PyObject_Ptr)
+                              return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      Routine_Name : constant String := "Python_CLF.Call Integers ";
+      F            : constant PyObject_Ptr :=
+        Python.Get_Symbol (M, Function_Name);
+      PyParams     : PyObject_Ptr;
+      PyResult     : PyObject_Ptr;
+      Result       : Integer;
+   begin
+      Assert (Obj /= System.Null_Address, Routine_Name & "Obj is null");
+      PyParams := Py_BuildValue (To_C ("(O)"), Obj);
+      PyResult := Python.Call_Object (F, PyParams);
+      if PyResult = System.Null_Address then
+         Put (Routine_Name & "Py error message: ");
+         PyErr_Print;
+      end if;
+
+      Result := Integer (PyInt_AsLong (PyResult));
+
+      Py_DecRef (F);
+      Py_DecRef (PyParams);
+      Py_DecRef (PyResult);
+
+      return Result;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    function Call (M : Python.Module; Function_Name : String; A : Positive)
                   return PyObject_Ptr is
       use Interfaces.C;

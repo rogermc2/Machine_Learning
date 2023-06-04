@@ -26,6 +26,9 @@ def fit (tokenizer, newsgroups_data):
 def get_sequences (tokenizer, newsgroups_data):
     return tokenizer.texts_to_sequences(newsgroups_data)
 
+def get_word_index (tokenizer):
+    return tokenizer.word_index
+    
 def predict_proba(clf, features):
     pred=clf.predict_proba(features)
     return tuple(map(tuple, pred))

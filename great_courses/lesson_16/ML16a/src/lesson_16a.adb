@@ -22,6 +22,7 @@ procedure Lesson_16A is
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
    Sequences            : ML_Types.Integer_List;
+   Word_Index           : Integer;
 begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_16a");
@@ -36,6 +37,7 @@ begin
    Python_CLF.Call (Classifier, "fit", Tokenizer, Newsgroups.Data);
    Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
                                  Newsgroups.Data);
+   Word_Index := Python_CLF.Call (Classifier, "get_word_index", Tokenizer);
 
 --     Python.Call (Classifier, "plot", Alphas, Result);
 
