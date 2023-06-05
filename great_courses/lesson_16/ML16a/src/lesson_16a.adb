@@ -16,7 +16,7 @@ with Support_16A; use Support_16A;
 
 procedure Lesson_16A is
    Program_Name         : constant String := "Lesson 16A ";
-   Emmbeddings_Index    : constant Dictionary :=
+   Emmbeddings_Index    : constant Coeffs_Dictionary :=
      Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
    Newsgroups_File      : constant String := "Newsgroups.data";
    Max_Words            : constant Positive := 20000;
@@ -26,7 +26,7 @@ procedure Lesson_16A is
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
    Sequences            : ML_Types.Integer_List_2D;
-   Word_Index           : Word_Dictionary;
+   Word_Index           : Occurrences_Dictionary;
    Embedding_Vector     : NL_Types.Float_List;
    Num_Words            : Natural;
 begin
@@ -50,7 +50,7 @@ begin
    Num_Words := Integer'Min (Max_Words, Integer (Word_Index.Length));
 
    declare
-      use Word_Dictionary_Package;
+      use Occurrences_Dictionary_Package;
       aKey       : Unbounded_String;
 --        Value      : Integer;
       Word_Count : Natural := 0;

@@ -24,7 +24,7 @@ package body Support_16A is
    --     function Tokenize (aLine : String; Dictionary : Dictionary_List)
    --                        return Integer_Array;
    --     pragma Inline (Tokenize);
-   function Process_Glove_Line (File_ID : File_Type) return Dictionary_Record;
+   function Process_Glove_Line (File_ID : File_Type) return Coeffs_Record;
    pragma Inline (Process_Glove_Line);
 
    --  -------------------------------------------------------------------------
@@ -66,13 +66,13 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Glove_Data (File_Name : String) return Dictionary is
+   function Get_Glove_Data (File_Name : String) return Coeffs_Dictionary is
       Routine_Name : constant String := "Support_16A.Get_Glove_Data ";
       File_ID      : File_Type;
       Num_Lines    : Natural := 0;
       Row          : Natural := 0;
-      Item         : Dictionary_Record;
-      Embeddings   : Word_Dictionary;
+      Item         : Coeffs_Record;
+      Embeddings   : Coeffs_Dictionary;
    begin
       New_Line;
       Put_Line (Routine_Name & "reading " & File_Name);
@@ -88,7 +88,7 @@ package body Support_16A is
          end if;
 
          Item := Process_Glove_Line (File_ID);
-         Embeddings.Insert (Item.Key, Item.Values);
+         Embeddings.Insert (Item.Key, Item.Coeffs);
       end loop;
       New_Line;
 
@@ -190,7 +190,7 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
-   function Process_Glove_Line (File_ID : File_Type) return Dictionary_Record is
+   function Process_Glove_Line (File_ID : File_Type) return Coeffs_Record is
       use Neural_Utilities;
       use ML_Types.String_Package;
       --        Routine_Name  : constant String := "Support_16A.Process_Glove_Line ";

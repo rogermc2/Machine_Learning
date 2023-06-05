@@ -12,8 +12,8 @@ with ML_Types;
 
 package body Python_16A is
 
-   function Parse_Word_Dictionary (Tuple : Python_API.PyObject_Ptr)
-                                     return Support_16A.Word_Dictionary;
+   function Parse_Occurrences_Dictionary (Tuple : Python_API.PyObject_Ptr)
+                                          return Support_16A.Occurrences_Dictionary;
    function Parse_Tuples (Tuples : Python_API.PyObject_Ptr) return
      Support_16A.Newsgroups_Record;
 
@@ -21,7 +21,7 @@ package body Python_16A is
 
    function Call (M : Python.Module; Function_Name : String;
                   Tokeniser : Python_API.PyObject_Ptr)
-                  return Support_16A.Word_Dictionary is
+                  return Support_16A.Occurrences_Dictionary is
       use Interfaces.C;
       use Python_API;
 
@@ -32,13 +32,13 @@ package body Python_16A is
       F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
       PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
-      Result   : Support_16A.Word_Dictionary;
+      Result   : Support_16A.Occurrences_Dictionary;
    begin
       PyParams := Py_BuildValue (To_C ("(O)"), Tokeniser);
       PyResult := Python.Call_Object (F, PyParams);
       Py_DecRef (F);
 
-      Result := Parse_Word_Dictionary (PyResult);
+      Result := Parse_Occurrences_Dictionary (PyResult);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
@@ -67,19 +67,19 @@ package body Python_16A is
 
    -- --------------------------------------------------------------------------
 
-   function Parse_Word_Dictionary (Tuple : Python_API.PyObject_Ptr)
-                                     return Support_16A.Word_Dictionary is
+   function Parse_Occurrences_Dictionary (Tuple : Python_API.PyObject_Ptr)
+                                          return Support_16A.Occurrences_Dictionary is
       use System;
       use Interfaces.C;
       use Ada.Strings.Unbounded;
       use Python_API;
-      Routine_Name    : constant String := "Python_16A.Parse_Dictionary_List ";
+      Routine_Name    : constant String := "Python_16A.Parse_Occurrences_Dictionary ";
       Tuple_Size      : constant int := PyTuple_Size (Tuple);
       Tuple_Item      : PyObject_Ptr;
       Py_Str_Ptr      : PyObject_Ptr;
       Key             : Unbounded_String;
       Value           : Integer;
-      Data            : Support_16A.Word_Dictionary;
+      Data            : Support_16A.Occurrences_Dictionary;
    begin
       New_Line;
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
@@ -97,12 +97,12 @@ package body Python_16A is
 
       return Data;
 
-   end Parse_Word_Dictionary;
+   end Parse_Occurrences_Dictionary;
 
    -- --------------------------------------------------------------------------
 
    function Parse_Text_Tuple (Tuple : Python_API.PyObject_Ptr)
-                                                           return ML_Types.Unbounded_List is
+                              return ML_Types.Unbounded_List is
       use System;
       use Interfaces.C;
       use Ada.Strings.Unbounded;
@@ -168,7 +168,7 @@ package body Python_16A is
    -- --------------------------------------------------------------------------
 
    function Parse_Tuples (Tuples : Python_API.PyObject_Ptr)
-                                                       return Support_16A.Newsgroups_Record is
+                          return Support_16A.Newsgroups_Record is
       use Interfaces.C;
       use Python_API;
       --        Routine_Name : constant String := "Python_16A.Parse_Tuples  ";

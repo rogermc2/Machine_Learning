@@ -15,9 +15,9 @@ package Support_16A is
       Labels   : Integer_Matrix (1 .. Rows, 1 .. 1);
    end record;
 
-   type Dictionary_Record is record
+   type Coeffs_Record is record
       Key    : Unbounded_String;
-      Values : NL_Types.Float_List;
+      Coeffs : NL_Types.Float_List;
    end record;
 
    type Newsgroups_Record is record
@@ -29,13 +29,13 @@ package Support_16A is
    end record;
 
    use NL_Types;
-   package Dictionary_Package is new
+   package Coeffs_Dictionary_Package is new
      Ada.Containers.Ordered_Maps (Unbounded_String, Float_List);
-   subtype Dictionary is Dictionary_Package.Map;
+   subtype Coeffs_Dictionary is Coeffs_Dictionary_Package.Map;
 
-   package Word_Dictionary_Package is new
+   package Occurrences_Dictionary_Package is new
      Ada.Containers.Ordered_Maps (Unbounded_String, Integer);
-   subtype Word_Dictionary is Word_Dictionary_Package.Map;
+   subtype Occurrences_Dictionary is Occurrences_Dictionary_Package.Map;
 
    function ProbA_Chooser
      (Classifier       : Python.Module;
@@ -44,7 +44,7 @@ package Support_16A is
       Train_Set        : ML_Types.Integer_List_2D;
       Train_Labels     : ML_Types.Integer_List; Alpha : Integer;
       Clf              : Python_API.PyObject_Ptr) return Integer;
-   function Get_Glove_Data (File_Name : String) return Dictionary;
+   function Get_Glove_Data (File_Name : String) return Coeffs_Dictionary;
    function Load_Newsgroups (Classifier : Python.Module; File_Name : String;
                        Reload : Boolean := False) return Newsgroups_Record;
 --     function Read_Vocabulary (File_Name : String) return Dictionary_List;
