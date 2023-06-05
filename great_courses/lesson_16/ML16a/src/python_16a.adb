@@ -9,28 +9,37 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 with ML_Types;
-with Python_API;
 
 package body Python_16A is
 
-   function Parse_Dictionary_Record (Tuple : Python_API.PyObject_Ptr)
-                                     return Support_16A.Dictionary_Record;
+   function Parse_Word_Dictionary (Tuple : Python_API.PyObject_Ptr)
+                                     return Support_16A.Word_Dictionary;
    function Parse_Tuples (Tuples : Python_API.PyObject_Ptr) return
      Support_16A.Newsgroups_Record;
 
    --  -------------------------------------------------------------------------
 
-   function Call (M : Python.Module; Function_Name : String)
-                  return Support_16A.Dictionary_Record is
+   function Call (M : Python.Module; Function_Name : String;
+                  Tokeniser : Python_API.PyObject_Ptr)
+                  return Support_16A.Word_Dictionary is
+      use Interfaces.C;
       use Python_API;
+
+      function Py_BuildValue (Format : char_array; O1 : PyObject_Ptr)
+                              return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
       F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
-      Result   : Support_16A.Dictionary_Record;
+      Result   : Support_16A.Word_Dictionary;
    begin
-      PyResult := Python.Call_Object (F);
+      PyParams := Py_BuildValue (To_C ("(O)"), Tokeniser);
+      PyResult := Python.Call_Object (F, PyParams);
       Py_DecRef (F);
 
-      Result := Parse_Dictionary_Record (PyResult);
+      Result := Parse_Word_Dictionary (PyResult);
+      Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
       return Result;
@@ -58,19 +67,19 @@ package body Python_16A is
 
    -- --------------------------------------------------------------------------
 
-   function Parse_Dictionary_Record (Tuple : Python_API.PyObject_Ptr)
-                                     return Support_16A.Dictionary_Record is
+   function Parse_Word_Dictionary (Tuple : Python_API.PyObject_Ptr)
+                                     return Support_16A.Word_Dictionary is
       use System;
       use Interfaces.C;
       use Ada.Strings.Unbounded;
-      use ML_Types;
       use Python_API;
-      Routine_Name    : constant String := "Python_16A.Parse_Text_Tuple ";
+      Routine_Name    : constant String := "Python_16A.Parse_Dictionary_List ";
       Tuple_Size      : constant int := PyTuple_Size (Tuple);
       Tuple_Item      : PyObject_Ptr;
-      Tuple_Item_Size : Integer;
       Py_Str_Ptr      : PyObject_Ptr;
-      Data_List       : Support_16A.Dictionary_Record;
+      Key             : Unbounded_String;
+      Value           : Integer;
+      Data            : Support_16A.Word_Dictionary;
    begin
       New_Line;
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
@@ -80,52 +89,20 @@ package body Python_16A is
          Tuple_Item := PyTuple_GetItem (Tuple, item);
          Assert (Tuple_Item /= System.Null_Address, Routine_Name &
                    "Tuple_Item is null");
-         Tuple_Item_Size := Integer (PyTuple_Size (Tuple_Item));
-         --           Put_Line (Routine_Name & "Tuple_Item size: " &
-         --                       Integer'Image (Tuple_Item_Size));
-
-         declare
-            Text          : String (1 .. Tuple_Item_Size);
-            Has_Long_Char : Boolean := False;
-         begin
-            for index in 0 .. Tuple_Item_Size - 1 loop
-               Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
-               declare
-                  aChar     : constant String :=
-                                Python.Py_String_To_Ada (Py_Str_Ptr);
-                  Long_Char : constant Boolean := aChar'Length > 1;
-               begin
-                  if Long_Char then
-                     Has_Long_Char := True;
-                     --                       Put_Line (Routine_Name & "Item, index" &
-                     --                                   int'Image (item) & ","  &
-                     --                                   Integer'Image (index) & ":");
-                     --                       Put_Line ("String: " & aChar);
-                     --                       Put_Line ("String (1): " & aChar (1));
-                     Text (index + 1) := '|';
-                  else
-                     Text (index + 1) := aChar (1);
-                  end if;
-               end;
-
-               if Has_Long_Char then
-                  Put_Line (Text);
-               end if;
-            end loop;
-            Data_List.Append (To_Unbounded_String (Text));
-            --              Put_Line (Routine_Name & "Text: " & Text);
-         end;
-
+         Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, 0);
+         Key := To_Unbounded_String (Python.Py_String_To_Ada (Py_Str_Ptr));
+         Value := Integer (PyInt_AsLong (PyTuple_GetItem (Tuple_Item, 0)));
+         Data.Insert (Key, Value);
       end loop;
 
-      return Data_List;
+      return Data;
 
-   end Parse_Dictionary_Record;
+   end Parse_Word_Dictionary;
 
    -- --------------------------------------------------------------------------
 
    function Parse_Text_Tuple (Tuple : Python_API.PyObject_Ptr)
-                              return ML_Types.Unbounded_List is
+                                                           return ML_Types.Unbounded_List is
       use System;
       use Interfaces.C;
       use Ada.Strings.Unbounded;
@@ -158,7 +135,7 @@ package body Python_16A is
                Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
                declare
                   aChar     : constant String :=
-                                Python.Py_String_To_Ada (Py_Str_Ptr);
+                    Python.Py_String_To_Ada (Py_Str_Ptr);
                   Long_Char : constant Boolean := aChar'Length > 1;
                begin
                   if Long_Char then
@@ -191,7 +168,7 @@ package body Python_16A is
    -- --------------------------------------------------------------------------
 
    function Parse_Tuples (Tuples : Python_API.PyObject_Ptr)
-                          return Support_16A.Newsgroups_Record is
+                                                       return Support_16A.Newsgroups_Record is
       use Interfaces.C;
       use Python_API;
       --        Routine_Name : constant String := "Python_16A.Parse_Tuples  ";

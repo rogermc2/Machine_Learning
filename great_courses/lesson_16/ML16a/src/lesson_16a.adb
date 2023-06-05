@@ -1,6 +1,6 @@
 
 with Ada.Exceptions; use Ada.Exceptions;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Basic_Printing; use  Basic_Printing;
@@ -11,6 +11,7 @@ with Python;
 with Python_API;
 with Python_CLF;
 
+with Python_16A;
 with Support_16A; use Support_16A;
 
 procedure Lesson_16A is
@@ -25,7 +26,7 @@ procedure Lesson_16A is
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
    Sequences            : ML_Types.Integer_List_2D;
-   Word_Index           : Dictionary_Record;
+   Word_Index           : Word_Dictionary;
    Embedding_Vector     : NL_Types.Float_List;
    Num_Words            : Natural;
 begin
@@ -43,19 +44,26 @@ begin
    Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
                                  Newsgroups.Data);
    Print_Integer_List_2D (Program_Name & "Sequences", Sequences, 1, 1);
-   Word_Index := Python_CLF.Call (Classifier, "get_word_index", Tokenizer);
+   Word_Index := Python_16A.Call (Classifier, "get_word_index", Tokenizer);
    Put_Line (Program_Name & Integer'Image (Integer (Word_Index.Length)) &
                " unique tokens found.");
    Num_Words := Integer'Min (Max_Words, Integer (Word_Index.Length));
 
    declare
+      use Word_Dictionary_Package;
+      aKey       : Unbounded_String;
+--        Value      : Integer;
+      Word_Count : Natural := 0;
 --        Emmbedding_Matrix : array (1 .. Num_Words, 1 .. Emmbedding_Dimension)
       Emmbedding_Matrix : array (1 .. Num_Words) of NL_Types.Float_List;
    begin
-      for word in 1 .. Integer (Word_Index.Length) loop
-         if word < Max_Words then
-            Embedding_Vector := Emmbeddings_Index.Element (Word_Index (word));
-            Emmbedding_Matrix (word) := Embedding_Vector;
+      for index in Word_Index.Iterate loop
+         Word_Count := Word_Count + 1;
+         if Word_Count <= Max_Words then
+            aKey := Key (index);
+--              Value := Element (index);
+            Embedding_Vector := Emmbeddings_Index.Element (aKey);
+            Emmbedding_Matrix (Word_Count) := Embedding_Vector;
          end if;
       end loop;
    end;

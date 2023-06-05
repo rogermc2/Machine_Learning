@@ -16,8 +16,8 @@ package Support_16A is
    end record;
 
    type Dictionary_Record is record
-      Key   : Unbounded_String;
-      Value : Integer;
+      Key    : Unbounded_String;
+      Values : NL_Types.Float_List;
    end record;
 
    type Newsgroups_Record is record
@@ -32,6 +32,10 @@ package Support_16A is
    package Dictionary_Package is new
      Ada.Containers.Ordered_Maps (Unbounded_String, Float_List);
    subtype Dictionary is Dictionary_Package.Map;
+
+   package Word_Dictionary_Package is new
+     Ada.Containers.Ordered_Maps (Unbounded_String, Integer);
+   subtype Word_Dictionary is Word_Dictionary_Package.Map;
 
    function ProbA_Chooser
      (Classifier       : Python.Module;

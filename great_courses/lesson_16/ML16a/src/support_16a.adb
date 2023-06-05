@@ -36,7 +36,7 @@ package body Support_16A is
       Best_Index   : Positive;
       pragma Warnings (Off);
       Best         : constant Float := Max (Values, Best_Index);
-      pragma Warnings (On)Dictionary_Record;
+      pragma Warnings (On);
    begin
       return Indices (Best_Index);
 
@@ -72,7 +72,7 @@ package body Support_16A is
       Num_Lines    : Natural := 0;
       Row          : Natural := 0;
       Item         : Dictionary_Record;
-      Embeddings   : Dictionary;
+      Embeddings   : Word_Dictionary;
    begin
       New_Line;
       Put_Line (Routine_Name & "reading " & File_Name);
