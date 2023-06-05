@@ -91,8 +91,12 @@ package body Python_16A is
                    "Tuple_Item is null");
          Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, 0);
          Key := To_Unbounded_String (Python.Py_String_To_Ada (Py_Str_Ptr));
-         Value := Integer (PyInt_AsLong (PyTuple_GetItem (Tuple_Item, 0)));
-         Data.Insert (Key, Value);
+         if To_String (Key)'Length > 0 then
+            Put_Line (Routine_Name & "item, Key: "& int'Image (item) & ", " &
+                        To_String (Key));
+            Value := Integer (PyInt_AsLong (PyTuple_GetItem (Tuple_Item, 0)));
+            Data.Insert (Key, Value);
+         end if;
       end loop;
 
       return Data;
@@ -117,15 +121,12 @@ package body Python_16A is
    begin
       New_Line;
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
-      --        Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
 
       for item in 0 .. Tuple_Size - 1 loop
          Tuple_Item := PyTuple_GetItem (Tuple, item);
          Assert (Tuple_Item /= System.Null_Address, Routine_Name &
                    "Tuple_Item is null");
          Tuple_Item_Size := Integer (PyTuple_Size (Tuple_Item));
-         --           Put_Line (Routine_Name & "Tuple_Item size: " &
-         --                       Integer'Image (Tuple_Item_Size));
 
          declare
             Text          : String (1 .. Tuple_Item_Size);
@@ -146,7 +147,7 @@ package body Python_16A is
                      --                       Put_Line ("String: " & aChar);
                      --                       Put_Line ("String (1): " & aChar (1));
                      Text (index + 1) := '|';
-                  else
+                  elsif aChar'Length = 1 then
                      Text (index + 1) := aChar (1);
                   end if;
                end;
@@ -156,7 +157,6 @@ package body Python_16A is
                end if;
             end loop;
             Data_List.Append (To_Unbounded_String (Text));
-            --              Put_Line (Routine_Name & "Text: " & Text);
          end;
 
       end loop;

@@ -44,6 +44,7 @@ begin
    Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
                                  Newsgroups.Data);
    Print_Integer_List_2D (Program_Name & "Sequences", Sequences, 1, 1);
+
    Word_Index := Python_16A.Call (Classifier, "get_word_index", Tokenizer);
    Put_Line (Program_Name & Integer'Image (Integer (Word_Index.Length)) &
                " unique tokens found.");
@@ -60,6 +61,7 @@ begin
       for index in Word_Index.Iterate loop
          Word_Count := Word_Count + 1;
          if Word_Count <= Max_Words then
+            Put_Line (Program_Name & "aKey: " & To_String (aKey));
             aKey := Key (index);
 --              Value := Element (index);
             Embedding_Vector := Emmbeddings_Index.Element (aKey);

@@ -27,8 +27,7 @@ def get_sequences (tokenizer, newsgroups_data):
     return tuple (map(tuple,tokenizer.texts_to_sequences(newsgroups_data)))
 
 def get_word_index (tokenizer):
-    print("get_word_index word_index type: ", type(tokenizer.word_index))
-    print("get_word_index word_index: ", tokenizer.word_index[0]);
+#    print("get_word_index word_index: ", tokenizer.word_index);
     return tuple (map(tuple,tokenizer.word_index))
 
 def get_data (sequences, max_sequence_length):

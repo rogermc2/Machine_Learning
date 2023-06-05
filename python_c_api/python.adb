@@ -103,7 +103,7 @@ package body Python is
   
    function Py_String_To_Ada (C_String_Ptr : Python_API.PyObject_Ptr)
                               return String is
-      --  Routine_Name    : constant String := "Python.Py_String_To_Ada  ";
+--        Routine_Name    : constant String := "Python.Py_String_To_Ada  ";
 
       procedure Move_Bytes (dst, src : PyObject_Ptr; Count : Positive);
       pragma Import (C, Move_Bytes, "memcpy");
@@ -111,6 +111,8 @@ package body Python is
       function Strlen (C_String_Ptr : PyObject_Ptr) return Natural;
       pragma Import (C, Strlen, "strlen");
 
+      --  PyUnicode_AsUTF8 encodes a Unicode object using UTF-8 and returns
+      --  the result as a Python bytes object.
       Unicode_Ptr : constant PyObject_Ptr := PyUnicode_AsUTF8 (C_String_Ptr);
       Length      : constant Natural := Strlen (Unicode_Ptr);
    begin
@@ -118,7 +120,7 @@ package body Python is
          return "";
       else
          declare
-            Ada_String : String (1..Length);
+            Ada_String : String (1..Integer (Length));
          begin
             Move_Bytes (Ada_String(1)'address, Unicode_Ptr, Length);
             return Ada_String;
