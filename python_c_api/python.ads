@@ -1,6 +1,8 @@
 
 with System;
 
+--  with Interfaces.C.Strings;
+
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Types;
@@ -26,6 +28,8 @@ package Python is
    procedure Close_Module (M : Module);
    function Get_Symbol (M : in Module; Function_Name : in String)
                         return Python_API.PyObject_Ptr;
+--     function C_String_To_Ada (C_String : Interfaces.C.Strings.chars_ptr)
+--                               return String;
    function Py_String_To_Ada (C_String_Ptr : Python_API.PyObject_Ptr)
                               return String;
    

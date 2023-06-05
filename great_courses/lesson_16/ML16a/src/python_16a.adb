@@ -2,6 +2,7 @@
 with System;
 
 with Interfaces.C;
+with Interfaces.C.Strings;
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
@@ -19,7 +20,7 @@ package body Python_16A is
 
    --  -------------------------------------------------------------------------
 
-   function Call (M : Python.Module; Function_Name : String;
+   function Call (M         : Python.Module; Function_Name : String;
                   Tokeniser : Python_API.PyObject_Ptr)
                   return Support_16A.Occurrences_Dictionary is
       use Interfaces.C;
@@ -82,21 +83,41 @@ package body Python_16A is
       Data            : Support_16A.Occurrences_Dictionary;
    begin
       New_Line;
-      Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
+      Assert (Tuple /= Null_Address, Routine_Name & "Tuple is null.");
       --        Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
 
       for item in 0 .. Tuple_Size - 1 loop
          Tuple_Item := PyTuple_GetItem (Tuple, item);
-         Assert (Tuple_Item /= System.Null_Address, Routine_Name &
+         Assert (Tuple_Item /= Null_Address, Routine_Name &
                    "Tuple_Item is null");
          Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, 0);
-         Key := To_Unbounded_String (Python.Py_String_To_Ada (Py_Str_Ptr));
-         if To_String (Key)'Length > 0 then
-            Put_Line (Routine_Name & "item, Key: "& int'Image (item) & ", " &
-                        To_String (Key));
-            Value := Integer (PyInt_AsLong (PyTuple_GetItem (Tuple_Item, 0)));
-            Data.Insert (Key, Value);
-         end if;
+         Assert (Py_Str_Ptr /= Null_Address, Routine_Name &
+                      "Py_Str_Ptr is null.");
+         Put_Line (Routine_Name & "Py_Str_Ptr set ");
+
+         declare
+            use Interfaces.C.Strings;
+            C_String_Access : constant char_array_access :=
+                                PyBytes_AsString (Py_Str_Ptr);
+            C_String_Ptr    : constant chars_ptr :=
+                                To_Chars_Ptr (C_String_Access);
+            --              C_String        : constant char_array := C_String_Ptr.all;
+         begin
+            Assert (C_String_Access /= Null, Routine_Name &
+                      "C_String_Access is null.");
+            Assert (C_String_Ptr /= Null_Ptr, Routine_Name &
+                      "C_String_Ptr is null.");
+            Put_Line (Routine_Name & "C_String_Ptr set ");
+            Key := To_Unbounded_String (Interfaces.C.Strings.Value (C_String_Ptr));
+            Put_Line (Routine_Name & "Key set ");
+            if To_String (Key)'Length > 0 then
+               Put_Line (Routine_Name & "item, Key: "& int'Image (item) & ", " &
+                           To_String (Key));
+               Value :=
+                 Integer (PyInt_AsLong (PyTuple_GetItem (Tuple_Item, 1)));
+               Data.Insert (Key, Value);
+            end if;
+         end;
       end loop;
 
       return Data;
@@ -136,7 +157,7 @@ package body Python_16A is
                Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
                declare
                   aChar     : constant String :=
-                    Python.Py_String_To_Ada (Py_Str_Ptr);
+                                Python.Py_String_To_Ada (Py_Str_Ptr);
                   Long_Char : constant Boolean := aChar'Length > 1;
                begin
                   if Long_Char then

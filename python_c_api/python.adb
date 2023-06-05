@@ -1,4 +1,3 @@
-
 --  Based on inspirel_ada-python_demo
 
 with Interfaces.C;
@@ -101,6 +100,28 @@ package body Python is
 
    --  -------------------------------------------------------------------------
   
+--     function C_String_To_Ada (C_String : Interfaces.C.Strings.chars_ptr)
+--                               return String is
+--        use Interfaces.C;
+--        use Interfaces.C.Strings;
+--        Routine_Name    : constant String := "Python.C_String_To_Ada  ";
+--        
+--  --        function Strlen (C_String_Ptr : chars_ptr) return int;
+--  --        pragma Import (C, Strlen, "strlen");
+--        
+--        Length          : constant Natural := Natural (Strlen (C_String));
+--        Ada_String      : String (1 .. Length);
+--     begin
+--          Put_Line (Routine_Name & "Length" & Integer'Image (Length));
+--        for index in Ada_String'Range loop
+--           Ada_String (index) := Character (C_String (size_t (index - 1)));
+--        end loop;
+--        
+--        return "Ada_String";
+--     end C_String_To_Ada;
+
+   --  -------------------------------------------------------------------------
+  
    function Py_String_To_Ada (C_String_Ptr : Python_API.PyObject_Ptr)
                               return String is
 --        Routine_Name    : constant String := "Python.Py_String_To_Ada  ";
@@ -108,13 +129,13 @@ package body Python is
       procedure Move_Bytes (dst, src : PyObject_Ptr; Count : Positive);
       pragma Import (C, Move_Bytes, "memcpy");
 
-      function Strlen (C_String_Ptr : PyObject_Ptr) return Natural;
+      function Strlen (C_String_Ptr : PyObject_Ptr) return Interfaces.C.int;
       pragma Import (C, Strlen, "strlen");
 
       --  PyUnicode_AsUTF8 encodes a Unicode object using UTF-8 and returns
       --  the result as a Python bytes object.
       Unicode_Ptr : constant PyObject_Ptr := PyUnicode_AsUTF8 (C_String_Ptr);
-      Length      : constant Natural := Strlen (Unicode_Ptr);
+      Length      : constant Natural := Natural (Strlen (Unicode_Ptr));
    begin
       if Length < 1 then
          return "";

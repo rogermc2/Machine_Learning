@@ -20,8 +20,8 @@ procedure Lesson_16A is
      Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
    Newsgroups_File      : constant String := "Newsgroups.data";
    Max_Words            : constant Positive := 20000;
-   Max_Sequence_Size    : constant Positive := 1000;
-   Emmbedding_Dimension : constant Positive := 100;
+--     Max_Sequence_Size    : constant Positive := 1000;
+--     Emmbedding_Dimension : constant Positive := 100;
    Classifier           : Python.Module;
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
