@@ -16,8 +16,8 @@ package Support_16A is
    end record;
 
    type Dictionary_Record is record
-      Key    : Unbounded_String;
-      Values : NL_Types.Float_List;
+      Key   : Unbounded_String;
+      Value : Integer;
    end record;
 
    type Newsgroups_Record is record

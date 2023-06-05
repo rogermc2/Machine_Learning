@@ -36,7 +36,7 @@ package body Support_16A is
       Best_Index   : Positive;
       pragma Warnings (Off);
       Best         : constant Float := Max (Values, Best_Index);
-      pragma Warnings (On);
+      pragma Warnings (On)Dictionary_Record;
    begin
       return Indices (Best_Index);
 

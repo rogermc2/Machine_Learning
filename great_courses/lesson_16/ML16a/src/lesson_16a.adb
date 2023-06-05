@@ -25,7 +25,7 @@ procedure Lesson_16A is
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
    Sequences            : ML_Types.Integer_List_2D;
-   Word_Index           : ML_Types.Unbounded_List;
+   Word_Index           : Dictionary_Record;
    Embedding_Vector     : NL_Types.Float_List;
    Num_Words            : Natural;
 begin

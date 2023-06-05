@@ -28,7 +28,8 @@ def get_sequences (tokenizer, newsgroups_data):
 
 def get_word_index (tokenizer):
     print("get_word_index word_index type: ", type(tokenizer.word_index))
-    return tuple (tokenizer.word_index)
+    print("get_word_index word_index: ", tokenizer.word_index[0]);
+    return tuple (map(tuple,tokenizer.word_index))
 
 def get_data (sequences, max_sequence_length):
     return tuple (tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length))
