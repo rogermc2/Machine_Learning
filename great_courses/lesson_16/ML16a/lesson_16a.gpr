@@ -7,12 +7,11 @@ project Lesson_16A is
    for Exec_Dir use ".";
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnat12", "-O", "-gnatn", "-funroll-loops", "-gnato", "-fstack-check", "-gnatw.Tkmru", "-gnatyclux");
+      for Default_Switches ("ada") use ("-gnat12", "-O", "-gnatn", "-funroll-loops", "-gnato", "-fstack-check", "-gnatf", "-gnatw.Tkmru", "-gnatyclux");
    end Compiler;
 
    package Linker is
-
-    	for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.9/3.9.16/Frameworks/Python.framework/Versions/3.9/lib", "-lpython3.9");
+      for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.9/3.9.16/Frameworks/Python.framework/Versions/3.9/lib", "-lpython3.9");
    end Linker;
 
 end Lesson_16A;

@@ -76,6 +76,7 @@ package body Python_16A is
       use Python_API;
       Routine_Name    : constant String := "Python_16A.Parse_Occurrences_Dictionary ";
       Tuple_Size      : constant int := PyTuple_Size (Tuple);
+      Tuple_List      : Python.Tuple_List_Array (1 .. integer (Tuple_Size));
       Tuple_Item      : PyObject_Ptr;
       Py_Str_Ptr      : PyObject_Ptr;
       Key             : Unbounded_String;
@@ -85,22 +86,27 @@ package body Python_16A is
       New_Line;
       Assert (Tuple /= Null_Address, Routine_Name & "Tuple is null.");
       --        Put_Line (Routine_Name & "Tuple_Size: " & int'Image (Tuple_Size));
-
+      --  Example Convert_Tuple_List input
+      --     Tuple_List : constant Tuple_List_Array :=
+      --       ((To_Unbounded_String ("the"), 1),
+      --        (To_Unbounded_String ("example"), 2),
+      --        (To_Unbounded_String ("python"), 3));
       for item in 0 .. Tuple_Size - 1 loop
          Tuple_Item := PyTuple_GetItem (Tuple, item);
          Assert (Tuple_Item /= Null_Address, Routine_Name &
                    "Tuple_Item is null");
+         Put_Line (Routine_Name & "Tuple_Item size " & int'Image (PyTuple_Size (Tuple_Item)));
          Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, 0);
          Assert (Py_Str_Ptr /= Null_Address, Routine_Name &
-                      "Py_Str_Ptr is null.");
+                   "Py_Str_Ptr is null.");
          Put_Line (Routine_Name & "Py_Str_Ptr set ");
 
          declare
             use Interfaces.C.Strings;
             C_String_Access : constant char_array_access :=
-                                PyBytes_AsString (Py_Str_Ptr);
+              PyBytes_AsString (Py_Str_Ptr);
             C_String_Ptr    : constant chars_ptr :=
-                                To_Chars_Ptr (C_String_Access);
+              To_Chars_Ptr (C_String_Access);
             --              C_String        : constant char_array := C_String_Ptr.all;
          begin
             Assert (C_String_Access /= Null, Routine_Name &
@@ -157,7 +163,7 @@ package body Python_16A is
                Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
                declare
                   aChar     : constant String :=
-                                Python.Py_String_To_Ada (Py_Str_Ptr);
+                    Python.Py_String_To_Ada (Py_Str_Ptr);
                   Long_Char : constant Boolean := aChar'Length > 1;
                begin
                   if Long_Char then
