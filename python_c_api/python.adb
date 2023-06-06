@@ -101,12 +101,11 @@ package body Python is
 
    --  -------------------------------------------------------------------------
     
---     function Convert_Python_String (Python_String: PyObject_Ptr)
---                                     return String is
+--     function Py_String_To_Ada (Py_String_Ptr: PyObject_Ptr) return String is
 --        use System;
 --        use Interfaces.C.Strings;
 --        Unicode_String : constant PyObject_Ptr :=
---                           PyUnicode_FromString (Python_String);
+--                           PyUnicode_FromString (Py_String_Ptr);
 --        Utf8_String    : chars_ptr;
 --        Ada_String     : Unbounded_String := Null_Unbounded_String;
 --     begin
@@ -121,9 +120,9 @@ package body Python is
 --  
 --        return To_String (Ada_String);
 --        
---     end Convert_Python_String;
+--     end Py_String_To_Ada;
    
-   --  -------------------------------------------------------------------------
+   -------------------------------------------------------------------------
   
    function Convert_Tuple_List  (Tuple_List : Tuple_List_Array)
                                  return Tuple_Map is

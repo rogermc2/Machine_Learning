@@ -34,6 +34,9 @@ def get_word_index (tokenizer):
 
 def get_data (sequences, max_sequence_length):
     return tuple (tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length))
+
+def get_labels (sequences, max_sequence_length):
+    return tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length)
     
 def predict_proba(clf, features):
     pred=clf.predict_proba(features)

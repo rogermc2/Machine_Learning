@@ -3,7 +3,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use  Basic_Printing;
+--  with Basic_Printing; use  Basic_Printing;
 --  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with NL_Types;
@@ -43,7 +43,7 @@ begin
    Python_CLF.Call (Classifier, "fit", Tokenizer, Newsgroups.Data);
    Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
                                  Newsgroups.Data);
-   Print_Integer_List_2D (Program_Name & "Sequences", Sequences, 1, 1);
+--     Print_Integer_List_2D (Program_Name & "Sequences", Sequences, 1, 1);
 
    Word_Index := Python_16A.Call (Classifier, "get_word_index", Tokenizer);
    Put_Line (Program_Name & Integer'Image (Integer (Word_Index.Length)) &
