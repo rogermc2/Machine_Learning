@@ -148,16 +148,14 @@ package body Python is
 
    --  -------------------------------------------------------------------------
   
-   function Py_String_To_Ada (C_String_Ptr : Python_API.PyObject_Ptr)
+   function Py_String_To_Ada (Py_String_Ptr : Python_API.PyObject_Ptr)
                               return String is
       use Interfaces.C.Strings;
-      --        Routine_Name    : constant String := "Python.Py_String_To_Ada  ";
       --  PyUnicode_AsUTF8 encodes a Unicode object using UTF-8 and returns
       --  the result as a Python bytes object.
-      Unicode_Ptr : constant chars_ptr := PyUnicode_AsUTF8 (C_String_Ptr);
    begin
       
-      return Value (Unicode_Ptr);
+      return Value (PyUnicode_AsUTF8 (Py_String_Ptr));
 
    end Py_String_To_Ada;
 

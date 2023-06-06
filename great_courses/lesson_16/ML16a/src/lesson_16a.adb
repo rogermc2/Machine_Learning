@@ -64,7 +64,7 @@ begin
          if Word_Count <= Max_Words then
             aKey := Key (curs);
             Put_Line (Program_Name & "aKey: " & To_String (aKey));
---              Value := Element (index);
+--              Value := Element (curs);
             Embedding_Vector := Emmbeddings_Index.Element (aKey);
             Emmbedding_Matrix (Word_Count) := Embedding_Vector;
          end if;

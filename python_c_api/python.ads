@@ -40,7 +40,7 @@ package Python is
                         return Python_API.PyObject_Ptr;
    function Convert_Tuple_List  (Tuple_List : Tuple_List_Array)
                                  return Tuple_Map;
-   function Py_String_To_Ada (C_String_Ptr : Python_API.PyObject_Ptr)
+   function Py_String_To_Ada (Py_String_Ptr : Python_API.PyObject_Ptr)
                               return String;
    
    --  Overloads for "all" needed combinations of parameters and return types:
