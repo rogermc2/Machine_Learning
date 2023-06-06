@@ -126,23 +126,23 @@ package body Python is
    --  -------------------------------------------------------------------------
   
    function Convert_Tuple_List  (Tuple_List : Tuple_List_Array)
-                                 return Tuple_Map.Map is
-      use Tuple_Map;                  --                                                
-      My_Map : Tuple_Map.Map;
+                                 return Tuple_Map is
+      use Tuple_Map_Package;
+      theMap : Tuple_Map;
    begin
       --  Iterate over the tuple_list and populate the map
       for tuple of Tuple_List loop
-         My_Map.Insert (tuple.Key, tuple.Value);
+         theMap.Insert (tuple.Key, tuple.Value);
       end loop;
 
       --  Display the map
-      for Item in My_Map.Iterate loop
+      for Item in theMap.Iterate loop
          Put (To_String (Key (Item)) & " => ");
          Put (Integer'Image (Element (Item)));
          New_Line;
       end loop;
          
-      return My_Map;
+      return theMap;
       
    end Convert_Tuple_List;
 

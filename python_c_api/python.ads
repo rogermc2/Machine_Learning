@@ -14,11 +14,15 @@ package Python is
 
    subtype Module is System.Address;
    
-   type Tuple_Item is private;    
+   type Tuple_Item is record
+      Key   : Unbounded_String;
+      Value : Integer;
+   end record;       
    type Tuple_List_Array is array (Integer range <>) of Tuple_Item;
    
-   package Tuple_Map is new Ada.Containers.Indefinite_Ordered_Maps
-     (Key_Type => Unbounded_String, Element_Type => Integer);
+   package Tuple_Map_Package is new Ada.Containers.Indefinite_Ordered_Maps
+     (Unbounded_String, Integer);
+   subtype Tuple_Map is Tuple_Map_Package.Map;
    
    Interpreter_Error : exception;
    
@@ -35,7 +39,7 @@ package Python is
    function Get_Symbol (M : in Module; Function_Name : in String)
                         return Python_API.PyObject_Ptr;
    function Convert_Tuple_List  (Tuple_List : Tuple_List_Array)
-                                 return Tuple_Map.Map;
+                                 return Tuple_Map;
    function Py_String_To_Ada (C_String_Ptr : Python_API.PyObject_Ptr)
                               return String;
    
@@ -211,12 +215,5 @@ package Python is
                   B : ML_Arrays_And_Matrices.Integer_Array)
                   return Python_API.PyObject_Ptr;
    function Run_String (Script : String) return Python_API.PyObject_Ptr;
-
-private
-   
-   type Tuple_Item is record
-      Key   : Unbounded_String;
-      Value : Integer;
-   end record;    
 
 end Python;

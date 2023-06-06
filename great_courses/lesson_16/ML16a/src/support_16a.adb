@@ -217,48 +217,6 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
-   --     function Read_Vocabulary (File_Name : String) return Dictionary_List is
-   --        Routine_Name     : constant String := "Support_16A.Read_Vocabulary ";
-   --        File_ID          : File_Type;
-   --        Lexicon_Size     : Natural := 0;  --  Token
-   --        Vocab_Dictionary : Dictionary_List;
-   --        Item             : Dictionary_Record;
-   --     begin
-   --        Item := (Unknown, Lexicon_Size);
-   --        Vocab_Dictionary.Append (Item);
-   --        Lexicon_Size := Lexicon_Size + 1;
-   --
-   --        Open (File_ID, In_File, File_Name);
-   --
-   --        while not End_Of_File (File_ID) loop
-   --           declare
-   --              aLine : constant Unbounded_String :=
-   --                        To_Unbounded_String (Get_Line (File_ID));
-   --              Count : constant Positive := Integer'Value (Slice (aLine, 1, 4));
-   --              Token : constant Unbounded_String :=
-   --                        To_Unbounded_String
-   --                          (Slice (aLine, 6, Length (aLine) - 1));
-   --           begin
-   --              if Count > 1 then
-   --                 Item := (Token, Lexicon_Size);
-   --                 Vocab_Dictionary.Append (Item);
-   --                 Lexicon_Size := Lexicon_Size + 1;
-   --              end if;
-   --           end;
-   --        end loop;
-   --
-   --        Close (File_ID);
-   --
-   --        Item :=  (Lex_Size, Lexicon_Size);
-   --        Vocab_Dictionary.Append (Item);
-   --        Put_Line (Routine_Name & File_Name & " processed.");
-   --
-   --        return Vocab_Dictionary;
-   --
-   --     end Read_Vocabulary;
-
-   --  -------------------------------------------------------------------------
-
    procedure Save_Data (Data : Newsgroups_Record; File_Name : String) is
       use Ada.Streams.Stream_IO;
       Routine_Name : constant String := "Support_16A.Save_Data ";
