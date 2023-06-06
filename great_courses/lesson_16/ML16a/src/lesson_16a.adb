@@ -58,11 +58,12 @@ begin
 --        Emmbedding_Matrix : array (1 .. Num_Words, 1 .. Emmbedding_Dimension)
       Emmbedding_Matrix : array (1 .. Num_Words) of NL_Types.Float_List;
    begin
-      for index in Word_Index.Iterate loop
+      for curs in Word_Index.Iterate loop
          Word_Count := Word_Count + 1;
+         Put_Line (Program_Name & "Word_Count" & Integer'Image (Word_Count));
          if Word_Count <= Max_Words then
+            aKey := Key (curs);
             Put_Line (Program_Name & "aKey: " & To_String (aKey));
-            aKey := Key (index);
 --              Value := Element (index);
             Embedding_Vector := Emmbeddings_Index.Element (aKey);
             Emmbedding_Matrix (Word_Count) := Embedding_Vector;
