@@ -4,7 +4,6 @@ with Interfaces.C;
 with Interfaces.C.Strings;
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Characters.Latin_1;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
@@ -18,61 +17,45 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
-   --     package Python_To_Ada is
-   --        --  Import necessary C functions
-   --  --        pragma Import(C, PyUnicode_FromString, "PyUnicode_FromString");
-   --  --        pragma Import(C, PyUnicode_AsUTF8String, "PyUnicode_AsUTF8String");
-   --  
-   --        --  Import necessary Ada packages
-   --        use Interfaces.C;
-   --        use Ada.Strings.Unbounded;
+--     function Convert_C_String(CString: Interfaces.C.Strings.chars_ptr)
+--                               return String is
+--        use Interfaces.C;
+--        use Interfaces.C.Strings;
+--     begin
+--        return Value (CString);
+--        
+--     end Convert_C_String;
 
-   package CStrings renames Interfaces.C.Strings;
+   --  -------------------------------------------------------------------------
 
-   function Convert_C_String(CString: CStrings.chars_ptr) return Unbounded_String is
-      use Interfaces.C;
-      Result : Unbounded_String;
-      I      : Natural := 0;
-      C_Ptr  : CStrings.chars_ptr := CString;
-      Temp_Char : Character;
-   begin
-      loop
-         Temp_Char := Character(C_Ptr.all);
-         exit when Temp_Char = Character'Val(0);
-         Ada.Strings.Unbounded.Append(Result, Temp_Char);
-         C_Ptr := C_Ptr.all + 1;
-      end loop;
-
-      return Result;
-   end Convert_C_String;
-
-   function Convert_Python_String(PythonString: System.Address) return Unbounded_String is
+   function Convert_Python_String (PythonString: PyObject_Ptr)
+                                  return Unbounded_String is
       use System;
-      use CStrings;
-      PyString     : System.Address;
-      Utf8String   : CStrings.chars_ptr;
-      AdaString    : Ada.Strings.Unbounded.Unbounded_String;
-      TempString   : String;
+      use Interfaces.C.Strings;
+      PyString     : PyObject_Ptr;
+      Utf8String   : chars_ptr;
+      AdaString    : Unbounded_String;
+      TempString   : Unbounded_String;
    begin
       PyString := PyUnicode_FromString(PythonString);
       if PyString = System.Null_Address then
          return Ada.Strings.Unbounded.Null_Unbounded_String;
       end if;
 
-      Utf8String := CStrings.chars_ptr(PyUnicode_AsUTF8String(PyString));
-      if Utf8String = CStrings.null_chars_ptr then
-         Py_DecRef(PyString);
-         return Ada.Strings.Unbounded.Null_Unbounded_String;
+      Utf8String := PyUnicode_AsUTF8String (PyString);
+      if Utf8String = null_ptr then
+         Py_DecRef (PyString);
+         return Null_Unbounded_String;
       end if;
 
-      TempString := Convert_C_String(Utf8String);
-      AdaString := To_Unbounded_String(TempString);
+      TempString := To_Unbounded_String (Value(Utf8String));
+      AdaString := TempString;
 
       Py_DecRef(PyString);
 
       return AdaString;
+      
    end Convert_Python_String;
-   --     end Python_To_Ada;
    
    --  -------------------------------------------------------------------------
   
