@@ -175,7 +175,8 @@ package Python_API is
       return PyObject_Ptr;
    pragma Import (C, PyUnicode_AsUTF8AndSize, "PyUnicode_AsUTF8AndSize");
    
-   function PyUnicode_AsUTF8String (Unicode: System.Address) return System.Address;
+   function PyUnicode_AsUTF8String (Unicode: System.Address)
+                                    return PyObject_Ptr;
    pragma Import (C, PyUnicode_AsUTF8String, "PyUnicode_AsUTF8String");
    
    function PyUnicode_AsEncodedString (Unicode: PyObject_Ptr)

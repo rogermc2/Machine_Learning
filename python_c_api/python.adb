@@ -17,57 +17,15 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
---     function Convert_C_String(CString: Interfaces.C.Strings.chars_ptr)
---                               return String is
---        use Interfaces.C;
---        use Interfaces.C.Strings;
---     begin
---        return Value (CString);
---        
---     end Convert_C_String;
-
-   --  -------------------------------------------------------------------------
-
-   function Convert_Python_String (PythonString: PyObject_Ptr)
-                                  return Unbounded_String is
-      use System;
-      use Interfaces.C.Strings;
-      PyString     : PyObject_Ptr;
-      Utf8String   : chars_ptr;
-      AdaString    : Unbounded_String;
-      TempString   : Unbounded_String;
-   begin
-      PyString := PyUnicode_FromString(PythonString);
-      if PyString = System.Null_Address then
-         return Ada.Strings.Unbounded.Null_Unbounded_String;
-      end if;
-
-      Utf8String := PyUnicode_AsUTF8String (PyString);
-      if Utf8String = null_ptr then
-         Py_DecRef (PyString);
-         return Null_Unbounded_String;
-      end if;
-
-      TempString := To_Unbounded_String (Value(Utf8String));
-      AdaString := TempString;
-
-      Py_DecRef(PyString);
-
-      return AdaString;
-      
-   end Convert_Python_String;
-   
-   --  -------------------------------------------------------------------------
-  
    procedure Initialize (Program_Name : String := "") is
       use  Interfaces.C;
    begin
       if Program_Name /= "" then
          declare
             C_Name           : constant Interfaces.C.char_array :=
-              To_C (Program_Name);
+                                 To_C (Program_Name);
             Program_Name_Ptr : constant access Interfaces.C.char_array :=
-              new char_array'(C_Name);
+                                 new char_array'(C_Name);
          begin
             Py_SetProgramName (Program_Name_Ptr.all);
          end;
@@ -111,7 +69,7 @@ package body Python is
       use type System.Address;
       Routine_Name : constant String := "Python.Import_File ";
       PyFileName   : constant PyObject_Ptr :=
-        PyString_FromString (Interfaces.C.To_C (File_Name));
+                       PyString_FromString (Interfaces.C.To_C (File_Name));
    begin
       Execute_String ("cwd = os.getcwd()");
       Execute_String ("os.path.join (cwd, '/src/py_package')");
@@ -143,77 +101,30 @@ package body Python is
 
    --  -------------------------------------------------------------------------
     
-   --     package CStrings renames Interfaces.C.Strings;
-   --  
-   --     function Convert_C_String (CString : CStrings.chars_ptr)
-   --                                return Unbounded_String is
-   --        Result : Unbounded_String;
-   --        I      : Natural := 0;
-   --        C_Ptr  : CStrings.chars_ptr := CString;
-   --     begin
-   --        while  CStrings.Value (C_Ptr) /= null_character loop
-   --           Result(I) := Character(CString(C_Ptr));
-   --           C_Ptr := C_Ptr + 1;
-   --           I := I + 1;
-   --        end loop;
-   --  
-   --        return Result;
-   --     end Convert_C_String;
-   --     
-   --     --  -------------------------------------------------------------------------
-   --      
-   --     function Convert_Python_String (PythonString : System.Address) return Ada.Strings.Unbounded.Unbounded_String is
-   --        use System;
-   --        use CStrings;
-   --        PyString : System.Address;
-   --        Utf8String : CStrings.chars_ptr;
-   --        AdaString : Ada.Strings.Unbounded.Unbounded_String;
-   --        TempString : String;
-   --     begin
-   --        PyString := PyUnicode_FromString(PythonString);
-   --        if PyString = System.Null_Address then
-   --           return Ada.Strings.Unbounded.Null_Unbounded_String;
-   --        end if;
-   --  
-   --        Utf8String := CStrings.chars_ptr(PyUnicode_AsUTF8String(PyString));
-   --        if Utf8String = CStrings.null_chars_ptr then
-   --           Py_DecRef (PyString);
-   --           return Ada.Strings.Unbounded.Null_Unbounded_String;
-   --        end if;
-   --  
-   --        TempString := Convert_C_String(Utf8String);
-   --        AdaString := Ada.Strings.Unbounded.To_Unbounded_String(TempString);
-   --  
-   --        Py_DecRef (PyString);
-   --  
-   --        return AdaString;
-   --     end Convert_Python_String;
+--     function Convert_Python_String (Python_String: PyObject_Ptr)
+--                                     return String is
+--        use System;
+--        use Interfaces.C.Strings;
+--        Unicode_String : constant PyObject_Ptr :=
+--                           PyUnicode_FromString (Python_String);
+--        Utf8_String    : chars_ptr;
+--        Ada_String     : Unbounded_String := Null_Unbounded_String;
+--     begin
+--        if Unicode_String /= System.Null_Address then
+--           Utf8_String := PyUnicode_AsUTF8 (Unicode_String);
+--           if Utf8_String /= null_ptr then
+--              Ada_String := To_Unbounded_String (Value (Utf8_String));
+--           end if;
+--        end if;
+--  
+--        Py_DecRef (Unicode_String);
+--  
+--        return To_String (Ada_String);
+--        
+--     end Convert_Python_String;
    
-   --     procedure Convert_String is;
-
-   --        package Strings_IO is new Ada.Text_IO.Text_IO (Item => Ada.Strings.Unbounded.Unbounded_String);
+   --  -------------------------------------------------------------------------
   
-   --        PythonString : constant System.Address := System'To_Address(16#12345678#);
-   --        AdaString : Ada.Strings.Unbounded.Unbounded_String := Convert_Python_String(PythonString);
-   --  
-   --     begin
-   --        -- Initialize the Python interpreter
-   --        Py_Initialize;
-   --  
-   --        -- Display the converted Ada string
-   --        Strings_IO.Put_Line(AdaString);
-   --  
-   --        -- Finalize the Python interpreter
-   --        Py_Finalize;
-   --     end Convert_String;
-   
-   --  ----------------------------------------------------------------------------------------
-   --  Example Convert_Tuple_List input
-   --     Tuple_List : constant Tuple_List_Array :=
-   --       ((To_Unbounded_String ("the"), 1),
-   --        (To_Unbounded_String ("example"), 2),
-   --        (To_Unbounded_String ("python"), 3));
-   
    function Convert_Tuple_List  (Tuple_List : Tuple_List_Array)
                                  return Tuple_Map.Map is
       use Tuple_Map;                  --                                                
@@ -239,29 +150,14 @@ package body Python is
   
    function Py_String_To_Ada (C_String_Ptr : Python_API.PyObject_Ptr)
                               return String is
+      use Interfaces.C.Strings;
       --        Routine_Name    : constant String := "Python.Py_String_To_Ada  ";
-
-      procedure Move_Bytes (dst, src : PyObject_Ptr; Count : Positive);
-      pragma Import (C, Move_Bytes, "memcpy");
-
-      function Strlen (C_String_Ptr : PyObject_Ptr) return Interfaces.C.int;
-      pragma Import (C, Strlen, "strlen");
-
       --  PyUnicode_AsUTF8 encodes a Unicode object using UTF-8 and returns
       --  the result as a Python bytes object.
-      Unicode_Ptr : constant PyObject_Ptr := PyUnicode_AsUTF8 (C_String_Ptr);
-      Length      : constant Natural := Natural (Strlen (Unicode_Ptr));
+      Unicode_Ptr : constant chars_ptr := PyUnicode_AsUTF8 (C_String_Ptr);
    begin
-      if Length < 1 then
-         return "";
-      else
-         declare
-            Ada_String : String (1..Integer (Length));
-         begin
-            Move_Bytes (Ada_String(1)'address, Unicode_Ptr, Length);
-            return Ada_String;
-         end;
-      end if;
+      
+      return Value (Unicode_Ptr);
 
    end Py_String_To_Ada;
 
@@ -275,8 +171,8 @@ package body Python is
       --  PyObject_GetAttrString retrieves the attribute named Function_Name
       --  from the object PyModule.
       F            : constant PyObject_Ptr :=
-        PyObject_GetAttrString
-          (PyModule, Interfaces.C.To_C (Function_Name));
+                       PyObject_GetAttrString
+                         (PyModule, Interfaces.C.To_C (Function_Name));
    begin
       if F = System.Null_Address then
          Put_Line (Routine_Name & "Python error message:");
@@ -1017,7 +913,7 @@ package body Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Matrix) is
       Routine_Name : constant String :=
-        "Python.Parse_Tuple Real_Float_Matrix * 2 ";
+                       "Python.Parse_Tuple Real_Float_Matrix * 2 ";
       
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1, T2  : PyObject_Ptr) return PyObject_Ptr;
@@ -1177,7 +1073,7 @@ package body Python is
       F        : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
       A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
       PyParams : constant PyObject_Ptr := 
-        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+                   Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
       PyResult : PyObject_Ptr;
       Result   : aliased Interfaces.C.long;
    begin
@@ -1205,7 +1101,7 @@ package body Python is
       A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple  : constant PyObject_Ptr := To_Tuple (B);
       PyParams : constant PyObject_Ptr := 
-        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+                   Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
       PyResult : PyObject_Ptr;
       Result   : aliased Interfaces.C.long;
    begin
@@ -1309,7 +1205,7 @@ package body Python is
       A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple  : constant PyObject_Ptr := To_Tuple (B);
       PyParams : constant PyObject_Ptr := 
-        Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
+                   Py_BuildValue (Interfaces.C.To_C ("OO"), A_Tuple, B_Tuple);
       PyResult : PyObject_Ptr;
       Result   : aliased Interfaces.C.long;
    begin
@@ -2248,7 +2144,7 @@ package body Python is
       Routine_Name : constant String := "Python.Call Unbounded_String_Array ";
       PyFunc       : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
       A_String     : constant Interfaces.C.char_array :=
-        Interfaces.C.To_C (To_String (A));
+                       Interfaces.C.To_C (To_String (A));
       PyParams     : PyObject_Ptr;
       PyResult     : PyObject_Ptr;
    begin
@@ -2384,7 +2280,7 @@ package body Python is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F            : constant PyObject_Ptr :=
-        Python.Get_Symbol (M, Function_Name);
+                       Python.Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       B_Tuple      : constant PyObject_Ptr := To_Tuple (B);
       PyParams     : PyObject_Ptr;

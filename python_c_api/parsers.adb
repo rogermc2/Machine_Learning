@@ -1,11 +1,10 @@
 
 with Interfaces.C; use Interfaces.C;
+with Interfaces.C.Strings;
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
 --  with Ada.Text_IO; use Ada.Text_IO;
-
-with Python;
 
 package body Parsers is
 
@@ -188,23 +187,22 @@ package body Parsers is
    --  -------------------------------------------------------------------------
 
    function Parse_Tuple (Tuple : PyObject_Ptr) return ML_Types.Unbounded_List is
+      use Interfaces.C.Strings;
       use Ada.Strings.Unbounded;
       use ML_Types;
-      --           Routine_Name : constant String := "Parsers.Parse_Tuple Integer_List  ";
+      --           Routine_Name : constant String := "Parsers.Parse_Tuple Unbounded_List  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
-      Py_Rep         : PyObject_Ptr;
-      Py_String      : PyObject_Ptr;
-      Value          : Unbounded_String;
-      Result         : Unbounded_List;
+      Py_String_Ptr  : chars_ptr;
+      UB_String      : Unbounded_String;
+      UB_List        : Unbounded_List;
    begin
       for row in 0 .. Tuple_Size - 1 loop
-         Py_Rep := PyObject_Repr (PyTuple_GetItem (Tuple, row));
-         Py_String := PyUnicode_AsUTF8 (Py_Rep);
-         Value := To_Unbounded_String (Python.Py_String_To_Ada (Py_String));
-         Result.Append (Value);
+         Py_String_Ptr := PyUnicode_AsUTF8 (PyTuple_GetItem (Tuple, row));
+         UB_String := To_Unbounded_String (Value (Py_String_Ptr));
+         UB_List.Append (UB_String);
       end loop;
 
-      return Result;
+      return UB_List;
 
    end Parse_Tuple;
 
