@@ -20,8 +20,8 @@ procedure Lesson_16A is
      Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
    Newsgroups_File      : constant String := "Newsgroups.data";
    Max_Words            : constant Positive := 20000;
---     Max_Sequence_Size    : constant Positive := 1000;
---     Emmbedding_Dimension : constant Positive := 100;
+   --     Max_Sequence_Size    : constant Positive := 1000;
+   --     Emmbedding_Dimension : constant Positive := 100;
    Classifier           : Python.Module;
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
@@ -43,7 +43,7 @@ begin
    Python_CLF.Call (Classifier, "fit", Tokenizer, Newsgroups.Data);
    Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
                                  Newsgroups.Data);
---     Print_Integer_List_2D (Program_Name & "Sequences", Sequences, 1, 1);
+   --     Print_Integer_List_2D (Program_Name & "Sequences", Sequences, 1, 1);
 
    Word_Index := Python_16A.Call (Classifier, "get_word_index", Tokenizer);
    Put_Line (Program_Name & Integer'Image (Integer (Word_Index.Length)) &
@@ -53,25 +53,27 @@ begin
    declare
       use Occurrences_Dictionary_Package;
       aKey       : Unbounded_String;
---        Value      : Integer;
-      Word_Count : Natural := 0;
---        Emmbedding_Matrix : array (1 .. Num_Words, 1 .. Emmbedding_Dimension)
+      Value      : Integer;
+      Word_Count : Natural := 1;
+      --        Emmbedding_Matrix : array (1 .. Num_Words, 1 .. Emmbedding_Dimension)
       Emmbedding_Matrix : array (1 .. Num_Words) of NL_Types.Float_List;
    begin
       for curs in Word_Index.Iterate loop
-         Word_Count := Word_Count + 1;
-         Put_Line (Program_Name & "Word_Count" & Integer'Image (Word_Count));
-         if Word_Count <= Max_Words then
+--           Put_Line (Program_Name & "Word_Count" & Integer'Image (Word_Count));
+         if Word_Count < Max_Words then
             aKey := Key (curs);
-            Put_Line (Program_Name & "aKey: " & To_String (aKey));
---              Value := Element (curs);
-            Embedding_Vector := Emmbeddings_Index.Element (aKey);
-            Emmbedding_Matrix (Word_Count) := Embedding_Vector;
+--              Put_Line (Program_Name & "aKey: " & To_String (aKey));
+            if Emmbeddings_Index.Contains (aKey) then
+               Word_Count := Word_Count + 1;
+               Value := Element (curs);
+               Embedding_Vector := Emmbeddings_Index.Element (aKey);
+               Emmbedding_Matrix (Word_Count) := Embedding_Vector;
+            end if;
          end if;
       end loop;
    end;
 
---     Python.Call (Classifier, "plot", Alphas, Result);
+   --     Python.Call (Classifier, "plot", Alphas, Result);
 
    Python.Close_Module (Classifier);
    Python.Finalize;
