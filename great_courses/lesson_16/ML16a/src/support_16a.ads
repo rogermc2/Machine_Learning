@@ -20,6 +20,9 @@ package Support_16A is
       Coeffs : NL_Types.Float_List;
    end record;
 
+   type Embedding_Matrix_Type is array (integer range <>) of
+     NL_Types.Float_List;
+
    type Newsgroups_Record is record
       Data         : ML_Types.Unbounded_List;
       Target       : Python_API.PyObject_Ptr;
@@ -37,6 +40,10 @@ package Support_16A is
      Ada.Containers.Ordered_Maps (Unbounded_String, Integer);
    subtype Occurrences_Dictionary is Occurrences_Dictionary_Package.Map;
 
+   function Prepare_Embedding_Matrix
+     ( Embeddings_Index : Coeffs_Dictionary;
+       Word_Index : Occurrences_Dictionary; Max_Words : Positive)
+      return Embedding_Matrix_Type;
    function ProbA_Chooser
      (Classifier       : Python.Module;
       Current_Item     : Positive; Num_Items : Positive;

@@ -131,6 +131,42 @@ package body Support_16A is
    end Load_Newsgroups;
 
    --  -------------------------------------------------------------------------
+
+   function Prepare_Embedding_Matrix
+     ( Embeddings_Index : Coeffs_Dictionary;
+       Word_Index : Occurrences_Dictionary; Max_Words : Positive)
+      return Embedding_Matrix_Type is
+      use Occurrences_Dictionary_Package;
+      Num_Words        : constant Positive :=
+        Integer'Min (Max_Words, Integer (Word_Index.Length));
+      aKey             : Unbounded_String;
+      Word_Count       : Natural := 1;
+      Embedding_Vector : NL_Types.Float_List;
+      --        Emmbedding_Matrix : array (1 .. Num_Words, 1 .. Emmbedding_Dimension)
+      Embedding_Matrix : Embedding_Matrix_Type (1 .. Num_Words);
+   begin
+      --  prepare embedding matrix
+
+      for curs in Word_Index.Iterate loop
+         --           Put_Line (Program_Name & "Word_Count" & Integer'Image (Word_Count));
+         if Word_Count < Max_Words then
+            aKey := Key (curs);
+            --              Put_Line (Program_Name & "aKey: " & To_String (aKey));
+            if Embeddings_Index.Contains (aKey) then
+               Embedding_Vector := Embeddings_Index.Element (aKey);
+               if not Embedding_Vector.Is_Empty then
+                  Word_Count := Word_Count + 1;
+                  Embedding_Matrix (Word_Count) := Embedding_Vector;
+               end if;
+            end if;
+         end if;
+      end loop;
+
+      return Embedding_Matrix;
+
+   end Prepare_Embedding_Matrix;
+
+   --  -------------------------------------------------------------------------
    --  ProbA_Chooser chooses between B options.
    --  Current_Item is the initial item to consider.
    --  Train_Set represents the results of previous selections.
@@ -153,8 +189,8 @@ package body Support_16A is
       Train_Set_Length : constant Natural := Integer (Train_Set.Length);
       NIM1             : constant Natural := Num_Items - 1;
       Examples_Batch   : constant Integer_Array_List :=
-                           Slice (Labeled_Examples.Features,
-                                  Current_Item, Current_Item + NIM1);
+        Slice (Labeled_Examples.Features,
+               Current_Item, Current_Item + NIM1);
       --  Y_Hat predictions
       Y_Hat            : Real_Float_Matrix (1 .. Num_Items, 1 .. 2);
       Indices          : Integer_Array (Y_Hat'Range);
