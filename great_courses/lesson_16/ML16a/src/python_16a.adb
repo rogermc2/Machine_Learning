@@ -136,33 +136,40 @@ package body Python_16A is
          Tuple_Item_Size := Integer (PyTuple_Size (Tuple_Item));
 
          declare
-            Text          : String (1 .. Tuple_Item_Size);
+--              Text          : String (1 .. Tuple_Item_Size);
+            Text          : Unbounded_String;
             Has_Long_Char : Boolean := False;
             Count         : Natural := 0;
+            Continue      : Boolean := True;
+            Index         : Natural := 0;
          begin
-            for index in 0 .. Tuple_Item_Size - 1 loop
+--              for index in 0 .. Tuple_Item_Size - 1 loop
+            while Continue and then index < Tuple_Item_Size loop
                Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
                declare
                   aChar     : constant String :=
                                 Python.Py_String_To_Ada (Py_Str_Ptr);
                   Long_Char : constant Boolean := aChar'Length > 1;
                begin
+                  Continue := aChar (1) /= '@' and
+                    aChar (1) /= Character'Val (0);
                   if Long_Char then
                      Has_Long_Char := True;
-                     Text (index + 1) := '|';
+                     Text :=  Text & "|";
                   elsif aChar'Length = 1 then
-                     Text (index + 1) := aChar (1);
+                     Text :=  Text & aChar (1);
                   end if;
                end;
 
-               if Count < 100 and then Has_Long_Char then
+               if Count < 10 and then Has_Long_Char then
                   Count := Count + 1;
-                  Put_Line (Text);
+                  Put_Line (To_String (Text));
                end if;
+               Index := Index + 1;
             end loop;
 
-            if Text'Length > 0 then
-               Data_List.Append (To_Unbounded_String (Text));
+            if Length (Text) > 0 then
+               Data_List.Append (Text);
             end if;
          end;
 

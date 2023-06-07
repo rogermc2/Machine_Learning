@@ -114,4 +114,7 @@ package NL_Types is
      (Positive, Slice_Record);
    subtype Slices_List is Slices_Package.Vector;
 
+   function Slice (Data : Float_List; First, Last : Positive)
+                   return Float_List;
+
 end NL_Types;

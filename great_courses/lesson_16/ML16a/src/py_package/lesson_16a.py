@@ -1,3 +1,4 @@
+
 import numpy as np
 import tensorflow as tf
 from sklearn.datasets import fetch_20newsgroups
@@ -28,17 +29,20 @@ def get_sequences (tokenizer, newsgroups_data):
 
 def get_word_index (tokenizer):
     tuple_list = [(key, value) for key, value in tokenizer.word_index.items()]
-#    print("get_word_index tuple (tuple_list): ", tuple (tuple_list));
     return tuple (tuple_list)
 
 def get_data (sequences, max_sequence_length):
-#    `sequences` must be a list of iterables. Found non-iterable
+    #    `sequences` must be a list of iterables. Found non-iterable
     print ("get_data sequences type: ", type(sequences))
+    print ("get_data sequences length: ", len(sequences))
     sequences_list =[]
+    row=0
     for item in sequences:
+#        print ("get_data row, length: ", row, len(item));
         sequences_list.append(list(item))
+        row = row + 1
+    print ("get_data sequences_list num rows: ", row)
     print ("get_data sequences_list type: ", type(sequences_list))
-#    print ("pad_sequences", tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length))
     return tuple (map(tuple, tf.keras.preprocessing.sequence.pad_sequences(sequences_list), maxlen=max_sequence_length))
 
 def get_labels (sequences, max_sequence_length):

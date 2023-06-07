@@ -20,7 +20,7 @@ procedure Lesson_16A is
    Newsgroups_File      : constant String := "Newsgroups.data";
    Max_Words            : constant Positive := 20000;
    Max_Sequence_Size    : constant Positive := 1000;
-   --     Embedding_Dimension  : constant Positive := 100;
+   Embedding_Dimension  : constant Positive := 20;  --  100
    Classifier           : Python.Module;
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
@@ -43,14 +43,12 @@ begin
    Put_Line (Program_Name  & "Sequences: " &
                Integer'Image (Integer (Sequences.Length)));
    --     Print_Integer_List_2D (Program_Name & "Sequences", Sequences, 1, 1);
-
    Word_Index := Python_16A.Call (Classifier, "get_word_index", Tokenizer);
    Put_Line (Program_Name & Integer'Image (Integer (Word_Index.Length)) &
                " unique tokens found.");
-
    declare
       Embedding_Matrix : Embedding_Matrix_Type := Prepare_Embedding_Matrix
-        (Embeddings_Index, Word_Index, Max_Words);
+        (Embeddings_Index, Word_Index, Max_Words, Embedding_Dimension);
       Data : Integer_Matrix :=
         Python.Call (Classifier, "get_data", Sequences, Max_Sequence_Size);
       Labels : Integer_Matrix :=
