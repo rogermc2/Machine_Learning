@@ -32,12 +32,20 @@ def get_word_index (tokenizer):
     return tuple (tuple_list)
 
 def get_data (sequences, max_sequence_length):
-    print ("sequences type: ", type(sequences))
+#    `sequences` must be a list of iterables. Found non-iterable
+    print ("get_data sequences type: ", type(sequences))
+    sequences_list =[]
+    for item in sequences:
+        sequences_list.append(list(item))
+    print ("get_data sequences_list type: ", type(sequences_list))
 #    print ("pad_sequences", tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length))
-    return tuple (map(tuple,tf.keras.preprocessing.sequence.pad_sequences(list(sequences)), maxlen=max_sequence_length))
+    return tuple (map(tuple, tf.keras.preprocessing.sequence.pad_sequences(sequences_list), maxlen=max_sequence_length))
 
 def get_labels (sequences, max_sequence_length):
-    return tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length)
+    sequences_list =[]
+    for item in sequences:
+        sequences_list.append(list(item))
+    return tf.keras.preprocessing.sequence.pad_sequences(sequences_list, maxlen=max_sequence_length)
     
 def predict_proba(clf, features):
     pred=clf.predict_proba(features)
