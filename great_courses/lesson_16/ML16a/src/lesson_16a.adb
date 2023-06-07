@@ -40,6 +40,8 @@ begin
    Python_CLF.Call (Classifier, "fit", Tokenizer, Newsgroups.Data);
    Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
                                  Newsgroups.Data);
+   Put_Line (Program_Name  & "Sequences: " &
+               Integer'Image (Integer (Sequences.Length)));
    --     Print_Integer_List_2D (Program_Name & "Sequences", Sequences, 1, 1);
 
    Word_Index := Python_16A.Call (Classifier, "get_word_index", Tokenizer);
@@ -51,6 +53,8 @@ begin
         (Embeddings_Index, Word_Index, Max_Words);
       Data : Integer_Matrix :=
         Python.Call (Classifier, "get_data", Sequences, Max_Sequence_Size);
+      Labels : Integer_Matrix :=
+        Python.Call (Classifier, "get_labels", Sequences, Max_Sequence_Size);
    begin
       null;
    end;

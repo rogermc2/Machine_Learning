@@ -138,6 +138,7 @@ package body Python_16A is
          declare
             Text          : String (1 .. Tuple_Item_Size);
             Has_Long_Char : Boolean := False;
+--              Count         : Natural := 0;
          begin
             for index in 0 .. Tuple_Item_Size - 1 loop
                Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
@@ -148,11 +149,6 @@ package body Python_16A is
                begin
                   if Long_Char then
                      Has_Long_Char := True;
-                     --                       Put_Line (Routine_Name & "Item, index" &
-                     --                                   int'Image (item) & ","  &
-                     --                                   Integer'Image (index) & ":");
-                     --                       Put_Line ("String: " & aChar);
-                     --                       Put_Line ("String (1): " & aChar (1));
                      Text (index + 1) := '|';
                   elsif aChar'Length = 1 then
                      Text (index + 1) := aChar (1);
@@ -160,6 +156,7 @@ package body Python_16A is
                end;
 
                if Has_Long_Char then
+--                    Count := Count + 1;
                   Put_Line (Text);
                end if;
             end loop;

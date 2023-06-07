@@ -84,6 +84,9 @@ package Python is
                   A : ML_Types.Integer_List; B : Integer)
                   return ML_Arrays_And_Matrices.Integer_Matrix;
    function Call (M : Module; Function_Name : String;
+                  A : ML_Types.Integer_List_2D; B : Integer)
+                  return ML_Arrays_And_Matrices.Integer_Matrix;
+   function Call (M : Module; Function_Name : String;
                   A : Python_API.PyObject_Ptr)
                   return ML_Arrays_And_Matrices.Integer_Array;
    procedure Call (M : Module; Function_Name : String;

@@ -1631,7 +1631,7 @@ package body Python_CLF is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       Routine_Name : constant String :=
-        "Python_CLF.Call Float_Matrix, Integer_Array ";
+        "Python_CLF.Call Float_Matrix, Unbounded_List ";
       F            : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
       A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
       PyParams     : PyObject_Ptr;
@@ -1641,6 +1641,8 @@ package body Python_CLF is
       Assert (CLF /= System.Null_Address, Routine_Name & "CLF is null");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OO"), CLF, A_Tuple);
+      Assert (PyParams /= System.Null_Address, Routine_Name &
+                "PyParams is null");
       PyResult := Call_Object (F, PyParams);
 
       if PyResult = System.Null_Address then

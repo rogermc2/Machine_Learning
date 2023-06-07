@@ -191,19 +191,17 @@ package body Tuple_Builder is
                       return PyObject_Ptr is
       use Interfaces.C;
       --        Routine_Name : constant String := "Python.To_Tuple Integer_List_2D ";
-      Num_Cols     : Natural := 0;
-      Row_Size     : int := 0;
+      Row_Size     : int;
       Value        : Integer;
       Data_Row     : ML_Types.Integer_List;
       Item         : PyObject_Ptr;
       Py_Row       : int := -1;
-      Py_Col       : int := -1;
+      Py_Col       : int;
       Result       : constant PyObject_Ptr := PyTuple_New (int (Data.Length));
    begin
       if not Data.Is_Empty then
-         Num_Cols := Natural (Data.First_Element.Length);
-         Row_Size := int (Num_Cols);
          for row in Data.First_Index .. Data.Last_Index loop
+            Row_Size := int (Data.Element (row).Length);
             Item := PyTuple_New (Row_Size);
             Data_Row := Data (row);
             Py_Row := Py_Row + 1;

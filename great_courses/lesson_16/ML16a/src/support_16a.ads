@@ -54,7 +54,6 @@ package Support_16A is
    function Get_Glove_Data (File_Name : String) return Coeffs_Dictionary;
    function Load_Newsgroups (Classifier : Python.Module; File_Name : String;
                        Reload : Boolean := False) return Newsgroups_Record;
---     function Read_Vocabulary (File_Name : String) return Dictionary_List;
    procedure Save_Data (Data : Newsgroups_Record; File_Name : String);
 
 end Support_16A;

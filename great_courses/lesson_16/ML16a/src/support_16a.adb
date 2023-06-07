@@ -94,7 +94,6 @@ package body Support_16A is
 
       Close (File_ID);
 
-      Put_Line (Routine_Name & File_Name & " processed.");
       Put_Line (Routine_Name & "found" &
                   Integer'Image (Integer (Embeddings.Length)) &
                   " word vectors.");
@@ -268,47 +267,6 @@ package body Support_16A is
       Put_Line (Routine_Name & File_Name & " written");
 
    end Save_Data;
-
-   --  -------------------------------------------------------------------------
-
-   --     function Tokenize (aLine : String; Dictionary : Dictionary_List)
-   --                        return Integer_Array is
-   --        use Neural_Utilities;
-   --        use ML_Types;
-   --        use String_Package;
-   --        --        Routine_Name : constant String := "Support_16A.Tokenize ";
-   --        Words        : ML_Types.String_List;
-   --        Word_Cursor  : String_Package.Cursor;
-   --        Index        : Natural;
-   --        Item         : Dictionary_Record;
-   --        Unknown_Item : constant Boolean := Find_Item (Dictionary, Unknown, Item);
-   --        Unknown_Val  : constant Integer := Item.Value;
-   --        Vec          : Integer_Array (0 .. Positive (Dictionary.Length) - 1) :=
-   --                         (others => 0);
-   --        Word         : Unbounded_String;
-   --     begin
-   --        pragma Warnings (Off, Unknown_Item);
-   --        Words := Split_String_On_Spaces (aLine);
-   --        Word_Cursor := Words.First;
-   --        while Has_Element (Word_Cursor) loop
-   --           Word := Element (Word_Cursor);
-   --           if Find_Item (Dictionary, Word, Item) then
-   --              --  the word has a feature so add one to the corresponding feature
-   --              Num_Known := Num_Known + 1;
-   --              Index := Item.Value;
-   --           else
-   --              --  add one to the Unknown count
-   --              Num_Unknown := Num_Unknown + 1;
-   --              Index := Unknown_Val;
-   --           end if;
-   --
-   --           Vec (Index) := Vec (Index) + 1;
-   --           Next  (Word_Cursor);
-   --        end loop;
-   --
-   --        return Vec;
-   --
-   --     end Tokenize;
 
    --  -------------------------------------------------------------------------
 

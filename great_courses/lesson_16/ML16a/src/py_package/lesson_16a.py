@@ -27,13 +27,14 @@ def get_sequences (tokenizer, newsgroups_data):
     return tuple (map(tuple,tokenizer.texts_to_sequences(newsgroups_data)))
 
 def get_word_index (tokenizer):
-#    print("get_word_index word_index: ", tokenizer.word_index);
     tuple_list = [(key, value) for key, value in tokenizer.word_index.items()]
-    print("get_word_index tuple (tuple_list): ", tuple (tuple_list));
+#    print("get_word_index tuple (tuple_list): ", tuple (tuple_list));
     return tuple (tuple_list)
 
 def get_data (sequences, max_sequence_length):
-    return tuple (tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length))
+    print ("sequences type: ", type(sequences))
+#    print ("pad_sequences", tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length))
+    return tuple (map(tuple,tf.keras.preprocessing.sequence.pad_sequences(list(sequences)), maxlen=max_sequence_length))
 
 def get_labels (sequences, max_sequence_length):
     return tf.keras.preprocessing.sequence.pad_sequences(sequences, maxlen=max_sequence_length)

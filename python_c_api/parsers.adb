@@ -1,4 +1,6 @@
 
+with System;
+
 with Interfaces.C; use Interfaces.C;
 with Interfaces.C.Strings;
 
@@ -44,7 +46,7 @@ package body Parsers is
 
    function Parse_Tuple (Tuple : PyObject_Ptr) return ML_Types.Integer_List_2D is
       use ML_Types;
---        Routine_Name   : constant String := "Parsers.Parse_Tuple IL2D  ";
+      --        Routine_Name   : constant String := "Parsers.Parse_Tuple IL2D  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
       Tuple_Row_Size : int;
       Tuple_Row      : PyObject_Ptr;
@@ -74,7 +76,8 @@ package body Parsers is
    --  -------------------------------------------------------------------------
 
    function Parse_Tuple (Tuple : PyObject_Ptr) return Integer_Matrix  is
-      --        Routine_Name : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
+      use System;
+      Routine_Name   : constant String := "Parsers.Parse_Tuple Integer_Matrix  ";
       Tuple_Size     : constant int := PyTuple_Size (Tuple);
       Tuple_Row_Size : constant int :=
                          PyTuple_Size (PyTuple_GetItem (Tuple, 0));
@@ -83,10 +86,14 @@ package body Parsers is
       Result         : Integer_Matrix (1 .. Integer (Tuple_Size),
                                        1 .. Integer (Tuple_Row_Size));
    begin
+      Assert (Tuple /= Null_Address, Routine_Name & "Tuple is null");
       for row in 0 .. Tuple_Size - 1 loop
          Tuple_Row := PyTuple_GetItem (Tuple, row);
+         Assert (Tuple_Row /= Null_Address, Routine_Name & "Tuple_Row is null");
          for col in 0 .. Tuple_Row_Size - 1 loop
             Tuple_Item := PyTuple_GetItem (Tuple_Row, col);
+            Assert (Tuple_Item /= Null_Address, Routine_Name &
+                      "Tuple_Item is null");
             Result (Integer (row) + 1, Integer (col) + 1) :=
               Integer (PyLong_AsLong (Tuple_Item));
          end loop;
