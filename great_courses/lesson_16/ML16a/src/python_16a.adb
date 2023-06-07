@@ -138,7 +138,7 @@ package body Python_16A is
          declare
             Text          : String (1 .. Tuple_Item_Size);
             Has_Long_Char : Boolean := False;
---              Count         : Natural := 0;
+            Count         : Natural := 0;
          begin
             for index in 0 .. Tuple_Item_Size - 1 loop
                Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
@@ -155,8 +155,8 @@ package body Python_16A is
                   end if;
                end;
 
-               if Has_Long_Char then
---                    Count := Count + 1;
+               if Count < 100 and then Has_Long_Char then
+                  Count := Count + 1;
                   Put_Line (Text);
                end if;
             end loop;
