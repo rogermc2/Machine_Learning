@@ -40,6 +40,8 @@ package Python_CLF is
                    A : ML_Types.Integer_List_2D);
    function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                   A : ML_Types.Integer_List_2D) return Integer_Matrix;
+   function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
+                  A : ML_Types.Integer_List_2D; B : Integer) return Integer_Matrix;
    procedure Call (M    : Python.Module; Function_Name : String; CLF : PyObject_Ptr;
                    A, B : ML_Types.Integer_List_2D);
    function Call (M : Python.Module; Function_Name : String; CLF : PyObject_Ptr;

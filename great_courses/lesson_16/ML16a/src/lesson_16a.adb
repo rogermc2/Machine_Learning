@@ -1,10 +1,10 @@
 
 with Ada.Exceptions; use Ada.Exceptions;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+--  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use  Basic_Printing;
---  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 with Python;
 with Python_API;
@@ -19,14 +19,13 @@ procedure Lesson_16A is
      Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
    Newsgroups_File      : constant String := "Newsgroups.data";
    Max_Words            : constant Positive := 20000;
-   --     Max_Sequence_Size    : constant Positive := 1000;
+   Max_Sequence_Size    : constant Positive := 1000;
    --     Embedding_Dimension  : constant Positive := 100;
    Classifier           : Python.Module;
    Tokenizer            : Python_API.PyObject_Ptr;
    Newsgroups           : Newsgroups_Record;
    Sequences            : ML_Types.Integer_List_2D;
    Word_Index           : Occurrences_Dictionary;
-   Num_Words            : Natural;
 begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_16a");
@@ -50,6 +49,8 @@ begin
    declare
       Embedding_Matrix : Embedding_Matrix_Type := Prepare_Embedding_Matrix
         (Embeddings_Index, Word_Index, Max_Words);
+      Data : Integer_Matrix :=
+        Python.Call (Classifier, "get_data", Sequences, Max_Sequence_Size);
    begin
       null;
    end;

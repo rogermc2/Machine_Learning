@@ -78,8 +78,11 @@ package Python is
                   B : ML_Types.Integer_List) return Python_API.PyObject_Ptr;
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Types.Integer_List);
-   procedure Call (M    : Module; Function_Name : String;
-                   A    : ML_Types.Integer_List; B : Integer);
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Types.Integer_List; B : Integer);
+   function Call (M : Module; Function_Name : String;
+                  A : ML_Types.Integer_List; B : Integer)
+                  return ML_Arrays_And_Matrices.Integer_Matrix;
    function Call (M : Module; Function_Name : String;
                   A : Python_API.PyObject_Ptr)
                   return ML_Arrays_And_Matrices.Integer_Array;
