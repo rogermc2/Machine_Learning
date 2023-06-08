@@ -37,9 +37,9 @@ package body Python_16A is
       PyParams := Py_BuildValue (To_C ("(O)"), Tokeniser);
       PyResult := Python.Call_Object (F, PyParams);
       Py_DecRef (F);
+      Py_DecRef (PyParams);
 
       Result := Parse_Occurrences_Dictionary (PyResult);
-      Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
       return Result;

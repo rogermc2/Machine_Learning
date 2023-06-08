@@ -43,6 +43,7 @@ begin
    Word_Index := Python_16A.Call (Classifier, "get_word_index", Tokenizer);
    Put_Line (Program_Name & Integer'Image (Integer (Word_Index.Length)) &
                " unique tokens found.");
+   Python_API.Py_DecRef (Tokenizer);
    declare
       Embedding_Matrix : Embedding_Matrix_Type := Prepare_Embedding_Matrix
         (Word_Index, Max_Words, Embedding_Dimension);

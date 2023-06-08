@@ -1,7 +1,5 @@
 
-with System;
-
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Directories; use Ada.Directories;
 --  with Ada.Exceptions; use Ada.Exceptions;
@@ -9,12 +7,9 @@ with Ada.Streams;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
-
 --  with Basic_Printing; use Basic_Printing;
 with Neural_Utilities;
 with Python_16A;
-with Python_CLF;
 
 package body Support_16A is
 
@@ -30,18 +25,18 @@ package body Support_16A is
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
    --  Values list with the highest value.
-   function Arg_Max (Indices : Integer_Array; Values : Real_Float_Vector)
-                     return Integer is
-      --        Routine_Name : constant String := "Support_16A.Arg_Max ";
-      Best_Index   : Positive;
-      pragma Warnings (Off);
-      Best         : constant Float := Max (Values, Best_Index);
-      pragma Warnings (On);
-   begin
-      return Indices (Best_Index);
-
-   end Arg_Max;
-   pragma Inline (Arg_Max);
+--     function Arg_Max (Indices : Integer_Array; Values : Real_Float_Vector)
+--                       return Integer is
+--        --        Routine_Name : constant String := "Support_16A.Arg_Max ";
+--        Best_Index   : Positive;
+--        pragma Warnings (Off);
+--        Best         : constant Float := Max (Values, Best_Index);
+--        pragma Warnings (On);
+--     begin
+--        return Indices (Best_Index);
+--
+--     end Arg_Max;
+--     pragma Inline (Arg_Max);
 
    --  -------------------------------------------------------------------------
 
@@ -170,64 +165,6 @@ package body Support_16A is
       return Embedding_Matrix;
 
    end Prepare_Embedding_Matrix;
-
-   --  -------------------------------------------------------------------------
-   --  ProbA_Chooser chooses between B options.
-   --  Current_Item is the initial item to consider.
-   --  Train_Set represents the results of previous selections.
-   --  If alpha selections have not yet made the selection is random.
-   --  If alpha selections have been made in the past, fit a clf Naive Bayes
-   --  model using the traing data of academic papers by title, trainset and
-   --  training labels if the academic papers were interesting, trainlabs.
-   --  After fitting the clf model use it to select the item most likely to be
-   --  labeled as interesting.
-   function ProbA_Chooser
-     (Classifier       : Python.Module; Current_Item : Positive;
-      Num_Items        : Positive;  --  b
-      Labeled_Examples : Data_Items;
-      Train_Set        : ML_Types.Integer_List_2D;
-      Train_Labels     : ML_Types.Integer_List;
-      Alpha            : Integer;  Clf : Python_API.PyObject_Ptr)
-      return Integer is
-      use System;
-      Routine_Name     : constant String := "Support_16.ProbA_Chooser ";
-      Train_Set_Length : constant Natural := Integer (Train_Set.Length);
-      NIM1             : constant Natural := Num_Items - 1;
-      Examples_Batch   : constant Integer_Array_List :=
-                           Slice (Labeled_Examples.Features,
-                                  Current_Item, Current_Item + NIM1);
-      --  Y_Hat predictions
-      Y_Hat            : Real_Float_Matrix (1 .. Num_Items, 1 .. 2);
-      Indices          : Integer_Array (Y_Hat'Range);
-      Y_Hat_2          : Real_Float_Vector (Y_Hat'Range);
-      Item             : Integer;
-   begin
-      Assert (CLF /= Null_Address, Routine_Name & "CLF is null");
-      --  Maximum length of Train_Set is Rounds / B
-      if Train_Set_Length = Alpha then
-         Python_CLF.Call (Classifier, "fit", Clf, Train_Set, Train_Labels);
-      end if;
-
-      if Train_Set_Length < Alpha then
-         Item := Maths.Random_Integer (Current_Item, Current_Item + NIM1);
-      else  --  Train_Set_Length >= Alpha
-         --  predict_proba() returns a Train_Set_Length x two-dimensional array
-         --  For binary data, the first column is the probability that the
-         --  outcome will be 0 and the second is the probability that the
-         --  outcome will be 1, P(0) + P (1) = 1.
-         --  The sum of each row of the two columns should equal one.
-         Y_Hat := Python_CLF.Call (Classifier, "predict_proba", Clf,
-                                   Examples_Batch);
-         for index in Indices'Range loop
-            Indices (index) := Current_Item + index - 1;
-            Y_Hat_2 (index) := Y_Hat (index, 2);
-         end loop;
-         Item := Arg_Max (Indices, Y_Hat_2);
-      end if;
-
-      return Item;
-
-   end ProbA_Chooser;
 
    --  -------------------------------------------------------------------------
 
