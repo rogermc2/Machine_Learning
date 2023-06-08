@@ -13,7 +13,7 @@ package body U8_Tuple_Builder is
    --  -------------------------------------------------------------------------
 
    function To_Tuple (Data : ML_U8_Types.Unsigned_8_Array_3D)
-                      return PyObject is
+                      return PyObject_Ptr is
       use ML_Arrays_And_Matrices;
       --        Routine_Name : constant String := "U8_Tuple_Builder.To_Tuple Unsigned_8_Array_3D ";
       Array_Length : constant Positive := Data'Length (1) * Data'Length (2);
@@ -35,7 +35,7 @@ package body U8_Tuple_Builder is
    --  -------------------------------------------------------------------------
 
    function To_Tuple (Data : ML_U8_Types.Image_64_Vector)
-                      return PyObject is
+                      return PyObject_Ptr is
       use Interfaces.C;
       Routine_Name : constant String :=
                          "U8_Tuple_Builder.To_Tuple Image_64_Vector ";
@@ -43,11 +43,11 @@ package body U8_Tuple_Builder is
       Length_2D    : constant int := int (Image'Length (3));
       Length_3D    : constant int := int (Image'Length (2));
       Length_4D    : constant int := int (Data'Length);
-      Tuple_4D     : constant PyObject := PyTuple_New (Length_4D);
+      Tuple_4D     : constant PyObject_Ptr := PyTuple_New (Length_4D);
 
-      function Do_Column (row : Positive) return PyObject is
-         Tuple_2D       : constant PyObject := PyTuple_New (Length_2D);
-         Tuple_3D       : constant PyObject := PyTuple_New (Length_3D);
+      function Do_Column (row : Positive) return PyObject_Ptr is
+         Tuple_2D       : constant PyObject_Ptr := PyTuple_New (Length_2D);
+         Tuple_3D       : constant PyObject_Ptr := PyTuple_New (Length_3D);
          Py_Col_Index   : int := 0;
          Py_Depth_Index : int;
       begin
@@ -67,8 +67,8 @@ package body U8_Tuple_Builder is
 
       end Do_Column;
 
-      function Do_Row return PyObject is
-         Tuple        : constant PyObject := PyTuple_New (Length_3D);
+      function Do_Row return PyObject_Ptr is
+         Tuple        : constant PyObject_Ptr := PyTuple_New (Length_3D);
          Py_Index     : int := 0;
          Py_Col_Index : int;
       begin

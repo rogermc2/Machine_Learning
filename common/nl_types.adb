@@ -35,6 +35,19 @@ package body NL_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function "=" (L, R : Float_List) return Boolean is
+      Result : Boolean := True;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result := Result and L.Element (index) = R.Element (index);
+      end loop;
+
+      return Result;
+
+   end "=";
+
+   --  ----------------------------------------------------------------------------
+
    function "+" (L, R : Float_List) return Float_List is
       Result : Float_List;
    begin
@@ -281,7 +294,19 @@ package body NL_Types is
 
    end "-";
 
-   --  ----------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
+
+   procedure Check_Lengths (Routine_Name : String; L : ML_Types.Integer_List;
+                            R            : Float_List) is
+      use Ada.Containers;
+   begin
+      Assert (R.Length = L.Length, Routine_Name &
+                " R length" & Count_Type'Image (R.Length) &
+                " should be the same as L length" &
+                Count_Type'Image (L.Length));
+   end Check_Lengths;
+
+   --  -------------------------------------------------------------------------
 
    function Dot (L : Float_List; R : Float_List_2D) return Float_List is
       R_List : Float_List;
@@ -300,7 +325,7 @@ package body NL_Types is
 
    end Dot;
 
-   --  ----------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
    function Dot (L, R : Float_List) return Float_List_2D is
       R_List : Float_List;
@@ -318,7 +343,7 @@ package body NL_Types is
 
    end Dot;
 
-   --  ----------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
    function Dot (L, R : Float_List_2D) return Float_List_2D is
       RT      : constant Float_List_2D := Transpose (R);
@@ -346,7 +371,21 @@ package body NL_Types is
 
    end Dot;
 
-   --  ----------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
+
+   function Slice (Data : Float_List; First, Last : Positive)
+                   return Float_List is
+      Result : Float_List;
+   begin
+      for row in First .. Last loop
+         Result.Append (Data.Element (row));
+      end loop;
+
+      return Result;
+
+   end Slice;
+
+   --  -------------------------------------------------------------------------
 
    function Transpose (Values : Float_List_2D) return  Float_List_2D is
       use Ada.Containers;
@@ -372,18 +411,6 @@ package body NL_Types is
 
    --  -------------------------------------------------------------------------
 
-   procedure Check_Lengths (Routine_Name : String; L : ML_Types.Integer_List;
-                            R            : Float_List) is
-      use Ada.Containers;
-   begin
-      Assert (R.Length = L.Length, Routine_Name &
-                " R length" & Count_Type'Image (R.Length) &
-                " should be the same as L length" &
-                Count_Type'Image (L.Length));
-   end Check_Lengths;
-
-   --  ----------------------------------------------------------------------------
---
 --     function Transpose (Values : ML_Types.Integer_List_2D)
 --                         return  ML_Types.Integer_List_2D is
 --        use Ada.Containers;

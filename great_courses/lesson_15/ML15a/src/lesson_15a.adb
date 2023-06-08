@@ -23,7 +23,7 @@ procedure Lesson_15A is
    Test_X       : ML_U8_Types.Image_64_Vector (1 .. 2 * Test_Size);
    Test_Y       : Integer_Array (1 .. 2 * Test_Size);
    Classifier   : Python.Module;
-   Model        : Python_API.PyObject;
+   Model        : Python_API.PyObject_Ptr;
    Test         : ML_U8_Types.Image_64_Array;
 begin
    Put_Line (Program_Name & "initializing Python.");

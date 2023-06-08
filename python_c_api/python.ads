@@ -1,6 +1,8 @@
 
 with System;
 
+with Ada.Containers.Indefinite_Ordered_Maps;
+
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Types;
@@ -12,6 +14,16 @@ package Python is
 
    subtype Module is System.Address;
    
+   type Tuple_Item is record
+      Key   : Unbounded_String;
+      Value : Integer;
+   end record;       
+   type Tuple_List_Array is array (Integer range <>) of Tuple_Item;
+   
+   package Tuple_Map_Package is new Ada.Containers.Indefinite_Ordered_Maps
+     (Unbounded_String, Integer);
+   subtype Tuple_Map is Tuple_Map_Package.Map;
+   
    Interpreter_Error : exception;
    
    procedure Initialize (Program_Name : String := "");
@@ -19,51 +31,63 @@ package Python is
     
    procedure Execute_String (Script : String);
    function Import_File (File_Name : String) return Module;
-   function Call_Object (PyFunc, PyParams : Python_API.PyObject)
-                         return Python_API.PyObject;
+   function Call_Object (PyFunc : Python_API.PyObject_Ptr)
+                         return Python_API.PyObject_Ptr;
+   function Call_Object (PyFunc, PyParams : Python_API.PyObject_Ptr)
+                         return Python_API.PyObject_Ptr;
    procedure Close_Module (M : Module);
    function Get_Symbol (M : in Module; Function_Name : in String)
-                        return Python_API.PyObject;
+                        return Python_API.PyObject_Ptr;
+   function Convert_Tuple_List  (Tuple_List : Tuple_List_Array)
+                                 return Tuple_Map;
+   function Py_String_To_Ada (Py_String_Ptr : Python_API.PyObject_Ptr)
+                              return String;
    
    --  Overloads for "all" needed combinations of parameters and return types:
    
    procedure Call (M : Module; Function_Name : String);
    function Call (M : Module; Function_Name : String)
-                  return Python_API.PyObject;
+                  return Python_API.PyObject_Ptr;
    procedure Call (M : Module; Function_Name : String;
-                   A : Python_API.PyObject);
-   function Call (M : Module; Function_Name : String; A : Python_API.PyObject)
+                   A : Python_API.PyObject_Ptr);
+   function Call (M : Module; Function_Name : String; A : Python_API.PyObject_Ptr)
                   return Integer;
    procedure Call (M : Module; Function_Name, A : String);
    function Call (M : Module; Function_Name, A : String)
-                  return Python_API.PyObject;
+                  return Python_API.PyObject_Ptr;
    function Call (M : Module; Function_Name : String; A : Float)
-                  return Python_API.PyObject;
-   function Call (M : Module; Function_Name : String; A : Python_API.PyObject)
+                  return Python_API.PyObject_Ptr;
+   function Call (M : Module; Function_Name : String; A : Python_API.PyObject_Ptr)
                   return Boolean;
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer)
-                  return Python_API.PyObject;
+                  return Python_API.PyObject_Ptr;
    function Call (M : Module; Function_Name : String; A : Integer;
                   B : ML_Arrays_And_Matrices.Real_Float_Matrix)
-                  return Python_API.PyObject;
+                  return Python_API.PyObject_Ptr;
    procedure Call (M : Module; Function_Name : String; A, B : Integer);
    function Call (M : Module; Function_Name : String; A, B : Integer)
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer; B : Float)
-                  return Python_API.PyObject;
+                  return Python_API.PyObject_Ptr;
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Array);
    function Call (M : Python.Module; Function_Name : String;
                   A : ML_Arrays_And_Matrices.Integer_Array_List;
-                  B : ML_Types.Integer_List) return Python_API.PyObject;
+                  B : ML_Types.Integer_List) return Python_API.PyObject_Ptr;
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Types.Integer_List);
-   procedure Call (M    : Module; Function_Name : String;
-                   A    : ML_Types.Integer_List; B : Integer);
+   procedure Call (M : Module; Function_Name : String;
+                   A : ML_Types.Integer_List; B : Integer);
    function Call (M : Module; Function_Name : String;
-                  A : Python_API.PyObject)
+                  A : ML_Types.Integer_List; B : Integer)
+                  return ML_Arrays_And_Matrices.Integer_Matrix;
+   function Call (M : Module; Function_Name : String;
+                  A : ML_Types.Integer_List_2D; B : Integer)
+                  return ML_Arrays_And_Matrices.Integer_Matrix;
+   function Call (M : Module; Function_Name : String;
+                  A : Python_API.PyObject_Ptr)
                   return ML_Arrays_And_Matrices.Integer_Array;
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix);
@@ -185,11 +209,17 @@ package Python is
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_List);
    function Call (M : Module; Function_Name : String; A : Unbounded_String)
-                  return Python_API.PyObject;
+                  return Python_API.PyObject_Ptr;
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unbounded_String_Array);
    procedure Call (M : Module; Function_Name : String;
+                   A : ML_Types.Unbounded_List);
+   procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Unbounded_String_Matrix);
-   function Run_String (Script : String) return Python_API.PyObject;
+   function Call (M : Python.Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Real_Float_Matrix;
+                  B : ML_Arrays_And_Matrices.Integer_Array)
+                  return Python_API.PyObject_Ptr;
+   function Run_String (Script : String) return Python_API.PyObject_Ptr;
 
 end Python;
