@@ -15,9 +15,6 @@ with Support_16A; use Support_16A;
 
 procedure Lesson_16A is
    Program_Name         : constant String := "Lesson 16A ";
-   Embeddings_Index     : constant Coeffs_Dictionary :=
-     Get_Glove_Data ("../../data/glove.6B/glove.6B.100d.txt");
-   Newsgroups_File      : constant String := "Newsgroups.data";
    Max_Words            : constant Positive := 20000;
    Max_Sequence_Size    : constant Positive := 1000;
    Embedding_Dimension  : constant Positive := 20;  --  100
@@ -30,7 +27,7 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_16a");
 
-   Newsgroups := Load_Newsgroups (Classifier, Newsgroups_File, True);
+   Newsgroups := Load_Newsgroups (Classifier, True);
 
    Put_Line (Program_Name  & "Newsgroups file read");
    Put_Line (Program_Name  & "Newsgroups.Data length" &
@@ -48,7 +45,7 @@ begin
                " unique tokens found.");
    declare
       Embedding_Matrix : Embedding_Matrix_Type := Prepare_Embedding_Matrix
-        (Embeddings_Index, Word_Index, Max_Words, Embedding_Dimension);
+        (Word_Index, Max_Words, Embedding_Dimension);
       Data : Integer_Matrix :=
         Python.Call (Classifier, "get_data", Sequences, Max_Sequence_Size);
       Labels : Integer_Matrix :=

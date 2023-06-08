@@ -103,11 +103,11 @@ package body Support_16A is
 
    --  -------------------------------------------------------------------------
 
-   function Load_Newsgroups (Classifier : Python.Module; File_Name : String;
-                             Reload     : Boolean := False) return Newsgroups_Record is
+   function Load_Newsgroups (Classifier : Python.Module;  Reload : Boolean := False) return Newsgroups_Record is
       use Ada.Streams;
       use Stream_IO;
       Routine_Name  : constant String := "Support_16A.Load_Newsgroups ";
+      File_Name     : constant String := "Newsgroups.data";
       File_ID       : Stream_IO.File_Type;
       aStream       : Stream_Access;
       Data          : Newsgroups_Record;
@@ -132,10 +132,10 @@ package body Support_16A is
    --  -------------------------------------------------------------------------
 
    function Prepare_Embedding_Matrix
-     (Embeddings_Index     : Coeffs_Dictionary;
-      Word_Index           : Occurrences_Dictionary; Max_Words : Positive;
+     (Word_Index           : Occurrences_Dictionary; Max_Words : Positive;
       Embedding_Dimension  :  Positive) return Embedding_Matrix_Type is
       use Occurrences_Dictionary_Package;
+      Embeddings_Index : Coeffs_Dictionary;
       Num_Words        : constant Positive :=
                            Integer'Min (Max_Words, Integer (Word_Index.Length));
       aKey             : Unbounded_String;
@@ -146,7 +146,6 @@ package body Support_16A is
       Vector_Length    : Positive;
    begin
       --  prepare embedding matrix
-
       for curs in Word_Index.Iterate loop
          --           Put_Line (Program_Name & "Word_Count" & Integer'Image (Word_Count));
          if Word_Count < Max_Words then

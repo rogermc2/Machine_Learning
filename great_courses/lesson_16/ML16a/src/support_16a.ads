@@ -41,8 +41,7 @@ package Support_16A is
    subtype Occurrences_Dictionary is Occurrences_Dictionary_Package.Map;
 
    function Prepare_Embedding_Matrix
-     ( Embeddings_Index    : Coeffs_Dictionary;
-       Word_Index           : Occurrences_Dictionary; Max_Words : Positive;
+     (Word_Index           : Occurrences_Dictionary; Max_Words : Positive;
        Embedding_Dimension  :  Positive) return Embedding_Matrix_Type;
    function ProbA_Chooser
      (Classifier       : Python.Module;
@@ -52,7 +51,7 @@ package Support_16A is
       Train_Labels     : ML_Types.Integer_List; Alpha : Integer;
       Clf              : Python_API.PyObject_Ptr) return Integer;
    function Get_Glove_Data (File_Name : String) return Coeffs_Dictionary;
-   function Load_Newsgroups (Classifier : Python.Module; File_Name : String;
+   function Load_Newsgroups (Classifier : Python.Module;
                              Reload     : Boolean := False) return Newsgroups_Record;
    procedure Save_Data (Data : Newsgroups_Record; File_Name : String);
 
