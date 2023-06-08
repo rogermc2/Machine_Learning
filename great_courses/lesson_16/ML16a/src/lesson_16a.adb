@@ -15,8 +15,8 @@ with Support_16A; use Support_16A;
 
 procedure Lesson_16A is
    Program_Name         : constant String := "Lesson 16A ";
-   Max_Words            : constant Positive := 20000;
-   Max_Sequence_Size    : constant Positive := 1000;
+   Max_Words            : constant Positive := 2000;  -- 20000
+   Max_Sequence_Size    : constant Positive := 50;  --  1000
    Embedding_Dimension  : constant Positive := 20;  --  100
    Classifier           : Python.Module;
    Tokenizer            : Python_API.PyObject_Ptr;
