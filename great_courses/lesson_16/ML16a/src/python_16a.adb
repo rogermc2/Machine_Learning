@@ -106,6 +106,9 @@ package body Python_16A is
          end if;
       end loop;
 
+      Py_DecRef (Item_Ptr);
+      Py_DecRef (Py_Str_Ptr);
+
       return Data;
 
    end Parse_Occurrences_Dictionary;
@@ -174,6 +177,9 @@ package body Python_16A is
          end;
 
       end loop;
+
+      Py_DecRef (Tuple_Item);
+      Py_DecRef (Py_Str_Ptr);
 
       return Data_List;
 
