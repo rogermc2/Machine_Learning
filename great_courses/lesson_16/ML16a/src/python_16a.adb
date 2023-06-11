@@ -24,6 +24,8 @@ package body Python_16A is
                   return Support_16A.Occurrences_Dictionary is
       use Interfaces.C;
       use Python_API;
+      Routine_Name    : constant String :=
+                          "Python_16A.CallOccurrences_Dictionary  ";
 
       function Py_BuildValue (Format : char_array; O1 : PyObject_Ptr)
                               return PyObject_Ptr;
@@ -34,12 +36,15 @@ package body Python_16A is
       PyResult : PyObject_Ptr;
       Result   : Support_16A.Occurrences_Dictionary;
    begin
+      Put_Line (Routine_Name);
       PyParams := Py_BuildValue (To_C ("(O)"), Tokeniser);
       PyResult := Python.Call_Object (F, PyParams);
       Py_DecRef (F);
       Py_DecRef (PyParams);
 
+      Put_Line (Routine_Name & "Parse_Occurrences_Dictionary");
       Result := Parse_Occurrences_Dictionary (PyResult);
+      Put_Line (Routine_Name & "Occurrences_Dictionary parsed");
       Py_DecRef (PyResult);
 
       return Result;
@@ -51,15 +56,19 @@ package body Python_16A is
    function Call (M : Python.Module; Function_Name : String)
                   return Support_16A.Newsgroups_Record is
       use Python_API;
+      Routine_Name    : constant String :=
+                          "Python_16A.Newsgroups_Record ";
       F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
       PyResult : PyObject_Ptr;
       Result   : Support_16A.Newsgroups_Record;
    begin
+      Put_Line (Routine_Name & Function_Name);
       PyResult := Python.Call_Object (F);
       Py_DecRef (F);
 
       Result := Parse_Tuples (PyResult);
       Py_DecRef (PyResult);
+      Put_Line (Routine_Name & "done");
 
       return Result;
 
@@ -131,6 +140,7 @@ package body Python_16A is
    begin
       New_Line;
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
+      Put_Line (Routine_Name);
 
       for item in 0 .. Tuple_Size - 1 loop
          Tuple_Item := PyTuple_GetItem (Tuple, item);
@@ -139,14 +149,12 @@ package body Python_16A is
          Tuple_Item_Size := Integer (PyTuple_Size (Tuple_Item));
 
          declare
---              Text          : String (1 .. Tuple_Item_Size);
             Text          : Unbounded_String;
             Has_Long_Char : Boolean := False;
             Count         : Natural := 0;
             Continue      : Boolean := True;
             Index         : Natural := 0;
          begin
---              for index in 0 .. Tuple_Item_Size - 1 loop
             while Continue and then index < Tuple_Item_Size loop
                Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
                declare
@@ -180,6 +188,7 @@ package body Python_16A is
 
       Py_DecRef (Tuple_Item);
       Py_DecRef (Py_Str_Ptr);
+      Put_Line (Routine_Name & "done.");
 
       return Data_List;
 

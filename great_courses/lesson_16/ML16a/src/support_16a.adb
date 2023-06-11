@@ -2,7 +2,7 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Directories; use Ada.Directories;
---  with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Streams;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -13,30 +13,24 @@ with Python_16A;
 
 package body Support_16A is
 
-   --     Lex_Size    : constant Unbounded_String := To_Unbounded_String ("@size");
-   --     Unknown     : constant Unbounded_String := To_Unbounded_String ("@unk");
-
-   --     function Tokenize (aLine : String; Dictionary : Dictionary_List)
-   --                        return Integer_Array;
-   --     pragma Inline (Tokenize);
    function Process_Glove_Line (File_ID : File_Type) return Coeffs_Record;
    pragma Inline (Process_Glove_Line);
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
    --  Values list with the highest value.
---     function Arg_Max (Indices : Integer_Array; Values : Real_Float_Vector)
---                       return Integer is
---        --        Routine_Name : constant String := "Support_16A.Arg_Max ";
---        Best_Index   : Positive;
---        pragma Warnings (Off);
---        Best         : constant Float := Max (Values, Best_Index);
---        pragma Warnings (On);
---     begin
---        return Indices (Best_Index);
---
---     end Arg_Max;
---     pragma Inline (Arg_Max);
+   --     function Arg_Max (Indices : Integer_Array; Values : Real_Float_Vector)
+   --                       return Integer is
+   --        --        Routine_Name : constant String := "Support_16A.Arg_Max ";
+   --        Best_Index   : Positive;
+   --        pragma Warnings (Off);
+   --        Best         : constant Float := Max (Values, Best_Index);
+   --        pragma Warnings (On);
+   --     begin
+   --        return Indices (Best_Index);
+   --
+   --     end Arg_Max;
+   --     pragma Inline (Arg_Max);
 
    --  -------------------------------------------------------------------------
 
@@ -130,6 +124,8 @@ package body Support_16A is
      (Word_Index           : Occurrences_Dictionary; Max_Words : Positive;
       Embedding_Dimension  :  Positive) return Embedding_Matrix_Type is
       use Occurrences_Dictionary_Package;
+      Routine_Name     : constant String :=
+                           "Support_16A.Prepare_Embedding_Matrix ";
       Embeddings_Index : Coeffs_Dictionary;
       Num_Words        : constant Positive :=
                            Integer'Min (Max_Words, Integer (Word_Index.Length));
@@ -140,6 +136,7 @@ package body Support_16A is
       Embedding_Matrix : Embedding_Matrix_Type (1 .. Num_Words);
       Vector_Length    : Positive;
    begin
+      Put_Line (Routine_Name);
       --  prepare embedding matrix
       for curs in Word_Index.Iterate loop
          --           Put_Line (Program_Name & "Word_Count" & Integer'Image (Word_Count));
@@ -161,8 +158,21 @@ package body Support_16A is
             end if;
          end if;
       end loop;
+      Put_Line (Routine_Name & "done");
 
       return Embedding_Matrix;
+
+   exception
+      when Error: Constraint_Error => Put_Line (Routine_Name &
+                                                  "Constraint_Error");
+         Put_Line (Exception_Information(Error));
+         raise;
+         return Embedding_Matrix;
+
+      when Error: others => Put_Line (Routine_Name & "exception");
+         Put_Line (Exception_Information(Error));
+         raise;
+         return Embedding_Matrix;
 
    end Prepare_Embedding_Matrix;
 
