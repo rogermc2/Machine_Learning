@@ -66,6 +66,7 @@ package body Python_16A is
       PyResult := Python.Call_Object (F);
       Py_DecRef (F);
 
+      Put_Line (Routine_Name & "setting Result");
       Result := Parse_Tuples (PyResult);
       Py_DecRef (PyResult);
       Put_Line (Routine_Name & "done");
@@ -188,6 +189,8 @@ package body Python_16A is
 
       Py_DecRef (Tuple_Item);
       Py_DecRef (Py_Str_Ptr);
+      Put_Line (Routine_Name & "Data_List length " &
+               Integer'Image (Integer (Data_List.Length)));
       Put_Line (Routine_Name & "done.");
 
       return Data_List;
@@ -200,12 +203,13 @@ package body Python_16A is
                           return Support_16A.Newsgroups_Record is
       use Interfaces.C;
       use Python_API;
-      --        Routine_Name : constant String := "Python_16A.Parse_Tuples  ";
+      Routine_Name : constant String := "Python_16A.Parse_Tuples  ";
       --        Tuples_Size  : constant int := PyTuple_Size (Tuples);
       Result       : Support_16A.Newsgroups_Record;
    begin
-      --        Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuples_Size));
       Result.Data := Parse_Text_Tuple (PyTuple_GetItem (Tuples, 0));
+      Put_Line (Routine_Name & "Result.Data length: " &
+                  Integer'Image (Integer (Result.Data.Length)));
       --        Result.Target := PyTuple_GetItem (Tuple, 1);
       --        Result.File_Names := PyTuple_GetItem (Tuple, 2);
       --        Result.Descr := PyTuple_GetItem (Tuple, 3);
