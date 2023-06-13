@@ -101,26 +101,26 @@ package body Python is
 
    --  -------------------------------------------------------------------------
     
---     function Py_String_To_Ada (Py_String_Ptr: PyObject_Ptr) return String is
---        use System;
---        use Interfaces.C.Strings;
---        Unicode_String : constant PyObject_Ptr :=
---                           PyUnicode_FromString (Py_String_Ptr);
---        Utf8_String    : chars_ptr;
---        Ada_String     : Unbounded_String := Null_Unbounded_String;
---     begin
---        if Unicode_String /= System.Null_Address then
---           Utf8_String := PyUnicode_AsUTF8 (Unicode_String);
---           if Utf8_String /= null_ptr then
---              Ada_String := To_Unbounded_String (Value (Utf8_String));
---           end if;
---        end if;
---  
---        Py_DecRef (Unicode_String);
---  
---        return To_String (Ada_String);
---        
---     end Py_String_To_Ada;
+   --     function Py_String_To_Ada (Py_String_Ptr: PyObject_Ptr) return String is
+   --        use System;
+   --        use Interfaces.C.Strings;
+   --        Unicode_String : constant PyObject_Ptr :=
+   --                           PyUnicode_FromString (Py_String_Ptr);
+   --        Utf8_String    : chars_ptr;
+   --        Ada_String     : Unbounded_String := Null_Unbounded_String;
+   --     begin
+   --        if Unicode_String /= System.Null_Address then
+   --           Utf8_String := PyUnicode_AsUTF8 (Unicode_String);
+   --           if Utf8_String /= null_ptr then
+   --              Ada_String := To_Unbounded_String (Value (Utf8_String));
+   --           end if;
+   --        end if;
+   --  
+   --        Py_DecRef (Unicode_String);
+   --  
+   --        return To_String (Ada_String);
+   --        
+   --     end Py_String_To_Ada;
    
    -------------------------------------------------------------------------
   
@@ -698,7 +698,7 @@ package body Python is
       
       declare
          Result : constant ML_Arrays_And_Matrices.Integer_Matrix:=
-           Parsers.Parse_Tuple (PyResult);
+                    Parsers.Parse_Tuple (PyResult);
       begin
          Py_DecRef (PyResult);
          return Result;
@@ -739,7 +739,7 @@ package body Python is
       
       declare
          Result : constant ML_Arrays_And_Matrices.Integer_Matrix:=
-           Parsers.Parse_Tuple (PyResult);
+                    Parsers.Parse_Tuple (PyResult);
       begin
          Py_DecRef (PyResult);
          return Result;
@@ -1330,6 +1330,8 @@ package body Python is
    procedure Call (M       : Module; Function_Name : String;
                    A, B, C : ML_Arrays_And_Matrices.Real_Float_Vector;
                    D       : ML_Arrays_And_Matrices.Float_Array_3D) is
+      use System;
+      Routine_Name : constant String := "Python.Call ABC FV, D 3DA ";
 
       function Py_BuildValue (Format          : Interfaces.C.char_array;
                               T1, T2, T3, T4  : PyObject_Ptr) return PyObject_Ptr;
@@ -1343,10 +1345,16 @@ package body Python is
       PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
    begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
+      Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
+      Assert (C_Tuple /= Null_Address, Routine_Name & "C_Tuple is null");
+      Assert (D_Tuple /= Null_Address, Routine_Name & "D_Tuple is null");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOOO"),
                        A_Tuple, B_Tuple, C_Tuple, D_Tuple);
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
 
+      Put_Line (Routine_Name & "Call_Object");
       PyResult := Call_Object (F, PyParams);
 
       Py_DecRef (F);

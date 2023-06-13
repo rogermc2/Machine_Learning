@@ -42,31 +42,32 @@ package body Tuple_Builder is
       use Interfaces.C;
       Routine_Name  : constant String := "Python.To_Tuple Float_Array_3D ";
       Result        : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
-      Py_Row        : constant PyObject_Ptr := PyTuple_New (int (Data'Length (2)));
-      Py_Col        : constant PyObject_Ptr := PyTuple_New (int (Data'Length (3)));
-      Py_Row_Index  : int := -1;
-      Py_Col_Index  : int;
-      Py_Vert_Index : int;
+      Py_X          : constant PyObject_Ptr := PyTuple_New (int (Data'Length (2)));
+      Py_Y          : constant PyObject_Ptr := PyTuple_New (int (Data'Length (3)));
+      Py_X_Index    : int := -1;
+      Py_Y_Index    : int;
+      Py_Z_Index    : int;
       Value         : Float;
    begin
-      for row in Data'Range loop
-         Py_Row_Index := Py_Row_Index + 1;
-         Py_Col_Index := -1;
-         for col in Data'Range (1) loop
-            Py_Col_Index := Py_Col_Index + 1;
-            Py_Vert_Index := -1;
-            for vert in Data'Range (2) loop
-               Py_Vert_Index := Py_Vert_Index + 1;
-               Value := Data (row, col, vert);
-               PyTuple_SetItem (Py_Col, Py_Vert_Index, PyFloat_FromDouble (double (Value)));
+      for x in Data'Range loop
+         Py_X_Index := Py_X_Index + 1;
+         Py_Y_Index := -1;
+         for y in Data'Range (2) loop
+            Py_Y_Index := Py_Y_Index + 1;
+            Py_Z_Index := -1;
+            for z in Data'Range (3) loop
+               Py_Z_Index := Py_Z_Index + 1;
+               Value := Data (x, y, z);
+               PyTuple_SetItem (Py_Y, Py_Z_Index,
+                                PyFloat_FromDouble (double (Value)));
             end loop;
-            PyTuple_SetItem (Py_Row, Py_Col_Index, Py_Col);
+            PyTuple_SetItem (Py_X, Py_Y_Index, Py_Y);
          end loop;
-         PyTuple_SetItem (Result, Py_Row_Index, Py_Row);
+         PyTuple_SetItem (Result, Py_X_Index, Py_X);
       end loop;
       
-      Py_DecRef (Py_Row);
-      Py_DecRef (Py_Col);
+      Py_DecRef (Py_X);
+      Py_DecRef (Py_Y);
 
       return Result;
 
