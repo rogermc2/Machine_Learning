@@ -15,7 +15,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array) 
                       return PyObject_Ptr is
       use Interfaces.C;
-      Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      Routine_Name : constant String := "Python.To_Tuple Float_Array ";
       Value        : Float;
       Py_Row       : int := -1;
       Result       : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
@@ -25,6 +25,48 @@ package body Tuple_Builder is
          Value := Data (row);
          PyTuple_SetItem (Result, Py_Row, PyFloat_FromDouble (double (Value)));
       end loop;
+
+      return Result;
+
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array_3D) 
+                      return PyObject_Ptr is
+      use Interfaces.C;
+      Routine_Name  : constant String := "Python.To_Tuple Float_Array_3D ";
+      Result        : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
+      Py_Row        : constant PyObject_Ptr := PyTuple_New (int (Data'Length (2)));
+      Py_Col        : constant PyObject_Ptr := PyTuple_New (int (Data'Length (3)));
+      Py_Row_Index  : int := -1;
+      Py_Col_Index  : int;
+      Py_Vert_Index : int;
+      Value         : Float;
+   begin
+      for row in Data'Range loop
+         Py_Row_Index := Py_Row_Index + 1;
+         Py_Col_Index := -1;
+         for col in Data'Range (1) loop
+            Py_Col_Index := Py_Col_Index + 1;
+            Py_Vert_Index := -1;
+            for vert in Data'Range (2) loop
+               Py_Vert_Index := Py_Vert_Index + 1;
+               Value := Data (row, col, vert);
+               PyTuple_SetItem (Py_Col, Py_Vert_Index, PyFloat_FromDouble (double (Value)));
+            end loop;
+            PyTuple_SetItem (Py_Row, Py_Col_Index, Py_Col);
+         end loop;
+         PyTuple_SetItem (Result, Py_Row_Index, Py_Row);
+      end loop;
+      
+      Py_DecRef (Py_Row);
+      Py_DecRef (Py_Col);
 
       return Result;
 

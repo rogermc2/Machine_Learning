@@ -17,6 +17,8 @@ package ML_Arrays_And_Matrices is
    type Binary_Array is array (Integer range <>) of Binary;
    type Boolean_Array is array (Integer range <>) of Boolean;
    type Float_Array is array (Integer range <>) of Float;
+   type Float_Array_3D is array (Integer range <>, Integer range <>,
+                                 Integer range <>) of Float;
 
    procedure Float_Array_Sort is new Ada.Containers.Generic_Array_Sort
      (Integer, Float, Float_Array);

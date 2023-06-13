@@ -137,6 +137,9 @@ package Python is
                    B : ML_Arrays_And_Matrices.Integer_Array);
    procedure Call (M          : Module; Function_Name : String;
                    A, B, C, D : ML_Arrays_And_Matrices.Real_Float_Vector);
+   procedure Call (M       : Module; Function_Name : String;
+                   A, B, C : ML_Arrays_And_Matrices.Real_Float_Vector;
+                   D       : ML_Arrays_And_Matrices.Float_Array_3D);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : NL_Types.Float_List);
    procedure Call (M    : Module; Function_Name : String;
