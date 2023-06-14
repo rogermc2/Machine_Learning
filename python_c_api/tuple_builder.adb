@@ -40,9 +40,11 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array_3D) 
                       return PyObject_Ptr is
       use Interfaces.C;
+      use ML_Arrays_And_Matrices;
       Routine_Name  : constant String := "Python.To_Tuple Float_Array_3D ";
       Result        : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
-      Py_X          : constant PyObject_Ptr := PyTuple_New (int (Data'Length (2)));
+      Py_X          : PyObject_Ptr;
+      aRow          : Real_Float_Vector (Data'Range);
       Py_Y          : constant PyObject_Ptr := PyTuple_New (int (Data'Length (3)));
       Py_X_Index    : int := -1;
       Py_Y_Index    : int;
@@ -51,18 +53,8 @@ package body Tuple_Builder is
    begin
       for x in Data'Range loop
          Py_X_Index := Py_X_Index + 1;
-         Py_Y_Index := -1;
-         for y in Data'Range (2) loop
-            Py_Y_Index := Py_Y_Index + 1;
-            Py_Z_Index := -1;
-            for z in Data'Range (3) loop
-               Py_Z_Index := Py_Z_Index + 1;
-               Value := Data (x, y, z);
-               PyTuple_SetItem (Py_Y, Py_Z_Index,
-                                PyFloat_FromDouble (double (Value)));
-            end loop;
-            PyTuple_SetItem (Py_X, Py_Y_Index, Py_Y);
-         end loop;
+         aRow := Get_Row (Data, x);
+         Py_X := To_Tuple (aRow);
          PyTuple_SetItem (Result, Py_X_Index, Py_X);
       end loop;
       

@@ -191,6 +191,9 @@ package ML_Arrays_And_Matrices is
    function Get_Row (Matrix : Real_Float_Matrix; Row : Integer)
                      return Real_Float_Vector;
    pragma Inline (Get_Row);
+   function Get_Matrix (Array_3D : Float_Array_3D; Level : Integer)
+                        return Real_Float_Matrix;
+   pragma Inline (Get_Matrix);
    --  Hadamard product
    function H_Product (L, R : Binary_Array) return Binary_Array;
    function H_Product (L, R : Real_Float_Vector) return Real_Float_Vector;
