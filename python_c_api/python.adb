@@ -1334,8 +1334,9 @@ package body Python is
       use ML_Arrays_And_Matrices;
       Routine_Name : constant String := "Python.Call ABC FV, D 3DA ";
 
-      function Py_BuildValue (Format         : Interfaces.C.char_array;
-                              T1, T2, T3, T4 : PyObject_Ptr) return PyObject_Ptr;
+      function Py_BuildValue
+        (Format : Interfaces.C.char_array; T1, T2, T3, T4 : PyObject_Ptr)
+         return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
@@ -1356,7 +1357,8 @@ package body Python is
                   Interfaces.C.int'Image (PyTuple_Size (D_Tuple)));
       Test := PyTuple_GetItem (D_Tuple, 10);
       aMatrix := Parsers.Parse_Tuple (Test);
-      Print_Float_Matrix (Routine_Name & "aMatrix 10", aMatrix, 1, 1);
+      Print_Float_Matrix (Routine_Name & "aMatrix D_Tuple item 10", aMatrix,
+                          1, 1, 1, 2);
       Py_DecRef (Test);
       
       PyParams :=
