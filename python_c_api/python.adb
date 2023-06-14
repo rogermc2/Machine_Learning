@@ -1333,8 +1333,8 @@ package body Python is
       use System;
       Routine_Name : constant String := "Python.Call ABC FV, D 3DA ";
 
-      function Py_BuildValue (Format          : Interfaces.C.char_array;
-                              T1, T2, T3, T4  : PyObject_Ptr) return PyObject_Ptr;
+      function Py_BuildValue (Format         : Interfaces.C.char_array;
+                              T1, T2, T3, T4 : PyObject_Ptr) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
@@ -1349,6 +1349,8 @@ package body Python is
       Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
       Assert (C_Tuple /= Null_Address, Routine_Name & "C_Tuple is null");
       Assert (D_Tuple /= Null_Address, Routine_Name & "D_Tuple is null");
+      Put_Line (Routine_Name & "D_Tuple length" &
+                  Interfaces.C.int'Image (PyTuple_Size (D_Tuple)));
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOOO"),
                        A_Tuple, B_Tuple, C_Tuple, D_Tuple);

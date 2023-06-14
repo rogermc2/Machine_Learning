@@ -8,6 +8,8 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
+--  with Basic_Printing; use Basic_Printing;
+
 package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
@@ -43,23 +45,24 @@ package body Tuple_Builder is
       use ML_Arrays_And_Matrices;
       Routine_Name  : constant String := "Python.To_Tuple Float_Array_3D ";
       Result        : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
-      Py_X          : PyObject_Ptr;
-      aRow          : Real_Float_Vector (Data'Range);
-      Py_Y          : constant PyObject_Ptr := PyTuple_New (int (Data'Length (3)));
-      Py_X_Index    : int := -1;
-      Py_Y_Index    : int;
-      Py_Z_Index    : int;
-      Value         : Float;
+      Py_Matrix     : PyObject_Ptr;
+      aMatrix       : Real_Float_Matrix (Data'Range (2), Data'Range (3));
+      Py_Index      : int := -1;
    begin
-      for x in Data'Range loop
-         Py_X_Index := Py_X_Index + 1;
-         aRow := Get_Row (Data, x);
-         Py_X := To_Tuple (aRow);
-         PyTuple_SetItem (Result, Py_X_Index, Py_X);
+      for mat in Data'Range loop
+         Py_Index := Py_Index + 1;
+--           Put_Line (Routine_Name & "mat, Py_Index: " & Integer'Image (mat) & int'Image (Py_Index));
+         aMatrix := Get_Matrix (Data, mat);
+--           Put_Line (Routine_Name & "Matrix (1, 1)" & Float'Image (aMatrix (1, 1)));
+         Py_Matrix := To_Tuple (aMatrix);
+         Put_Line (Routine_Name & "last Py_Index" & int'Image (Py_Index));
+         PyTuple_SetItem (Result, Py_Index, Py_Matrix);
       end loop;
+--        Put_Line (Routine_Name & "last Py_Index" & int'Image (Py_Index));
+      Put_Line (Routine_Name & " last Matrix (1, 1)" & Float'Image (aMatrix (1, 1)));
+--        Print_Float_Matrix (Routine_Name & "last matrix", aMatrix);
       
-      Py_DecRef (Py_X);
-      Py_DecRef (Py_Y);
+      Py_DecRef (Py_Matrix);
 
       return Result;
 

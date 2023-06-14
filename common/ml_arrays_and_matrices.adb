@@ -699,13 +699,11 @@ package body ML_Arrays_And_Matrices is
 
    function Get_Matrix (Array_3D : Float_Array_3D; Level : Integer)
                         return Real_Float_Matrix is
-      aRow   : Real_Float_Vector (Array_3D'Range (2));
       Result : Real_Float_Matrix (Array_3D'Range (2), Array_3D'Range (3));
    begin
       for row in Array_3D'Range (2) loop
          for col in Array_3D'Range (3) loop
-            aRow (col) := Array_3D  (Level,row, col);
-            --           Result (col) := Matrix  (row, col);
+            Result (row, col) := Array_3D (Level, row, col);
          end loop;
       end loop;
 
