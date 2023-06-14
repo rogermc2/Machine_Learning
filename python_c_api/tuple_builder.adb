@@ -55,8 +55,6 @@ package body Tuple_Builder is
          Py_Matrix := To_Tuple (aMatrix);
          PyTuple_SetItem (Result, Py_Index, Py_Matrix);
       end loop;
-      Put_Line (Routine_Name & " last Matrix (1, 1)" & Float'Image (aMatrix (1, 1)));
---        Print_Float_Matrix (Routine_Name & "last matrix", aMatrix);
 
       return Result;
 

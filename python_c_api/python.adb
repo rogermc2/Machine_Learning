@@ -8,7 +8,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Parsers;
 with Python_API; use Python_API;
 with Tuple_Builder; use Tuple_Builder;
@@ -1346,34 +1346,23 @@ package body Python is
       D_Tuple  : constant PyObject_Ptr := To_Tuple (D);
       PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
-      aMatrix  : Real_Float_Matrix (1 .. 11, 1 .. 11);
-      Test     : PyObject_Ptr;
    begin
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
       Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
       Assert (C_Tuple /= Null_Address, Routine_Name & "C_Tuple is null");
       Assert (D_Tuple /= Null_Address, Routine_Name & "D_Tuple is null");
-      Put_Line (Routine_Name & "D_Tuple length" &
-                  Interfaces.C.int'Image (PyTuple_Size (D_Tuple)));
-      Test := PyTuple_GetItem (D_Tuple, 10);
-      aMatrix := Parsers.Parse_Tuple (Test);
-      Print_Float_Matrix (Routine_Name & "aMatrix D_Tuple item 10", aMatrix,
-                          1, 1, 1, 2);
-      Py_DecRef (Test);
       
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOOO"),
                        A_Tuple, B_Tuple, C_Tuple, D_Tuple);
-      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
-
-      Put_Line (Routine_Name & "Call_Object");
-      PyResult := Call_Object (F, PyParams);
-
-      Py_DecRef (F);
       Py_DecRef (A_Tuple);
       Py_DecRef (B_Tuple);
       Py_DecRef (C_Tuple);
       Py_DecRef (D_Tuple);
+      
+      PyResult := Call_Object (F, PyParams);
+
+      Py_DecRef (F);
       Py_DecRef (PyParams);
       Py_DecRef (PyResult);
 
