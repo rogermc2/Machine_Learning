@@ -8,7 +8,7 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with Parsers;
 with Python_API; use Python_API;
 with Tuple_Builder; use Tuple_Builder;
@@ -1331,6 +1331,7 @@ package body Python is
                    A, B, C : ML_Arrays_And_Matrices.Real_Float_Vector;
                    D       : ML_Arrays_And_Matrices.Float_Array_3D) is
       use System;
+      use ML_Arrays_And_Matrices;
       Routine_Name : constant String := "Python.Call ABC FV, D 3DA ";
 
       function Py_BuildValue (Format         : Interfaces.C.char_array;
@@ -1344,6 +1345,8 @@ package body Python is
       D_Tuple  : constant PyObject_Ptr := To_Tuple (D);
       PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
+      aMatrix  : Real_Float_Matrix (1 .. 11, 1 .. 11);
+      Test     : PyObject_Ptr;
    begin
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null");
       Assert (B_Tuple /= Null_Address, Routine_Name & "B_Tuple is null");
@@ -1351,6 +1354,11 @@ package body Python is
       Assert (D_Tuple /= Null_Address, Routine_Name & "D_Tuple is null");
       Put_Line (Routine_Name & "D_Tuple length" &
                   Interfaces.C.int'Image (PyTuple_Size (D_Tuple)));
+      Test := PyTuple_GetItem (D_Tuple, 10);
+      aMatrix := Parsers.Parse_Tuple (Test);
+      Print_Float_Matrix (Routine_Name & "aMatrix 10", aMatrix, 1, 1);
+      Py_DecRef (Test);
+      
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("OOOO"),
                        A_Tuple, B_Tuple, C_Tuple, D_Tuple);

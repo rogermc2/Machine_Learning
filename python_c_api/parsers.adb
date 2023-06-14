@@ -24,7 +24,6 @@ package body Parsers is
          T_Row := PyTuple_GetItem (Tuple, row - 1);
          Vec (Integer (row)) := PyObject_IsTrue (T_Row) /= 0;
       end loop;
-      Py_DecRef (T_Row);
 
    end Parse_Tuple;
 
@@ -42,7 +41,6 @@ package body Parsers is
          Value := PyTuple_GetItem (Tuple, row - 1);
          Vec (Integer (row)) := Integer (PyLong_AsLong (Value));
       end loop;
-      Py_DecRef (Value);
 
    end Parse_Tuple;
 
@@ -73,9 +71,6 @@ package body Parsers is
          Result.Append (Result_Row);
       end loop;
 
-      Py_DecRef (Tuple_Row);
-      Py_DecRef (Tuple_Item);
-
       return Result;
 
    end Parse_Tuple;
@@ -105,9 +100,6 @@ package body Parsers is
               Integer (PyLong_AsLong (Tuple_Item));
          end loop;
       end loop;
-
-      Py_DecRef (Tuple_Row);
-      Py_DecRef (Tuple_Item);
 
       return Result;
 
@@ -181,9 +173,6 @@ package body Parsers is
               Float (PyFloat_AsDouble (Tuple_Item));
          end loop;
       end loop;
-
-      Py_DecRef (Tuple_Row);
-      Py_DecRef (Tuple_Item);
 
       return Result;
 

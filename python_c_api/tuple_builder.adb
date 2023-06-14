@@ -51,18 +51,12 @@ package body Tuple_Builder is
    begin
       for mat in Data'Range loop
          Py_Index := Py_Index + 1;
---           Put_Line (Routine_Name & "mat, Py_Index: " & Integer'Image (mat) & int'Image (Py_Index));
          aMatrix := Get_Matrix (Data, mat);
---           Put_Line (Routine_Name & "Matrix (1, 1)" & Float'Image (aMatrix (1, 1)));
          Py_Matrix := To_Tuple (aMatrix);
-         Put_Line (Routine_Name & "last Py_Index" & int'Image (Py_Index));
          PyTuple_SetItem (Result, Py_Index, Py_Matrix);
       end loop;
---        Put_Line (Routine_Name & "last Py_Index" & int'Image (Py_Index));
       Put_Line (Routine_Name & " last Matrix (1, 1)" & Float'Image (aMatrix (1, 1)));
 --        Print_Float_Matrix (Routine_Name & "last matrix", aMatrix);
-      
-      Py_DecRef (Py_Matrix);
 
       return Result;
 
