@@ -259,7 +259,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject_Ptr is
       use Interfaces.C;
-      --        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
       Num_Cols     : constant Positive := Data'Length (2);
       Row_Size     : constant int := int (Num_Cols);
       Value        : Integer;
@@ -268,6 +268,7 @@ package body Tuple_Builder is
       Py_Col       : int := -1;
       Result       : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
    begin
+      Put_Line (Routine_Name);
       for row in Data'Range loop
          Item := PyTuple_New (Row_Size);
          Py_Row := Py_Row + 1;
