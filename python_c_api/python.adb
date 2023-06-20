@@ -781,6 +781,8 @@ package body Python is
 
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Matrix) is
+      use System;
+      Routine_Name : constant String := "Python.Call Integer_Matrix ";
 
       function Py_BuildValue (Format  : Interfaces.C.char_array;
                               T1      : PyObject_Ptr) return PyObject_Ptr;
@@ -791,9 +793,11 @@ package body Python is
       PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
    begin
+      Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null!");
       PyParams :=
         Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
-
+      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null!");
+      Put_Line (Routine_Name & "Calling Object");
       PyResult := Call_Object (F, PyParams);
 
       Py_DecRef (F);
