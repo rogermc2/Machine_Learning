@@ -34,7 +34,7 @@ def predict_proba(clf, features):
     return tuple(map(tuple, pred))
 
 def plot_matrix(matrix):
-    matrix = np.array(map, np.array (matrix))
+    matrix = np.array(map(np.array, matrix))
     plt.xlabel("Alphas")
     plt.ylabel("Score")
     plt.show()

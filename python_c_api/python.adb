@@ -100,30 +100,7 @@ package body Python is
    end Close_Module;
 
    --  -------------------------------------------------------------------------
-    
-   --     function Py_String_To_Ada (Py_String_Ptr: PyObject_Ptr) return String is
-   --        use System;
-   --        use Interfaces.C.Strings;
-   --        Unicode_String : constant PyObject_Ptr :=
-   --                           PyUnicode_FromString (Py_String_Ptr);
-   --        Utf8_String    : chars_ptr;
-   --        Ada_String     : Unbounded_String := Null_Unbounded_String;
-   --     begin
-   --        if Unicode_String /= System.Null_Address then
-   --           Utf8_String := PyUnicode_AsUTF8 (Unicode_String);
-   --           if Utf8_String /= null_ptr then
-   --              Ada_String := To_Unbounded_String (Value (Utf8_String));
-   --           end if;
-   --        end if;
-   --  
-   --        Py_DecRef (Unicode_String);
-   --  
-   --        return To_String (Ada_String);
-   --        
-   --     end Py_String_To_Ada;
-   
-   -------------------------------------------------------------------------
-  
+ 
    function Convert_Tuple_List  (Tuple_List : Tuple_List_Array)
                                  return Tuple_Map is
       use Tuple_Map_Package;
@@ -579,7 +556,7 @@ package body Python is
       PyResult : PyObject_Ptr;
    begin
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
 
       PyResult := Call_Object (F, PyParams);
 
@@ -795,10 +772,9 @@ package body Python is
    begin
       Assert (A_Tuple /= Null_Address, Routine_Name & "A_Tuple is null!");
       PyParams :=
-        Py_BuildValue (Interfaces.C.To_C ("O"), A_Tuple);
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
       Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null!");
-      Put_Line (Routine_Name & "Calling Object");
-      PyResult := Call_Object (F, PyParams);
+       PyResult := Call_Object (F, PyParams);
 
       Py_DecRef (F);
       Py_DecRef (A_Tuple);

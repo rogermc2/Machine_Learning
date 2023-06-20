@@ -71,14 +71,13 @@ package body Tuple_Builder is
                       return PyObject_Ptr is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
-      Value        : Integer;
       Py_Row       : int := -1;
       Result       : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
    begin
-      for row in Data'Range loop
+      for index in Data'Range loop
          Py_Row := Py_Row + 1;
-         Value := Data (row);
-         PyTuple_SetItem (Result, Py_Row, PyLong_FromLong (long (Value)));
+         PyTuple_SetItem (Result, Py_Row,
+                          PyLong_FromLong (long (Data (index))));
       end loop;
 
       return Result;
@@ -259,26 +258,14 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject_Ptr is
       use Interfaces.C;
-      Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
-      Num_Cols     : constant Positive := Data'Length (2);
-      Row_Size     : constant int := int (Num_Cols);
-      Value        : Integer;
-      Item         : PyObject_Ptr;
-      Py_Row       : int := -1;
-      Py_Col       : int := -1;
+      use ML_Arrays_And_Matrices;
+--        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      Py_Index     : int := -1;
       Result       : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
    begin
-      Put_Line (Routine_Name);
       for row in Data'Range loop
-         Item := PyTuple_New (Row_Size);
-         Py_Row := Py_Row + 1;
-         Py_Col := -1;
-         for col in Data'Range (2) loop
-            Py_Col := Py_Col + 1;
-            Value := Data (row, col);
-            PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (long (Value)));
-         end loop;
-         PyTuple_SetItem (Result, Py_Row, Item);
+         Py_Index := Py_Index + 1;
+         PyTuple_SetItem (Result, Py_Index, To_Tuple (Get_Row (Data, row)));
       end loop;
       
       return Result;
