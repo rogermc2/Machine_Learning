@@ -2,12 +2,8 @@
 import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-#from keras.utils import to_categorical
-#from keras.layers import Dense, Input, GlobalMaxPooling1D
-#from keras.layers import Conv1D, MaxPooling1D, Embedding
-#from keras.models import Model
-#from keras.initializers import Constant
 from matplotlib import pyplot as plt
+import matplotlib.colors as mcolors
 
 def init_tokenizer(max_words):
     return tf.keras.preprocessing.text.Tokenizer(num_words=max_words)
@@ -34,7 +30,18 @@ def predict_proba(clf, features):
     return tuple(map(tuple, pred))
 
 def plot_matrix(matrix):
-    matrix = np.array(map(np.array, matrix))
+    mat = np.asarray(matrix)
+    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    ax.set_facecolor('#333')
+    ax.spines.right.set_visible(False)
+    ax.spines.top.set_visible(False)
+    for row in mat:
+        for col in row:
+            print("mat[row][col]", mat[row][col])
+            plt.plot(matrix, color=mat[row][col])
+#    plt.annotate(f"({r}, {g}, {b})", (100, y[-1]))
     plt.xlabel("Alphas")
     plt.ylabel("Score")
     plt.show()
