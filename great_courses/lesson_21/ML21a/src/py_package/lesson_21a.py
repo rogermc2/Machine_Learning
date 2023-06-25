@@ -1,5 +1,6 @@
 
 import numpy as np
+import math
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
@@ -37,11 +38,19 @@ def plot_matrix(matrix):
     ax.set_facecolor('#333')
     ax.spines.right.set_visible(False)
     ax.spines.top.set_visible(False)
+    xvals=range(len(mat)+1)
+    yvals=range(len(mat[0])+1)
+    x=-1
     for row in mat:
+        x=x+1
+        y=-1
         for col in row:
-            print("mat[row][col]", mat[row][col])
-            plt.plot(matrix, color=mat[row][col])
+            y=y+1
+            plt.scatter(xvals[x], yvals[y], color=colors[col])
 #    plt.annotate(f"({r}, {g}, {b})", (100, y[-1]))
-    plt.xlabel("Alphas")
-    plt.ylabel("Score")
+    xticks_list = range(math.floor(min(xvals)), math.ceil(max(xvals))+1)
+    plt.xticks(xticks_list)
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.title("Grid Map")
     plt.show()
