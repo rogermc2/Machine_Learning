@@ -11,7 +11,7 @@ with Python;
 --  with Python_CLF;
 
 --  with Python_21A;
---  with Support_21A; use Support_21A;
+with Support_21A; use Support_21A;
 
 procedure Lesson_21A is
    Program_Name         : constant String := "Lesson 21A ";
