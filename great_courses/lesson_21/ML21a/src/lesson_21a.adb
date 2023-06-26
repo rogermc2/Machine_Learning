@@ -29,7 +29,8 @@ procedure Lesson_21A is
 begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_21a");
-   Python.Call (Classifier, "plot_matrix", Grid_Map);
+   Python.Call (Classifier, "plot", Grid_Map);
+--     Python.Call (Classifier, "plot_matrix", Grid_Map);
    --     Python_API.Py_DecRef (Tokenizer);
    Python.Close_Module (Classifier);
    Python.Finalize;

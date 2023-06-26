@@ -2,6 +2,8 @@
 import numpy as np
 import math
 import tensorflow as tf
+import keras.backend as K
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 import matplotlib.colors as mcolors
@@ -52,5 +54,13 @@ def plot_matrix(matrix):
     plt.xticks(xticks_list)
     plt.xlabel("x")
     plt.ylabel("y")
+    plt.title("Grid Map")
+    plt.show()
+    
+def plot(grid_map):
+    mat = np.asarray(grid_map)
+    colors = ["white", "blue", "orange", "yellow", "green"]
+    sns.heatmap(grid_map, cmap=sns.xkcd_palette(colors), yticklabels=False, xticklabels=False,
+            annot=False, cbar = False, annot_kws={"size": 30}, linewidths=1, linecolor="gray")
     plt.title("Grid Map")
     plt.show()
