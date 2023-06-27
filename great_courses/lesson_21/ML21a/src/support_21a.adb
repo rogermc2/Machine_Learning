@@ -7,6 +7,8 @@ with Ada.Assertions; use Ada.Assertions;
 
 package body Support_21A is
 
+   function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
+                         V     : Integer_Matrix) return Integer_Matrix;
    function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor;
 
    --  -------------------------------------------------------------------------
@@ -32,7 +34,7 @@ package body Support_21A is
    --  grid_map equal is the value of the third dimension of the cell.
    --  Clip keeps the current location in the grid to be within the size of the grid.
    function Binarize (Num_Rows, Num_Cols, Num_Cats : Positive;
-                      Grid_Map : Integer_Matrix) return Trans_Tensor is
+                      Grid_Map                     : Integer_Matrix) return Trans_Tensor is
 
       function Clip (Val, Min, Max : Integer) return Integer is
          Result : Integer := Val;
@@ -49,20 +51,27 @@ package body Support_21A is
 
       end Clip;
 
-      Rewards   : constant Integer_Array (Grid_Map'Range) := (0, -1, -1, -1, 10);
-      Num_Acts  : constant Positive := 5;
-      Acts      : constant Integer_Matrix (1 .. Num_Acts, 1 ..2) :=
-        ((-1,0), (0,1), (1,0), (0,-1), (0,0));
-      Mat_Map   : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. Num_Cats);
-      Mat_Trans : Trans_Tensor (1 .. Num_Acts, 1 .. Num_Rows * Num_Cols,
-                                1 .. Num_Rows * Num_Cols) :=
-        (others => (others => (others => 0)));
-      rk        : Integer_Matrix (Grid_Map'Range, 1 .. 1);
-      rfk       : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
-      v         : Integer_Matrix (Grid_Map'Range, 1 .. 1);
-      Action    : Integer_Array (1 .. 2);
-      Row_Next  : Positive;
-      Col_Next  : Positive;
+      Rewards           : constant Integer_Array (Grid_Map'Range) :=
+                            (0, -1, -1, -1, 10);
+      Num_Acts          : constant Positive := 5;
+      Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
+      Acts              : constant Integer_Matrix (1 .. Num_Acts, 1 ..2) :=
+                            ((-1,0), (0,1), (1,0), (0,-1), (0,0));
+      Mat_Map           : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2),
+                                        1 .. Num_Cats);
+      Mat_Trans         : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
+                                        1 .. Rows_x_Cols) :=
+                            (others => (others => (others => 0)));
+      Q                 : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
+                                        1 .. Rows_x_Cols);
+      Q_Act             : Integer_Matrix (1 .. Rows_x_Cols, 1 .. Rows_x_Cols);
+      rk                : Integer_Matrix (Grid_Map'Range, 1 .. 1);
+      rfk               : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
+      rffk              : Integer_Matrix (Grid_Map'Range, 1 .. 1);
+      v                 : Integer_Matrix (Grid_Map'Range, 1 .. 1);
+      Action            : Integer_Array (1 .. 2);
+      Row_Next          : Positive;
+      Col_Next          : Positive;
    begin
       for row in Mat_Map'Range loop
          for col in Mat_Map'Range (2) loop
@@ -100,17 +109,52 @@ package body Support_21A is
 
       rfk := Product (Mat_Map, rk);
 
+      for row in rfk'Range loop
+         for col in rfk'Range (2) loop
+            rffk ((row - 1) * rfk'Length (2) + col, 1) :=
+              rfk (row, col, 1);
+         end loop;
+      end loop;
+      v := rffk;
+
+      for count in 1 .. 50 loop
+         for act in Q'Range loop
+            Q_Act := Dot_Trans_V (Mat_Trans, act, v);
+            for row in Q_Act'Range loop
+               for col in Q_Act'Range (2) loop
+                  Q (act, row, col) := Q_Act (row, col);
+               end loop;
+            end loop;
+         end loop;
+      end loop;
+
       return Mat_Trans;
 
    end Binarize;
+
+   --  -------------------------------------------------------------------------
+
+   function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
+                         V     : Integer_Matrix) return Integer_Matrix is
+      Act    : Integer_Matrix (Trans'Range (2), Trans'Range (3));
+   begin
+      for row in Act'Range loop
+         for col in Act'Range (2) loop
+            Act (row, col) := Trans (Trans_Row, row, col);
+         end loop;
+      end loop;
+
+      return Dot (Act, V);
+
+   end Dot_Trans_V;
 
    --  -------------------------------------------------------------------------
    --  for matrix A of dimensions (m,n,p) and B of dimensions (p,s)
    --  C(i, j, k) = sum[r=1 to p] A(i, j, r) * B(r, k)
    function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor is
       Routine_Name : constant String := "Support_21A.Dot ";
-      Sum    : Integer;
-      Result : Trans_Tensor (L'Range, L'Range (2), R'Range (2));
+      Sum          : Integer;
+      Result       : Trans_Tensor (L'Range, L'Range (2), R'Range (2));
    begin
       Assert (R'Length (2) = L'Length (3), Routine_Name &
                 "R'LenResultgth (2) not = L'Length (3)");

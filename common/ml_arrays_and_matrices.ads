@@ -172,9 +172,11 @@ package ML_Arrays_And_Matrices is
    procedure Check_Lengths (Routine_Name : String; L, R : Real_Float_Matrix);
    pragma Inline (Check_Lengths);
    function Cumulative_Sum (A : Float_Array) return Float_Array;
+   function Dot (L, R : Integer_Array) return Integer;
    function Dot (L, R : Real_Float_List) return Float;
    function Dot (L : Integer_Matrix; R : Real_Float_Vector)
                  return Real_Float_Vector;
+   function Dot (L, R : Integer_Matrix) return Integer_Matrix;
    function Dot (L : Real_Float_Vector; R : Integer_Matrix)
                  return Real_Float_Vector;
    pragma Inline (Dot);
@@ -184,6 +186,9 @@ package ML_Arrays_And_Matrices is
    function Flatten (M : Integer_Matrix) return Integer_Array;
    function Flatten (M : Real_Float_Matrix) return Real_Float_Vector;
    pragma Inline (Flatten);
+   function Get_Col (Matrix : Integer_Matrix; Col : Integer)
+                     return Integer_Array;
+   pragma Inline (Get_Col);
    function Get_Row (Matrix : Binary_Matrix; Row : Integer)
                      return Binary_Array;
    function Get_Row (Matrix : Integer_Matrix; Row : Integer)
