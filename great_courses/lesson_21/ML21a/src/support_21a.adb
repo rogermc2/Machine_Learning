@@ -59,6 +59,7 @@ package body Support_21A is
         (others => (others => (others => 0)));
       rk        : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       rfk       : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
+      v         : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       Action    : Integer_Array (1 .. 2);
       Row_Next  : Positive;
       Col_Next  : Positive;
