@@ -7,7 +7,7 @@ with Ada.Assertions; use Ada.Assertions;
 
 package body Support_21A is
 
-   function Dot (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor;
+   function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor;
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
@@ -97,38 +97,43 @@ package body Support_21A is
          rk (row, 1) := Rewards (row);
       end loop;
 
-      rfk := Dot (Mat_Map, rk);
+      rfk := Product (Mat_Map, rk);
 
       return Mat_Trans;
 
    end Binarize;
 
    --  -------------------------------------------------------------------------
-
-   function Dot (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor is
+   --  for matrix A of dimensions (m,n,p) and B of dimensions (p,s)
+   --  C(i, j, k) = sum[r=1 to p] A(i, j, r) * B(r, k)
+   function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor is
       Routine_Name : constant String := "Support_21A.Dot ";
       Sum    : Integer;
       Result : Trans_Tensor (L'Range, L'Range (2), R'Range (2));
    begin
       Assert (R'Length (2) = L'Length (3), Routine_Name &
-                "R'Length (2) not = L'Length (3)");
-      for row in L'Range loop
-         for col in L'Range (2) loop
-            Sum := 0;
-            for item in L'Range (3) loop
-               Sum := Sum + L(row, col, item) * R (row, item);
-               --                 Assert (Sum'Valid, "Dot, Sum =" & Float'Image (Sum) & "row, col:"
-               --                         & Integer'Image (row) & ", " & Integer'Image (col) &
-               --                           ", L, R:" & Integer'Image (L (row, col)) & ", " &
-               --                           Integer'Image (R (col)));
+                "R'LenResultgth (2) not = L'Length (3)");
+      for li in L'Range loop
+         for lj in L'Range (2) loop
+            for rk in R'Range (2) loop
+               Sum := 0;
+               for lr in L'Range (3) loop  -- r
+                  --  Result(i, j, k) = sum (L(i, j, r) * R(r, k))
+                  Sum := Sum + L(li, lj, lr) * R (lr, rk);
+                  Assert (Sum'Valid, Routine_Name & "Sum =" &
+                            Integer'Image (Sum) & "row, col:" &
+                            Integer'Image (li) & ", " & Integer'Image (lj) &
+                            ", L, R:" & Integer'Image (L (li, lj, lr)) &
+                            ", " & Integer'Image (R (lr, rk)));
+               end loop;
+               Result (li, lj, rk) := Sum;
             end loop;
-            Result (row, col, item) := Sum;
          end loop;
       end loop;
 
       return Result;
 
-   end Dot;
+   end Product;
 
    --  ----------------------------------------------------------------------------
 
