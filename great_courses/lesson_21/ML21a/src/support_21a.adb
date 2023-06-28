@@ -85,12 +85,10 @@ package body Support_21A is
       Mat_Trans         : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
                                         1 .. Rows_x_Cols) :=
         (others => (others => (others => 0)));
-      Q                 : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
-                                        1 .. Rows_x_Cols);
-      --        BQ                : Float_Tensor (Q'Range, Q'Range (2), Q'Range (3));
+      Q                 : Integer_Matrix (1 .. Rows_x_Cols, 1 .. Num_Acts);
       Q_Act             : Integer_Matrix (1 .. Rows_x_Cols, 1 .. Rows_x_Cols);
       rk                : Integer_Matrix (Grid_Map'Range, 1 .. 1);
-      rfk               : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
+      rfk               : Float_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
       rffk              : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       v                 : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       Action            : Integer_Array (1 .. 2);
