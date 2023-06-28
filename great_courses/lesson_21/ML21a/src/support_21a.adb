@@ -88,14 +88,14 @@ package body Support_21A is
       Q                 : Integer_Matrix (1 .. Rows_x_Cols, 1 .. Num_Acts);
       Q_Act             : Integer_Matrix (1 .. Rows_x_Cols, 1 .. Rows_x_Cols);
       rk                : Integer_Matrix (Grid_Map'Range, 1 .. 1);
-      rfk               : Float_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
+      rfk               : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
       rffk              : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       v                 : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       Action            : Integer_Array (1 .. 2);
       Row_Next          : Positive;
       Col_Next          : Positive;
-      Pi_Q              : Float_Tensor (Q'Range, Q'Range (2), Q'Range (3));
-      Pi_Q_Sum          : Real_Float_Matrix (Q'Range (2), Q'Range (3));
+      Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
+      Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
       for row in Mat_Map'Range loop
          for col in Mat_Map'Range (2) loop
