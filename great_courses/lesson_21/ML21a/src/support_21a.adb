@@ -4,12 +4,14 @@ with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
+with Python_21a;
 
 package body Support_21A is
 
    function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
                          V     : Integer_Matrix) return Integer_Matrix;
    function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor;
+   function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -19,7 +21,7 @@ package body Support_21A is
       for row in Q'Range loop
          for col in Q'Range (2) loop
             for item in Q'Range (3) loop
-                  Result (row, col, item) := B * Float (Q (row, col, item));
+               Result (row, col, item) := B * Float (Q (row, col, item));
             end loop;
          end loop;
       end loop;
@@ -71,21 +73,21 @@ package body Support_21A is
       end Clip;
 
       Rewards           : constant Integer_Array (Grid_Map'Range) :=
-                            (0, -1, -1, -1, 10);
+        (0, -1, -1, -1, 10);
       Num_Acts          : constant Positive := 5;
       Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       Acts              : constant Integer_Matrix (1 .. Num_Acts, 1 ..2) :=
         ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       Beta              : constant Float := 10.0;
---        Gamma             : constant Float := 0.9;
+      --        Gamma             : constant Float := 0.9;
       Mat_Map           : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2),
                                         1 .. Num_Cats);
       Mat_Trans         : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
                                         1 .. Rows_x_Cols) :=
-                            (others => (others => (others => 0)));
+        (others => (others => (others => 0)));
       Q                 : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
                                         1 .. Rows_x_Cols);
---        BQ                : Float_Tensor (Q'Range, Q'Range (2), Q'Range (3));
+      --        BQ                : Float_Tensor (Q'Range, Q'Range (2), Q'Range (3));
       Q_Act             : Integer_Matrix (1 .. Rows_x_Cols, 1 .. Rows_x_Cols);
       rk                : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       rfk               : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
@@ -94,6 +96,8 @@ package body Support_21A is
       Action            : Integer_Array (1 .. 2);
       Row_Next          : Positive;
       Col_Next          : Positive;
+      Pi_Q              : Float_Tensor (Q'Range, Q'Range (2), Q'Range (3));
+      Pi_Q_Sum          : Real_Float_Matrix (Q'Range (2), Q'Range (3));
    begin
       for row in Mat_Map'Range loop
          for col in Mat_Map'Range (2) loop
@@ -150,7 +154,8 @@ package body Support_21A is
          end loop;
       end loop;
 
-      Pi := Python_21a.Call (Classifier, "softmax", Beta * Q);
+      Pi_Q := Python_21a.Call (Classifier, "softmax", Beta * Q) * Q;
+      Pi_Q_Sum := Sum_Each_Column (Pi_Q);
 
       return Mat_Trans;
 
@@ -205,5 +210,25 @@ package body Support_21A is
    end Product;
 
    --  ----------------------------------------------------------------------------
+
+   function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix is
+      Sum    : Float;
+      Result : Real_Float_Matrix (Data'Range (2), Data'Range (3));
+   begin
+      for col in Data'Range (2) loop
+         for item in Data'Range (3) loop
+            Sum := 0.0;
+            for row in Data'Range loop
+               Sum := Sum + Data (row, Col, item);
+            end loop;
+            Result (col, item) := Sum;
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Sum_Each_Column;
+
+   --  ------------------------------------------------------------------------
 
 end Support_21A;
