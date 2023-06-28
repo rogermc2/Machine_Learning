@@ -12,6 +12,23 @@ package body Support_21A is
    function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor;
 
    --  -------------------------------------------------------------------------
+
+   function "*" (B : Float; Q : Trans_Tensor) return Float_Tensor is
+      Result : Float_Tensor (Q'Range, Q'Range (2), Q'Range (3));
+   begin
+      for row in Q'Range loop
+         for col in Q'Range (2) loop
+            for item in Q'Range (3) loop
+                  Result (row, col, item) := B * Float (Q (row, col, item));
+            end loop;
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "*";
+
+   --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
    --  Values list with the highest value.
    --     function Arg_Max (Indices : Integer_Array; Values : Real_Float_Vector)
@@ -33,8 +50,10 @@ package body Support_21A is
    --  Values in matmap equal 1 if the value of row and column of that cell in
    --  grid_map equal is the value of the third dimension of the cell.
    --  Clip keeps the current location in the grid to be within the size of the grid.
-   function Binarize (Num_Rows, Num_Cols, Num_Cats : Positive;
-                      Grid_Map                     : Integer_Matrix) return Trans_Tensor is
+   function Binarize (Classifier : Python.Module;
+                      Num_Rows, Num_Cols, Num_Cats : Positive;
+                      Grid_Map                     : Integer_Matrix)
+                      return Trans_Tensor is
 
       function Clip (Val, Min, Max : Integer) return Integer is
          Result : Integer := Val;
@@ -56,7 +75,9 @@ package body Support_21A is
       Num_Acts          : constant Positive := 5;
       Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       Acts              : constant Integer_Matrix (1 .. Num_Acts, 1 ..2) :=
-                            ((-1,0), (0,1), (1,0), (0,-1), (0,0));
+        ((-1,0), (0,1), (1,0), (0,-1), (0,0));
+      Beta              : constant Float := 10.0;
+--        Gamma             : constant Float := 0.9;
       Mat_Map           : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2),
                                         1 .. Num_Cats);
       Mat_Trans         : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
@@ -64,6 +85,7 @@ package body Support_21A is
                             (others => (others => (others => 0)));
       Q                 : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
                                         1 .. Rows_x_Cols);
+--        BQ                : Float_Tensor (Q'Range, Q'Range (2), Q'Range (3));
       Q_Act             : Integer_Matrix (1 .. Rows_x_Cols, 1 .. Rows_x_Cols);
       rk                : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       rfk               : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
@@ -127,6 +149,8 @@ package body Support_21A is
             end loop;
          end loop;
       end loop;
+
+      Pi := Python_21a.Call (Classifier, "softmax", Beta * Q);
 
       return Mat_Trans;
 

@@ -1,14 +1,9 @@
 
 with Python;
-with Python_API;
+with Support_21A;
 
-with Support_16A;
-
-package Python_16A is
+package Python_21A is
 
    function Call (M : Python.Module; Function_Name : String;
-                  Tokeniser : Python_API.PyObject_Ptr)
-                  return Support_16A.Occurrences_Dictionary;
-   function Call (M : Python.Module; Function_Name : String)
-                  return Support_16A.Newsgroups_Record;
-end Python_16A;
+                  Q : Support_21A.Float_Tensor) return Float;
+end Python_21A;

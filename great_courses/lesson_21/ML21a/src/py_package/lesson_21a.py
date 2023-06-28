@@ -28,9 +28,9 @@ def get_labels (sequences, max_sequence_length):
         sequences_list.append(list(item))
     return tf.keras.preprocessing.sequence.pad_sequences(sequences_list, maxlen=max_sequence_length)
     
-def predict_proba(clf, features):
-    pred=clf.predict_proba(features)
-    return tuple(map(tuple, pred))
+def softmax(beta_Q):
+    bq=np.asarray(beta_Q)
+    return tuple(K.softmax(bq))
 
 def plot_matrix(matrix):
     mat = np.asarray(matrix)
