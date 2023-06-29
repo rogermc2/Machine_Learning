@@ -9,26 +9,26 @@ with Ada.Assertions; use Ada.Assertions;
 package body Support_21A is
 
    function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
-                         V     : Integer_Matrix) return Integer_Matrix;
+                         V     : Real_Float_Matrix) return Real_Float_Matrix;
    function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor;
---     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
+   --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
 
---     function "*" (B : Float; Q : Trans_Tensor) return Float_Tensor is
---        Result : Float_Tensor (Q'Range, Q'Range (2), Q'Range (3));
---     begin
---        for row in Q'Range loop
---           for col in Q'Range (2) loop
---              for item in Q'Range (3) loop
---                 Result (row, col, item) := B * Float (Q (row, col, item));
---              end loop;
---           end loop;
---        end loop;
---
---        return Result;
---
---     end "*";
+   --     function "*" (B : Float; Q : Trans_Tensor) return Float_Tensor is
+   --        Result : Float_Tensor (Q'Range, Q'Range (2), Q'Range (3));
+   --     begin
+   --        for row in Q'Range loop
+   --           for col in Q'Range (2) loop
+   --              for item in Q'Range (3) loop
+   --                 Result (row, col, item) := B * Float (Q (row, col, item));
+   --              end loop;
+   --           end loop;
+   --        end loop;
+   --
+   --        return Result;
+   --
+   --     end "*";
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the index from indices associated with the item in the
@@ -56,6 +56,7 @@ package body Support_21A is
                       Num_Rows, Num_Cols, Num_Cats : Positive;
                       Grid_Map                     : Integer_Matrix)
                       return Trans_Tensor is
+      use Real_Float_Arrays;
 
       function Clip (Val, Min, Max : Integer) return Integer is
          Result : Integer := Val;
@@ -79,18 +80,18 @@ package body Support_21A is
       Acts              : constant Integer_Matrix (1 .. Num_Acts, 1 ..2) :=
         ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       Beta              : constant Float := 10.0;
-      --        Gamma             : constant Float := 0.9;
+      Gamma             : constant Float := 0.9;
       Mat_Map           : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2),
                                         1 .. Num_Cats);
       Mat_Trans         : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
                                         1 .. Rows_x_Cols) :=
         (others => (others => (others => 0)));
       Q                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. Num_Acts);
-      Q_Act             : Integer_Matrix (1 .. Rows_x_Cols, 1 .. Rows_x_Cols);
+      Q_Act             : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. Rows_x_Cols);
       rk                : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       rfk               : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
-      rffk              : Integer_Matrix (Grid_Map'Range, 1 .. 1);
-      v                 : Integer_Matrix (Grid_Map'Range, 1 .. 1);
+      rffk              : Real_Float_Matrix (Grid_Map'Range, 1 .. 1);
+      v                 : Real_Float_Matrix (Grid_Map'Range, 1 .. 1);
       Action            : Integer_Array (1 .. 2);
       Row_Next          : Positive;
       Col_Next          : Positive;
@@ -136,7 +137,7 @@ package body Support_21A is
       for row in rfk'Range loop
          for col in rfk'Range (2) loop
             rffk ((row - 1) * rfk'Length (2) + col, 1) :=
-              rfk (row, col, 1);
+              Float (rfk (row, col, 1));
          end loop;
       end loop;
       v := rffk;
@@ -146,7 +147,7 @@ package body Support_21A is
             Q_Act := Dot_Trans_V (Mat_Trans, act, v);
             for row in Q_Act'Range loop
                for col in Q_Act'Range (2) loop
-                  Q ((act - 1) * col + row, col) := Beta * Float (Q_Act (row, col));
+                  Q ((act - 1) * col + row, col) := Beta * Q_Act (row, col);
                end loop;
             end loop;
          end loop;
@@ -155,6 +156,8 @@ package body Support_21A is
       Pi_Q := Python.Call (Classifier, "softmax", Q) ;
       Pi_Q_Sum := Sum_Each_Column (Pi_Q);
 
+      v := rffk + gamma * Pi_Q_Sum;
+
       return Mat_Trans;
 
    end Binarize;
@@ -162,16 +165,17 @@ package body Support_21A is
    --  -------------------------------------------------------------------------
 
    function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
-                         V     : Integer_Matrix) return Integer_Matrix is
-      Act    : Integer_Matrix (Trans'Range (2), Trans'Range (3));
+                         V     : Real_Float_Matrix) return Real_Float_Matrix is
+      use Real_Float_Arrays;
+      Act    : Real_Float_Matrix (Trans'Range (2), Trans'Range (3));
    begin
       for row in Act'Range loop
          for col in Act'Range (2) loop
-            Act (row, col) := Trans (Trans_Row, row, col);
+            Act (row, col) := Float (Trans (Trans_Row, row, col));
          end loop;
       end loop;
 
-      return Dot (Act, V);
+      return Act * V;
 
    end Dot_Trans_V;
 
@@ -209,23 +213,23 @@ package body Support_21A is
 
    --  ----------------------------------------------------------------------------
 
---     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix is
---        Sum    : Float;
---        Result : Real_Float_Matrix (Data'Range (2), Data'Range (3));
---     begin
---        for col in Data'Range (2) loop
---           for item in Data'Range (3) loop
---              Sum := 0.0;
---              for row in Data'Range loop
---                 Sum := Sum + Data (row, Col, item);
---              end loop;
---              Result (col, item) := Sum;
---           end loop;
---        end loop;
---
---        return Result;
---
---     end Sum_Each_Column;
+   --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix is
+   --        Sum    : Float;
+   --        Result : Real_Float_Matrix (Data'Range (2), Data'Range (3));
+   --     begin
+   --        for col in Data'Range (2) loop
+   --           for item in Data'Range (3) loop
+   --              Sum := 0.0;
+   --              for row in Data'Range loop
+   --                 Sum := Sum + Data (row, Col, item);
+   --              end loop;
+   --              Result (col, item) := Sum;
+   --           end loop;
+   --        end loop;
+   --
+   --        return Result;
+   --
+   --     end Sum_Each_Column;
 
    --  ------------------------------------------------------------------------
 
