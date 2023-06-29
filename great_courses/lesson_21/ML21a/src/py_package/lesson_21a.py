@@ -31,6 +31,11 @@ def get_labels (sequences, max_sequence_length):
 def softmax(beta_Q):
     bq=np.asarray(beta_Q)
     return tuple(K.softmax(bq))
+    
+def plan():
+    planner = K.function([rk], [pi, Q])
+    r = np.array([0, -1, -1, -1, 10])
+    piout, Qout = planner([r])
 
 def plot_matrix(matrix):
     mat = np.asarray(matrix)

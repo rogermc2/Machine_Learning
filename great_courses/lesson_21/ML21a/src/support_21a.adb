@@ -10,6 +10,10 @@ package body Support_21A is
 
    function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix;
+   procedure Find_Policy (Grid : in out Integer_Matrix;
+                          Row_In, Col_In : Positive; Acts : Integer_Matrix;
+                          Pi   : Real_Float_Matrix);
+   function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
    function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
@@ -178,6 +182,49 @@ package body Support_21A is
       return Act * V;
 
    end Dot_Trans_V;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Find_Policy (Grid : in out Integer_Matrix;
+                          Row_In, Col_In : Positive; Acts : Integer_Matrix;
+                          Pi   : Real_Float_Matrix) is
+      Num_Cols : constant Positive := Grid'Length (2);
+      Row      : Positive := Row_In;
+      Col      : Positive := Col_In;
+      Pi_Row   : Positive;
+      Max_Prob : Float;
+      A        : Positive := 6;
+   begin
+      while Grid (Row, Col) = 6 loop
+         Pi_Row := (Row - 1) * Num_Cols;
+         Max_Prob := Pi_Max (Pi, Pi_Row);
+         for ana in 1 .. 5 loop
+            if Pi (Pi_Row, ana) = Max_Prob then
+               A := ana;
+            end if;
+         end loop;
+         Grid (Row, Col) := A;
+         Row := Row + Acts (A, 1);
+         Col := Col + Acts (A, 2);
+      end loop;
+      Find_Policy (Grid, Row, Col, Acts, Pi);
+
+   end Find_Policy;
+
+   --  -------------------------------------------------------------------------
+
+   function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float is
+      Result : Float := Pi (Row, 1);
+   begin
+      for col in Pi'Range (2) loop
+         if Pi (Row, col) > Result then
+            Result := Pi (Row, col);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Pi_Max;
 
    --  -------------------------------------------------------------------------
    --  for matrix A of dimensions (m,n,p) and B of dimensions (p,s)
