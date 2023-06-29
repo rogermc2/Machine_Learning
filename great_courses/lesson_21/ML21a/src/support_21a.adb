@@ -1,7 +1,8 @@
 
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Exceptions; use Ada.Exceptions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings.Unbounded;
 
 --  with Basic_Printing; use Basic_Printing;
 --  with Python_21a;
@@ -10,9 +11,6 @@ package body Support_21A is
 
    function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix;
-   procedure Find_Policy (Grid : in out Integer_Matrix;
-                          Row_In, Col_In : Positive; Acts : Integer_Matrix;
-                          Pi   : Real_Float_Matrix);
    function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
    function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
@@ -99,6 +97,7 @@ package body Support_21A is
       Action            : Integer_Array (1 .. 2);
       Row_Next          : Positive;
       Col_Next          : Positive;
+      Pi                : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
       Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
@@ -162,6 +161,8 @@ package body Support_21A is
 
       v := rffk + gamma * Pi_Q_Sum;
 
+      Plot_Policy (Pi, Acts, Num_Rows, Num_Cols);
+
       return Mat_Trans;
 
    end Binarize;
@@ -185,9 +186,8 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Find_Policy (Grid : in out Integer_Matrix;
-                          Row_In, Col_In : Positive; Acts : Integer_Matrix;
-                          Pi   : Real_Float_Matrix) is
+   procedure Find_Policy (Grid : in out Integer_Matrix; Pi : Real_Float_Matrix;
+                          Acts : Integer_Matrix; Row_In, Col_In : Positive) is
       Num_Cols : constant Positive := Grid'Length (2);
       Row      : Positive := Row_In;
       Col      : Positive := Col_In;
@@ -207,7 +207,7 @@ package body Support_21A is
          Row := Row + Acts (A, 1);
          Col := Col + Acts (A, 2);
       end loop;
-      Find_Policy (Grid, Row, Col, Acts, Pi);
+      Find_Policy (Grid, Pi, Acts, Row, Col);
 
    end Find_Policy;
 
@@ -227,6 +227,26 @@ package body Support_21A is
    end Pi_Max;
 
    --  -------------------------------------------------------------------------
+
+   procedure Plot_Policy (Pi : Real_Float_Matrix; Acts : Integer_Matrix;
+                          Num_Rows, Num_Cols : Positive) is
+      use Ada.Strings.Unbounded;
+      Grid : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
+      Line : Unbounded_String;
+   begin
+      Find_Policy (Grid, Pi, Acts, 1, 1);
+
+      for row in 1 .. Num_Rows loop
+         for col in 1 .. Num_Cols loop
+            Line := Line & "^>v<x? " & To_Unbounded_String (Integer'Image (Grid (row, col)));
+         end loop;
+         Put_Line (To_String (Line));
+      end loop;
+
+   end Plot_Policy;
+
+   --  -------------------------------------------------------------------------
+
    --  for matrix A of dimensions (m,n,p) and B of dimensions (p,s)
    --  C(i, j, k) = sum[r=1 to p] A(i, j, r) * B(r, k)
    function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor is
