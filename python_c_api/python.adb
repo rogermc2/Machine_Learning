@@ -994,6 +994,71 @@ package body Python is
 
    --  -------------------------------------------------------------------------
 
+   function Call (M : Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Real_Float_Matrix) return Float is
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject_Ptr) return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
+      Result   : Float;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+
+      PyResult := Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      
+      Result := Parsers.Parse_Tuple (PyResult);
+      Py_DecRef (PyResult);
+      
+      return Result;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
+   function Call (M : Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Real_Float_Matrix)
+                  return ML_Arrays_And_Matrices.Real_Float_Matrix is
+
+      function Py_BuildValue (Format : Interfaces.C.char_array;
+                              T1     : PyObject_Ptr) return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F        : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
+      A_Tuple  : constant PyObject_Ptr := To_Tuple (A);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
+   begin
+      PyParams :=
+        Py_BuildValue (Interfaces.C.To_C ("(O)"), A_Tuple);
+
+      PyResult := Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+      
+      declare 
+         Result : constant ML_Arrays_And_Matrices.Real_Float_Matrix :=
+           Parsers.Parse_Tuple (PyResult);
+      begin
+         Py_DecRef (PyResult);
+         return Result;
+      end;
+
+   end Call;
+
+   --  -------------------------------------------------------------------------
+
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B : ML_Arrays_And_Matrices.Boolean_Array) is

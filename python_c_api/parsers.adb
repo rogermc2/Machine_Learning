@@ -107,6 +107,15 @@ package body Parsers is
 
    --  -------------------------------------------------------------------------
 
+   function Parse_Tuple (Tuple : PyObject_Ptr) return Float is
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple Float ";
+   begin
+         return Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, 0)));
+
+   end Parse_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function Parse_Tuple (Tuple : PyObject_Ptr) return Float_Array is
       --        Routine_Name : constant String := "Parsers.Parse_Tuple Float_Array ";
       Result       : Float_Array (1 .. Integer (PyTuple_Size (Tuple)));
