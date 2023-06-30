@@ -10,12 +10,15 @@ with Python;
 --  with Python_CLF;
 
 --  with Python_21A;
---  with Support_21A; use Support_21A;
+with Support_21A; use Support_21A;
 
 procedure Lesson_21A is
    Program_Name         : constant String := "Lesson 21A ";
    Num_Rows             : constant Positive := 5;
    Num_Cols             : constant Positive := 10;
+   Num_Acts             : constant Positive := 5;
+   Num_Cats             : constant Positive := 5;
+   Rows_x_Cols          : constant Positive := Num_Rows * Num_Cols;
    Grid_Map             : constant Integer_Matrix (1 .. Num_Rows,
                                                    1 .. Num_Cols) :=
                             ((0,0,0,0,0,2,0,0,1,0),
@@ -24,13 +27,15 @@ procedure Lesson_21A is
                              (0,0,0,1,0,2,0,3,0,0),
                              (0,0,0,0,0,2,0,3,0,4));
    Classifier           : Python.Module;
-   --     Tokenizer            : Python_API.PyObject_Ptr;
+   Mat_Trans            : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
+                                        1 .. Rows_x_Cols);
 begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_21a");
    Python.Call (Classifier, "plot", Grid_Map);
---     Python.Call (Classifier, "plot_matrix", Grid_Map);
---     Python_API.Py_DecRef (Tokenizer);   Python.Close_Module (Classifier);
+   Mat_Trans := Binarize (Classifier, Num_Rows, Num_Cols, Num_Cats, Grid_Map);
+   --     Python.Call (Classifier, "plot_matrix", Grid_Map);
+--     Plot_Policy (Pi, Acts, Num_Rows, Num_Cols);
    Python.Finalize;
 
    Put_Line ("----------------------------------------------");

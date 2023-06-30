@@ -59,6 +59,7 @@ package body Support_21A is
                       Grid_Map                     : Integer_Matrix)
                       return Trans_Tensor is
       use Real_Float_Arrays;
+      Routine_Name : constant String := "Support_21A.Binarize ";
 
       function Clip (Val, Min, Max : Integer) return Integer is
          Result : Integer := Val;
@@ -150,18 +151,19 @@ package body Support_21A is
             Q_Act := Dot_Trans_V (Mat_Trans, act, v);
             for row in Q_Act'Range loop
                for col in Q_Act'Range (2) loop
-                  Q ((act - 1) * col + row, col) := Beta * Q_Act (row, col);
+                  Q ((act - 1) * col + row, col) := Q_Act (row, col);
                end loop;
             end loop;
          end loop;
+         Pi := Python.Call (Classifier, "softmax", Beta * Q);
+         Pi_Q := Pi * Q;
+         Pi_Q_Sum := Sum_Each_Column (Pi_Q);
+         v := rffk + gamma * Pi_Q_Sum;
       end loop;
 
-      Pi_Q := Python.Call (Classifier, "softmax", Q) ;
-      Pi_Q_Sum := Sum_Each_Column (Pi_Q);
-
-      v := rffk + gamma * Pi_Q_Sum;
-
+      Put_Line (Routine_Name & "Plot_Policy");
       Plot_Policy (Pi, Acts, Num_Rows, Num_Cols);
+      Put_Line (Routine_Name & "Policy plotted");
 
       return Mat_Trans;
 
@@ -247,20 +249,20 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   --  for matrix A of dimensions (m,n,p) and B of dimensions (p,s)
-   --  C(i, j, k) = sum[r=1 to p] A(i, j, r) * B(r, k)
+   --  for matrix L of dimensions (m,n,p) and R of dimensions (p,s)
+   --  C(i, j, k) = sum[r=1 to p] L(i, j, r) * R(r, k)
    function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor is
-      Routine_Name : constant String := "Support_21A.Dot ";
+      Routine_Name : constant String := "Support_21A.Product ";
       Sum          : Integer;
       Result       : Trans_Tensor (L'Range, L'Range (2), R'Range (2));
    begin
-      Assert (R'Length (2) = L'Length (3), Routine_Name &
-                "R'LenResultgth (2) not = L'Length (3)");
+      Assert (R'Length = L'Length (3), Routine_Name &
+                "R'Length not = L'Length (3)");
       for li in L'Range loop
          for lj in L'Range (2) loop
-            for rk in R'Range (2) loop
                Sum := 0;
-               for lr in L'Range (3) loop  -- r
+            for lr in L'Range (3) loop  -- r
+               for rk in R'Range loop
                   --  Result(i, j, k) = sum (L(i, j, r) * R(r, k))
                   Sum := Sum + L(li, lj, lr) * R (lr, rk);
                   Assert (Sum'Valid, Routine_Name & "Sum =" &
@@ -269,7 +271,7 @@ package body Support_21A is
                             ", L, R:" & Integer'Image (L (li, lj, lr)) &
                             ", " & Integer'Image (R (lr, rk)));
                end loop;
-               Result (li, lj, rk) := Sum;
+               Result (li, lj, lr) := Sum;
             end loop;
          end loop;
       end loop;
