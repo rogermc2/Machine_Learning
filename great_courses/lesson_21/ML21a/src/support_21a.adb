@@ -260,18 +260,18 @@ package body Support_21A is
                 "R'Length not = L'Length (3)");
       for li in L'Range loop
          for lj in L'Range (2) loop
+            for rk in R'Range loop
                Sum := 0;
-            for lr in L'Range (3) loop  -- r
-               for rk in R'Range loop
+               for rr in L'Range (3) loop  -- r
                   --  Result(i, j, k) = sum (L(i, j, r) * R(r, k))
-                  Sum := Sum + L(li, lj, lr) * R (lr, rk);
+                  Sum := Sum + L(li, lj, rr) * R (rr, rk);
                   Assert (Sum'Valid, Routine_Name & "Sum =" &
                             Integer'Image (Sum) & "row, col:" &
                             Integer'Image (li) & ", " & Integer'Image (lj) &
-                            ", L, R:" & Integer'Image (L (li, lj, lr)) &
-                            ", " & Integer'Image (R (lr, rk)));
+                            ", L, R:" & Integer'Image (L (li, lj, rr)) &
+                            ", " & Integer'Image (R (rr, rk)));
                end loop;
-               Result (li, lj, lr) := Sum;
+               Result (li, lj, rk) := Sum;
             end loop;
          end loop;
       end loop;
