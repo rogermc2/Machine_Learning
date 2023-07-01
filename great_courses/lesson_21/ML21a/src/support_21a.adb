@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 --  with Python_21a;
 
 package body Support_21A is
@@ -174,6 +174,11 @@ package body Support_21A is
       Index        : Natural;
       Q_Row        : Positive;
    begin
+      Put_Line (Routine_Name & "Mat_Trans dim:" &
+                  Integer'Image (Mat_Trans'Length) &
+                  Integer'Image (Mat_Trans'Length (2)) &
+                  Integer'Image (Mat_Trans'Length (3)));
+      Print_Matrix_Dimensions (Routine_Name & "Q", Q);
       for act_index in Natural range 1 .. Num_Acts loop
          Put_Line (Routine_Name & "act_index, Num_Acts:" &
                      Integer'Image (act_index) & Integer'Image (Num_Acts));
@@ -194,7 +199,9 @@ package body Support_21A is
 --                    Put_Line (Routine_Name & "Q_Act (row, col):" &
 --                                Float'Image (Q_Act (row, col)));
 --                    Q ((act_index - 1) * col + row, col) := Q_Act (row, col);
---                    Put_Line (Routine_Name & "Q (Q_Row, col):" & Float'Image (Q (Q_Row, col)));
+                  Put_Line (Routine_Name & "Q_Row, col:" & Integer'Image (Q_Row) &
+                              Integer'Image (col));
+                  Put_Line (Routine_Name & "Q (Q_Row, col):" & Float'Image (Q (Q_Row, col)));
                end loop;
             end loop;
          end;
