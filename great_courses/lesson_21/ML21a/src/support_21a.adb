@@ -12,7 +12,7 @@ package body Support_21A is
    function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix;
    function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
-   function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor;
+   function Product (L : Trans_Tensor; R : Integer_Matrix) return Integer_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -92,7 +92,7 @@ package body Support_21A is
       Q                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. Num_Acts);
       Q_Act             : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. Rows_x_Cols);
       rk                : Integer_Matrix (Grid_Map'Range, 1 .. 1);
-      rfk               : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
+      rfk               : Integer_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
       rffk              : Real_Float_Matrix (Grid_Map'Range, 1 .. 1);
       v                 : Real_Float_Matrix (Grid_Map'Range, 1 .. 1);
       Action            : Integer_Array (1 .. 2);
@@ -251,26 +251,26 @@ package body Support_21A is
 
    --  for matrix L of dimensions (m,n,p) and R of dimensions (p,s)
    --  C(i, j, k) = sum[r=1 to p] L(i, j, r) * R(r, k)
-   function Product (L : Trans_Tensor; R : Integer_Matrix) return Trans_Tensor is
+   function Product (L : Trans_Tensor; R : Integer_Matrix) return Integer_Tensor is
       Routine_Name : constant String := "Support_21A.Product ";
       Sum          : Integer;
-      Result       : Trans_Tensor (L'Range, L'Range (2), R'Range (2));
+      Result       : Integer_Tensor (L'Range, L'Range (2), R'Range (2));
    begin
       Assert (R'Length = L'Length (3), Routine_Name &
                 "R'Length not = L'Length (3)");
+      Put_Line (Routine_Name & "Result lengths:" & Integer'Image (Result'Length) &
+                  Integer'Image (Result'Length (2)) &
+                  Integer'Image (Result'Length (3)));
       for li in L'Range loop
          for lj in L'Range (2) loop
-            for rk in R'Range loop
+            for rk in R'Range (2) loop
                Sum := 0;
                for rr in L'Range (3) loop  -- r
                   --  Result(i, j, k) = sum (L(i, j, r) * R(r, k))
                   Sum := Sum + L(li, lj, rr) * R (rr, rk);
-                  Assert (Sum'Valid, Routine_Name & "Sum =" &
-                            Integer'Image (Sum) & "row, col:" &
-                            Integer'Image (li) & ", " & Integer'Image (lj) &
-                            ", L, R:" & Integer'Image (L (li, lj, rr)) &
-                            ", " & Integer'Image (R (rr, rk)));
                end loop;
+               Put_Line (Routine_Name & "li, lj, rk:" & Integer'Image (li) &
+                           Integer'Image (lj) & Integer'Image (rk));
                Result (li, lj, rk) := Sum;
             end loop;
          end loop;

@@ -8,6 +8,8 @@ package Support_21A is
                                Integer range <>) of Binary;
    type Float_Tensor is array (Integer range <>, Integer range <>,
                                Integer range <>) of Float;
+   type Integer_Tensor is array (Integer range <>, Integer range <>,
+                               Integer range <>) of Integer;
 
    function Binarize (Classifier : Python.Module;
                       Num_Rows, Num_Cols, Num_Cats : Positive;
