@@ -9,10 +9,10 @@ with Ada.Strings.Unbounded;
 
 package body Support_21A is
 
-   function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
+   function Dot_Trans_V (Trans : Binary_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix;
    function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
-   function Product (L : Trans_Tensor; R : Integer_Matrix) return Integer_Tensor;
+   function Product (L : Binary_Tensor; R : Integer_Matrix) return Integer_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -57,7 +57,7 @@ package body Support_21A is
    function Binarize (Classifier : Python.Module;
                       Num_Rows, Num_Cols, Num_Cats : Positive;
                       Grid_Map                     : Integer_Matrix)
-                      return Trans_Tensor is
+                      return Binary_Tensor is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Support_21A.Binarize ";
 
@@ -84,9 +84,9 @@ package body Support_21A is
         ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       Beta              : constant Float := 10.0;
       Gamma             : constant Float := 0.9;
-      Mat_Map           : Trans_Tensor (Grid_Map'Range, Grid_Map'Range (2),
+      Mat_Map           : Binary_Tensor (Grid_Map'Range, Grid_Map'Range (2),
                                         1 .. Num_Cats);
-      Mat_Trans         : Trans_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
+      Mat_Trans         : Binary_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
                                         1 .. Rows_x_Cols) :=
         (others => (others => (others => 0)));
       Q                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. Num_Acts);
@@ -171,7 +171,7 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   function Dot_Trans_V (Trans : Trans_Tensor; Trans_Row : Positive;
+   function Dot_Trans_V (Trans : Binary_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix is
       use Real_Float_Arrays;
       Act    : Real_Float_Matrix (Trans'Range (2), Trans'Range (3));
@@ -251,7 +251,7 @@ package body Support_21A is
 
    --  for matrix L of dimensions (m,n,p) and R of dimensions (p,s)
    --  C(i, j, k) = sum[r=1 to p] L(i, j, r) * R(r, k)
-   function Product (L : Trans_Tensor; R : Integer_Matrix) return Integer_Tensor is
+   function Product (L : Binary_Tensor; R : Integer_Matrix) return Integer_Tensor is
       Routine_Name : constant String := "Support_21A.Product ";
       Sum          : Integer;
       Result       : Integer_Tensor (L'Range, L'Range (2), R'Range (2));
