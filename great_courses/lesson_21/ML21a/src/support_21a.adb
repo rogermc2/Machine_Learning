@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 package body Support_21A is
 
    function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
-                       Num_Acts : Positive) return Real_Float_Matrix;
+                       Num_Acts : Integer) return Real_Float_Matrix;
    function Dot_Trans_V (Trans : Binary_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix;
    function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
@@ -168,32 +168,39 @@ package body Support_21A is
    --  -------------------------------------------------------------------------
 
    function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
-                       Num_Acts : Positive) return Real_Float_Matrix is
-      Q    : Real_Float_Matrix (Mat_Trans'Range (2), Mat_Trans'Range (3));
+                       Num_Acts  : Integer) return Real_Float_Matrix is
+      Routine_Name : constant String := "Support_21A.Compute_Q ";
+      Q            : Real_Float_Matrix (Mat_Trans'Range (2), Mat_Trans'Range);
+      Index        : Natural;
+      Q_Row        : Positive;
    begin
-      for act_index in 1 .. Num_Acts loop
-         --        Put_Line (Routine_Name & "act_index, Num_Acts:" &
-         --                    Integer'Image (act_index) & Integer'Image (Num_Acts));
+      for act_index in Natural range 1 .. Num_Acts loop
+         Put_Line (Routine_Name & "act_index, Num_Acts:" &
+                     Integer'Image (act_index) & Integer'Image (Num_Acts));
+         Index := act_index;
          declare
             Q_Act : constant Real_Float_Matrix :=
-              Dot_Trans_V (Mat_Trans, act_index, v);
+              Dot_Trans_V (Mat_Trans, Index, v);
          begin
             --           Print_Matrix_Dimensions (Routine_Name & "Q_Act", Q_Act);
-            --           Put_Line (Routine_Name & "act_index:" & Integer'Image (act_index));
+            Put_Line (Routine_Name & "act_index:" & Integer'Image (act_index));
             for row in Q_Act'Range loop
                for col in Q_Act'Range (2) loop
-                  --                 Put_Line (Routine_Name & "(act_index - 1) * col + row, col:" &
-                  --                             Integer'Image ((act_index - 1) * col + row ) &
-                  --                             Integer'Image (col));
-                  --                 Put_Line (Routine_Name & "Q_Act (row, col):" &
-                  --                             Float'Image (Q_Act (row, col)));
-                  Q ((act_index - 1) * col + row, col) := Q_Act (row, col);
-                  --                 Put_Line (Routine_Name & "Q (index, col):" &
-                  --                             Float'Image (Q ((act_index - 1) * col + row, col)));
+                  Q_Row := (act_index - 1) * col + row;
+                  Put_Line (Routine_Name & "Q_Row:" & Integer'Image (Row));
+--                    Put_Line (Routine_Name & "(act_index - 1) * col + row, col:" &
+--                                Integer'Image ((act_index - 1) * col + row ) &
+--                                Integer'Image (col));
+--                    Put_Line (Routine_Name & "Q_Act (row, col):" &
+--                                Float'Image (Q_Act (row, col)));
+--                    Q ((act_index - 1) * col + row, col) := Q_Act (row, col);
+--                    Put_Line (Routine_Name & "Q (Q_Row, col):" & Float'Image (Q (Q_Row, col)));
                end loop;
             end loop;
          end;
+         Put_Line (Routine_Name & "after declare block, act_index:" & Integer'Image (act_index));
       end loop;
+      Put_Line (Routine_Name & "done");
 
       return Q;
 
