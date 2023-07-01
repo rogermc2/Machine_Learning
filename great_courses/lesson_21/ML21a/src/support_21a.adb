@@ -9,6 +9,8 @@ with Ada.Strings.Unbounded;
 
 package body Support_21A is
 
+   function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
+                       Num_Acts : Positive) return Real_Float_Matrix;
    function Dot_Trans_V (Trans : Binary_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix;
    function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
@@ -85,16 +87,16 @@ package body Support_21A is
       Beta              : constant Float := 10.0;
       Gamma             : constant Float := 0.9;
       Mat_Map           : Binary_Tensor (Grid_Map'Range, Grid_Map'Range (2),
-                                        1 .. Num_Cats);
+                                         1 .. Num_Cats);
       Mat_Trans         : Binary_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
-                                        1 .. Rows_x_Cols) :=
+                                         1 .. Rows_x_Cols) :=
         (others => (others => (others => 0)));
       Q                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. Num_Acts);
-      Q_Act             : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. Rows_x_Cols);
+      --        Q_Act             : Real_Float_Matrix (1 .. Num_Cols, 1 .. Num_Acts);
       rk                : Integer_Matrix (Grid_Map'Range, 1 .. 1);
       rfk               : Integer_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
-      rffk              : Real_Float_Matrix (Grid_Map'Range, 1 .. 1);
-      v                 : Real_Float_Matrix (Grid_Map'Range, 1 .. 1);
+      rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
+      v                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       Action            : Integer_Array (1 .. 2);
       Row_Next          : Positive;
       Col_Next          : Positive;
@@ -147,14 +149,8 @@ package body Support_21A is
       v := rffk;
 
       for count in 1 .. 50 loop
-         for act in Q'Range loop
-            Q_Act := Dot_Trans_V (Mat_Trans, act, v);
-            for row in Q_Act'Range loop
-               for col in Q_Act'Range (2) loop
-                  Q ((act - 1) * col + row, col) := Q_Act (row, col);
-               end loop;
-            end loop;
-         end loop;
+         Q := Compute_Q (Mat_Trans, v, Num_Acts);
+
          Pi := Python.Call (Classifier, "softmax", Beta * Q);
          Pi_Q := Pi * Q;
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
@@ -168,6 +164,40 @@ package body Support_21A is
       return Mat_Trans;
 
    end Binarize;
+
+   --  -------------------------------------------------------------------------
+
+   function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
+                       Num_Acts : Positive) return Real_Float_Matrix is
+      Q    : Real_Float_Matrix (Mat_Trans'Range (2), Mat_Trans'Range (3));
+   begin
+      for act_index in 1 .. Num_Acts loop
+         --        Put_Line (Routine_Name & "act_index, Num_Acts:" &
+         --                    Integer'Image (act_index) & Integer'Image (Num_Acts));
+         declare
+            Q_Act : constant Real_Float_Matrix :=
+              Dot_Trans_V (Mat_Trans, act_index, v);
+         begin
+            --           Print_Matrix_Dimensions (Routine_Name & "Q_Act", Q_Act);
+            --           Put_Line (Routine_Name & "act_index:" & Integer'Image (act_index));
+            for row in Q_Act'Range loop
+               for col in Q_Act'Range (2) loop
+                  --                 Put_Line (Routine_Name & "(act_index - 1) * col + row, col:" &
+                  --                             Integer'Image ((act_index - 1) * col + row ) &
+                  --                             Integer'Image (col));
+                  --                 Put_Line (Routine_Name & "Q_Act (row, col):" &
+                  --                             Float'Image (Q_Act (row, col)));
+                  Q ((act_index - 1) * col + row, col) := Q_Act (row, col);
+                  --                 Put_Line (Routine_Name & "Q (index, col):" &
+                  --                             Float'Image (Q ((act_index - 1) * col + row, col)));
+               end loop;
+            end loop;
+         end;
+      end loop;
+
+      return Q;
+
+   end Compute_Q;
 
    --  -------------------------------------------------------------------------
 
@@ -258,9 +288,6 @@ package body Support_21A is
    begin
       Assert (R'Length = L'Length (3), Routine_Name &
                 "R'Length not = L'Length (3)");
-      Put_Line (Routine_Name & "Result lengths:" & Integer'Image (Result'Length) &
-                  Integer'Image (Result'Length (2)) &
-                  Integer'Image (Result'Length (3)));
       for li in L'Range loop
          for lj in L'Range (2) loop
             for rk in R'Range (2) loop
@@ -269,8 +296,6 @@ package body Support_21A is
                   --  Result(i, j, k) = sum (L(i, j, r) * R(r, k))
                   Sum := Sum + L(li, lj, rr) * R (rr, rk);
                end loop;
-               Put_Line (Routine_Name & "li, lj, rk:" & Integer'Image (li) &
-                           Integer'Image (lj) & Integer'Image (rk));
                Result (li, lj, rk) := Sum;
             end loop;
          end loop;
