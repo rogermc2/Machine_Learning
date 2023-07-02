@@ -150,10 +150,10 @@ package body Support_21A is
 
       for count in 1 .. 50 loop
          Q := Compute_Q (Mat_Trans, v, Num_Acts);
-         Print_Matrix_Dimensions (Routine_Name & "softmax",
-                                  Python.Call (Classifier, "softmax", Beta * Q));
          Pi := Python.Call (Classifier, "softmax", Beta * Q);
-         Pi_Q := Pi * Q;
+         Print_Matrix_Dimensions (Routine_Name & "Pi", Pi);
+         Pi_Q := H_Product (Q, Pi);
+         Print_Matrix_Dimensions (Routine_Name & "Pi_Q", Pi_Q);
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
          v := rffk + gamma * Pi_Q_Sum;
       end loop;
