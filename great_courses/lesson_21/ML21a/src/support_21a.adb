@@ -100,7 +100,7 @@ package body Support_21A is
       Action            : Integer_Array (1 .. 2);
       Row_Next          : Positive;
       Col_Next          : Positive;
-      Pi                : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+      Pi                : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
@@ -150,7 +150,8 @@ package body Support_21A is
 
       for count in 1 .. 50 loop
          Q := Compute_Q (Mat_Trans, v, Num_Acts);
-
+         Print_Matrix_Dimensions (Routine_Name & "softmax",
+                                  Python.Call (Classifier, "softmax", Beta * Q));
          Pi := Python.Call (Classifier, "softmax", Beta * Q);
          Pi_Q := Pi * Q;
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);

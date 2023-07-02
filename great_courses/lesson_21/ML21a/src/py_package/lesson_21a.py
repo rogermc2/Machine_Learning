@@ -30,7 +30,7 @@ def get_labels (sequences, max_sequence_length):
     
 def softmax(beta_Q):
     bq=np.asarray(beta_Q)
-    return tuple(K.softmax(bq))
+    return tuple(map (tuple, K.softmax(bq)))
     
 def plan():
     planner = K.function([rk], [pi, Q])
