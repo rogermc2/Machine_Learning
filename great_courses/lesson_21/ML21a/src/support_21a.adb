@@ -5,7 +5,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
 with Basic_Printing; use Basic_Printing;
---  with Python_21a;
 
 package body Support_21A is
 
@@ -13,7 +12,7 @@ package body Support_21A is
 
    function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
                        Num_Acts : Integer) return Real_Float_Matrix;
-   function Dot_Trans_V (Trans : Binary_Tensor; Trans_Row : Positive;
+   function Dot_Trans_V (Trans : Binary_Tensor; Act : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix;
    function Get_Acts_Row (Matrix : Acts_Matrix; Row : Integer)
                           return Acts_Array;
@@ -65,7 +64,7 @@ package body Support_21A is
                       Grid_Map                     : Integer_Matrix)
                       return Binary_Tensor is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Support_21A.Binarize ";
+--        Routine_Name : constant String := "Support_21A.Binarize ";
 
       function Clip (Val, Min, Max : Integer) return Integer is
          Result : Integer := Val;
@@ -153,10 +152,12 @@ package body Support_21A is
       v := rffk;
 
 --        for count in 1 .. 50 loop
-      for count in 1 .. 1 loop
+      for count in 1 .. 2 loop
          Q := Compute_Q (Mat_Trans, v, Num_Acts);
+--           Print_Float_Matrix (Routine_Name & "Q", Q);
+--           Print_Float_Matrix (Routine_Name & "Beta * Q", Beta * Q);
          Pi := Python.Call (Classifier, "softmax", Beta * Q);
-         Print_Float_Matrix (Routine_Name & "Pi", Pi);
+--           Print_Float_Matrix (Routine_Name & "Pi", Pi);
          Pi_Q := H_Product (Q, Pi);
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
          v := rffk + gamma * Pi_Q_Sum;
@@ -184,6 +185,7 @@ package body Support_21A is
             Q_Act : constant Real_Float_Matrix :=
               Dot_Trans_V (Mat_Trans, act_index, v);
          begin
+--              Print_Float_Matrix (Routine_Name & "Q_Act", Q_Act);
             for row in Q_Act'Range loop
                for col in Q_Act'Range (2) loop
                   Q (row, col) := Q_Act (row, col);
@@ -191,7 +193,6 @@ package body Support_21A is
             end loop;
          end;
       end loop;
---        Print_Matrix_Dimensions (Routine_Name & "Q", Q);
 
       return Q;
 
@@ -199,18 +200,20 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   function Dot_Trans_V (Trans : Binary_Tensor; Trans_Row : Positive;
+   function Dot_Trans_V (Trans : Binary_Tensor; Act : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix is
       use Real_Float_Arrays;
-      Act    : Real_Float_Matrix (Trans'Range (2), Trans'Range (3));
+      Routine_Name : constant String := "Support_21A.Dot_Trans_V ";
+      Act_Mat    : Real_Float_Matrix (Trans'Range (2), Trans'Range (3));
    begin
-      for row in Act'Range loop
-         for col in Act'Range (2) loop
-            Act (row, col) := Float (Trans (Trans_Row, row, col));
+      Print_Matrix_Dimensions (Routine_Name & "Act_Mat", Act_Mat);
+      for row in Act_Mat'Range loop
+         for col in Act_Mat'Range (2) loop
+            Act_Mat (row, col) := Float (Trans (Act, row, col));
          end loop;
       end loop;
 
-      return Act * V;
+      return Act_Mat * V;
 
    end Dot_Trans_V;
 
@@ -226,10 +229,10 @@ package body Support_21A is
       Max_Prob : Float;
       A        : Natural := 5;
    begin
-      Put_Line (Routine_Name);
-      Put_Line (Routine_Name & "Grid (Row, Col)" &
-                  Integer'Image (Row) & Integer'Image (Col) &
-        Integer'Image (Grid (Row, Col)));
+      Put_Line (Routine_Name & "Row, Col:" &
+                  Integer'Image (Row) & Integer'Image (Col));
+      Put_Line (Routine_Name & "Grid (Row, Col): " &
+                  Integer'Image (Grid (Row, Col)));
       while Grid (Row, Col) = 6 loop
          Pi_Row := (Row - 1) * Num_Cols + Col;
          Max_Prob := Pi_Max (Pi, Pi_Row);
@@ -240,10 +243,12 @@ package body Support_21A is
          end loop;
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
          Put_Line (Routine_Name & "A" & Integer'Image (A));
+         Put_Line (Routine_Name & "Col" & Integer'Image (Col));
+         Put_Line (Routine_Name & "Acts (A, 2): " & Integer'Image (Acts (A, 2)));
 
          Grid (Row, Col) := A;
          Row := Row + Acts (A, 1);
-         Col := Col + Acts (A, 2);
+         Col := Col + Acts (A, 2) + 1;
          Find_Policy (Grid, Pi, Acts, Row, Col);
       end loop;
 
