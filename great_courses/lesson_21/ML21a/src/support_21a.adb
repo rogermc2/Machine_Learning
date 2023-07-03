@@ -1,18 +1,22 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 --  with Python_21a;
 
 package body Support_21A is
+
+   type Acts_Array is array (Integer range <>) of Acts_Range;
 
    function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
                        Num_Acts : Integer) return Real_Float_Matrix;
    function Dot_Trans_V (Trans : Binary_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix;
+   function Get_Acts_Row (Matrix : Acts_Matrix; Row : Integer)
+                          return Acts_Array;
    function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
    function Product (L : Binary_Tensor; R : Integer_Matrix) return Integer_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
@@ -61,7 +65,7 @@ package body Support_21A is
                       Grid_Map                     : Integer_Matrix)
                       return Binary_Tensor is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Support_21A.Binarize ";
+      Routine_Name : constant String := "Support_21A.Binarize ";
 
       function Clip (Val, Min, Max : Integer) return Integer is
          Result : Integer := Val;
@@ -82,7 +86,7 @@ package body Support_21A is
         (0, -1, -1, -1, 10);
       Num_Acts          : constant Positive := 5;
       Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
-      Acts              : constant Integer_Matrix (1 .. Num_Acts, 1 ..2) :=
+      Acts              : constant Acts_Matrix (1 .. Num_Acts, 1 ..2) :=
         ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       Beta              : constant Float := 10.0;
       Gamma             : constant Float := 0.9;
@@ -97,7 +101,7 @@ package body Support_21A is
       rfk               : Integer_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
       rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       v                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
-      Action            : Integer_Array (1 .. 2);
+      Action            : Acts_Array (1 .. 2);
       Row_Next          : Positive;
       Col_Next          : Positive;
       Pi                : Real_Float_Matrix (Q'Range, Q'Range (2));
@@ -117,7 +121,7 @@ package body Support_21A is
       end loop;
 
       for acts_item in Acts'Range loop
-         Action := Get_Row (Acts, acts_item);
+         Action := Get_Acts_Row (Acts, acts_item);
          for row in Mat_Map'Range  loop
             for col in Mat_Map'Range (2) loop
                Row_Next := Clip (row + Action (1) + 1, 1, Num_Rows);
@@ -148,9 +152,11 @@ package body Support_21A is
       end loop;
       v := rffk;
 
-      for count in 1 .. 50 loop
+--        for count in 1 .. 50 loop
+      for count in 1 .. 1 loop
          Q := Compute_Q (Mat_Trans, v, Num_Acts);
          Pi := Python.Call (Classifier, "softmax", Beta * Q);
+         Print_Float_Matrix (Routine_Name & "Pi", Pi);
          Pi_Q := H_Product (Q, Pi);
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
          v := rffk + gamma * Pi_Q_Sum;
@@ -211,23 +217,29 @@ package body Support_21A is
    --  -------------------------------------------------------------------------
 
    procedure Find_Policy (Grid : in out Integer_Matrix; Pi : Real_Float_Matrix;
-                          Acts : Integer_Matrix; Row_In, Col_In : Positive) is
---        Routine_Name : constant String := "Support_21A.Find_Policy ";
+                          Acts : Acts_Matrix; Row_In, Col_In : Positive) is
+      Routine_Name : constant String := "Support_21A.Find_Policy ";
       Num_Cols : constant Positive := Grid'Length (2);
       Row      : Positive := Row_In;
       Col      : Positive := Col_In;
       Pi_Row   : Positive;
       Max_Prob : Float;
-      A        : Positive := 5;
+      A        : Natural := 5;
    begin
-      while Grid (Row, Col) = 5 loop
+      Put_Line (Routine_Name);
+      Put_Line (Routine_Name & "Grid (Row, Col)" &
+                  Integer'Image (Row) & Integer'Image (Col) &
+        Integer'Image (Grid (Row, Col)));
+      while Grid (Row, Col) = 6 loop
          Pi_Row := (Row - 1) * Num_Cols + Col;
          Max_Prob := Pi_Max (Pi, Pi_Row);
          for ana in 1 .. 5 loop
             if Pi (Pi_Row, ana) = Max_Prob then
-               A := ana;
+               A := ana - 1;
             end if;
          end loop;
+         Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
+         Put_Line (Routine_Name & "A" & Integer'Image (A));
 
          Grid (Row, Col) := A;
          Row := Row + Acts (A, 1);
@@ -235,13 +247,35 @@ package body Support_21A is
          Find_Policy (Grid, Pi, Acts, Row, Col);
       end loop;
 
+exception
+   when Error: Constraint_Error => Put_Line (Routine_Name &
+                                               "Constraint_Error");
+      Put_Line (Exception_Information(Error));
+   when Error: others => Put_Line (Routine_Name & "exception");
+      Put_Line (Exception_Information(Error));
    end Find_Policy;
 
    --  -------------------------------------------------------------------------
 
+   function Get_Acts_Row (Matrix : Acts_Matrix; Row : Integer)
+                          return Acts_Array is
+      Result : Acts_Array (Matrix'Range (2));
+   begin
+      for col in Matrix'Range (2) loop
+         Result (col) := Matrix  (Row, col);
+      end loop;
+
+      return Result;
+
+   end Get_Acts_Row;
+
+   --  ------------------------------------------------------------------------
+
    function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float is
+      Routine_Name : constant String := "Support_21A.Pi_Max ";
       Result : Float := Pi (Row, 1);
    begin
+      Put_Line (Routine_Name & "Result" & Float'Image (Result));
       for col in Pi'Range (2) loop
          if Pi (Row, col) > Result then
             Result := Pi (Row, col);
@@ -254,7 +288,7 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Plot_Policy (Pi : Real_Float_Matrix; Acts : Integer_Matrix;
+   procedure Plot_Policy (Pi : Real_Float_Matrix; Acts : Acts_Matrix;
                           Num_Rows, Num_Cols : Positive) is
       use Ada.Strings.Unbounded;
 --        Routine_Name : constant String := "Support_21A.Plot_Policy ";
