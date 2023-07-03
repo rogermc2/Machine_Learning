@@ -64,7 +64,7 @@ package body Support_21A is
                       Grid_Map                     : Integer_Matrix)
                       return Binary_Tensor is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Support_21A.Binarize ";
+      Routine_Name : constant String := "Support_21A.Binarize ";
 
       function Clip (Val, Min, Max : Integer) return Integer is
          Result : Integer := Val;
@@ -151,13 +151,13 @@ package body Support_21A is
       end loop;
       v := rffk;
 
---        for count in 1 .. 50 loop
-      for count in 1 .. 2 loop
+      --        for count in 1 .. 50 loop
+      for count in 1 .. 1 loop
          Q := Compute_Q (Mat_Trans, v, Num_Acts);
---           Print_Float_Matrix (Routine_Name & "Q", Q);
+         Print_Float_Matrix (Routine_Name & "Q", Q);
 --           Print_Float_Matrix (Routine_Name & "Beta * Q", Beta * Q);
          Pi := Python.Call (Classifier, "softmax", Beta * Q);
---           Print_Float_Matrix (Routine_Name & "Pi", Pi);
+         --           Print_Float_Matrix (Routine_Name & "Pi", Pi);
          Pi_Q := H_Product (Q, Pi);
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
          v := rffk + gamma * Pi_Q_Sum;
@@ -173,21 +173,26 @@ package body Support_21A is
 
    function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
                        Num_Acts  : Integer) return Real_Float_Matrix is
---        Routine_Name : constant String := "Support_21A.Compute_Q ";
-      Q            : Real_Float_Matrix (Mat_Trans'Range (2), Mat_Trans'Range);
+      Routine_Name : constant String := "Support_21A.Compute_Q ";
+      Q            : Real_Float_Matrix (Mat_Trans'Range (2), Mat_Trans'Range) :=
+      (others =>  (others => 0.0));
    begin
---        Put_Line (Routine_Name & "Mat_Trans dim:" &
---                    Integer'Image (Mat_Trans'Length) &
---                    Integer'Image (Mat_Trans'Length (2)) &
---                    Integer'Image (Mat_Trans'Length (3)));
+      --        Put_Line (Routine_Name & "Mat_Trans dim:" &
+      --                    Integer'Image (Mat_Trans'Length) &
+      --                    Integer'Image (Mat_Trans'Length (2)) &
+      --                    Integer'Image (Mat_Trans'Length (3)));
       for act_index in Natural range 1 .. Num_Acts loop
          declare
             Q_Act : constant Real_Float_Matrix :=
               Dot_Trans_V (Mat_Trans, act_index, v);
          begin
---              Print_Float_Matrix (Routine_Name & "Q_Act", Q_Act);
+            Print_Float_Matrix (Routine_Name & "Q_Act", Q_Act);
             for row in Q_Act'Range loop
                for col in Q_Act'Range (2) loop
+                  Assert (Q_Act (row, col)'Valid, Routine_Name &
+                            "invalid Q_Act (row, col): " & Integer'Image (row) &
+                            Integer'Image (col) & ": " &
+                            Float'Image  (Q_Act (row, col)));
                   Q (row, col) := Q_Act (row, col);
                end loop;
             end loop;
@@ -203,10 +208,10 @@ package body Support_21A is
    function Dot_Trans_V (Trans : Binary_Tensor; Act : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Support_21A.Dot_Trans_V ";
+      --        Routine_Name : constant String := "Support_21A.Dot_Trans_V ";
       Act_Mat    : Real_Float_Matrix (Trans'Range (2), Trans'Range (3));
    begin
---        Print_Matrix_Dimensions (Routine_Name & "Act_Mat", Act_Mat);
+      --        Print_Matrix_Dimensions (Routine_Name & "Act_Mat", Act_Mat);
       for row in Act_Mat'Range loop
          for col in Act_Mat'Range (2) loop
             Act_Mat (row, col) := Float (Trans (Act, row, col));
@@ -219,23 +224,27 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Find_Policy (Grid : in out Integer_Matrix; Pi : Real_Float_Matrix;
-                          Acts : Acts_Matrix; Row_In, Col_In : Positive) is
+   procedure Find_Policy (Policy_Grid : in out Integer_Matrix;
+                          Pi : Real_Float_Matrix; Acts : Acts_Matrix;
+                          Row_In, Col_In : Positive) is
       Routine_Name : constant String := "Support_21A.Find_Policy ";
-      Num_Cols : constant Positive := Grid'Length (2);
+      Num_Cols : constant Positive := Policy_Grid'Length (2);
       Row      : Positive := Row_In;
       Col      : Positive := Col_In;
       Pi_Row   : Positive;
       Max_Prob : Float;
-      A        : Natural := 5;
+      A        : Natural := 6;
    begin
       Put_Line (Routine_Name & "Row, Col:" &
                   Integer'Image (Row) & Integer'Image (Col));
-      Put_Line (Routine_Name & "Grid (Row, Col): " &
-                  Integer'Image (Grid (Row, Col)));
-      while Grid (Row, Col) = 6 loop
-         Pi_Row := (Row - 1) * Num_Cols + Col;
-         Max_Prob := Pi_Max (Pi, Pi_Row);
+      Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
+                  Integer'Image (Policy_Grid (Row, Col)));
+      Assert ( Pi (Row, 1)'Valid, Routine_Name & "invalid Pi: " &
+                 Float'Image  (Pi (Row, 1)));
+--        Print_Float_Matrix (Routine_Name & "Pi", Pi);
+      while Policy_Grid (Row, Col) = 6 loop
+         Pi_Row := (Row - 1) * Num_Cols + 1;
+         Max_Prob := Pi_Max (Pi, Pi_Row + Col - 1);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
          for ana in 1 .. 5 loop
             if Pi (Pi_Row, ana) = Max_Prob then
@@ -246,18 +255,18 @@ package body Support_21A is
          Put_Line (Routine_Name & "Col" & Integer'Image (Col));
          Put_Line (Routine_Name & "Acts (A, 2): " & Integer'Image (Acts (A, 2)));
 
-         Grid (Row, Col) := A;
+         Policy_Grid (Row, Col) := A;
          Row := Row + Acts (A, 1);
          Col := Col + Acts (A, 2) + 1;
-         Find_Policy (Grid, Pi, Acts, Row, Col);
+         Find_Policy (Policy_Grid, Pi, Acts, Row, Col);
       end loop;
 
-exception
-   when Error: Constraint_Error => Put_Line (Routine_Name &
-                                               "Constraint_Error");
-      Put_Line (Exception_Information(Error));
-   when Error: others => Put_Line (Routine_Name & "exception");
-      Put_Line (Exception_Information(Error));
+   exception
+      when Error: Constraint_Error => Put_Line (Routine_Name &
+                                                  "Constraint_Error");
+         Put_Line (Exception_Information(Error));
+      when Error: others => Put_Line (Routine_Name & "exception");
+         Put_Line (Exception_Information(Error));
    end Find_Policy;
 
    --  -------------------------------------------------------------------------
@@ -296,17 +305,17 @@ exception
    procedure Plot_Policy (Pi : Real_Float_Matrix; Acts : Acts_Matrix;
                           Num_Rows, Num_Cols : Positive) is
       use Ada.Strings.Unbounded;
---        Routine_Name : constant String := "Support_21A.Plot_Policy ";
-      Signs : constant String (1 .. 7) := "^>v<x? ";
-      Grid  : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
-      Line  : Unbounded_String;
+      --        Routine_Name : constant String := "Support_21A.Plot_Policy ";
+      Signs       : constant String (1 .. 7) := "^>v<x? ";
+      Policy_Grid : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
+      Line        : Unbounded_String;
    begin
-      Find_Policy (Grid, Pi, Acts, 1, 1);
+      Find_Policy (Policy_Grid, Pi, Acts, 1, 1);
 
       for row in 1 .. Num_Rows loop
          Line := To_Unbounded_String ("");
          for col in 1 .. Num_Cols loop
-            Line := Line & Signs (Grid (row, col) + 1);
+            Line := Line & Signs (Policy_Grid (row, col) + 1);
          end loop;
          Put_Line (To_String (Line));
       end loop;
