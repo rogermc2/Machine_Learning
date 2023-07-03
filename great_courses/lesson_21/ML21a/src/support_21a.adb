@@ -267,7 +267,7 @@ package body Support_21A is
       for row in 1 .. Num_Rows loop
          Line := To_Unbounded_String ("");
          for col in 1 .. Num_Cols loop
-            Line := Line & Signs (Grid (row, col));
+            Line := Line & Signs (Grid (row, col) + 1);
          end loop;
          Put_Line (To_String (Line));
       end loop;
