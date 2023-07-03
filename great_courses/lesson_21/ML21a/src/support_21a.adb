@@ -257,16 +257,17 @@ package body Support_21A is
    procedure Plot_Policy (Pi : Real_Float_Matrix; Acts : Integer_Matrix;
                           Num_Rows, Num_Cols : Positive) is
       use Ada.Strings.Unbounded;
-      Grid : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
-      Line : Unbounded_String;
+--        Routine_Name : constant String := "Support_21A.Plot_Policy ";
+      Signs : constant String (1 .. 7) := "^>v<x? ";
+      Grid  : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
+      Line  : Unbounded_String;
    begin
       Find_Policy (Grid, Pi, Acts, 1, 1);
 
       for row in 1 .. Num_Rows loop
          Line := To_Unbounded_String ("");
          for col in 1 .. Num_Cols loop
-            Line := Line & ">v<x? " & To_Unbounded_String (Integer'Image (Grid (row, col)));
---              Line := Line & "^>v<x? " & To_Unbounded_String (Integer'Image (Grid (row, col)));
+            Line := Line & Signs (Grid (row, col));
          end loop;
          Put_Line (To_String (Line));
       end loop;
