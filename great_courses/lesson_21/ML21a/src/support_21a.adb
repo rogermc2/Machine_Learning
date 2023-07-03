@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 --  with Python_21a;
 
 package body Support_21A is
@@ -61,7 +61,7 @@ package body Support_21A is
                       Grid_Map                     : Integer_Matrix)
                       return Binary_Tensor is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Support_21A.Binarize ";
+--        Routine_Name : constant String := "Support_21A.Binarize ";
 
       function Clip (Val, Min, Max : Integer) return Integer is
          Result : Integer := Val;
@@ -151,16 +151,12 @@ package body Support_21A is
       for count in 1 .. 50 loop
          Q := Compute_Q (Mat_Trans, v, Num_Acts);
          Pi := Python.Call (Classifier, "softmax", Beta * Q);
-         Print_Matrix_Dimensions (Routine_Name & "Pi", Pi);
          Pi_Q := H_Product (Q, Pi);
-         Print_Matrix_Dimensions (Routine_Name & "Pi_Q", Pi_Q);
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
          v := rffk + gamma * Pi_Q_Sum;
       end loop;
 
-      Put_Line (Routine_Name & "Plot_Policy");
       Plot_Policy (Pi, Acts, Num_Rows, Num_Cols);
-      Put_Line (Routine_Name & "Policy plotted");
 
       return Mat_Trans;
 
@@ -170,13 +166,13 @@ package body Support_21A is
 
    function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
                        Num_Acts  : Integer) return Real_Float_Matrix is
-      Routine_Name : constant String := "Support_21A.Compute_Q ";
+--        Routine_Name : constant String := "Support_21A.Compute_Q ";
       Q            : Real_Float_Matrix (Mat_Trans'Range (2), Mat_Trans'Range);
    begin
-      Put_Line (Routine_Name & "Mat_Trans dim:" &
-                  Integer'Image (Mat_Trans'Length) &
-                  Integer'Image (Mat_Trans'Length (2)) &
-                  Integer'Image (Mat_Trans'Length (3)));
+--        Put_Line (Routine_Name & "Mat_Trans dim:" &
+--                    Integer'Image (Mat_Trans'Length) &
+--                    Integer'Image (Mat_Trans'Length (2)) &
+--                    Integer'Image (Mat_Trans'Length (3)));
       for act_index in Natural range 1 .. Num_Acts loop
          declare
             Q_Act : constant Real_Float_Matrix :=
@@ -189,7 +185,7 @@ package body Support_21A is
             end loop;
          end;
       end loop;
-      Print_Matrix_Dimensions (Routine_Name & "Q", Q);
+--        Print_Matrix_Dimensions (Routine_Name & "Q", Q);
 
       return Q;
 
@@ -216,26 +212,28 @@ package body Support_21A is
 
    procedure Find_Policy (Grid : in out Integer_Matrix; Pi : Real_Float_Matrix;
                           Acts : Integer_Matrix; Row_In, Col_In : Positive) is
+--        Routine_Name : constant String := "Support_21A.Find_Policy ";
       Num_Cols : constant Positive := Grid'Length (2);
       Row      : Positive := Row_In;
       Col      : Positive := Col_In;
       Pi_Row   : Positive;
       Max_Prob : Float;
-      A        : Positive := 6;
+      A        : Positive := 5;
    begin
-      while Grid (Row, Col) = 6 loop
-         Pi_Row := (Row - 1) * Num_Cols;
+      while Grid (Row, Col) = 5 loop
+         Pi_Row := (Row - 1) * Num_Cols + Col;
          Max_Prob := Pi_Max (Pi, Pi_Row);
          for ana in 1 .. 5 loop
             if Pi (Pi_Row, ana) = Max_Prob then
                A := ana;
             end if;
          end loop;
+
          Grid (Row, Col) := A;
          Row := Row + Acts (A, 1);
          Col := Col + Acts (A, 2);
+         Find_Policy (Grid, Pi, Acts, Row, Col);
       end loop;
-      Find_Policy (Grid, Pi, Acts, Row, Col);
 
    end Find_Policy;
 
@@ -265,8 +263,10 @@ package body Support_21A is
       Find_Policy (Grid, Pi, Acts, 1, 1);
 
       for row in 1 .. Num_Rows loop
+         Line := To_Unbounded_String ("");
          for col in 1 .. Num_Cols loop
-            Line := Line & "^>v<x? " & To_Unbounded_String (Integer'Image (Grid (row, col)));
+            Line := Line & ">v<x? " & To_Unbounded_String (Integer'Image (Grid (row, col)));
+--              Line := Line & "^>v<x? " & To_Unbounded_String (Integer'Image (Grid (row, col)));
          end loop;
          Put_Line (To_String (Line));
       end loop;
