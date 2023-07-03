@@ -203,10 +203,10 @@ package body Support_21A is
    function Dot_Trans_V (Trans : Binary_Tensor; Act : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Support_21A.Dot_Trans_V ";
+--        Routine_Name : constant String := "Support_21A.Dot_Trans_V ";
       Act_Mat    : Real_Float_Matrix (Trans'Range (2), Trans'Range (3));
    begin
-      Print_Matrix_Dimensions (Routine_Name & "Act_Mat", Act_Mat);
+--        Print_Matrix_Dimensions (Routine_Name & "Act_Mat", Act_Mat);
       for row in Act_Mat'Range loop
          for col in Act_Mat'Range (2) loop
             Act_Mat (row, col) := Float (Trans (Act, row, col));
@@ -236,12 +236,12 @@ package body Support_21A is
       while Grid (Row, Col) = 6 loop
          Pi_Row := (Row - 1) * Num_Cols + Col;
          Max_Prob := Pi_Max (Pi, Pi_Row);
+         Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
          for ana in 1 .. 5 loop
             if Pi (Pi_Row, ana) = Max_Prob then
                A := ana - 1;
             end if;
          end loop;
-         Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
          Put_Line (Routine_Name & "A" & Integer'Image (A));
          Put_Line (Routine_Name & "Col" & Integer'Image (Col));
          Put_Line (Routine_Name & "Acts (A, 2): " & Integer'Image (Acts (A, 2)));
