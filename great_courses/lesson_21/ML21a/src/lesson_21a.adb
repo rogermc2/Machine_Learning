@@ -27,7 +27,7 @@ procedure Lesson_21A is
                              (0,0,0,1,0,2,0,3,0,0),
                              (0,0,0,0,0,2,0,3,0,4));
    Classifier           : Python.Module;
-   Mat_Trans            : Binary_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
+   Mat_Trans            : Boolean_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
                                          1 .. Rows_x_Cols);
 begin
    Python.Initialize;
