@@ -10,17 +10,19 @@ package body Support_21A is
 
    type Acts_Array is array (Integer range <>) of Acts_Range;
 
+   function Compute_Map_Matrix (Grid_Map : Integer_Matrix; Num_Cats : Positive)
+                                return Boolean_Tensor;
    function Compute_Q (Mat_Trans : Boolean_Tensor; v : Real_Float_Matrix;
                        Num_Acts : Integer) return Real_Float_Matrix;
    function Compute_Transition_Matrix
      (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Acts_Matrix;
-      Mat_Map : Binary_Tensor) return Boolean_Tensor;
+      Mat_Map : Boolean_Tensor) return Boolean_Tensor;
    function Dot_Trans_V (Trans : Boolean_Tensor; Trans_Row : Positive;
                          V : Real_Float_Matrix) return Real_Float_Matrix;
    function Get_Action (Matrix : Acts_Matrix; Row : Integer)
                         return Acts_Array;
    function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
-   function Product (L : Binary_Tensor; R : Integer_Matrix) return Integer_Tensor;
+   function Product (L : Boolean_Tensor; R : Integer_Matrix) return Integer_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -75,13 +77,17 @@ package body Support_21A is
       --  Acts defines how each action changes the row and column
       Actions           : constant Acts_Matrix (1 .. Num_Actions, 1 ..2) :=
         ((-1,0), (0,1), (1,0), (0,-1), (0,0));
-      Beta              : constant Float := 10.0;
-      Gamma             : constant Float := 0.9;
       --  Mat_Map is a binarised version of Grid_Map in which the value of
       --  Mat_Map is 1 (otherwise 0) if the Grid_Map row and column
       --  equals the index of the third dimension of the cell.
-      Mat_Map           : Binary_Tensor (Grid_Map'Range, Grid_Map'Range (2),
-                                         1 .. Num_Cats);
+      Mat_Map           : constant Boolean_Tensor :=
+        Compute_Map_Matrix (Grid_Map, Num_Cats);
+      --  Mat_Transition represents the probability that a given action
+      --  will cause a transition between a given pair of locations.
+      Mat_Transition : constant Boolean_Tensor :=
+        Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions, Mat_Map);
+      Beta              : constant Float := 10.0;
+      Gamma             : constant Float := 0.9;
       Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
                                              1 .. Num_Actions);
       --        Q_Act             : Real_Float_Matrix (1 .. Num_Cols, 1 .. Num_Acts);
@@ -93,64 +99,67 @@ package body Support_21A is
       Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
-      for row in Mat_Map'Range loop
-         for col in Mat_Map'Range (2) loop
-            for cat in Mat_Map'Range (3) loop
-               if Grid_Map (row, col) = cat then
-                  Mat_Map (row, col, cat) := 1;
-               else
-                  Mat_Map (row, col, cat) := 0;
-               end if;
-            end loop;
-         end loop;
+      for row in Rewards'Range loop
+         rk (row, 1) := Rewards (row);
       end loop;
 
-      declare
-         --  Mat_Transition represents the probability that a given action
-         --  will cause a transition between a given pair of locations.
-         Mat_Transition : constant Boolean_Tensor :=
-           Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions, Mat_Map);
-      begin
-         for row in Rewards'Range loop
-            rk (row, 1) := Rewards (row);
+      rfk := Product (Mat_Map, rk);
+
+      for row in rfk'Range loop
+         for col in rfk'Range (2) loop
+            rffk ((row - 1) * rfk'Length (2) + col, 1) :=
+              Float (rfk (row, col, 1));
          end loop;
+      end loop;
+      v := rffk;
 
-         rfk := Product (Mat_Map, rk);
+      --        for count in 1 .. 50 loop
+      for count in 1 .. 2 loop
+         Q := Compute_Q (Mat_Transition, v, Num_Actions);
+         Print_Float_Matrix (Routine_Name & "Q", Q);
+         --           Print_Float_Matrix (Routine_Name & "Beta * Q", Beta * Q);
+         Pi := Python.Call (Classifier, "softmax", Beta * Q);
+         --           Print_Float_Matrix (Routine_Name & "Pi", Pi);
+         Pi_Q := H_Product (Q, Pi);
+         Pi_Q_Sum := Sum_Each_Column (Pi_Q);
+         v := rffk + gamma * Pi_Q_Sum;
+      end loop;
 
-         for row in rfk'Range loop
-            for col in rfk'Range (2) loop
-               rffk ((row - 1) * rfk'Length (2) + col, 1) :=
-                 Float (rfk (row, col, 1));
-            end loop;
-         end loop;
-         v := rffk;
+      Plot_Policy (Pi, Actions, Num_Rows, Num_Cols);
 
-         --        for count in 1 .. 50 loop
-         for count in 1 .. 2 loop
-            Q := Compute_Q (Mat_Transition, v, Num_Actions);
-            Print_Float_Matrix (Routine_Name & "Q", Q);
-            --           Print_Float_Matrix (Routine_Name & "Beta * Q", Beta * Q);
-            Pi := Python.Call (Classifier, "softmax", Beta * Q);
-            --           Print_Float_Matrix (Routine_Name & "Pi", Pi);
-            Pi_Q := H_Product (Q, Pi);
-            Pi_Q_Sum := Sum_Each_Column (Pi_Q);
-            v := rffk + gamma * Pi_Q_Sum;
-         end loop;
-
-         Plot_Policy (Pi, Actions, Num_Rows, Num_Cols);
-
-         return Mat_Transition;
-      end;  --  declare block
+      return Mat_Transition;
 
    end Binarize;
 
    --  -------------------------------------------------------------------------
+   --  Compute_Map_Matrix generates a binarised version of Grid_Map in which the
+   --  value of each element is 1 (otherwise 0) if the Grid_Map row and column
+   --  equals the index of the third dimension of the cell.
+   function Compute_Map_Matrix (Grid_Map : Integer_Matrix; Num_Cats : Positive)
+                                return Boolean_Tensor is
+      Mat_Map   : Boolean_Tensor (Grid_Map'Range, Grid_Map'Range (2),
+                                  1 .. Num_Cats);
+   begin
+      for row in Mat_Map'Range loop
+         for col in Mat_Map'Range (2) loop
+            for cat in Mat_Map'Range (3) loop
+               Mat_Map (row, col, cat) := Grid_Map (row, col) = cat;
+            end loop;
+         end loop;
+      end loop;
+
+      return Mat_Map;
+
+   end Compute_Map_Matrix;
+
+   --  -------------------------------------------------------------------------
+
    --  Compute_Transition_Matrix generates a transition matrix that indicates
    --  whether or not a given action will cause a transition between a given
    --  pair of locations.
    function Compute_Transition_Matrix
      (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Acts_Matrix;
-      Mat_Map : Binary_Tensor) return Boolean_Tensor is
+      Mat_Map : Boolean_Tensor) return Boolean_Tensor is
 
       --  Clip keeps the current grid location within the grid boundary
       function Clip (Value, Min, Max : Integer) return Integer is
@@ -366,8 +375,9 @@ package body Support_21A is
 
    --  for matrix L of dimensions (m,n,p) and R of dimensions (p,s)
    --  C(i, j, k) = sum[r=1 to p] L(i, j, r) * R(r, k)
-   function Product (L : Binary_Tensor; R : Integer_Matrix) return Integer_Tensor is
+   function Product (L : Boolean_Tensor; R : Integer_Matrix) return Integer_Tensor is
       Routine_Name : constant String := "Support_21A.Product ";
+      L_Int        : Natural;
       Sum          : Integer;
       Result       : Integer_Tensor (L'Range, L'Range (2), R'Range (2));
    begin
@@ -378,8 +388,13 @@ package body Support_21A is
             for rk in R'Range (2) loop
                Sum := 0;
                for rr in L'Range (3) loop  -- r
+                  if L(li, lj, rr) then
+                     L_Int := 1;
+                  else
+                     L_Int := 0;
+                  end if;
                   --  Result(i, j, k) = sum (L(i, j, r) * R(r, k))
-                  Sum := Sum + L(li, lj, rr) * R (rr, rk);
+                  Sum := Sum + L_Int * R (rr, rk);
                end loop;
                Result (li, lj, rk) := Sum;
             end loop;
