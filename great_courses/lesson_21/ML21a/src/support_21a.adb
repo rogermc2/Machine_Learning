@@ -82,8 +82,8 @@ package body Support_21A is
       --  equals the index of the third dimension of the cell.
       Mat_Map           : constant Boolean_Tensor :=
         Compute_Map_Matrix (Grid_Map, Num_Cats);
-      --  Mat_Transition represents the probability that a given action
-      --  will cause a transition between a given pair of locations.
+      --  Mat_Transition indicates whether or not a given action will cause
+      --  a transition between a given pair of locations.
       Mat_Transition : constant Boolean_Tensor :=
         Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions, Mat_Map);
       Beta              : constant Float := 10.0;
