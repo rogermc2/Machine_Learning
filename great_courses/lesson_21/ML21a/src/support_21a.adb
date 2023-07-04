@@ -12,9 +12,9 @@ package body Support_21A is
 
    function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
                        Num_Acts : Integer) return Real_Float_Matrix;
-   function Dot_Trans_V (Trans : Binary_Tensor; Act : Positive;
+   function Dot_Trans_V (Trans : Binary_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix;
-   function Get_Acts_Row (Matrix : Acts_Matrix; Row : Integer)
+   function Get_Action (Matrix : Acts_Matrix; Row : Integer)
                           return Acts_Array;
    function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
    function Product (L : Binary_Tensor; R : Integer_Matrix) return Integer_Tensor;
@@ -66,6 +66,7 @@ package body Support_21A is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Support_21A.Binarize ";
 
+      --  Clip keeps the current grid location within the grid boundary
       function Clip (Val, Min, Max : Integer) return Integer is
          Result : Integer := Val;
       begin
@@ -73,8 +74,8 @@ package body Support_21A is
             Result := Min;
          end if;
 
-         if Result > Max - 1 then
-            Result := Max - 1;
+         if Result > Max then
+            Result := Max;
          end if;
 
          return Result;
@@ -85,10 +86,14 @@ package body Support_21A is
         (0, -1, -1, -1, 10);
       Num_Acts          : constant Positive := 5;
       Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
-      Acts              : constant Acts_Matrix (1 .. Num_Acts, 1 ..2) :=
+      --  Acts defines how each action changes the row and column
+      Actions           : constant Acts_Matrix (1 .. Num_Acts, 1 ..2) :=
         ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       Beta              : constant Float := 10.0;
       Gamma             : constant Float := 0.9;
+      --  Mat_Map is a binarised version of Grid_Map in which the value of
+      --  Mat_Map is 1 (otherwise 0) if the Grid_Map row and column
+      --  equals the index of the third dimension of the cell.
       Mat_Map           : Binary_Tensor (Grid_Map'Range, Grid_Map'Range (2),
                                          1 .. Num_Cats);
       Mat_Trans         : Binary_Tensor (1 .. Num_Acts, 1 .. Rows_x_Cols,
@@ -100,7 +105,7 @@ package body Support_21A is
       rfk               : Integer_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
       rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       v                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
-      Action            : Acts_Array (1 .. 2);
+      Current_Action    : Acts_Array (1 .. 2);
       Row_Next          : Positive;
       Col_Next          : Positive;
       Pi                : Real_Float_Matrix (Q'Range, Q'Range (2));
@@ -119,16 +124,19 @@ package body Support_21A is
          end loop;
       end loop;
 
-      for acts_item in Acts'Range loop
-         Action := Get_Acts_Row (Acts, acts_item);
+      for act in Actions'Range loop
+         --  Current_Action specifies changes to the row and column
+         Current_Action := Get_Action (Actions, act);
          for row in Mat_Map'Range  loop
             for col in Mat_Map'Range (2) loop
-               Row_Next := Clip (row + Action (1) + 1, 1, Num_Rows);
-               Col_Next := Clip (col + Action (2) + 1, 1, Num_Cols);
+               --  Clip keeps this grid location inside the grid boundary
+               --  Row_Next and Col_Next are the changed row and column
+               Row_Next := Clip (row + Current_Action (1), 1, Num_Rows);
+               Col_Next := Clip (col + Current_Action (2), 1, Num_Cols);
                for row_2 in Mat_Map'Range  loop
                   for col_2 in Mat_Map'Range (2) loop
                      if row_2 = Row_Next and col_2 = Col_Next then
-                        Mat_Trans (acts_item, (row - 1) * Num_Cols + col,
+                        Mat_Trans (act, (row - 1) * Num_Cols + col,
                                    (row_2 - 1) * Num_Cols + col_2) := 1;
                      end if;
                   end loop;
@@ -152,10 +160,10 @@ package body Support_21A is
       v := rffk;
 
       --        for count in 1 .. 50 loop
-      for count in 1 .. 1 loop
+      for count in 1 .. 2 loop
          Q := Compute_Q (Mat_Trans, v, Num_Acts);
          Print_Float_Matrix (Routine_Name & "Q", Q);
---           Print_Float_Matrix (Routine_Name & "Beta * Q", Beta * Q);
+         --           Print_Float_Matrix (Routine_Name & "Beta * Q", Beta * Q);
          Pi := Python.Call (Classifier, "softmax", Beta * Q);
          --           Print_Float_Matrix (Routine_Name & "Pi", Pi);
          Pi_Q := H_Product (Q, Pi);
@@ -163,30 +171,34 @@ package body Support_21A is
          v := rffk + gamma * Pi_Q_Sum;
       end loop;
 
-      Plot_Policy (Pi, Acts, Num_Rows, Num_Cols);
+      Plot_Policy (Pi, Actions, Num_Rows, Num_Cols);
 
       return Mat_Trans;
 
    end Binarize;
 
    --  -------------------------------------------------------------------------
-
+   --  V reflects how good it is to be in each location looking ahead an
+   --  additional step.
    function Compute_Q (Mat_Trans : Binary_Tensor; v : Real_Float_Matrix;
                        Num_Acts  : Integer) return Real_Float_Matrix is
       Routine_Name : constant String := "Support_21A.Compute_Q ";
       Q            : Real_Float_Matrix (Mat_Trans'Range (2), Mat_Trans'Range) :=
-      (others =>  (others => 0.0));
+        (others =>  (others => 0.0));
    begin
-      --        Put_Line (Routine_Name & "Mat_Trans dim:" &
-      --                    Integer'Image (Mat_Trans'Length) &
-      --                    Integer'Image (Mat_Trans'Length (2)) &
-      --                    Integer'Image (Mat_Trans'Length (3)));
+      --  Mat_Trans 5, 50, 50; Num_Acts, Num_Rows_x_Num_Cols, Num_Rows_x_Num_Cols
+      --  V 50, 1
+--        Put_Line (Routine_Name & "Mat_Trans dim:" &
+--                    Integer'Image (Mat_Trans'Length) &
+--                    Integer'Image (Mat_Trans'Length (2)) &
+--                    Integer'Image (Mat_Trans'Length (3)));
+      Print_Float_Matrix (Routine_Name & "v", v);
       for act_index in Natural range 1 .. Num_Acts loop
          declare
             Q_Act : constant Real_Float_Matrix :=
               Dot_Trans_V (Mat_Trans, act_index, v);
          begin
-            Print_Float_Matrix (Routine_Name & "Q_Act", Q_Act);
+--              Print_Float_Matrix (Routine_Name & "Q_Act", Q_Act);
             for row in Q_Act'Range loop
                for col in Q_Act'Range (2) loop
                   Assert (Q_Act (row, col)'Valid, Routine_Name &
@@ -199,25 +211,29 @@ package body Support_21A is
          end;
       end loop;
 
+      --  Q 50, 5
       return Q;
 
    end Compute_Q;
 
    --  -------------------------------------------------------------------------
 
-   function Dot_Trans_V (Trans : Binary_Tensor; Act : Positive;
+   function Dot_Trans_V (Trans : Binary_Tensor; Trans_Row : Positive;
                          V     : Real_Float_Matrix) return Real_Float_Matrix is
       use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Support_21A.Dot_Trans_V ";
+--        Routine_Name : constant String := "Support_21A.Dot_Trans_V ";
       Act_Mat    : Real_Float_Matrix (Trans'Range (2), Trans'Range (3));
    begin
-      --        Print_Matrix_Dimensions (Routine_Name & "Act_Mat", Act_Mat);
+      --  Trans 5, 50, 50; Num_Acts, Num_Rows_x_Num_Cols, Num_Rows_x_Num_Cols
+      --  V 50, 1
+      --  Act_Mat 50, 50
       for row in Act_Mat'Range loop
          for col in Act_Mat'Range (2) loop
-            Act_Mat (row, col) := Float (Trans (Act, row, col));
+            Act_Mat (row, col) := Float (Trans (Trans_Row, row, col));
          end loop;
       end loop;
 
+      --  Act_Mat * V   50, 1
       return Act_Mat * V;
 
    end Dot_Trans_V;
@@ -241,7 +257,7 @@ package body Support_21A is
                   Integer'Image (Policy_Grid (Row, Col)));
       Assert ( Pi (Row, 1)'Valid, Routine_Name & "invalid Pi: " &
                  Float'Image  (Pi (Row, 1)));
---        Print_Float_Matrix (Routine_Name & "Pi", Pi);
+      --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
       while Policy_Grid (Row, Col) = 6 loop
          Pi_Row := (Row - 1) * Num_Cols + 1;
          Max_Prob := Pi_Max (Pi, Pi_Row + Col - 1);
@@ -271,7 +287,7 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Acts_Row (Matrix : Acts_Matrix; Row : Integer)
+   function Get_Action (Matrix : Acts_Matrix; Row : Integer)
                           return Acts_Array is
       Result : Acts_Array (Matrix'Range (2));
    begin
@@ -281,7 +297,7 @@ package body Support_21A is
 
       return Result;
 
-   end Get_Acts_Row;
+   end Get_Action;
 
    --  ------------------------------------------------------------------------
 
