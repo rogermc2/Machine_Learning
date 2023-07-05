@@ -35,7 +35,6 @@ begin
    Python.Call (Classifier, "plot", Grid_Map);
    Mat_Trans := Binarize (Classifier, Num_Rows, Num_Cols, Num_Cats, Grid_Map);
    --     Python.Call (Classifier, "plot_matrix", Grid_Map);
---     Plot_Policy (Pi, Acts, Num_Rows, Num_Cols);
    Python.Finalize;
 
    Put_Line ("----------------------------------------------");

@@ -124,13 +124,28 @@ package body Support_21A is
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
          v := rffk + gamma * Pi_Q_Sum;
       end loop;
-      Print_Float_Matrix (Routine_Name & "v", v);
+      --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
 
       Plot_Policy (Pi, Actions, Num_Rows, Num_Cols);
 
       return Mat_Transition;
 
    end Binarize;
+
+   --  -------------------------------------------------------------------------
+   --  Clip keeps the current grid location within the grid boundary
+   function Clip (Value, Min, Max : Integer) return Integer is
+      Result : Integer := Value;
+   begin
+      if Result < Min then
+         Result := Min;
+      elsif Result > Max then
+         Result := Max;
+      end if;
+
+      return Result;
+
+   end Clip;
 
    --  -------------------------------------------------------------------------
    --  Compute_Map_Matrix generates a binarised version of Grid_Map in which the
@@ -161,21 +176,6 @@ package body Support_21A is
    function Compute_Transition_Matrix
      (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Acts_Matrix;
       Mat_Map : Boolean_Tensor) return Boolean_Tensor is
-
-      --  Clip keeps the current grid location within the grid boundary
-      function Clip (Value, Min, Max : Integer) return Integer is
-         Result : Integer := Value;
-      begin
-         if Result < Min then
-            Result := Min;
-         elsif Result > Max then
-            Result := Max;
-         end if;
-
-         return Result;
-
-      end Clip;
-
       Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       Current_Action    : Acts_Array (1 .. 2);
       Row_Next          : Positive;
@@ -279,12 +279,15 @@ package body Support_21A is
                           Row_In, Col_In : Positive) is
       Routine_Name : constant String := "Support_21A.Find_Policy ";
       Num_Cols : constant Positive := Policy_Grid'Length (2);
+      Num_Rows : constant Positive := Policy_Grid'Length;
       Row      : Positive := Row_In;
       Col      : Positive := Col_In;
       Pi_Row   : Positive;
       Max_Prob : Float;
       A        : Natural := 6;
    begin
+      Put_Line (Routine_Name & "Num_Rows, Num_Cols:" &
+                  Integer'Image (Num_Rows) & Integer'Image (Num_Cols));
       Put_Line (Routine_Name & "Row, Col:" &
                   Integer'Image (Row) & Integer'Image (Col));
       Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
@@ -298,16 +301,16 @@ package body Support_21A is
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
          for ana in 1 .. 5 loop
             if Pi (Pi_Row, ana) = Max_Prob then
-               A := ana - 1;
+               A := ana;
             end if;
          end loop;
          Put_Line (Routine_Name & "A" & Integer'Image (A));
          Put_Line (Routine_Name & "Col" & Integer'Image (Col));
-         Put_Line (Routine_Name & "Acts (A, 2): " & Integer'Image (Acts (A, 2)));
+         Put_Line (Routine_Name & "Acts (A-1, 2): " & Integer'Image (Acts (A-1, 2)));
 
          Policy_Grid (Row, Col) := A;
-         Row := Row + Acts (A, 1);
-         Col := Col + Acts (A, 2) + 1;
+         Row := Clip (Row + Acts (A, 1), 1, Num_Rows);
+         Col := Clip (Col + Acts (A, 2), 1, Num_Cols);
          Find_Policy (Policy_Grid, Pi, Acts, Row, Col);
       end loop;
 
