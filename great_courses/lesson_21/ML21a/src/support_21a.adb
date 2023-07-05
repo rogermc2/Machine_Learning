@@ -274,17 +274,17 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Find_Policy (Policy_Grid : in out Integer_Matrix;
-                          Policy : Real_Float_Matrix; Actions : Actions_Matrix;
-                          Row_In, Col_In : Positive) is
+   procedure Find_Policy
+     (Policy_Grid : in out Integer_Matrix; Current_Policy : Real_Float_Matrix;
+      Actions : Actions_Matrix; Row_In, Col_In : Positive) is
       Routine_Name : constant String := "Support_21A.Find_Policy ";
-      Num_Cols : constant Positive := Policy_Grid'Length (2);
-      Num_Rows : constant Positive := Policy_Grid'Length;
-      Row      : Positive := Row_In;
-      Col      : Positive := Col_In;
-      Pi_Row   : Positive;
-      Max_Prob : Float;
-      A        : Natural := 6;
+      Num_Cols     : constant Positive := Policy_Grid'Length (2);
+      Num_Rows     : constant Positive := Policy_Grid'Length;
+      Row          : Positive := Row_In;
+      Col          : Positive := Col_In;
+      Policy_Row   : Positive;
+      Max_Prob     : Float;
+      Action       : Natural := 6;
    begin
       Put_Line (Routine_Name & "Num_Rows, Num_Cols:" &
                   Integer'Image (Num_Rows) & Integer'Image (Num_Cols));
@@ -292,27 +292,27 @@ package body Support_21A is
                   Integer'Image (Row) & Integer'Image (Col));
       Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
                   Integer'Image (Policy_Grid (Row, Col)));
-      Assert (Policy (Row, 1)'Valid, Routine_Name & "invalid Pi: " &
-                 Float'Image  (Policy (Row, 1)));
+      Assert (Current_Policy (Row, 1)'Valid, Routine_Name & "invalid Policy: " &
+                 Float'Image  (Current_Policy (Row, 1)));
       --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
       while Policy_Grid (Row, Col) = 6 loop
-         Pi_Row := (Row - 1) * Num_Cols + 1;
-         Max_Prob := Pi_Max (Policy, Pi_Row + Col - 1);
+         Policy_Row := (Row - 1) * Num_Cols + 1;
+         Max_Prob := Pi_Max (Current_Policy, Policy_Row + Col - 1);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
-         for ana in 1 .. 5 loop
-            if Policy (Pi_Row, ana) = Max_Prob then
-               A := ana;
+         for act in 1 .. 5 loop
+            if Current_Policy (Policy_Row, act) = Max_Prob then
+               Action := act;
             end if;
          end loop;
-         Put_Line (Routine_Name & "A" & Integer'Image (A));
+         Put_Line (Routine_Name & "Action" & Integer'Image (Action));
          Put_Line (Routine_Name & "Col" & Integer'Image (Col));
-         Put_Line (Routine_Name & "Actions (A-1, 2): " &
-                     Integer'Image (Actions (A-1, 2)));
+         Put_Line (Routine_Name & "Actions (Action-1, 2): " &
+                     Integer'Image (Actions (Action-1, 2)));
 
-         Policy_Grid (Row, Col) := A;
-         Row := Clip (Row + Actions (A, 1), 1, Num_Rows);
-         Col := Clip (Col + Actions (A, 2), 1, Num_Cols);
-         Find_Policy (Policy_Grid, Policy, Actions, Row, Col);
+         Policy_Grid (Row, Col) := Action;
+         Row := Clip (Row + Actions (Action, 1), 1, Num_Rows);
+         Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
+         Find_Policy (Policy_Grid, Current_Policy, Actions, Row, Col);
       end loop;
 
    exception
