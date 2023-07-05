@@ -85,24 +85,27 @@ package body Support_21A is
       --  Mat_Transition indicates whether or not a given action will cause
       --  a transition between a given pair of locations.
       Mat_Transition : constant Boolean_Tensor :=
-        Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions, Mat_Map);
+        Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
+                                   Mat_Map);
       Beta              : constant Float := 10.0;
       Gamma             : constant Float := 0.9;
       Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
                                              1 .. Num_Actions);
-      --        Q_Act             : Real_Float_Matrix (1 .. Num_Cols, 1 .. Num_Acts);
-      rk                : Integer_Matrix (Grid_Map'Range, 1 .. 1);
-      rfk               : Integer_Tensor (Grid_Map'Range, Grid_Map'Range (2), 1 .. 1);
+      rk                : Integer_Matrix (1 .. Num_Rows, 1 .. 1);
+      rfk               : Integer_Tensor (1 .. Num_Rows, 1 .. Num_Cols, 1 .. 1);
       rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       v                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       Pi                : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
+      --  Rewards   (0, -1, -1, -1, 10);
       for row in Rewards'Range loop
          rk (row, 1) := Rewards (row);
       end loop;
+      Print_Integer_Matrix (Routine_Name & "rk", rk);
 
+      --  rfk maps each location to its reward value
       rfk := Product (Mat_Map, rk);
 
       for row in rfk'Range loop
@@ -113,17 +116,15 @@ package body Support_21A is
       end loop;
       v := rffk;
 
-      --        for count in 1 .. 50 loop
-      for count in 1 .. 2 loop
+      for count in 1 .. 50 loop
+         --        for count in 1 .. 5 loop
          Q := Compute_Q (Mat_Transition, v, Num_Actions);
-         Print_Float_Matrix (Routine_Name & "Q", Q);
-         --           Print_Float_Matrix (Routine_Name & "Beta * Q", Beta * Q);
          Pi := Python.Call (Classifier, "softmax", Beta * Q);
-         --           Print_Float_Matrix (Routine_Name & "Pi", Pi);
          Pi_Q := H_Product (Q, Pi);
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
          v := rffk + gamma * Pi_Q_Sum;
       end loop;
+      Print_Float_Matrix (Routine_Name & "v", v);
 
       Plot_Policy (Pi, Actions, Num_Rows, Num_Cols);
 
@@ -222,7 +223,7 @@ package body Support_21A is
       --                    Integer'Image (Mat_Trans'Length) &
       --                    Integer'Image (Mat_Trans'Length (2)) &
       --                    Integer'Image (Mat_Trans'Length (3)));
-      Print_Float_Matrix (Routine_Name & "v", v);
+      --        Print_Float_Matrix (Routine_Name & "v", v);
       for act_index in 1 .. Num_Acts loop
          declare
             Q_Act : constant Real_Float_Matrix :=
