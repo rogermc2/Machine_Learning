@@ -8,20 +8,20 @@ with Basic_Printing; use Basic_Printing;
 
 package body Support_21A is
 
-   type Acts_Array is array (Integer range <>) of Acts_Range;
+   type Actions_Array is array (Integer range <>) of Actions_Range;
 
    function Compute_Map_Matrix (Grid_Map : Integer_Matrix; Num_Cats : Positive)
                                 return Boolean_Tensor;
    function Compute_Q (Mat_Trans : Boolean_Tensor; v : Real_Float_Matrix;
                        Num_Acts : Integer) return Real_Float_Matrix;
    function Compute_Transition_Matrix
-     (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Acts_Matrix;
+     (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Actions_Matrix;
       Mat_Map : Boolean_Tensor) return Boolean_Tensor;
    function Dot_Trans_V (Trans : Boolean_Tensor; Trans_Row : Positive;
                          V : Real_Float_Matrix) return Real_Float_Matrix;
-   function Get_Action (Matrix : Acts_Matrix; Row : Integer)
-                        return Acts_Array;
-   function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float;
+   function Get_Action (Matrix : Actions_Matrix; Row : Integer)
+                        return Actions_Array;
+   function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float;
    function Product (L : Boolean_Tensor; R : Integer_Matrix) return Integer_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
@@ -75,7 +75,7 @@ package body Support_21A is
       Num_Actions       : constant Positive := 5;
       Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       --  Acts defines how each action changes the row and column
-      Actions           : constant Acts_Matrix (1 .. Num_Actions, 1 ..2) :=
+      Actions           : constant Actions_Matrix (1 .. Num_Actions, 1 ..2) :=
         ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       --  Mat_Map is a binarised version of Grid_Map in which the value of
       --  Mat_Map is 1 (otherwise 0) if the Grid_Map row and column
@@ -95,7 +95,7 @@ package body Support_21A is
       rfk               : Integer_Tensor (1 .. Num_Rows, 1 .. Num_Cols, 1 .. 1);
       rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       v                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
-      Pi                : Real_Float_Matrix (Q'Range, Q'Range (2));
+      Policy            : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
@@ -119,14 +119,14 @@ package body Support_21A is
       for count in 1 .. 50 loop
          --        for count in 1 .. 5 loop
          Q := Compute_Q (Mat_Transition, v, Num_Actions);
-         Pi := Python.Call (Classifier, "softmax", Beta * Q);
-         Pi_Q := H_Product (Q, Pi);
+         Policy := Python.Call (Classifier, "softmax", Beta * Q);
+         Pi_Q := H_Product (Q, Policy);
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
          v := rffk + gamma * Pi_Q_Sum;
       end loop;
       --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
 
-      Plot_Policy (Pi, Actions, Num_Rows, Num_Cols);
+      Plot_Policy (Policy, Actions, Num_Rows, Num_Cols);
 
       return Mat_Transition;
 
@@ -174,10 +174,10 @@ package body Support_21A is
    --  whether or not a given action will cause a transition between a given
    --  pair of locations.
    function Compute_Transition_Matrix
-     (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Acts_Matrix;
+     (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Actions_Matrix;
       Mat_Map : Boolean_Tensor) return Boolean_Tensor is
       Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
-      Current_Action    : Acts_Array (1 .. 2);
+      Current_Action    : Actions_Array (1 .. 2);
       Row_Next          : Positive;
       Col_Next          : Positive;
       Trans_Tensor      : Boolean_Tensor (1 .. Num_Actions, 1 .. Rows_x_Cols,
@@ -275,7 +275,7 @@ package body Support_21A is
    --  -------------------------------------------------------------------------
 
    procedure Find_Policy (Policy_Grid : in out Integer_Matrix;
-                          Pi : Real_Float_Matrix; Acts : Acts_Matrix;
+                          Policy : Real_Float_Matrix; Actions : Actions_Matrix;
                           Row_In, Col_In : Positive) is
       Routine_Name : constant String := "Support_21A.Find_Policy ";
       Num_Cols : constant Positive := Policy_Grid'Length (2);
@@ -292,26 +292,27 @@ package body Support_21A is
                   Integer'Image (Row) & Integer'Image (Col));
       Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
                   Integer'Image (Policy_Grid (Row, Col)));
-      Assert ( Pi (Row, 1)'Valid, Routine_Name & "invalid Pi: " &
-                 Float'Image  (Pi (Row, 1)));
+      Assert (Policy (Row, 1)'Valid, Routine_Name & "invalid Pi: " &
+                 Float'Image  (Policy (Row, 1)));
       --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
       while Policy_Grid (Row, Col) = 6 loop
          Pi_Row := (Row - 1) * Num_Cols + 1;
-         Max_Prob := Pi_Max (Pi, Pi_Row + Col - 1);
+         Max_Prob := Pi_Max (Policy, Pi_Row + Col - 1);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
          for ana in 1 .. 5 loop
-            if Pi (Pi_Row, ana) = Max_Prob then
+            if Policy (Pi_Row, ana) = Max_Prob then
                A := ana;
             end if;
          end loop;
          Put_Line (Routine_Name & "A" & Integer'Image (A));
          Put_Line (Routine_Name & "Col" & Integer'Image (Col));
-         Put_Line (Routine_Name & "Acts (A-1, 2): " & Integer'Image (Acts (A-1, 2)));
+         Put_Line (Routine_Name & "Actions (A-1, 2): " &
+                     Integer'Image (Actions (A-1, 2)));
 
          Policy_Grid (Row, Col) := A;
-         Row := Clip (Row + Acts (A, 1), 1, Num_Rows);
-         Col := Clip (Col + Acts (A, 2), 1, Num_Cols);
-         Find_Policy (Policy_Grid, Pi, Acts, Row, Col);
+         Row := Clip (Row + Actions (A, 1), 1, Num_Rows);
+         Col := Clip (Col + Actions (A, 2), 1, Num_Cols);
+         Find_Policy (Policy_Grid, Policy, Actions, Row, Col);
       end loop;
 
    exception
@@ -324,9 +325,9 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Action (Matrix : Acts_Matrix; Row : Integer)
-                        return Acts_Array is
-      Result : Acts_Array (Matrix'Range (2));
+   function Get_Action (Matrix : Actions_Matrix; Row : Integer)
+                        return Actions_Array is
+      Result : Actions_Array (Matrix'Range (2));
    begin
       for col in Matrix'Range (2) loop
          Result (col) := Matrix  (Row, col);
@@ -338,14 +339,14 @@ package body Support_21A is
 
    --  ------------------------------------------------------------------------
 
-   function Pi_Max (Pi : Real_Float_Matrix; Row : Positive) return Float is
+   function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float is
       Routine_Name : constant String := "Support_21A.Pi_Max ";
-      Result : Float := Pi (Row, 1);
+      Result       : Float := Policy (Row, 1);
    begin
       Put_Line (Routine_Name & "Result" & Float'Image (Result));
-      for col in Pi'Range (2) loop
-         if Pi (Row, col) > Result then
-            Result := Pi (Row, col);
+      for col in Policy'Range (2) loop
+         if Policy (Row, col) > Result then
+            Result := Policy (Row, col);
          end if;
       end loop;
 
@@ -355,7 +356,7 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Plot_Policy (Pi : Real_Float_Matrix; Acts : Acts_Matrix;
+   procedure Plot_Policy (Policy : Real_Float_Matrix; Actions : Actions_Matrix;
                           Num_Rows, Num_Cols : Positive) is
       use Ada.Strings.Unbounded;
       --        Routine_Name : constant String := "Support_21A.Plot_Policy ";
@@ -363,7 +364,7 @@ package body Support_21A is
       Policy_Grid : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
       Line        : Unbounded_String;
    begin
-      Find_Policy (Policy_Grid, Pi, Acts, 1, 1);
+      Find_Policy (Policy_Grid, Policy, Actions, 1, 1);
 
       for row in 1 .. Num_Rows loop
          Line := To_Unbounded_String ("");
