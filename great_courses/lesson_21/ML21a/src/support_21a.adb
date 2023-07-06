@@ -297,7 +297,7 @@ package body Support_21A is
       --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
       while Policy_Grid (Row, Col) = 6 loop
          Policy_Row := (Row - 1) * Num_Cols + 1;
-         Max_Prob := Pi_Max (Current_Policy, Policy_Row + Col - 1);
+         Max_Prob := Pi_Max (Current_Policy, Policy_Row + Col);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
          for act in 1 .. 5 loop
             if Current_Policy (Policy_Row, act) = Max_Prob then
@@ -359,12 +359,13 @@ package body Support_21A is
    procedure Plot_Policy (Policy : Real_Float_Matrix; Actions : Actions_Matrix;
                           Num_Rows, Num_Cols : Positive) is
       use Ada.Strings.Unbounded;
-      --        Routine_Name : constant String := "Support_21A.Plot_Policy ";
-      Signs       : constant String (1 .. 7) := "^>v<x? ";
-      Policy_Grid : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
-      Line        : Unbounded_String;
+      Routine_Name : constant String := "Support_21A.Plot_Policy ";
+      Signs        : constant String (1 .. 7) := "^>v<x? ";
+      Policy_Grid  : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
+      Line         : Unbounded_String;
    begin
       Find_Policy (Policy_Grid, Policy, Actions, 1, 1);
+      Print_Integer_Matrix (Routine_Name & "Policy_Grid", Policy_Grid);
 
       for row in 1 .. Num_Rows loop
          Line := To_Unbounded_String ("");
