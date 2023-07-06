@@ -288,8 +288,6 @@ package body Support_21A is
       Max_Prob     : Float;
       Action       : Natural := 6;
    begin
-      Put_Line (Routine_Name & "Num_Rows, Num_Cols:" &
-                  Integer'Image (Num_Rows) & Integer'Image (Num_Cols));
       Put_Line (Routine_Name & "Row, Col:" &
                   Integer'Image (Row) & Integer'Image (Col));
       Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
