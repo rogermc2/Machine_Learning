@@ -281,7 +281,7 @@ package body Support_21A is
       Actions : Actions_Matrix; Row_In, Col_In : Positive) is
       Routine_Name : constant String := "Support_21A.Find_Policy ";
       Num_Cols     : constant Positive := Policy_Grid'Length (2);
-      Num_Rows     : constant Positive := Policy_Grid'Length;
+--        Num_Rows     : constant Positive := Policy_Grid'Length;
       Row          : Positive := Row_In;
       Col          : Positive := Col_In;
       Row_Offset   : Natural;
