@@ -22,7 +22,9 @@ package body Support_21A is
    function Get_Action (Matrix : Actions_Matrix; Row : Integer)
                         return Actions_Array;
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float;
-   function Product (L : Boolean_Tensor; R : Integer_Matrix) return Integer_Tensor;
+   procedure Print_Actions_Matrix (Name  : String; aMatrix : Actions_Matrix);
+   function Product (L : Boolean_Tensor; R : Integer_Matrix)
+                     return Integer_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -282,7 +284,7 @@ package body Support_21A is
       Num_Rows     : constant Positive := Policy_Grid'Length;
       Row          : Positive := Row_In;
       Col          : Positive := Col_In;
-      Policy_Row   : Positive;
+      Row_Offset   : Natural;
       Max_Prob     : Float;
       Action       : Natural := 6;
    begin
@@ -293,25 +295,24 @@ package body Support_21A is
       Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
                   Integer'Image (Policy_Grid (Row, Col)));
       Assert (Current_Policy (Row, 1)'Valid, Routine_Name & "invalid Policy: " &
-                 Float'Image  (Current_Policy (Row, 1)));
+                Float'Image  (Current_Policy (Row, 1)));
       --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
       while Policy_Grid (Row, Col) = 6 loop
-         Policy_Row := (Row - 1) * Num_Cols + 1;
-         Max_Prob := Pi_Max (Current_Policy, Policy_Row + Col);
+         Row_Offset := (Row - 1) * Num_Cols;
+         Max_Prob := Pi_Max (Current_Policy, Row_Offset + Col);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
          for act in 1 .. 5 loop
-            if Current_Policy (Policy_Row, act) = Max_Prob then
+            if Current_Policy (Row_Offset + 1, act) = Max_Prob then
                Action := act;
             end if;
          end loop;
-         Put_Line (Routine_Name & "Action" & Integer'Image (Action));
-         Put_Line (Routine_Name & "Col" & Integer'Image (Col));
-         Put_Line (Routine_Name & "Actions (Action-1, 2): " &
-                     Integer'Image (Actions (Action-1, 2)));
 
          Policy_Grid (Row, Col) := Action;
-         Row := Clip (Row + Actions (Action, 1), 1, Num_Rows);
-         Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
+         Put_Line (Routine_Name & "next Action" & Integer'Image (Action));
+         Row := Row + Actions (Action, 1);
+         Col := Col + Actions (Action, 2);
+         Put_Line (Routine_Name & "next Row" & Integer'Image (Row));
+         Put_Line (Routine_Name & "next Col" & Integer'Image (Col));
          Find_Policy (Policy_Grid, Current_Policy, Actions, Row, Col);
       end loop;
 
@@ -340,10 +341,9 @@ package body Support_21A is
    --  ------------------------------------------------------------------------
 
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float is
-      Routine_Name : constant String := "Support_21A.Pi_Max ";
+      --        Routine_Name : constant String := "Support_21A.Pi_Max ";
       Result       : Float := Policy (Row, 1);
    begin
-      Put_Line (Routine_Name & "Result" & Float'Image (Result));
       for col in Policy'Range (2) loop
          if Policy (Row, col) > Result then
             Result := Policy (Row, col);
@@ -364,6 +364,7 @@ package body Support_21A is
       Policy_Grid  : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
       Line         : Unbounded_String;
    begin
+      Print_Actions_Matrix (Routine_Name & "Actions", Actions);
       Find_Policy (Policy_Grid, Policy, Actions, 1, 1);
       Print_Integer_Matrix (Routine_Name & "Policy_Grid", Policy_Grid);
 
@@ -378,6 +379,24 @@ package body Support_21A is
    end Plot_Policy;
 
    --  -------------------------------------------------------------------------
+
+   procedure Print_Actions_Matrix  (Name : String; aMatrix : Actions_Matrix) is
+   begin
+      Put_Line (Name & ": ");
+      for row in aMatrix'Range loop
+         for col in aMatrix'Range (2) loop
+            Put (Integer'Image (aMatrix (row, col)) & "  ");
+         end loop;
+
+         if aMatrix'Length (2) > 1 then
+            New_Line;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Actions_Matrix;
+
+   --  ------------------------------------------------------------------------
 
    --  for matrix L of dimensions (m,n,p) and R of dimensions (p,s)
    --  C(i, j, k) = sum[r=1 to p] L(i, j, r) * R(r, k)
