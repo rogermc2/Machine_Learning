@@ -3,7 +3,7 @@ import numpy as np
 import math
 import tensorflow as tf
 import keras.backend as K
-import seaborn as sns
+#import seaborn as sns
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 import matplotlib.colors as mcolors
@@ -18,14 +18,14 @@ import matplotlib.colors as mcolors
     
 def policy(r, matmap, mattrans):
     rk = K.placeholder(len(r))
-    rfk = K.dot(K.constant(np.asaarray(matmap)),K.reshape(rk,(-1,1)))
+    rfk = K.dot(K.constant(np.asarray(matmap)),K.reshape(rk,(-1,1)))
     rffk = K.reshape(rfk,(-1,1))
      
     v = K.reshape(rfk,(-1,1))
     gamma = 0.90
     beta = 10.0
     
-    trans=np.asaarray(mattrans)
+    trans=np.asarray(mattrans)
     for _ in range(50):
         q0 = K.dot(K.constant(trans[0]),v)
         q1 = K.dot(K.constant(trans[1]),v)
@@ -35,7 +35,7 @@ def policy(r, matmap, mattrans):
         Q = K.concatenate([q0,q1,q2,q3,q4])
         pi = K.softmax(beta*Q)
         v = rffk + gamma * K.reshape(K.sum(Q * pi,axis=1),(-1,1))
-    return tuple(Q, pi, v)
+    return (tuple(Q), tuple(pi), tuple(v))
     
 def plan(rk, pi, Q):
     planner = K.function([rk], [np.asarray (pi), np.asarray (Q)])

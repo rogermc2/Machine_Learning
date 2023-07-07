@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
 with Basic_Printing; use Basic_Printing;
---  with Python_API;
+with Python_API;
 with Python_21A;
 
 package body Support_21A is
@@ -73,11 +73,11 @@ package body Support_21A is
                       Grid_Map                     : Integer_Matrix)
                       return Boolean_Tensor is
 --        use Real_Float_Arrays;
---        Routine_Name : constant String := "Support_21A.Binarize ";
+      Routine_Name : constant String := "Support_21A.Binarize ";
       Rewards           : constant Integer_Array (Grid_Map'Range) :=
         (0, -1, -1, -1, 10);
       Num_Actions       : constant Positive := 5;
-      Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
+--        Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       --  Acts defines how each action changes the row and column
       Actions           : constant Actions_Matrix (1 .. Num_Actions, 1 ..2) :=
         ((-1,0), (0,1), (1,0), (0,-1), (0,0));
@@ -93,21 +93,29 @@ package body Support_21A is
                                    Mat_Map);
 --        Beta              : constant Float := 10.0;
 --        Gamma             : constant Float := 0.9;
-      Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
-                                             1 .. Num_Actions);
+      Q                 : Python_API.PyObject_Ptr;
+--        Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
+--                                               1 .. Num_Actions);
 --        rk_place          : Python_API.PyObject_Ptr;
 --        rk                : Integer_Matrix (1 .. Num_Rows, 1 .. 1);
 --        rfk               : Integer_Tensor (1 .. Num_Rows, 1 .. Num_Cols, 1 .. 1);
 --        rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
-      V                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
-      Policy            : Real_Float_Matrix (Q'Range, Q'Range (2));
+--        V                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
+--        Policy            : Real_Float_Matrix (Q'Range, Q'Range (2));
+      V                 : Python_API.PyObject_Ptr;
+      Policy            : Python_API.PyObject_Ptr;
 --        Policy_Out        : Real_Float_Matrix (Q'Range, Q'Range (2));
 --        Q_Out             : Real_Float_Matrix (Q'Range, Q'Range (2));
 --        Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
 --        Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
+      Put_Line (Routine_Name);
+
       --  Rewards   (0, -1, -1, -1, 10);
-      Python_21A.Policy (Classifier, Rewards, Mat_Map, Mat_Transition, Policy, Q, V);
+      Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition,
+                             Policy, Q, V);
+      Put_Line (Routine_Name & "Policy set");
+
 --        for row in Rewards'Range loop
 --           rk (row, 1) := Rewards (row);
 --        end loop;
@@ -140,7 +148,7 @@ package body Support_21A is
 --        Python_21A.Plan (Classifier, rk_place, Policy, Q, Policy_Out, Q_Out);
 --        Put_Line (Routine_Name & "Planner set");
 
-      Plot_Policy (Policy, Actions, Num_Rows, Num_Cols);
+--        Plot_Policy (Policy, Actions, Num_Rows, Num_Cols);
 
       return Mat_Transition;
 
