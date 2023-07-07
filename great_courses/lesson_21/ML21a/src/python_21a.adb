@@ -47,7 +47,7 @@ package body Python_21A is
 
    procedure Parse_Tuple (Tuple : PyObject_Ptr;
                           Pi, Q : out Real_Float_Matrix) is
---        Routine_Name : constant String := "Parsers.Parse_Tuple ";
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple ";
    begin
       Pi := Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 0));
       Q := Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 1));
@@ -56,31 +56,37 @@ package body Python_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Planner (Classifier : Python.Module; R : Integer_Array;
-                      Pi, Q      : out Real_Float_Matrix) is
+   procedure Plan (Classifier    : Python.Module; R : PyObject_Ptr;
+                   Pi, Q         :  Real_Float_Matrix;
+                   Pi_Out, Q_Out : out Real_Float_Matrix) is
       use Tuple_Builder;
-      Routine_Name    : constant String := "Python_21A.Planner  ";
+      Routine_Name    : constant String := "Python_21A.Plan  ";
 
-      function Py_BuildValue (Format : char_array; O1 : PyObject_Ptr)
+      function Py_BuildValue (Format : char_array; O1, T1, T2 : PyObject_Ptr)
                               return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F        : constant PyObject_Ptr := Python.Get_Symbol (Classifier, "plan");
-      R_Tuple  : constant PyObject_Ptr := To_Tuple (R);
+      Pi_Tuple : constant PyObject_Ptr := To_Tuple (Pi);
+      Q_Tuple  : constant PyObject_Ptr := To_Tuple (Q);
       PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
    begin
       Put_Line (Routine_Name);
-      PyParams := Py_BuildValue (To_C ("(O)"), R_Tuple);
+      PyParams := Py_BuildValue (To_C ("OOO"), R, Pi_Tuple, Q_Tuple);
+      Put_Line (Routine_Name & "Call_Object");
       PyResult := Python.Call_Object (F, PyParams);
       Py_DecRef (F);
-      Py_DecRef (R_Tuple);
+      Py_DecRef (Pi_Tuple);
+      Py_DecRef (Q_Tuple);
       Py_DecRef (PyParams);
+      Put_Line (Routine_Name & "parse");
 
-      Parse_Tuple (PyResult, Pi, Q);
+      Parse_Tuple (PyResult, Pi_Out, Q_Out);
       Py_DecRef (PyResult);
+      Put_Line (Routine_Name & "done");
 
-   end Planner;
+   end Plan;
 
    --  -------------------------------------------------------------------------
 

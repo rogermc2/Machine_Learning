@@ -570,6 +570,33 @@ package body Python is
    --  -------------------------------------------------------------------------
 
    function Call (M : Python.Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Integer_Array)
+                  return Python_API.PyObject_Ptr is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format : char_array; T1 : PyObject_Ptr)
+                              return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F            : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
+      A_Tuple      : constant PyObject_Ptr := To_Tuple (A);
+      PyParams     : PyObject_Ptr;
+      PyResult     : PyObject_Ptr;
+   begin
+      PyParams := Py_BuildValue (To_C ("(O)"), A_Tuple);
+      PyResult := Python.Call_Object (F, PyParams);
+
+      Py_DecRef (F);
+      Py_DecRef (A_Tuple);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
+   function Call (M : Python.Module; Function_Name : String;
                   A : ML_Arrays_And_Matrices.Integer_Array_List;
                   B : ML_Types.Integer_List) return Python_API.PyObject_Ptr is
       use Interfaces.C;

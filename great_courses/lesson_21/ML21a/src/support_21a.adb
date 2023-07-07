@@ -5,6 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
 with Basic_Printing; use Basic_Printing;
+with Python_API;
 with Python_21A;
 
 package body Support_21A is
@@ -94,6 +95,7 @@ package body Support_21A is
       Gamma             : constant Float := 0.9;
       Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
                                              1 .. Num_Actions);
+      rk_place          : Python_API.PyObject_Ptr;
       rk                : Integer_Matrix (1 .. Num_Rows, 1 .. 1);
       rfk               : Integer_Tensor (1 .. Num_Rows, 1 .. Num_Cols, 1 .. 1);
       rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
@@ -121,8 +123,7 @@ package body Support_21A is
       end loop;
       v := rffk;
 
-      Python_21A.Planner (Classifier, rk, Policy_Out, Q_Out);
-      Put_Line (Routine_Name & "Planner set");
+      rk_place := Python.Call (Classifier, "place_holder", Rewards);
 
       for count in 1 .. 50 loop
          --        for count in 1 .. 5 loop
@@ -135,6 +136,8 @@ package body Support_21A is
          v := rffk + gamma * Pi_Q_Sum;
       end loop;
       --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
+      Python_21A.Plan (Classifier, rk_place, Policy, Q, Policy_Out, Q_Out);
+      Put_Line (Routine_Name & "Planner set");
 
       Plot_Policy (Policy, Actions, Num_Rows, Num_Cols);
 

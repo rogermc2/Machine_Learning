@@ -12,8 +12,12 @@ def softmax(beta_Q):
     bq=np.asarray(beta_Q)
     return tuple(map (tuple, K.softmax(bq)))
     
-def plan():
-    planner = K.function([rk], [pi, Q])
+def place_holder(r):
+    print("place_holder", len(r))
+    return K.placeholder(len(r))
+    
+def plan(rk, pi, Q):
+    planner = K.function([rk], [np.asarray (pi), np.asarray (Q)])
     r = np.array([0, -1, -1, -1, 10])
     piout, Qout = planner([r])
 
