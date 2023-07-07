@@ -11,6 +11,7 @@ with Tuple_Builder;
 
 package body Python_21A is
 
+   function To_Tuple (Data : Support_21A.Boolean_Tensor)  return PyObject_Ptr;
    function To_Tuple (Data : Support_21A.Float_Tensor)  return PyObject_Ptr;
 
    --  -------------------------------------------------------------------------
@@ -47,10 +48,22 @@ package body Python_21A is
 
    procedure Parse_Tuple (Tuple : PyObject_Ptr;
                           Pi, Q : out Real_Float_Matrix) is
-      --        Routine_Name : constant String := "Parsers.Parse_Tuple ";
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q ";
    begin
       Pi := Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 0));
       Q := Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 1));
+
+   end Parse_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Parse_Tuple (Tuple : PyObject_Ptr;
+                          Pi, Q, V : out Real_Float_Matrix) is
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q, V ";
+   begin
+      Pi := Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 0));
+      Q := Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 1));
+      V := Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 2));
 
    end Parse_Tuple;
 
@@ -87,6 +100,65 @@ package body Python_21A is
       Put_Line (Routine_Name & "done");
 
    end Plan;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Policy (Classifier  : Python.Module; R : Integer_Array;
+                     Mat_Map, Mat_Transition : Support_21A.Boolean_Tensor;
+                     Pi, Q, V : out Real_Float_Matrix)is
+      use Tuple_Builder;
+      Routine_Name    : constant String := "Python_21A.Policy  ";
+
+      function Py_BuildValue (Format : char_array; T1, T2, T3 : PyObject_Ptr)
+                              return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+
+      F           : constant PyObject_Ptr := Python.Get_Symbol (Classifier, "policy");
+      R_Tuple     : constant PyObject_Ptr := To_Tuple (R);
+      Map_Tuple   : constant PyObject_Ptr := To_Tuple (Mat_Map);
+      Trans_Tuple : constant PyObject_Ptr := To_Tuple (Mat_Transition);
+      PyParams    : PyObject_Ptr;
+      PyResult    : PyObject_Ptr;
+   begin
+      Put_Line (Routine_Name);
+      PyParams := Py_BuildValue (To_C ("OOO"), R_Tuple, Map_Tuple, Trans_Tuple);
+      Put_Line (Routine_Name & "Call_Object");
+      PyResult := Python.Call_Object (F, PyParams);
+      Py_DecRef (F);
+      Py_DecRef (R_Tuple);
+      Py_DecRef (Map_Tuple);
+      Py_DecRef (Trans_Tuple);
+      Py_DecRef (PyParams);
+      Put_Line (Routine_Name & "parse");
+
+      Parse_Tuple (PyResult, Pi, Q, V);
+      Py_DecRef (PyResult);
+      Put_Line (Routine_Name & "done");
+
+   end Policy;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : Support_21A.Boolean_Tensor)  return PyObject_Ptr is
+      Routine_Name  : constant String := "Python_21a.To_Tuple Boolean_Tensor ";
+      Result        : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
+      Py_Tensor     : PyObject_Ptr;
+      Py_Index      : int := -1;
+   begin
+      for mat in Data'Range loop
+         Py_Index := Py_Index + 1;
+         Py_Tensor := To_Tuple (Data);
+         PyTuple_SetItem (Result, Py_Index, Py_Tensor);
+      end loop;
+
+      return Result;
+
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise;
+
+   end To_Tuple;
 
    --  -------------------------------------------------------------------------
 
