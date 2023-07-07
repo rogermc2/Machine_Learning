@@ -286,6 +286,7 @@ package body Support_21A is
       Col          : Positive := Col_In;
       Row_Offset   : Natural;
       Max_Prob     : Float;
+      Found        : Boolean;
       Action       : Natural := 6;
    begin
       Put_Line (Routine_Name & "Row, Col:" &
@@ -299,12 +300,15 @@ package body Support_21A is
          Row_Offset := (Row - 1) * Num_Cols;
          Max_Prob := Pi_Max (Current_Policy, Row_Offset + Col);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
+         Found := False;
          for act in 1 .. 5 loop
-            if Current_Policy (Row_Offset + 1, act) = Max_Prob then
+            if not Found and then Current_Policy (Row_Offset + 1, act) = Max_Prob then
+               Found := True;
                Action := act;
             end if;
          end loop;
 
+         --  Action: (-1,0), (0,1), (1,0), (0,-1), (0,0)
          Policy_Grid (Row, Col) := Action;
          Put_Line (Routine_Name & "next Action" & Integer'Image (Action));
          Row := Row + Actions (Action, 1);
