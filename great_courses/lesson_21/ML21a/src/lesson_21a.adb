@@ -32,7 +32,7 @@ procedure Lesson_21A is
 begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_21a");
-   Python.Call (Classifier, "plot", Grid_Map);
+--     Python.Call (Classifier, "plot", Grid_Map);
    Mat_Trans := Binarize (Classifier, Num_Rows, Num_Cols, Num_Cats, Grid_Map);
    --     Python.Call (Classifier, "plot_matrix", Grid_Map);
    Python.Finalize;

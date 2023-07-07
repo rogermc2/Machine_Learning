@@ -8,26 +8,6 @@ from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 import matplotlib.colors as mcolors
 
-def init_tokenizer(max_words):
-    return tf.keras.preprocessing.text.Tokenizer(num_words=max_words)
-
-def fit (tokenizer, newsgroups_data):
-    tokenizer.fit_on_texts(newsgroups_data)
-
-def get_sequences (tokenizer, newsgroups_data):
-    return tuple (map(tuple,tokenizer.texts_to_sequences(newsgroups_data)))
-
-def get_word_index (tokenizer):
-    tuple_list = [(key, value) for key, value in tokenizer.word_index.items()]
-    return tuple (tuple_list)
-
-
-def get_labels (sequences, max_sequence_length):
-    sequences_list =[]
-    for item in sequences:
-        sequences_list.append(list(item))
-    return tf.keras.preprocessing.sequence.pad_sequences(sequences_list, maxlen=max_sequence_length)
-    
 def softmax(beta_Q):
     bq=np.asarray(beta_Q)
     return tuple(map (tuple, K.softmax(bq)))

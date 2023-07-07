@@ -1,10 +1,11 @@
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Exceptions; use Ada.Exceptions;
+--  with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
 with Basic_Printing; use Basic_Printing;
+with Python_21A;
 
 package body Support_21A is
 
@@ -98,6 +99,8 @@ package body Support_21A is
       rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       v                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       Policy            : Real_Float_Matrix (Q'Range, Q'Range (2));
+      Policy_Out        : Real_Float_Matrix (Q'Range, Q'Range (2));
+      Q_Out             : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
       Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
@@ -118,10 +121,15 @@ package body Support_21A is
       end loop;
       v := rffk;
 
+      Python_21A.Planner (Classifier, rk, Policy_Out, Q_Out);
+      Put_Line (Routine_Name & "Planner set");
+
       for count in 1 .. 50 loop
          --        for count in 1 .. 5 loop
          Q := Compute_Q (Mat_Transition, v, Num_Actions);
+
          Policy := Python.Call (Classifier, "softmax", Beta * Q);
+
          Pi_Q := H_Product (Q, Policy);
          Pi_Q_Sum := Sum_Each_Column (Pi_Q);
          v := rffk + gamma * Pi_Q_Sum;
@@ -286,7 +294,7 @@ package body Support_21A is
       Col          : Positive := Col_In;
       Row_Offset   : Natural;
       Max_Prob     : Float;
-      Found        : Boolean;
+--        Found        : Boolean;
       Action       : Natural := 6;
    begin
       Put_Line (Routine_Name & "Row, Col:" &
@@ -300,10 +308,15 @@ package body Support_21A is
          Row_Offset := (Row - 1) * Num_Cols;
          Max_Prob := Pi_Max (Current_Policy, Row_Offset + Col);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
-         Found := False;
+--           Found := False;
          for act in 1 .. 5 loop
-            if not Found and then Current_Policy (Row_Offset + 1, act) = Max_Prob then
-               Found := True;
+            if Current_Policy (Row_Offset + 1, act) = Max_Prob then
+               Print_Float_Matrix (Routine_Name & "Current_Policy row" &
+                                       Integer'Image (Row_Offset + 1),
+                                     Slice (Current_Policy, Row_Offset + 1,
+                                       Row_Offset + 1));
+--              if not Found and then Current_Policy (Row_Offset + 1, act) = Max_Prob then
+--                 Found := True;
                Action := act;
             end if;
          end loop;
@@ -318,12 +331,12 @@ package body Support_21A is
          Find_Policy (Policy_Grid, Current_Policy, Actions, Row, Col);
       end loop;
 
-   exception
-      when Error: Constraint_Error => Put_Line (Routine_Name &
-                                                  "Constraint_Error");
-         Put_Line (Exception_Information(Error));
-      when Error: others => Put_Line (Routine_Name & "exception");
-         Put_Line (Exception_Information(Error));
+--     exception
+--        when Error: Constraint_Error => Put_Line (Routine_Name &
+--                                                    "Constraint_Error");
+--           Put_Line (Exception_Information(Error));
+--        when Error: others => Put_Line (Routine_Name & "exception");
+--           Put_Line (Exception_Information(Error));
    end Find_Policy;
 
    --  -------------------------------------------------------------------------
