@@ -14,19 +14,19 @@ package body Support_21A is
 
    function Compute_Map_Matrix (Grid_Map : Integer_Matrix; Num_Cats : Positive)
                                 return Boolean_Tensor;
---     function Compute_Q (Mat_Trans : Boolean_Tensor; v : Real_Float_Matrix;
---                         Num_Acts : Integer) return Real_Float_Matrix;
+   --     function Compute_Q (Mat_Trans : Boolean_Tensor; v : Real_Float_Matrix;
+   --                         Num_Acts : Integer) return Real_Float_Matrix;
    function Compute_Transition_Matrix
      (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Actions_Matrix;
       Mat_Map : Boolean_Tensor) return Boolean_Tensor;
---     function Dot_Trans_V (Trans : Boolean_Tensor; Trans_Row : Positive;
---                           V : Real_Float_Matrix) return Real_Float_Matrix;
+   --     function Dot_Trans_V (Trans : Boolean_Tensor; Trans_Row : Positive;
+   --                           V : Real_Float_Matrix) return Real_Float_Matrix;
    function Get_Action (Matrix : Actions_Matrix; Row : Integer)
                         return Actions_Array;
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float;
    procedure Print_Actions_Matrix (Name  : String; aMatrix : Actions_Matrix);
---     function Product (L : Boolean_Tensor; R : Integer_Matrix)
---                       return Integer_Tensor;
+   --     function Product (L : Boolean_Tensor; R : Integer_Matrix)
+   --                       return Integer_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -72,12 +72,12 @@ package body Support_21A is
                       Num_Rows, Num_Cols, Num_Cats : Positive;
                       Grid_Map                     : Integer_Matrix)
                       return Boolean_Tensor is
---        use Real_Float_Arrays;
+      --        use Real_Float_Arrays;
       Routine_Name : constant String := "Support_21A.Binarize ";
       Rewards           : constant Integer_Array (Grid_Map'Range) :=
         (0, -1, -1, -1, 10);
       Num_Actions       : constant Positive := 5;
---        Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
+      --        Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       --  Acts defines how each action changes the row and column
       Actions           : constant Actions_Matrix (1 .. Num_Actions, 1 ..2) :=
         ((-1,0), (0,1), (1,0), (0,-1), (0,0));
@@ -91,64 +91,69 @@ package body Support_21A is
       Mat_Transition : constant Boolean_Tensor :=
         Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
                                    Mat_Map);
---        Beta              : constant Float := 10.0;
---        Gamma             : constant Float := 0.9;
+      --        Beta              : constant Float := 10.0;
+      --        Gamma             : constant Float := 0.9;
       Q                 : Python_API.PyObject_Ptr;
---        Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
---                                               1 .. Num_Actions);
---        rk_place          : Python_API.PyObject_Ptr;
---        rk                : Integer_Matrix (1 .. Num_Rows, 1 .. 1);
---        rfk               : Integer_Tensor (1 .. Num_Rows, 1 .. Num_Cols, 1 .. 1);
---        rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
---        V                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
---        Policy            : Real_Float_Matrix (Q'Range, Q'Range (2));
+      --        Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
+      --                                               1 .. Num_Actions);
+      --        rk_place          : Python_API.PyObject_Ptr;
+      --        rk                : Integer_Matrix (1 .. Num_Rows, 1 .. 1);
+      --        rfk               : Integer_Tensor (1 .. Num_Rows, 1 .. Num_Cols, 1 .. 1);
+      --        rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
+      --        V                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
+      --        Policy            : Real_Float_Matrix (Q'Range, Q'Range (2));
       V                 : Python_API.PyObject_Ptr;
       Policy            : Python_API.PyObject_Ptr;
---        Policy_Out        : Real_Float_Matrix (Q'Range, Q'Range (2));
---        Q_Out             : Real_Float_Matrix (Q'Range, Q'Range (2));
---        Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
---        Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
+      --        Policy_Out        : Real_Float_Matrix (Q'Range, Q'Range (2));
+      --        Q_Out             : Real_Float_Matrix (Q'Range, Q'Range (2));
+      --        Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
+      --        Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
       Put_Line (Routine_Name);
 
       --  Rewards   (0, -1, -1, -1, 10);
       Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition,
                              Policy, Q, V);
-      Put_Line (Routine_Name & "Policy set");
+      declare
+         Result : constant Python_21A.Pi_Q_Out :=
+           Python_21A.Plan (Classifier, Rewards, Policy, Q);
+      begin
+         Put_Line (Routine_Name & "Policy set");
+      end;
 
---        for row in Rewards'Range loop
---           rk (row, 1) := Rewards (row);
---        end loop;
---        Print_Integer_Matrix (Routine_Name & "rk", rk);
+      --        for row in Rewards'Range loop
+      --           rk (row, 1) := Rewards (row);
+      --        end loop;
+      --        Print_Integer_Matrix (Routine_Name & "rk", rk);
 
       --  rfk maps each location to its reward value
---        rfk := Product (Mat_Map, rk);
---
---        for row in rfk'Range loop
---           for col in rfk'Range (2) loop
---              rffk ((row - 1) * rfk'Length (2) + col, 1) :=
---                Float (rfk (row, col, 1));
---           end loop;
---        end loop;
---        v := rffk;
---
---        rk_place := Python.Call (Classifier, "place_holder", Rewards);
---
---        for count in 1 .. 50 loop
---           --        for count in 1 .. 5 loop
---           Q := Compute_Q (Mat_Transition, v, Num_Actions);
---
---           Policy := Python.Call (Classifier, "softmax", Beta * Q);
---
---           Pi_Q := H_Product (Q, Policy);
---           Pi_Q_Sum := Sum_Each_Column (Pi_Q);
---           v := rffk + gamma * Pi_Q_Sum;
---        end loop;
---        --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
---        Python_21A.Plan (Classifier, rk_place, Policy, Q, Policy_Out, Q_Out);
---        Put_Line (Routine_Name & "Planner set");
+      --        rfk := Product (Mat_Map, rk);
+      --
+      --        for row in rfk'Range loop
+      --           for col in rfk'Range (2) loop
+      --              rffk ((row - 1) * rfk'Length (2) + col, 1) :=
+      --                Float (rfk (row, col, 1));
+      --           end loop;
+      --        end loop;
+      --        v := rffk;
+      --
+      --        rk_place := Python.Call (Classifier, "place_holder", Rewards);
+      --
+      --        for count in 1 .. 50 loop
+      --           --        for count in 1 .. 5 loop
+      --           Q := Compute_Q (Mat_Transition, v, Num_Actions);
+      --
+      --           Policy := Python.Call (Classifier, "softmax", Beta * Q);
+      --
+      --           Pi_Q := H_Product (Q, Policy);
+      --           Pi_Q_Sum := Sum_Each_Column (Pi_Q);
+      --           v := rffk + gamma * Pi_Q_Sum;
+      --        end loop;
+      --        --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
+      --        Python_21A.Plan (Classifier, rk_place, Policy, Q, Policy_Out, Q_Out);
+      --        Put_Line (Routine_Name & "Planner set");
 
---        Plot_Policy (Policy, Actions, Num_Rows, Num_Cols);
+      --        Plot_Policy (Policy, Actions, Num_Rows, Num_Cols);
 
       return Mat_Transition;
 
@@ -233,66 +238,66 @@ package body Support_21A is
 
    --  V reflects how good it is to be in each location looking ahead an
    --  additional step.
---     function Compute_Q (Mat_Trans : Boolean_Tensor; v : Real_Float_Matrix;
---                         Num_Acts  : Integer) return Real_Float_Matrix is
---        Routine_Name : constant String := "Support_21A.Compute_Q ";
---        Q            : Real_Float_Matrix (Mat_Trans'Range (2), Mat_Trans'Range) :=
---          (others =>  (others => 0.0));
---     begin
---        --  Mat_Trans 5, 50, 50; Num_Acts, Num_Rows_x_Num_Cols, Num_Rows_x_Num_Cols
---        --  V 50, 1
---        --        Put_Line (Routine_Name & "Mat_Trans dim:" &
---        --                    Integer'Image (Mat_Trans'Length) &
---        --                    Integer'Image (Mat_Trans'Length (2)) &
---        --                    Integer'Image (Mat_Trans'Length (3)));
---        --        Print_Float_Matrix (Routine_Name & "v", v);
---        for act_index in 1 .. Num_Acts loop
---           declare
---              Q_Act : constant Real_Float_Matrix :=
---                Dot_Trans_V (Mat_Trans, act_index, v);
---           begin
---              --              Print_Float_Matrix (Routine_Name & "Q_Act", Q_Act);
---              for row in Q_Act'Range loop
---                 for col in Q_Act'Range (2) loop
---                    Assert (Q_Act (row, col)'Valid, Routine_Name &
---                              "invalid Q_Act (row, col): " & Integer'Image (row) &
---                              Integer'Image (col) & ": " &
---                              Float'Image  (Q_Act (row, col)));
---                    Q (row, col) := Q_Act (row, col);
---                 end loop;
---              end loop;
---           end;
---        end loop;
---
---        --  Q 50, 5
---        return Q;
---
---     end Compute_Q;
+   --     function Compute_Q (Mat_Trans : Boolean_Tensor; v : Real_Float_Matrix;
+   --                         Num_Acts  : Integer) return Real_Float_Matrix is
+   --        Routine_Name : constant String := "Support_21A.Compute_Q ";
+   --        Q            : Real_Float_Matrix (Mat_Trans'Range (2), Mat_Trans'Range) :=
+   --          (others =>  (others => 0.0));
+   --     begin
+   --        --  Mat_Trans 5, 50, 50; Num_Acts, Num_Rows_x_Num_Cols, Num_Rows_x_Num_Cols
+   --        --  V 50, 1
+   --        --        Put_Line (Routine_Name & "Mat_Trans dim:" &
+   --        --                    Integer'Image (Mat_Trans'Length) &
+   --        --                    Integer'Image (Mat_Trans'Length (2)) &
+   --        --                    Integer'Image (Mat_Trans'Length (3)));
+   --        --        Print_Float_Matrix (Routine_Name & "v", v);
+   --        for act_index in 1 .. Num_Acts loop
+   --           declare
+   --              Q_Act : constant Real_Float_Matrix :=
+   --                Dot_Trans_V (Mat_Trans, act_index, v);
+   --           begin
+   --              --              Print_Float_Matrix (Routine_Name & "Q_Act", Q_Act);
+   --              for row in Q_Act'Range loop
+   --                 for col in Q_Act'Range (2) loop
+   --                    Assert (Q_Act (row, col)'Valid, Routine_Name &
+   --                              "invalid Q_Act (row, col): " & Integer'Image (row) &
+   --                              Integer'Image (col) & ": " &
+   --                              Float'Image  (Q_Act (row, col)));
+   --                    Q (row, col) := Q_Act (row, col);
+   --                 end loop;
+   --              end loop;
+   --           end;
+   --        end loop;
+   --
+   --        --  Q 50, 5
+   --        return Q;
+   --
+   --     end Compute_Q;
 
    --  -------------------------------------------------------------------------
 
---     function Dot_Trans_V (Trans : Boolean_Tensor; Trans_Row : Positive;
---                           V     : Real_Float_Matrix) return Real_Float_Matrix is
---        use Real_Float_Arrays;
---        --        Routine_Name : constant String := "Support_21A.Dot_Trans_V ";
---        Act_Mat    : Real_Float_Matrix (Trans'Range (2), Trans'Range (3)) :=
---          (others => (others => 0.0));
---     begin
---        --  Trans 5, 50, 50; Num_Acts, Num_Rows_x_Num_Cols, Num_Rows_x_Num_Cols
---        --  V 50, 1
---        --  Act_Mat 50, 50
---        for row in Act_Mat'Range loop
---           for col in Act_Mat'Range (2) loop
---              if Trans (Trans_Row, row, col) then
---                 Act_Mat (row, col) := 1.0;
---              end if;
---           end loop;
---        end loop;
---
---        --  Act_Mat * V   50, 1
---        return Act_Mat * V;
---
---     end Dot_Trans_V;
+   --     function Dot_Trans_V (Trans : Boolean_Tensor; Trans_Row : Positive;
+   --                           V     : Real_Float_Matrix) return Real_Float_Matrix is
+   --        use Real_Float_Arrays;
+   --        --        Routine_Name : constant String := "Support_21A.Dot_Trans_V ";
+   --        Act_Mat    : Real_Float_Matrix (Trans'Range (2), Trans'Range (3)) :=
+   --          (others => (others => 0.0));
+   --     begin
+   --        --  Trans 5, 50, 50; Num_Acts, Num_Rows_x_Num_Cols, Num_Rows_x_Num_Cols
+   --        --  V 50, 1
+   --        --  Act_Mat 50, 50
+   --        for row in Act_Mat'Range loop
+   --           for col in Act_Mat'Range (2) loop
+   --              if Trans (Trans_Row, row, col) then
+   --                 Act_Mat (row, col) := 1.0;
+   --              end if;
+   --           end loop;
+   --        end loop;
+   --
+   --        --  Act_Mat * V   50, 1
+   --        return Act_Mat * V;
+   --
+   --     end Dot_Trans_V;
 
    --  -------------------------------------------------------------------------
 
@@ -301,12 +306,12 @@ package body Support_21A is
       Actions : Actions_Matrix; Row_In, Col_In : Positive) is
       Routine_Name : constant String := "Support_21A.Find_Policy ";
       Num_Cols     : constant Positive := Policy_Grid'Length (2);
---        Num_Rows     : constant Positive := Policy_Grid'Length;
+      --        Num_Rows     : constant Positive := Policy_Grid'Length;
       Row          : Positive := Row_In;
       Col          : Positive := Col_In;
       Row_Offset   : Natural;
       Max_Prob     : Float;
---        Found        : Boolean;
+      --        Found        : Boolean;
       Action       : Natural := 6;
    begin
       Put_Line (Routine_Name & "Row, Col:" &
@@ -320,15 +325,15 @@ package body Support_21A is
          Row_Offset := (Row - 1) * Num_Cols;
          Max_Prob := Pi_Max (Current_Policy, Row_Offset + Col);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
---           Found := False;
+         --           Found := False;
          for act in 1 .. 5 loop
             if Current_Policy (Row_Offset + 1, act) = Max_Prob then
                Print_Float_Matrix (Routine_Name & "Current_Policy row" &
-                                       Integer'Image (Row_Offset + 1),
-                                     Slice (Current_Policy, Row_Offset + 1,
-                                       Row_Offset + 1));
---              if not Found and then Current_Policy (Row_Offset + 1, act) = Max_Prob then
---                 Found := True;
+                                     Integer'Image (Row_Offset + 1),
+                                   Slice (Current_Policy, Row_Offset + 1,
+                                     Row_Offset + 1));
+               --              if not Found and then Current_Policy (Row_Offset + 1, act) = Max_Prob then
+               --                 Found := True;
                Action := act;
             end if;
          end loop;
@@ -343,12 +348,12 @@ package body Support_21A is
          Find_Policy (Policy_Grid, Current_Policy, Actions, Row, Col);
       end loop;
 
---     exception
---        when Error: Constraint_Error => Put_Line (Routine_Name &
---                                                    "Constraint_Error");
---           Put_Line (Exception_Information(Error));
---        when Error: others => Put_Line (Routine_Name & "exception");
---           Put_Line (Exception_Information(Error));
+      --     exception
+      --        when Error: Constraint_Error => Put_Line (Routine_Name &
+      --                                                    "Constraint_Error");
+      --           Put_Line (Exception_Information(Error));
+      --        when Error: others => Put_Line (Routine_Name & "exception");
+      --           Put_Line (Exception_Information(Error));
    end Find_Policy;
 
    --  -------------------------------------------------------------------------
@@ -427,35 +432,35 @@ package body Support_21A is
 
    --  for matrix L of dimensions (m,n,p) and R of dimensions (p,s)
    --  C(i, j, k) = sum[r=1 to p] L(i, j, r) * R(r, k)
---     function Product (L : Boolean_Tensor; R : Integer_Matrix) return Integer_Tensor is
---        Routine_Name : constant String := "Support_21A.Product ";
---        L_Int        : Natural;
---        Sum          : Integer;
---        Result       : Integer_Tensor (L'Range, L'Range (2), R'Range (2));
---     begin
---        Assert (R'Length = L'Length (3), Routine_Name &
---                  "R'Length not = L'Length (3)");
---        for li in L'Range loop
---           for lj in L'Range (2) loop
---              for rk in R'Range (2) loop
---                 Sum := 0;
---                 for rr in L'Range (3) loop  -- r
---                    if L(li, lj, rr) then
---                       L_Int := 1;
---                    else
---                       L_Int := 0;
---                    end if;
---                    --  Result(i, j, k) = sum (L(i, j, r) * R(r, k))
---                    Sum := Sum + L_Int * R (rr, rk);
---                 end loop;
---                 Result (li, lj, rk) := Sum;
---              end loop;
---           end loop;
---        end loop;
---
---        return Result;
---
---     end Product;
+   --     function Product (L : Boolean_Tensor; R : Integer_Matrix) return Integer_Tensor is
+   --        Routine_Name : constant String := "Support_21A.Product ";
+   --        L_Int        : Natural;
+   --        Sum          : Integer;
+   --        Result       : Integer_Tensor (L'Range, L'Range (2), R'Range (2));
+   --     begin
+   --        Assert (R'Length = L'Length (3), Routine_Name &
+   --                  "R'Length not = L'Length (3)");
+   --        for li in L'Range loop
+   --           for lj in L'Range (2) loop
+   --              for rk in R'Range (2) loop
+   --                 Sum := 0;
+   --                 for rr in L'Range (3) loop  -- r
+   --                    if L(li, lj, rr) then
+   --                       L_Int := 1;
+   --                    else
+   --                       L_Int := 0;
+   --                    end if;
+   --                    --  Result(i, j, k) = sum (L(i, j, r) * R(r, k))
+   --                    Sum := Sum + L_Int * R (rr, rk);
+   --                 end loop;
+   --                 Result (li, lj, rk) := Sum;
+   --              end loop;
+   --           end loop;
+   --        end loop;
+   --
+   --        return Result;
+   --
+   --     end Product;
 
    --  ----------------------------------------------------------------------------
 
