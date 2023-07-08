@@ -1,6 +1,8 @@
 
-with Interfaces.C; use Interfaces.C;
+with System;
 
+with Interfaces.C; use Interfaces.C;
+with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -45,12 +47,13 @@ package body Python_21A is
 
    -- --------------------------------------------------------------------------
 
-   function Parse_Tuple (Tuple : PyObject_Ptr) return Pi_Q_Out is
-      --        Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q ";
+   function Parse_Tuple (Tuple : PyObject_Ptr) return Plan_Data is
+      Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q ";
       Pi : constant Real_Float_Matrix := Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 0));
       Q  : constant Real_Float_Matrix:= Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 1));
-      Result : Pi_Q_Out (Pi'Length, Pi'Length (2));
+      Result : Plan_Data (Pi'Length, Pi'Length (2));
    begin
+      Put_Line (Routine_Name);
       Result.Pi_Out := Pi;
       Result.Q_Out := Q;
 
@@ -61,19 +64,23 @@ package body Python_21A is
    --  -------------------------------------------------------------------------
 
    procedure Parse_Tuple (Tuple    : PyObject_Ptr;
-                          Pi, Q, V : out Python_API.PyObject_Ptr) is
-      --        Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q, V ";
+                          Rk, Pi, Q, V : out Python_API.PyObject_Ptr) is
+      Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q, V ";
    begin
-      Pi := PyTuple_GetItem (Tuple, 0);
-      Q := PyTuple_GetItem (Tuple, 1);
-      V := PyTuple_GetItem (Tuple, 2);
+      Put_Line (Routine_Name);
+      Rk := PyTuple_GetItem (Tuple, 0);
+      Pi := PyTuple_GetItem (Tuple, 1);
+      Q := PyTuple_GetItem (Tuple, 2);
+      V := PyTuple_GetItem (Tuple, 3);
+      Put_Line (Routine_Name & "done");
 
    end Parse_Tuple;
 
    --  -------------------------------------------------------------------------
 
    function Plan (Classifier : Python.Module;
-                  R, Pi, Q : Python_API.PyObject_Ptr) return Pi_Q_Out is
+                  R, Pi, Q : Python_API.PyObject_Ptr) return Plan_Data is
+      use System;
       Routine_Name : constant String := "Python_21A.Plan  ";
 
       function Py_BuildValue (Format : char_array; O1, O2, O3 : PyObject_Ptr)
@@ -84,15 +91,21 @@ package body Python_21A is
       PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
    begin
-      Put_Line (Routine_Name);
+      Assert (R /= Null_Address, Routine_Name & "R is null");
       PyParams := Py_BuildValue (To_C ("OOO"), R, Pi, Q);
+
+      Put_Line (Routine_Name & "calling object");
       PyResult := Python.Call_Object (F, PyParams);
+      Assert (PyResult /= Null_Address, Routine_Name & "PyResult is null");
+      Put_Line (Routine_Name & "PyResult set");
       Py_DecRef (F);
       Py_DecRef (PyParams);
+      Put_Line (Routine_Name & "parsing");
 
       declare
-         Result : constant Pi_Q_Out := Parse_Tuple (PyResult);
+         Result : constant Plan_Data := Parse_Tuple (PyResult);
       begin
+         Put_Line (Routine_Name & "Result set");
          Py_DecRef (PyResult);
          return Result;
       end;
@@ -104,9 +117,9 @@ package body Python_21A is
    procedure Set_Policy (Classifier     : Python.Module; R : Integer_Array;
                          Mat_Map        : Support_21A.Boolean_Tensor;
                          Mat_Transition : Support_21A.Boolean_Tensor;
-                         Pi, Q, V       : out Python_API.PyObject_Ptr) is
+                         Rk, Pi, Q, V   : out Python_API.PyObject_Ptr) is
       use Tuple_Builder;
-      --        Routine_Name    : constant String := "Python_21A.Set_Policy  ";
+      Routine_Name    : constant String := "Python_21A.Set_Policy  ";
 
       function Py_BuildValue (Format : char_array; T1, T2, T3 : PyObject_Ptr)
                               return PyObject_Ptr;
@@ -120,6 +133,7 @@ package body Python_21A is
       PyParams    : PyObject_Ptr;
       PyResult    : PyObject_Ptr;
    begin
+      Put_Line (Routine_Name);
       PyParams := Py_BuildValue (To_C ("OOO"), R_Tuple, Map_Tuple, Trans_Tuple);
       PyResult := Python.Call_Object (F, PyParams);
 
@@ -129,8 +143,10 @@ package body Python_21A is
       Py_DecRef (Trans_Tuple);
       Py_DecRef (PyParams);
 
-      Parse_Tuple (PyResult, Pi, Q, V);
+      Parse_Tuple (PyResult, Rk, Pi, Q, V);
       Py_DecRef (PyResult);
+
+      Put_Line (Routine_Name & "done");
 
    end Set_Policy;
 

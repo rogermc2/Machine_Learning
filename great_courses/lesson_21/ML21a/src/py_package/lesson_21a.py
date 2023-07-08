@@ -35,10 +35,11 @@ def policy(r, matmap, mattrans):
         Q = K.concatenate([q0,q1,q2,q3,q4])
         pi = K.softmax(beta*Q)
         v = rffk + gamma * K.reshape(K.sum(Q * pi,axis=1),(-1,1))
-    return (tuple(Q), tuple(pi), tuple(v))
+    return (tuple(rk), tuple(Q), tuple(pi), tuple(v))
     
 def plan(rk, pi, Q):
-    planner = K.function([rk], [np.asarray (pi), np.asarray (Q)])
+    print("python plan");
+    planner = K.function([rk[0]], [np.asarray (pi), np.asarray (Q)])
     r = np.array([0, -1, -1, -1, 10])
     piout, Qout = planner([r])
 

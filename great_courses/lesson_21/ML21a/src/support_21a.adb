@@ -96,7 +96,7 @@ package body Support_21A is
       Q                 : Python_API.PyObject_Ptr;
       --        Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
       --                                               1 .. Num_Actions);
-      --        rk_place          : Python_API.PyObject_Ptr;
+      rk_place          : Python_API.PyObject_Ptr;
       --        rk                : Integer_Matrix (1 .. Num_Rows, 1 .. 1);
       --        rfk               : Integer_Tensor (1 .. Num_Rows, 1 .. Num_Cols, 1 .. 1);
       --        rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
@@ -113,10 +113,10 @@ package body Support_21A is
 
       --  Rewards   (0, -1, -1, -1, 10);
       Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition,
-                             Policy, Q, V);
+                             rk_place, Policy, Q, V);
       declare
-         Result : constant Python_21A.Pi_Q_Out :=
-           Python_21A.Plan (Classifier, Rewards, Policy, Q);
+         Result : constant Python_21A.Plan_Data :=
+           Python_21A.Plan (Classifier, rk_place, Policy, Q);
       begin
          Put_Line (Routine_Name & "Policy set");
       end;

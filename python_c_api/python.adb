@@ -205,7 +205,8 @@ package body Python is
 
       if PyResult = System.Null_Address then
          New_Line;
-         Put_Line (Routine_Name & "Python error message:");
+         Put_Line (Routine_Name & 
+                     "PyObject_CallObject failed, Python error message:");
          PyErr_Print;
          raise Interpreter_Error with Routine_Name & "failed.";
       end if;
