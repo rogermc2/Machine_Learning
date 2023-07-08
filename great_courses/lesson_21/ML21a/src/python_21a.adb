@@ -3,7 +3,7 @@ with System;
 
 with Interfaces.C; use Interfaces.C;
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
@@ -49,9 +49,11 @@ package body Python_21A is
 
    function Parse_Tuple (Tuple : PyObject_Ptr) return Plan_Data is
       Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q ";
-      Pi : constant Real_Float_Matrix := Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 0));
-      Q  : constant Real_Float_Matrix:= Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 1));
-      Result : Plan_Data (Pi'Length, Pi'Length (2));
+      Pi           : constant Real_Float_Matrix :=
+                       Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 0));
+      Q            : constant Real_Float_Matrix:=
+                       Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 1));
+      Result       : Plan_Data (Pi'Length, Pi'Length (2));
    begin
       Put_Line (Routine_Name);
       Result.Pi_Out := Pi;
@@ -63,7 +65,7 @@ package body Python_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Parse_Tuple (Tuple    : PyObject_Ptr;
+   procedure Parse_Tuple (Tuple        : PyObject_Ptr;
                           Rk, Pi, Q, V : out Python_API.PyObject_Ptr) is
       Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q, V ";
    begin
@@ -73,13 +75,16 @@ package body Python_21A is
       Q := PyTuple_GetItem (Tuple, 2);
       V := PyTuple_GetItem (Tuple, 3);
       Put_Line (Routine_Name & "done");
-
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise;
    end Parse_Tuple;
 
    --  -------------------------------------------------------------------------
 
    function Plan (Classifier : Python.Module;
-                  R, Pi, Q : Python_API.PyObject_Ptr) return Plan_Data is
+                  R, Pi, Q   : Python_API.PyObject_Ptr) return Plan_Data is
       use System;
       Routine_Name : constant String := "Python_21A.Plan  ";
 
@@ -114,7 +119,8 @@ package body Python_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Set_Policy (Classifier     : Python.Module; R : Integer_Array;
+   procedure Set_Policy (Classifier     : Python.Module;
+                         Rewards        : Integer_Array;
                          Mat_Map        : Support_21A.Boolean_Tensor;
                          Mat_Transition : Support_21A.Boolean_Tensor;
                          Rk, Pi, Q, V   : out Python_API.PyObject_Ptr) is
@@ -125,9 +131,9 @@ package body Python_21A is
                               return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F           : constant PyObject_Ptr :=
-        Python.Get_Symbol (Classifier, "policy");
-      R_Tuple     : constant PyObject_Ptr := To_Tuple (R);
+      F           : constant PyObject_Ptr := Python.Get_Symbol (Classifier,
+                                                                "policy");
+      R_Tuple     : constant PyObject_Ptr := To_Tuple (Rewards);
       Map_Tuple   : constant PyObject_Ptr := To_Tuple (Mat_Map);
       Trans_Tuple : constant PyObject_Ptr := To_Tuple (Mat_Transition);
       PyParams    : PyObject_Ptr;
