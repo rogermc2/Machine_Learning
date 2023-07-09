@@ -118,42 +118,9 @@ package body Support_21A is
          Result : constant Python_21A.Plan_Data :=
            Python_21A.Plan (Classifier, rk_place, Policy, Q);
       begin
-         Put_Line (Routine_Name & "Policy set");
+         Put_Line (Routine_Name & "Plan set");
+         Plot_Policy (Result.Policy, Actions, Result.Rows, Result.Cols);
       end;
-
-      --        for row in Rewards'Range loop
-      --           rk (row, 1) := Rewards (row);
-      --        end loop;
-      --        Print_Integer_Matrix (Routine_Name & "rk", rk);
-
-      --  rfk maps each location to its reward value
-      --        rfk := Product (Mat_Map, rk);
-      --
-      --        for row in rfk'Range loop
-      --           for col in rfk'Range (2) loop
-      --              rffk ((row - 1) * rfk'Length (2) + col, 1) :=
-      --                Float (rfk (row, col, 1));
-      --           end loop;
-      --        end loop;
-      --        v := rffk;
-      --
-      --        rk_place := Python.Call (Classifier, "place_holder", Rewards);
-      --
-      --        for count in 1 .. 50 loop
-      --           --        for count in 1 .. 5 loop
-      --           Q := Compute_Q (Mat_Transition, v, Num_Actions);
-      --
-      --           Policy := Python.Call (Classifier, "softmax", Beta * Q);
-      --
-      --           Pi_Q := H_Product (Q, Policy);
-      --           Pi_Q_Sum := Sum_Each_Column (Pi_Q);
-      --           v := rffk + gamma * Pi_Q_Sum;
-      --        end loop;
-      --        --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
-      --        Python_21A.Plan (Classifier, rk_place, Policy, Q, Policy_Out, Q_Out);
-      --        Put_Line (Routine_Name & "Planner set");
-
-      --        Plot_Policy (Policy, Actions, Num_Rows, Num_Cols);
 
       return Mat_Transition;
 
@@ -342,7 +309,7 @@ package body Support_21A is
          Policy_Grid (Row, Col) := Action;
          Put_Line (Routine_Name & "next Action" & Integer'Image (Action));
          Row := Row + Actions (Action, 1);
-         Col := Col + Actions (Action, 2);
+         Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
          Put_Line (Routine_Name & "next Row" & Integer'Image (Row));
          Put_Line (Routine_Name & "next Col" & Integer'Image (Col));
          Find_Policy (Policy_Grid, Current_Policy, Actions, Row, Col);

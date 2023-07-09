@@ -55,8 +55,8 @@ package body Python_21A is
                        Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 1));
       Result       : Plan_Data (Pi'Length, Pi'Length (2));
    begin
-      Result.Pi_Out := Pi;
-      Result.Q_Out := Q;
+      Result.Policy := Pi;
+      Result.Q := Q;
 
       return Result;
 

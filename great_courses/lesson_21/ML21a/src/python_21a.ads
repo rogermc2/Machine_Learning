@@ -7,8 +7,8 @@ with Support_21A;
 package Python_21A is
 
    type Plan_Data (Rows, Cols : Positive) is record
-      Pi_Out : Real_Float_Matrix (1 .. Rows, 1 .. Cols);
-      Q_Out  : Real_Float_Matrix (1 .. Rows, 1 .. Cols);
+      Policy : Real_Float_Matrix (1 .. Rows, 1 .. Cols);
+      Q      : Real_Float_Matrix (1 .. Rows, 1 .. Cols);
    end record;
 
    function Plan (Classifier : Python.Module;
