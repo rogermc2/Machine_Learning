@@ -11,11 +11,13 @@ package Python_21A is
       Q      : Real_Float_Matrix (1 .. Rows, 1 .. Cols);
    end record;
 
-   function Plan (Classifier : Python.Module;
-                   R, Pi, Q : Python_API.PyObject_Ptr) return Plan_Data;
+   function Plan (Classifier           : Python.Module;
+                  R_Ptr, Pi_Ptr, Q_Ptr : Python_API.PyObject_Ptr)
+                  return Plan_Data;
    procedure Set_Policy (Classifier     : Python.Module;
                          Rewards        : Integer_Array;
                          Mat_Map        : Support_21A.Boolean_Tensor;
                          Mat_Transition : Support_21A.Boolean_Tensor;
-                         Rk, Pi, Q, V   : out Python_API.PyObject_Ptr);
+                         Rk_Ptr, Pi_Ptr : out Python_API.PyObject_Ptr;
+                         Q_Ptr, V_Ptr   : out Python_API.PyObject_Ptr);
 end Python_21A;

@@ -1,8 +1,8 @@
 
-with System;
+--  with System;
 
 with Interfaces.C; use Interfaces.C;
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Exceptions; use Ada.Exceptions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
@@ -78,27 +78,23 @@ package body Python_21A is
    --  -------------------------------------------------------------------------
 
    function Plan (Classifier : Python.Module;
-                  R, Pi, Q   : Python_API.PyObject_Ptr) return Plan_Data is
-      use System;
-      Routine_Name : constant String := "Python_21A.Plan  ";
+                  R_Ptr, Pi_Ptr, Q_Ptr : Python_API.PyObject_Ptr)
+                  return Plan_Data is
+--        use System;
+--        Routine_Name : constant String := "Python_21A.Plan  ";
 
       function Py_BuildValue (Format : char_array; O1, O2, O3 : PyObject_Ptr)
                               return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
-      F        : constant PyObject_Ptr := Python.Get_Symbol (Classifier, "plan");
+      F        : constant PyObject_Ptr :=
+                   Python.Get_Symbol (Classifier, "plan");
       PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
    begin
-      Assert (R /= Null_Address, Routine_Name & "R is null");
-      Assert (Pi /= Null_Address, Routine_Name & "Pi is null");
-      Assert (Q /= Null_Address, Routine_Name & "Q is null");
-
-      PyParams := Py_BuildValue (To_C ("OOO"), R, Pi, Q);
-      Assert (PyParams /= Null_Address, Routine_Name & "PyParams is null");
+      PyParams := Py_BuildValue (To_C ("OOO"), R_Ptr, Pi_Ptr, Q_Ptr);
 
       PyResult := Python.Call_Object (F, PyParams);
-      Assert (PyResult /= Null_Address, Routine_Name & "PyResult is null");
       Py_DecRef (F);
       Py_DecRef (PyParams);
 
@@ -117,7 +113,8 @@ package body Python_21A is
                          Rewards        : Integer_Array;
                          Mat_Map        : Support_21A.Boolean_Tensor;
                          Mat_Transition : Support_21A.Boolean_Tensor;
-                         Rk, Pi, Q, V   : out Python_API.PyObject_Ptr) is
+                         Rk_Ptr, Pi_Ptr : out Python_API.PyObject_Ptr;
+                           Q_Ptr, V_Ptr : out Python_API.PyObject_Ptr) is
       use Tuple_Builder;
 --        Routine_Name    : constant String := "Python_21A.Set_Policy  ";
 
@@ -142,7 +139,7 @@ package body Python_21A is
       Py_DecRef (Trans_Tuple);
       Py_DecRef (PyParams);
 
-      Parse_Tuple (PyResult, Rk, Pi, Q, V);
+      Parse_Tuple (PyResult, Rk_Ptr, Pi_Ptr, Q_Ptr, V_Ptr);
       Py_DecRef (PyResult);
 
    end Set_Policy;
