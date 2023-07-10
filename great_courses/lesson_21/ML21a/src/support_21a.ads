@@ -19,7 +19,6 @@ package Support_21A is
    function Binarize (Classifier : Python.Module;
                       Num_Rows, Num_Cols, Num_Cats : Positive;
                       Grid_Map : Integer_Matrix) return Boolean_Tensor;
-   procedure Plot_Policy (Policy : Real_Float_Matrix; Actions : Actions_Matrix;
-                          Num_Rows, Num_Cols : Positive);
+   procedure Plot_Policy (Policy : Real_Float_Matrix; Actions : Actions_Matrix);
 
 end Support_21A;

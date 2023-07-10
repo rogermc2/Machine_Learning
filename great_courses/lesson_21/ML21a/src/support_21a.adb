@@ -93,17 +93,17 @@ package body Support_21A is
                                    Mat_Map);
       --        Beta              : constant Float := 10.0;
       --        Gamma             : constant Float := 0.9;
-      Q                 : Python_API.PyObject_Ptr;
+      Q_Ptr             : Python_API.PyObject_Ptr;
       --        Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
       --                                               1 .. Num_Actions);
-      rk_place          : Python_API.PyObject_Ptr;
+      rk_Ptr            : Python_API.PyObject_Ptr;
       --        rk                : Integer_Matrix (1 .. Num_Rows, 1 .. 1);
       --        rfk               : Integer_Tensor (1 .. Num_Rows, 1 .. Num_Cols, 1 .. 1);
       --        rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       --        V                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       --        Policy            : Real_Float_Matrix (Q'Range, Q'Range (2));
-      V                 : Python_API.PyObject_Ptr;
-      Policy            : Python_API.PyObject_Ptr;
+      V_Ptr             : Python_API.PyObject_Ptr;
+      Policy_Ptr         : Python_API.PyObject_Ptr;
       --        Policy_Out        : Real_Float_Matrix (Q'Range, Q'Range (2));
       --        Q_Out             : Real_Float_Matrix (Q'Range, Q'Range (2));
       --        Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
@@ -113,13 +113,14 @@ package body Support_21A is
 
       --  Rewards   (0, -1, -1, -1, 10);
       Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition,
-                             rk_place, Policy, Q, V);
+                             rk_Ptr, Policy_Ptr, Q_Ptr, V_Ptr);
       declare
          Result : constant Python_21A.Plan_Data :=
-           Python_21A.Plan (Classifier, rk_place, Policy, Q);
+           Python_21A.Plan (Classifier, rk_Ptr, Policy_Ptr, Q_Ptr);
       begin
+--           Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
          Put_Line (Routine_Name & "Plan set");
-         Plot_Policy (Result.Policy, Actions, Result.Rows, Result.Cols);
+         Plot_Policy (Result.Policy, Actions);
       end;
 
       return Mat_Transition;
@@ -276,31 +277,28 @@ package body Support_21A is
       --        Num_Rows     : constant Positive := Policy_Grid'Length;
       Row          : Positive := Row_In;
       Col          : Positive := Col_In;
-      Row_Offset   : Natural;
+      Current_Row  : Positive;
       Max_Prob     : Float;
-      --        Found        : Boolean;
       Action       : Natural := 6;
    begin
-      Put_Line (Routine_Name & "Row, Col:" &
-                  Integer'Image (Row) & Integer'Image (Col));
-      Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
-                  Integer'Image (Policy_Grid (Row, Col)));
       Assert (Current_Policy (Row, 1)'Valid, Routine_Name & "invalid Policy: " &
                 Float'Image  (Current_Policy (Row, 1)));
-      --        Print_Float_Matrix (Routine_Name & "Pi", Pi);
+      --  Current_Policy rows x cols, actions
       while Policy_Grid (Row, Col) = 6 loop
-         Row_Offset := (Row - 1) * Num_Cols;
-         Max_Prob := Pi_Max (Current_Policy, Row_Offset + Col);
+         Put_Line (Routine_Name & "Row, Col:" &
+                     Integer'Image (Row) & Integer'Image (Col));
+         Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
+                     Integer'Image (Policy_Grid (Row, Col)));
+         Current_Row := (Row - 1) * Num_Cols + 1;
+         Max_Prob := Pi_Max (Current_Policy, Current_Row);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
-         --           Found := False;
+
          for act in 1 .. 5 loop
-            if Current_Policy (Row_Offset + 1, act) = Max_Prob then
+            if Current_Policy (Current_Row, act) = Max_Prob then
                Print_Float_Matrix (Routine_Name & "Current_Policy row" &
-                                     Integer'Image (Row_Offset + 1),
-                                   Slice (Current_Policy, Row_Offset + 1,
-                                     Row_Offset + 1));
-               --              if not Found and then Current_Policy (Row_Offset + 1, act) = Max_Prob then
-               --                 Found := True;
+                                     Integer'Image (Current_Row),
+                                   Slice (Current_Policy, Current_Row,
+                                     Current_Row));
                Action := act;
             end if;
          end loop;
@@ -355,21 +353,22 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Plot_Policy (Policy : Real_Float_Matrix; Actions : Actions_Matrix;
-                          Num_Rows, Num_Cols : Positive) is
+   procedure Plot_Policy (Policy  : Real_Float_Matrix;
+                          Actions : Actions_Matrix) is
       use Ada.Strings.Unbounded;
       Routine_Name : constant String := "Support_21A.Plot_Policy ";
       Signs        : constant String (1 .. 7) := "^>v<x? ";
-      Policy_Grid  : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) := (others => (others => 6));
+      Policy_Grid  : Integer_Matrix (Policy'Range, Policy'Range (2)) :=
+                       (others => (others => 6));
       Line         : Unbounded_String;
    begin
       Print_Actions_Matrix (Routine_Name & "Actions", Actions);
       Find_Policy (Policy_Grid, Policy, Actions, 1, 1);
       Print_Integer_Matrix (Routine_Name & "Policy_Grid", Policy_Grid);
 
-      for row in 1 .. Num_Rows loop
+      for row in Policy'Range loop
          Line := To_Unbounded_String ("");
-         for col in 1 .. Num_Cols loop
+         for col in Policy'Range (2) loop
             Line := Line & Signs (Policy_Grid (row, col) + 1);
          end loop;
          Put_Line (To_String (Line));
