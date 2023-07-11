@@ -18,7 +18,7 @@ package body Support_21A is
    --                         Num_Acts : Integer) return Real_Float_Matrix;
    function Compute_Transition_Matrix
      (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Actions_Matrix;
-      Mat_Map : Boolean_Tensor) return Boolean_Tensor;
+      Mat_Map                         : Boolean_Tensor) return Boolean_Tensor;
    --     function Dot_Trans_V (Trans : Boolean_Tensor; Trans_Row : Positive;
    --                           V : Real_Float_Matrix) return Real_Float_Matrix;
    function Get_Action (Matrix : Actions_Matrix; Row : Integer)
@@ -68,29 +68,29 @@ package body Support_21A is
    --  Values in matmap equal 1 if the value of row and column of that cell in
    --  grid_map equal is the value of the third dimension of the cell.
    --  Clip keeps the current location in the grid to be within the size of the grid.
-   function Binarize (Classifier : Python.Module;
+   function Binarize (Classifier                   : Python.Module;
                       Num_Rows, Num_Cols, Num_Cats : Positive;
                       Grid_Map                     : Integer_Matrix)
                       return Boolean_Tensor is
       --        use Real_Float_Arrays;
-      Routine_Name : constant String := "Support_21A.Binarize ";
+      Routine_Name      : constant String := "Support_21A.Binarize ";
       Rewards           : constant Integer_Array (Grid_Map'Range) :=
-        (0, -1, -1, -1, 10);
+                            (0, -1, -1, -1, 10);
       Num_Actions       : constant Positive := 5;
       --        Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       --  Acts defines how each action changes the row and column
       Actions           : constant Actions_Matrix (1 .. Num_Actions, 1 ..2) :=
-        ((-1,0), (0,1), (1,0), (0,-1), (0,0));
+                            ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       --  Mat_Map is a binarised version of Grid_Map in which the value of
       --  Mat_Map is 1 (otherwise 0) if the Grid_Map row and column
       --  equals the index of the third dimension of the cell.
       Mat_Map           : constant Boolean_Tensor :=
-        Compute_Map_Matrix (Grid_Map, Num_Cats);
+                            Compute_Map_Matrix (Grid_Map, Num_Cats);
       --  Mat_Transition indicates whether or not a given action will cause
       --  a transition between a given pair of locations.
-      Mat_Transition : constant Boolean_Tensor :=
-        Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
-                                   Mat_Map);
+      Mat_Transition    : constant Boolean_Tensor :=
+                            Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
+                                                       Mat_Map);
       --        Beta              : constant Float := 10.0;
       --        Gamma             : constant Float := 0.9;
       Q_Ptr             : Python_API.PyObject_Ptr;
@@ -103,7 +103,7 @@ package body Support_21A is
       --        V                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
       --        Policy            : Real_Float_Matrix (Q'Range, Q'Range (2));
       V_Ptr             : Python_API.PyObject_Ptr;
-      Policy_Ptr         : Python_API.PyObject_Ptr;
+      Policy_Ptr        : Python_API.PyObject_Ptr;
       --        Policy_Out        : Real_Float_Matrix (Q'Range, Q'Range (2));
       --        Q_Out             : Real_Float_Matrix (Q'Range, Q'Range (2));
       --        Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
@@ -116,11 +116,10 @@ package body Support_21A is
                              rk_Ptr, Policy_Ptr, Q_Ptr, V_Ptr);
       declare
          Result : constant Python_21A.Plan_Data :=
-           Python_21A.Plan (Classifier, rk_Ptr, Policy_Ptr, Q_Ptr);
+                    Python_21A.Plan (Classifier, rk_Ptr, Policy_Ptr, Q_Ptr);
       begin
---           Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
-         Put_Line (Routine_Name & "Plan set");
-         Plot_Policy (Result.Policy, Actions);
+         Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
+--           Plot_Policy (Result.Policy, Actions);
       end;
 
       return Mat_Transition;
@@ -170,7 +169,7 @@ package body Support_21A is
    --  pair of locations.
    function Compute_Transition_Matrix
      (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Actions_Matrix;
-      Mat_Map : Boolean_Tensor) return Boolean_Tensor is
+      Mat_Map                         : Boolean_Tensor) return Boolean_Tensor is
       Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       Current_Action    : Actions_Array (1 .. 2);
       Row_Next          : Positive;
@@ -271,7 +270,7 @@ package body Support_21A is
 
    procedure Find_Policy
      (Policy_Grid : in out Integer_Matrix; Current_Policy : Real_Float_Matrix;
-      Actions : Actions_Matrix; Row_In, Col_In : Positive) is
+      Actions     : Actions_Matrix; Row_In, Col_In : Positive) is
       Routine_Name : constant String := "Support_21A.Find_Policy ";
       Num_Cols     : constant Positive := Policy_Grid'Length (2);
       --        Num_Rows     : constant Positive := Policy_Grid'Length;
@@ -293,6 +292,7 @@ package body Support_21A is
          Max_Prob := Pi_Max (Current_Policy, Current_Row);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
 
+         --  Actions: ((-1,0), (0,1), (1,0), (0,-1), (0,0))
          for act in 1 .. 5 loop
             if Current_Policy (Current_Row, act) = Max_Prob then
                Print_Float_Matrix (Routine_Name & "Current_Policy row" &
@@ -303,11 +303,11 @@ package body Support_21A is
             end if;
          end loop;
 
-         --  Action: (-1,0), (0,1), (1,0), (0,-1), (0,0)
          Policy_Grid (Row, Col) := Action;
          Put_Line (Routine_Name & "next Action" & Integer'Image (Action));
          Row := Row + Actions (Action, 1);
-         Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
+         Col := Col + Actions (Action, 2);
+         --           Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
          Put_Line (Routine_Name & "next Row" & Integer'Image (Row));
          Put_Line (Routine_Name & "next Col" & Integer'Image (Col));
          Find_Policy (Policy_Grid, Current_Policy, Actions, Row, Col);
@@ -338,11 +338,14 @@ package body Support_21A is
    --  ------------------------------------------------------------------------
 
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float is
-      --        Routine_Name : constant String := "Support_21A.Pi_Max ";
+      Routine_Name : constant String := "Support_21A.Pi_Max ";
       Result       : Float := Policy (Row, 1);
    begin
+      Print_Float_Array (Routine_Name & "Policy, Row:" & Integer'Image (Row),
+                         Get_Row (Policy, Row));
       for col in Policy'Range (2) loop
          if Policy (Row, col) > Result then
+            Put_Line (Routine_Name & "Policy, max col:" & Integer'Image (col));
             Result := Policy (Row, col);
          end if;
       end loop;
