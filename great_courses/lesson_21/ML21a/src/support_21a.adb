@@ -25,6 +25,8 @@ package body Support_21A is
                         return Actions_Array;
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float;
    procedure Print_Actions_Matrix (Name  : String; aMatrix : Actions_Matrix);
+   procedure Print_Boolean_Tensor (Name  : String; Tensor : Boolean_Tensor;
+                                   Start : Positive := 1; Finish : Natural := 0);
    --     function Product (L : Boolean_Tensor; R : Integer_Matrix)
    --                       return Integer_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
@@ -75,22 +77,22 @@ package body Support_21A is
       --        use Real_Float_Arrays;
       Routine_Name      : constant String := "Support_21A.Binarize ";
       Rewards           : constant Integer_Array (Grid_Map'Range) :=
-                            (0, -1, -1, -1, 10);
+        (0, -1, -1, -1, 10);
       Num_Actions       : constant Positive := 5;
       --        Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       --  Acts defines how each action changes the row and column
       Actions           : constant Actions_Matrix (1 .. Num_Actions, 1 ..2) :=
-                            ((-1,0), (0,1), (1,0), (0,-1), (0,0));
+        ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       --  Mat_Map is a binarised version of Grid_Map in which the value of
       --  Mat_Map is 1 (otherwise 0) if the Grid_Map row and column
       --  equals the index of the third dimension of the cell.
       Mat_Map           : constant Boolean_Tensor :=
-                            Compute_Map_Matrix (Grid_Map, Num_Cats);
+        Compute_Map_Matrix (Grid_Map, Num_Cats);
       --  Mat_Transition indicates whether or not a given action will cause
       --  a transition between a given pair of locations.
       Mat_Transition    : constant Boolean_Tensor :=
-                            Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
-                                                       Mat_Map);
+        Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
+                                   Mat_Map);
       --        Beta              : constant Float := 10.0;
       --        Gamma             : constant Float := 0.9;
       Q_Ptr             : Python_API.PyObject_Ptr;
@@ -110,16 +112,19 @@ package body Support_21A is
       --        Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
       Put_Line (Routine_Name);
+      Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 1, 1);
+      Print_Boolean_Tensor (Routine_Name & "Mat_Map", Mat_Map, 1, 1);
 
       --  Rewards   (0, -1, -1, -1, 10);
+      --  Boolean_Tensors converted to binary tensors by Set_Policy To_Tuple calls
       Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition,
                              rk_Ptr, Policy_Ptr, Q_Ptr, V_Ptr);
       declare
          Result : constant Python_21A.Plan_Data :=
-                    Python_21A.Plan (Classifier, rk_Ptr, Policy_Ptr, Q_Ptr);
+           Python_21A.Plan (Classifier, rk_Ptr, Policy_Ptr, Q_Ptr);
       begin
          Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
---           Plot_Policy (Result.Policy, Actions);
+         --           Plot_Policy (Result.Policy, Actions);
       end;
 
       return Mat_Transition;
@@ -315,7 +320,7 @@ package body Support_21A is
 
       --     exception
       --        when Error: Constraint_Error => Put_Line (Routine_Name &
-      --                                                    "Constraint_Error");
+      --                    gps-emblem-entity-subprogram Print_Boolean_Tensor <span foreground="#A0A0A0">(Name : in String; Tensor : in Boolean_Tensor; Start : in Positive := 1; Finish : in Natural := 0)</span> gps-emblem-entity-subprogram                                "Constraint_Error");
       --           Put_Line (Exception_Information(Error));
       --        when Error: others => Put_Line (Routine_Name & "exception");
       --           Put_Line (Exception_Information(Error));
@@ -362,7 +367,7 @@ package body Support_21A is
       Routine_Name : constant String := "Support_21A.Plot_Policy ";
       Signs        : constant String (1 .. 7) := "^>v<x? ";
       Policy_Grid  : Integer_Matrix (Policy'Range, Policy'Range (2)) :=
-                       (others => (others => 6));
+        (others => (others => 6));
       Line         : Unbounded_String;
    begin
       Print_Actions_Matrix (Routine_Name & "Actions", Actions);
@@ -396,6 +401,36 @@ package body Support_21A is
       New_Line;
 
    end Print_Actions_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Boolean_Tensor (Name  : String; Tensor : Boolean_Tensor;
+                                   Start : Positive := 1; Finish : Natural := 0) is
+      Last : Positive;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (Tensor'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= Tensor'First and then Finish <= Tensor'Last then
+         for row in Start .. Last loop
+            for col in Tensor'Range (2) loop
+               for item in Tensor'Range (3) loop
+                  Put (Boolean'Image (Tensor (row, col, item)) & "  ");
+               end loop;
+               New_Line;
+            end loop;
+            New_Line;
+         end loop;
+      else
+         Put_Line ("Print_Boolean_Tensor called with invalid start or finish index.");
+      end if;
+      New_Line;
+
+   end Print_Boolean_Tensor;
 
    --  ------------------------------------------------------------------------
 
