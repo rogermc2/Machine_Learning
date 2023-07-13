@@ -49,22 +49,6 @@ package body Support_21A is
    --     end "*";
 
    --  -------------------------------------------------------------------------
-   --  Arg_Max returns the index from indices associated with the item in the
-   --  Values list with the highest value.
-   --     function Arg_Max (Indices : Integer_Array; Values : Real_Float_Vector)
-   --                       return Integer is
-   --        --        Routine_Name : constant String := "Support_16A.Arg_Max ";
-   --        Best_Index   : Positive;
-   --        pragma Warnings (Off);
-   --        Best         : constant Float := Max (Values, Best_Index);
-   --        pragma Warnings (On);
-   --     begin
-   --        return Indices (Best_Index);
-   --
-   --     end Arg_Max;
-   --     pragma Inline (Arg_Max);
-
-   --  -------------------------------------------------------------------------
    --  Binarize grid_map, adding an additional dimension representing the value
    --  in the cell to make matmap.
    --  Values in matmap equal 1 if the value of row and column of that cell in
@@ -93,27 +77,14 @@ package body Support_21A is
       Mat_Transition    : constant Boolean_Tensor :=
         Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
                                    Mat_Map);
-      --        Beta              : constant Float := 10.0;
-      --        Gamma             : constant Float := 0.9;
       Q_Ptr             : Python_API.PyObject_Ptr;
-      --        Q                 : Real_Float_Matrix (1 .. Rows_x_Cols,
-      --                                               1 .. Num_Actions);
       rk_Ptr            : Python_API.PyObject_Ptr;
-      --        rk                : Integer_Matrix (1 .. Num_Rows, 1 .. 1);
-      --        rfk               : Integer_Tensor (1 .. Num_Rows, 1 .. Num_Cols, 1 .. 1);
-      --        rffk              : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
-      --        V                 : Real_Float_Matrix (1 .. Rows_x_Cols, 1 .. 1);
-      --        Policy            : Real_Float_Matrix (Q'Range, Q'Range (2));
       V_Ptr             : Python_API.PyObject_Ptr;
       Policy_Ptr        : Python_API.PyObject_Ptr;
-      --        Policy_Out        : Real_Float_Matrix (Q'Range, Q'Range (2));
-      --        Q_Out             : Real_Float_Matrix (Q'Range, Q'Range (2));
-      --        Pi_Q              : Real_Float_Matrix (Q'Range, Q'Range (2));
-      --        Pi_Q_Sum          : Real_Float_Vector (Q'Range (2));
    begin
       Put_Line (Routine_Name);
-      Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 1, 1);
-      Print_Boolean_Tensor (Routine_Name & "Mat_Map", Mat_Map, 1, 1);
+--        Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 1, 1);
+--        Print_Boolean_Tensor (Routine_Name & "Mat_Map 5)", Mat_Map, 5, 5);
 
       --  Rewards   (0, -1, -1, -1, 10);
       --  Boolean_Tensors converted to binary tensors by Set_Policy To_Tuple calls
@@ -123,8 +94,9 @@ package body Support_21A is
          Result : constant Python_21A.Plan_Data :=
            Python_21A.Plan (Classifier, rk_Ptr, Policy_Ptr, Q_Ptr);
       begin
+         null;
          Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
-         --           Plot_Policy (Result.Policy, Actions);
+         Plot_Policy (Result.Policy, Actions);
       end;
 
       return Mat_Transition;
@@ -158,7 +130,7 @@ package body Support_21A is
       for row in Mat_Map'Range loop
          for col in Mat_Map'Range (2) loop
             for cat in Mat_Map'Range (3) loop
-               Mat_Map (row, col, cat) := Grid_Map (row, col) = cat;
+               Mat_Map (row, col, cat) := Grid_Map (row, col) = cat - 1;
             end loop;
          end loop;
       end loop;
