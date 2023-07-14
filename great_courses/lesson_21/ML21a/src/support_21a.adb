@@ -24,10 +24,7 @@ package body Support_21A is
    function Get_Action (Matrix : Actions_Matrix; Row : Integer)
                         return Actions_Array;
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float;
-   procedure Print_Actions_Matrix (Name  : String; aMatrix : Actions_Matrix);
-   procedure Print_Boolean_Tensor (Name  : String; Tensor : Boolean_Tensor;
-                                   Start : Positive := 1; Finish : Natural := 0);
-   --     function Product (L : Boolean_Tensor; R : Integer_Matrix)
+   procedure Print_Actions_Matrix (Name  : String; aMatrix : Actions_Matrix);   --     function Product (L : Boolean_Tensor; R : Integer_Matrix)
    --                       return Integer_Tensor;
    --     function Sum_Each_Column (Data : Float_Tensor) return Real_Float_Matrix;
 
@@ -79,17 +76,17 @@ package body Support_21A is
                                    Mat_Map);
       Q_Ptr             : Python_API.PyObject_Ptr;
       rk_Ptr            : Python_API.PyObject_Ptr;
-      V_Ptr             : Python_API.PyObject_Ptr;
+      --        V_Ptr             : Python_API.PyObject_Ptr;
       Policy_Ptr        : Python_API.PyObject_Ptr;
    begin
       Put_Line (Routine_Name);
---        Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 1, 1);
---        Print_Boolean_Tensor (Routine_Name & "Mat_Map 5)", Mat_Map, 5, 5);
+      --        Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 1, 1);
+      --        Print_Boolean_Tensor (Routine_Name & "Mat_Map 5)", Mat_Map, 5, 5);
 
       --  Rewards   (0, -1, -1, -1, 10);
       --  Boolean_Tensors converted to binary tensors by Set_Policy To_Tuple calls
       Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition,
-                             rk_Ptr, Policy_Ptr, Q_Ptr, V_Ptr);
+                             rk_Ptr, Policy_Ptr, Q_Ptr);
       declare
          Result : constant Python_21A.Plan_Data :=
            Python_21A.Plan (Classifier, rk_Ptr, Policy_Ptr, Q_Ptr);
@@ -284,18 +281,12 @@ package body Support_21A is
          Put_Line (Routine_Name & "next Action" & Integer'Image (Action));
          Row := Row + Actions (Action, 1);
          Col := Col + Actions (Action, 2);
-         --           Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
+         --  Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
          Put_Line (Routine_Name & "next Row" & Integer'Image (Row));
          Put_Line (Routine_Name & "next Col" & Integer'Image (Col));
          Find_Policy (Policy_Grid, Current_Policy, Actions, Row, Col);
       end loop;
 
-      --     exception
-      --        when Error: Constraint_Error => Put_Line (Routine_Name &
-      --                    gps-emblem-entity-subprogram Print_Boolean_Tensor <span foreground="#A0A0A0">(Name : in String; Tensor : in Boolean_Tensor; Start : in Positive := 1; Finish : in Natural := 0)</span> gps-emblem-entity-subprogram                                "Constraint_Error");
-      --           Put_Line (Exception_Information(Error));
-      --        when Error: others => Put_Line (Routine_Name & "exception");
-      --           Put_Line (Exception_Information(Error));
    end Find_Policy;
 
    --  -------------------------------------------------------------------------

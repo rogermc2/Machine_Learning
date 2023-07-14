@@ -19,5 +19,5 @@ package Python_21A is
                          Mat_Map        : Support_21A.Boolean_Tensor;
                          Mat_Transition : Support_21A.Boolean_Tensor;
                          Rk_Ptr, Pi_Ptr : out Python_API.PyObject_Ptr;
-                         Q_Ptr, V_Ptr   : out Python_API.PyObject_Ptr);
+                         Q_Ptr          : out Python_API.PyObject_Ptr);
 end Python_21A;

@@ -64,14 +64,13 @@ package body Python_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Parse_Tuple (Tuple        : PyObject_Ptr;
-                          Rk, Pi, Q, V : out Python_API.PyObject_Ptr) is
+   procedure Parse_Tuple (Tuple     : PyObject_Ptr;
+                          Rk, Pi, Q : out Python_API.PyObject_Ptr) is
 --        Routine_Name : constant String := "Parsers.Parse_Tuple Rk, Pi, Q, V ";
    begin
       Rk := PyTuple_GetItem (Tuple, 0);
       Pi := PyTuple_GetItem (Tuple, 1);
       Q := PyTuple_GetItem (Tuple, 2);
-      V := PyTuple_GetItem (Tuple, 3);
 
    end Parse_Tuple;
 
@@ -114,7 +113,7 @@ package body Python_21A is
                          Mat_Map        : Support_21A.Boolean_Tensor;
                          Mat_Transition : Support_21A.Boolean_Tensor;
                          Rk_Ptr, Pi_Ptr : out Python_API.PyObject_Ptr;
-                           Q_Ptr, V_Ptr : out Python_API.PyObject_Ptr) is
+                         Q_Ptr          : out Python_API.PyObject_Ptr) is
       use Tuple_Builder;
 --        Routine_Name    : constant String := "Python_21A.Set_Policy  ";
 
@@ -139,7 +138,7 @@ package body Python_21A is
       Py_DecRef (Trans_Tuple);
       Py_DecRef (PyParams);
 
-      Parse_Tuple (PyResult, Rk_Ptr, Pi_Ptr, Q_Ptr, V_Ptr);
+      Parse_Tuple (PyResult, Rk_Ptr, Pi_Ptr, Q_Ptr);
       Py_DecRef (PyResult);
 
    end Set_Policy;
