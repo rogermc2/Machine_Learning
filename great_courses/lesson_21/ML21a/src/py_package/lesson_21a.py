@@ -16,7 +16,8 @@ import matplotlib.colors as mcolors
 #    print("place_holder", len(r))
 #    return K.placeholder(len(r))
     
-def policy(r, matmap, mattrans):
+def policy(rt, matmap, mattrans):
+    r=np.asarray (rt)
     rk = K.placeholder(len(r))
     rfk = K.dot(K.constant(np.asarray(matmap)),K.reshape(rk,(-1,1)))
     rffk = K.reshape(rfk,(-1,1))
