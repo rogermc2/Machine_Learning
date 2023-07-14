@@ -35,13 +35,15 @@ def policy(r, matmap, mattrans):
         Q = K.concatenate([q0,q1,q2,q3,q4])
         pi = K.softmax(beta*Q)
         v = rffk + gamma * K.reshape(K.sum(Q * pi,axis=1),(-1,1))
-#   rk, Q, pi, v are tensors
-    return (rk, Q, pi, v)
+#   rk, Q, pi, v are tensors, v not used externally
+    return (rk, Q, pi)
     
 def plan(rk, pi, Q):
+    print("pi:", pi)
     planner = K.function([rk], [pi, Q])
     r = np.array([0, -1, -1, -1, 10])
     piout, Qout = planner([r])
+    print("piout:", piout)
     return (tuple (map (tuple, piout)), tuple(map (tuple, Qout)))
 
 def plot_matrix(matrix):
