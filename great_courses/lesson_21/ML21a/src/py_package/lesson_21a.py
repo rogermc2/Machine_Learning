@@ -17,15 +17,19 @@ import matplotlib.colors as mcolors
 #    return K.placeholder(len(r))
     
 def policy(r, matmap, mattrans):
+    mmap=np.asarray(matmap)
+    trans=np.asarray(mattrans)
+    print("mmap", mmap.shape)
+    print("trans", trans.shape)
     rk = K.placeholder(len(r))
-    rfk = K.dot(K.constant(np.asarray(matmap)),K.reshape(rk,(-1,1)))
+    print("rk", rk)
+    rfk = K.dot(K.constant(mmap),K.reshape(rk,(-1,1)))
     rffk = K.reshape(rfk,(-1,1))
      
     v = K.reshape(rfk,(-1,1))
     gamma = 0.90
     beta = 10.0
     
-    trans=np.asarray(mattrans)
     for _ in range(50):
         q0 = K.dot(K.constant(trans[0]),v)
         q1 = K.dot(K.constant(trans[1]),v)

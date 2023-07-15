@@ -80,7 +80,7 @@ package body Support_21A is
       Policy_Ptr        : Python_API.PyObject_Ptr;
    begin
       Put_Line (Routine_Name);
-      --        Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 1, 1);
+--        Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 2, 2);
       --        Print_Boolean_Tensor (Routine_Name & "Mat_Map 5)", Mat_Map, 5, 5);
 
       --  Rewards   (0, -1, -1, -1, 10);
@@ -279,6 +279,7 @@ package body Support_21A is
 
          Policy_Grid (Row, Col) := Action;
          Put_Line (Routine_Name & "next Action" & Integer'Image (Action));
+         --  Actions: ((-1,0), (0,1), (1,0), (0,-1), (0,0))
          Row := Row + Actions (Action, 1);
          Col := Col + Actions (Action, 2);
          --  Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
