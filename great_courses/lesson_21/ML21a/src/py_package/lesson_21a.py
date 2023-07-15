@@ -16,17 +16,25 @@ import matplotlib.colors as mcolors
 #    print("place_holder", len(r))
 #    return K.placeholder(len(r))
     
-def policy(rt, matmap, mattrans):
-    r=np.asarray (rt)
-    rk = K.placeholder(len(r))
-    rfk = K.dot(K.constant(np.asarray(matmap)),K.reshape(rk,(-1,1)))
-    rffk = K.reshape(rfk,(-1,1))
-     
-    v = K.reshape(rfk,(-1,1))
-    gamma = 0.90
-    beta = 10.0
-    
+def policy(r, matmap, mattrans):
+    mmap=np.asarray(matmap)
     trans=np.asarray(mattrans)
+    print("mmap", mmap.shape)
+    print("trans", trans.shape)
+    rk = K.placeholder(len(r))
+    # rfk (5 x 10 x 1) maps each location to its reward value
+    rfk = K.dot(K.constant(mmap),K.reshape(rk,(-1,1)))
+    # rffk (50 x 1)
+    rffk = K.reshape(rfk,(-1,1))
+    # v (50 x 1)
+    v = K.reshape(rfk,(-1,1))
+    gamma = 0.90  # future reward discount compared to current reward
+    beta = 10.0
+#    For each step of looking into the future, each of the five action
+#    calucates an estimate of the value of taking each action.
+#    Each value of q0 .. q4 corresponds to the estimated value of
+#    actions 0 to 4, by multipling the transition matrix for an action
+#    by the value estimate, v.
     for _ in range(50):
         q0 = K.dot(K.constant(trans[0]),v)
         q1 = K.dot(K.constant(trans[1]),v)
@@ -36,15 +44,9 @@ def policy(rt, matmap, mattrans):
         Q = K.concatenate([q0,q1,q2,q3,q4])
         pi = K.softmax(beta*Q)
         v = rffk + gamma * K.reshape(K.sum(Q * pi,axis=1),(-1,1))
-#   rk, Q, pi, v are tensors, v not used externally
-    return (rk, Q, pi)
-    
-def plan(rk, pi, Q):
-    print("pi:", pi)
     planner = K.function([rk], [pi, Q])
     r = np.array([0, -1, -1, -1, 10])
     piout, Qout = planner([r])
-    print("piout:", piout)
     return (tuple (map (tuple, piout)), tuple(map (tuple, Qout)))
 
 def plot_matrix(matrix):

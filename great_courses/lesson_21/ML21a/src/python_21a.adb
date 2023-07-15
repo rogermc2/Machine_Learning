@@ -64,56 +64,10 @@ package body Python_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Parse_Tuple (Tuple     : PyObject_Ptr;
-                          Rk, Pi, Q : out Python_API.PyObject_Ptr) is
---        Routine_Name : constant String := "Parsers.Parse_Tuple Rk, Pi, Q, V ";
-   begin
-      Rk := PyTuple_GetItem (Tuple, 0);
-      Pi := PyTuple_GetItem (Tuple, 1);
-      Q := PyTuple_GetItem (Tuple, 2);
-
-   end Parse_Tuple;
-
-   --  -------------------------------------------------------------------------
-
-   function Plan (Classifier : Python.Module;
-                  R_Ptr, Pi_Ptr, Q_Ptr : Python_API.PyObject_Ptr)
-                  return Plan_Data is
---        use System;
---        Routine_Name : constant String := "Python_21A.Plan  ";
-
-      function Py_BuildValue (Format : char_array; O1, O2, O3 : PyObject_Ptr)
-                              return PyObject_Ptr;
-      pragma Import (C, Py_BuildValue, "Py_BuildValue");
-
-      F        : constant PyObject_Ptr :=
-                   Python.Get_Symbol (Classifier, "plan");
-      PyParams : PyObject_Ptr;
-      PyResult : PyObject_Ptr;
-   begin
-      PyParams := Py_BuildValue (To_C ("OOO"), R_Ptr, Pi_Ptr, Q_Ptr);
-
-      PyResult := Python.Call_Object (F, PyParams);
-      Py_DecRef (F);
-      Py_DecRef (PyParams);
-
-      declare
-         Result : constant Plan_Data := Parse_Tuple (PyResult);
-      begin
-         Py_DecRef (PyResult);
-         return Result;
-      end;
-
-   end Plan;
-
-   --  -------------------------------------------------------------------------
-
-   procedure Set_Policy (Classifier     : Python.Module;
+   function Set_Policy (Classifier     : Python.Module;
                          Rewards        : Integer_Array;
                          Mat_Map        : Support_21A.Boolean_Tensor;
-                         Mat_Transition : Support_21A.Boolean_Tensor;
-                         Rk_Ptr, Pi_Ptr : out Python_API.PyObject_Ptr;
-                         Q_Ptr          : out Python_API.PyObject_Ptr) is
+                         Mat_Transition : Support_21A.Boolean_Tensor) return Plan_Data is
       use Tuple_Builder;
 --        Routine_Name    : constant String := "Python_21A.Set_Policy  ";
 
@@ -138,8 +92,12 @@ package body Python_21A is
       Py_DecRef (Trans_Tuple);
       Py_DecRef (PyParams);
 
-      Parse_Tuple (PyResult, Rk_Ptr, Pi_Ptr, Q_Ptr);
-      Py_DecRef (PyResult);
+      declare
+         Result : constant Plan_Data := Parse_Tuple (PyResult);
+      begin
+         Py_DecRef (PyResult);
+         return Result;
+      end;
 
    end Set_Policy;
 
