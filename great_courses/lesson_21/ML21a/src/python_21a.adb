@@ -14,7 +14,7 @@ package body Python_21A is
    --  -------------------------------------------------------------------------
 
    function Parse_Tuple (Tuple : PyObject_Ptr) return Plan_Data is
---        Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q ";
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple Pi, Q ";
       Pi           : constant Real_Float_Matrix :=
                        Parsers.Parse_Tuple (PyTuple_GetItem (Tuple, 0));
       Q            : constant Real_Float_Matrix:=
@@ -31,11 +31,11 @@ package body Python_21A is
    --  -------------------------------------------------------------------------
 
    function Set_Policy (Classifier     : Python.Module;
-                         Rewards        : Integer_Array;
-                         Mat_Map        : Support_21A.Boolean_Tensor;
-                         Mat_Transition : Support_21A.Boolean_Tensor) return Plan_Data is
+                        Rewards        : Integer_Array;
+                        Mat_Map        : Support_21A.Boolean_Tensor;
+                        Mat_Transition : Support_21A.Boolean_Tensor) return Plan_Data is
       use Tuple_Builder;
---        Routine_Name    : constant String := "Python_21A.Set_Policy  ";
+      --        Routine_Name    : constant String := "Python_21A.Set_Policy  ";
 
       function Py_BuildValue (Format : char_array; T1, T2, T3 : PyObject_Ptr)
                               return PyObject_Ptr;

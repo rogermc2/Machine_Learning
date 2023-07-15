@@ -10,7 +10,7 @@ package Python_21A is
       Q      : Real_Float_Matrix (1 .. Rows, 1 .. Cols);
    end record;
 
-   function Set_Policy (Classifier     : Python.Module;
+   function Set_Policy (Classifier      : Python.Module;
                          Rewards        : Integer_Array;
                          Mat_Map        : Support_21A.Boolean_Tensor;
                          Mat_Transition : Support_21A.Boolean_Tensor)
