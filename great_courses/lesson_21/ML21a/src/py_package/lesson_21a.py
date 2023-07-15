@@ -7,14 +7,6 @@ import keras.backend as K
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 import matplotlib.colors as mcolors
-
-#def softmax(beta_Q):
-#    bq=np.asarray(beta_Q)
-#    return tuple(map (tuple, K.softmax(bq)))
-#    
-#def place_holder(r):
-#    print("place_holder", len(r))
-#    return K.placeholder(len(r))
     
 def policy(r, matmap, mattrans):
     mmap=np.asarray(matmap)
