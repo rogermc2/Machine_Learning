@@ -1,7 +1,6 @@
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Python;
-with Python_API;
 with Support_21A;
 
 package Python_21A is
@@ -11,13 +10,10 @@ package Python_21A is
       Q      : Real_Float_Matrix (1 .. Rows, 1 .. Cols);
    end record;
 
-   function Plan (Classifier           : Python.Module;
-                  R_Ptr, Pi_Ptr, Q_Ptr : Python_API.PyObject_Ptr)
-                  return Plan_Data;
-   procedure Set_Policy (Classifier     : Python.Module;
+   function Set_Policy (Classifier     : Python.Module;
                          Rewards        : Integer_Array;
                          Mat_Map        : Support_21A.Boolean_Tensor;
-                         Mat_Transition : Support_21A.Boolean_Tensor;
-                         Rk_Ptr, Pi_Ptr : out Python_API.PyObject_Ptr;
-                         Q_Ptr          : out Python_API.PyObject_Ptr);
+                         Mat_Transition : Support_21A.Boolean_Tensor)
+                        return Plan_Data;
+
 end Python_21A;

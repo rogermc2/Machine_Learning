@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
 with Basic_Printing; use Basic_Printing;
-with Python_API;
+--  with Python_API;
 with Python_21A;
 
 package body Support_21A is
@@ -74,10 +74,10 @@ package body Support_21A is
       Mat_Transition    : constant Boolean_Tensor :=
         Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
                                    Mat_Map);
-      Q_Ptr             : Python_API.PyObject_Ptr;
-      rk_Ptr            : Python_API.PyObject_Ptr;
+--        Q_Ptr             : Python_API.PyObject_Ptr;
+--        rk_Ptr            : Python_API.PyObject_Ptr;
       --        V_Ptr             : Python_API.PyObject_Ptr;
-      Policy_Ptr        : Python_API.PyObject_Ptr;
+--        Policy_Ptr        : Python_API.PyObject_Ptr;
    begin
       Put_Line (Routine_Name);
 --        Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 2, 2);
@@ -85,15 +85,16 @@ package body Support_21A is
 
       --  Rewards   (0, -1, -1, -1, 10);
       --  Boolean_Tensors converted to binary tensors by Set_Policy To_Tuple calls
-      Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition,
-                             rk_Ptr, Policy_Ptr, Q_Ptr);
+--        Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition,
+--                               rk_Ptr, Policy_Ptr, Q_Ptr);
       declare
          Result : constant Python_21A.Plan_Data :=
-           Python_21A.Plan (Classifier, rk_Ptr, Policy_Ptr, Q_Ptr);
+           Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition);
+--             Python_21A.Plan (Classifier, rk_Ptr, Policy_Ptr, Q_Ptr);
       begin
          null;
          Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
-         Plot_Policy (Result.Policy, Actions);
+--           Plot_Policy (Result.Policy, Actions);
       end;
 
       return Mat_Transition;
