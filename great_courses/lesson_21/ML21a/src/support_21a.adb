@@ -34,22 +34,22 @@ package body Support_21A is
       --        use Real_Float_Arrays;
       Routine_Name      : constant String := "Support_21A.Binarize ";
       Rewards           : constant Integer_Array (Grid_Map'Range) :=
-                            (0, -1, -1, -1, 10);
+        (0, -1, -1, -1, 10);
       Num_Actions       : constant Positive := 5;
       --        Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
       --  Acts defines how each action changes the row and column
       Actions           : constant Actions_Matrix (1 .. Num_Actions, 1 ..2) :=
-                            ((-1,0), (0,1), (1,0), (0,-1), (0,0));
+        ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       --  Mat_Map is a binarised version of Grid_Map in which the value of
       --  Mat_Map is 1 (otherwise 0) if the Grid_Map row and column
       --  equals the index of the third dimension of the cell.
       Mat_Map           : constant Boolean_Tensor :=
-                            Compute_Map_Matrix (Grid_Map, Num_Cats);
+        Compute_Map_Matrix (Grid_Map, Num_Cats);
       --  Mat_Transition indicates whether or not a given action will cause
       --  a transition between a given pair of locations.
       Mat_Transition    : constant Boolean_Tensor :=
-                            Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
-                                                       Mat_Map);
+        Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
+                                   Mat_Map);
    begin
       Put_Line (Routine_Name);
       --        Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 2, 2);
@@ -59,9 +59,9 @@ package body Support_21A is
       --  Actions   ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       declare
          Result : constant Python_21A.Plan_Data :=
-                    Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition);
+           Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition);
       begin
-         Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
+--           Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
          Plot_Policy (Result.Policy, Actions);
       end;
 
@@ -154,29 +154,29 @@ package body Support_21A is
       --        Num_Rows     : constant Positive := Policy_Grid'Length;
       Row          : Positive := Row_In;
       Col          : Positive := Col_In;
-      Current_Row  : Positive;
+      Policy_Row   : Positive;
       Max_Prob     : Float;
       Action       : Natural := 6;
    begin
       Assert (Policy (Row, 1)'Valid, Routine_Name & "invalid Policy: " &
                 Float'Image  (Policy (Row, 1)));
-      --  rows x cols, actions
       while Policy_Grid (Row, Col) = 6 loop
          Put_Line (Routine_Name & "Row, Col:" &
                      Integer'Image (Row) & Integer'Image (Col));
          Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
                      Integer'Image (Policy_Grid (Row, Col)));
-         Current_Row := (Row - 1) * Num_Cols + 1;
-         Max_Prob := Pi_Max (Policy, Current_Row);
+         --  Policy dimensions rows x cols, actions
+         Policy_Row := (Row - 1) * Num_Cols + col;
+         Max_Prob := Pi_Max (Policy, Policy_Row);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
 
          --  Actions: ((-1,0), (0,1), (1,0), (0,-1), (0,0))
          for act in 1 .. 5 loop
-            if Policy (Current_Row, act) = Max_Prob then
+            if Policy (Policy_Row, act) = Max_Prob then
                Print_Float_Matrix
                  (Routine_Name & "Policy row" &
-                    Integer'Image (Current_Row), Slice (Policy, Current_Row,
-                      Current_Row));
+                    Integer'Image (Policy_Row), Slice (Policy, Policy_Row,
+                      Policy_Row));
                Action := act;
             end if;
          end loop;
@@ -235,7 +235,7 @@ package body Support_21A is
       Routine_Name : constant String := "Support_21A.Plot_Policy ";
       Signs        : constant String (1 .. 7) := "^>v<x? ";
       Policy_Grid  : Integer_Matrix (Policy'Range, Policy'Range (2)) :=
-                       (others => (others => 6));
+        (others => (others => 6));
       Line         : Unbounded_String;
    begin
       Print_Actions_Matrix (Routine_Name & "Actions", Actions);
