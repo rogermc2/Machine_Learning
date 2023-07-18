@@ -173,10 +173,10 @@ package body Support_21A is
          --  Actions: ((-1,0), (0,1), (1,0), (0,-1), (0,0))
          for act in 1 .. 5 loop
             if Policy (Policy_Row, act) = Max_Prob then
-               Print_Float_Matrix
-                 (Routine_Name & "Policy row" &
-                    Integer'Image (Policy_Row), Slice (Policy, Policy_Row,
-                      Policy_Row));
+--                 Print_Float_Matrix
+--                   (Routine_Name & "Policy row" &
+--                      Integer'Image (Policy_Row), Slice (Policy, Policy_Row,
+--                        Policy_Row));
                Action := act;
             end if;
          end loop;
@@ -189,6 +189,7 @@ package body Support_21A is
          --  Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
          Put_Line (Routine_Name & "next Row" & Integer'Image (Row));
          Put_Line (Routine_Name & "next Col" & Integer'Image (Col));
+         New_Line;
          Find_Policy (Policy_Grid, Policy, Actions, Row, Col);
       end loop;
 
@@ -211,14 +212,14 @@ package body Support_21A is
    --  ------------------------------------------------------------------------
 
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float is
-      Routine_Name : constant String := "Support_21A.Pi_Max ";
+--        Routine_Name : constant String := "Support_21A.Pi_Max ";
       Result       : Float := Policy (Row, 1);
    begin
-      Print_Float_Array (Routine_Name & "Policy, Row:" & Integer'Image (Row),
-                         Get_Row (Policy, Row));
+--        Print_Float_Array (Routine_Name & "Policy, Row:" & Integer'Image (Row),
+--                           Get_Row (Policy, Row));
       for col in Policy'Range (2) loop
          if Policy (Row, col) > Result then
-            Put_Line (Routine_Name & "Policy, max col:" & Integer'Image (col));
+--              Put_Line (Routine_Name & "Policy, max col:" & Integer'Image (col));
             Result := Policy (Row, col);
          end if;
       end loop;
