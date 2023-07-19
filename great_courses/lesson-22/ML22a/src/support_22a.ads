@@ -2,36 +2,29 @@
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+--  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
-with Python;
-with Python_API;
 
 package Support_22A is
 
+   type Float_Data_Array is array (Integer range <>) of Float;
+   type Boolean_Data_Array is array (Integer range <>) of Boolean;
+
+   type Row_Record is record
+      Treatment  : Boolean;
+      X1_6       : Float_Data_Array (1 .. 6);
+      X7_25      : Boolean_Data_Array (7 .. 25);
+   end record;
+
+   package Data_Package is new
+     Ada.Containers.Doubly_Linked_Lists (Row_Record);
+   subtype Data_List is Data_Package.List;
+
    type Data_Record is record
-      Features : Integer_Array_List;
-      Labels   : ML_Types.Integer_List;
+      Col_Names  : ML_Types.Indef_String_List;
+      Data       : Data_List;
    end record;
 
-   type Dictionary_Record is record
-      Key   : Unbounded_String;
-      Value : Natural := 0;
-   end record;
-
-   package Dictionary_Package is new
-     Ada.Containers.Doubly_Linked_Lists (Dictionary_Record);
-   subtype Dictionary_List is Dictionary_Package.List;
-
-   function Get_Data (File_Name : String; Dictionary : Dictionary_List)
-                      return Data_Record;
-   procedure Print_Bayes_Data
-     (Classifier : Python.Module; CLF : Python_API.PyObject_Ptr;
-      Word_Dict  : Dictionary_List; Sentence : ML_Types.Indef_String_List);
-   function Read_Vocabulary (File_Name : String) return Dictionary_List;
-   function Tokenize (Data : String; Dictionary : Dictionary_List)
-                      return Integer_Array;
-   function Word_List  (Dictionary : Dictionary_List)
-                        return ML_Types.Indef_String_List;
+   function Get_Data (File_Name : String) return Data_Record;
 
 end Support_22A;

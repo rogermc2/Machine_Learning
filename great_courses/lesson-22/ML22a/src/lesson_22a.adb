@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
---  withML_Types;
+with ML_Types;
 --  with Neural_Utilities;
 with Python; use Python;
 with Python_API;
@@ -12,15 +12,16 @@ with Python_CLF;
 with Support_22A; use Support_22A;
 
 procedure Lesson_22A is
-   subtype String_10 is String (1 .. 10);
-   type String10_Array is array (1 .. 5) of String_10;
+--     subtype String_10 is String (1 .. 10);
+--     type String10_Array is array (1 .. 5) of String_10;
 
    Project_Name           : constant String := "Lesson_22A ";
-   Data_File_Name        : constant String := "../../data/ihdp_npci_1.csv";
+   Data_File_Name         : constant String := "../../data/ihdp_npci_1.csv";
    Classifier             : Module;
-   Col                  : constant String10_Array :=
-                              ("treatment ", "y_factual ", "y_cfactual",
-                               "mu0       ", "mu1       ");
+   Col                    : ML_Types.Indef_String_List;
+--     Col                  : constant String10_Array :=
+--                                ("treatment ", "y_factual ", "y_cfactual",
+--                                 "mu0       ", "mu1       ");
 
    CLF                    : Python_API.PyObject_Ptr;
 
