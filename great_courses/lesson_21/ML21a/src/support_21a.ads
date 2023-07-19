@@ -1,6 +1,5 @@
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with Python;
 
 package Support_21A is
 
@@ -15,9 +14,11 @@ package Support_21A is
    type Integer_Tensor is array (Integer range <>, Integer range <>,
                                Integer range <>) of Integer;
 
-   function Binarize (Classifier : Python.Module;
-                      Num_Rows, Num_Cols, Num_Cats : Positive;
-                      Grid_Map : Integer_Matrix) return Boolean_Tensor;
+   function Compute_Map_Matrix (Grid_Map : Integer_Matrix; Num_Cats : Positive)
+                                return Boolean_Tensor;
+   function Compute_Transition_Matrix
+     (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Actions_Matrix;
+      Mat_Map                         : Boolean_Tensor) return Boolean_Tensor;
    procedure Plot_Policy
      (Num_Rows, Num_Cols : Positive; Policy : Real_Float_Matrix;
       Actions : Actions_Matrix);

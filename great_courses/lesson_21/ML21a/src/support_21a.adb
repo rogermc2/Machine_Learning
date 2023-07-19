@@ -4,64 +4,14 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
 --  with Basic_Printing; use Basic_Printing;
-with Python_21A;
 
 package body Support_21A is
 
    type Actions_Array is array (Integer range <>) of Actions_Range;
 
-   function Compute_Map_Matrix (Grid_Map : Integer_Matrix; Num_Cats : Positive)
-                                return Boolean_Tensor;
-   function Compute_Transition_Matrix
-     (Num_Rows, Num_Cols, Num_Actions : Positive; Actions : Actions_Matrix;
-      Mat_Map                         : Boolean_Tensor) return Boolean_Tensor;
    function Get_Action (Matrix : Actions_Matrix; Row : Integer)
                         return Actions_Array;
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float;
-
-   --  -------------------------------------------------------------------------
-
-   --  Binarize grid_map, adding an additional dimension representing the value
-   --  in the cell to make matmap.
-   --  Values in matmap equal 1 if the value of row and column of that cell in
-   --  grid_map equal is the value of the third dimension of the cell.
-   --  Clip keeps the current location in the grid to be within the size of the grid.
-   function Binarize (Classifier                   : Python.Module;
-                      Num_Rows, Num_Cols, Num_Cats : Positive;
-                      Grid_Map                     : Integer_Matrix)
-                      return Boolean_Tensor is
-      --        use Real_Float_Arrays;
-      Routine_Name      : constant String := "Support_21A.Binarize ";
-      Rewards           : constant Integer_Array (Grid_Map'Range) :=
-        (0, -1, -1, -1, 10);
-      Num_Actions       : constant Positive := 5;
-      --        Rows_x_Cols       : constant Positive := Num_Rows * Num_Cols;
-      --  Acts defines how each action changes the row and column
-      Actions           : constant Actions_Matrix (1 .. Num_Actions, 1 ..2) :=
-        ((-1,0), (0,1), (1,0), (0,-1), (0,0));
-      --  Mat_Map is a binarised version of Grid_Map in which the value of
-      --  Mat_Map is 1 (otherwise 0) if the Grid_Map row and column
-      --  equals the index of the third dimension of the cell.
-      Mat_Map           : constant Boolean_Tensor :=
-        Compute_Map_Matrix (Grid_Map, Num_Cats);
-      --  Mat_Transition indicates whether or not a given action will cause
-      --  a transition between a given pair of locations.
-      Mat_Transition    : constant Boolean_Tensor :=
-        Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
-                                   Mat_Map);
-   begin
-      --  Rewards   (0, -1, -1, -1, 10);
-      --  Actions   ((-1,0), (0,1), (1,0), (0,-1), (0,0));
-      declare
-         Result : constant Python_21A.Plan_Data :=
-           Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition);
-      begin
-         Plot_Policy (Num_Rows, Num_Cols, Result.Policy, Actions);
-      end;
-
-      return Mat_Transition;
-
-   end Binarize;
 
    --  -------------------------------------------------------------------------
    --  Clip keeps the current grid location within the grid boundary
@@ -208,7 +158,7 @@ package body Support_21A is
                           Policy : Real_Float_Matrix;
                           Actions : Actions_Matrix) is
       use Ada.Strings.Unbounded;
-      Routine_Name : constant String := "Support_21A.Plot_Policy ";
+--        Routine_Name : constant String := "Support_21A.Plot_Policy ";
       Signs        : constant String (1 .. 7) := "^>v<x ?";
       Policy_Grid  : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
         (others => (others => 6));
