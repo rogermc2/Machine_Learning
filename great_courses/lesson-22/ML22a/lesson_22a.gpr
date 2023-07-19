@@ -1,4 +1,4 @@
-project ML22A is
+project Lesson_22a is
 
    type Operating_System_Type is
       ("high_sierra", "ventura");
@@ -26,5 +26,5 @@ project ML22A is
       end case;
    end Linker;
 
-end ML22A;
+end Lesson_22a;
 
