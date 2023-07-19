@@ -3,7 +3,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Python_21A;
 
 package body Support_21A is
@@ -18,7 +18,6 @@ package body Support_21A is
    function Get_Action (Matrix : Actions_Matrix; Row : Integer)
                         return Actions_Array;
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float;
-   procedure Print_Actions_Matrix (Name  : String; aMatrix : Actions_Matrix);
 
    --  -------------------------------------------------------------------------
 
@@ -51,18 +50,13 @@ package body Support_21A is
         Compute_Transition_Matrix (Num_Rows, Num_Cols, Num_Actions, Actions,
                                    Mat_Map);
    begin
-      Put_Line (Routine_Name);
-      --        Print_Boolean_Tensor (Routine_Name & "Mat_Transition", Mat_Transition, 2, 2);
-      --        Print_Boolean_Tensor (Routine_Name & "Mat_Map 5)", Mat_Map, 5, 5);
-
       --  Rewards   (0, -1, -1, -1, 10);
       --  Actions   ((-1,0), (0,1), (1,0), (0,-1), (0,0));
       declare
          Result : constant Python_21A.Plan_Data :=
            Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition);
       begin
---           Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
-         Plot_Policy ( Num_Cols, Result.Policy, Actions);
+         Plot_Policy (Num_Rows, Num_Cols, Result.Policy, Actions);
       end;
 
       return Mat_Transition;
@@ -159,33 +153,20 @@ package body Support_21A is
       Assert (Policy (Row, 1)'Valid, Routine_Name & "invalid Policy: " &
                 Float'Image  (Policy (Row, 1)));
       while Policy_Grid (Row, Col) = 6 loop
-         Put_Line (Routine_Name & "Row, Col:" &
-                     Integer'Image (Row) & Integer'Image (Col));
          --  Policy dimensions rows x cols, actions
          Policy_Row := (Row - 1) * Num_Grid_Cols + Col;
          Max_Prob := Pi_Max (Policy, Policy_Row);
-         Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
 
          --  Actions: ((-1,0), (0,1), (1,0), (0,-1), (0,0))
          for act in 1 .. 5 loop
             if Policy (Policy_Row, act) = Max_Prob then
---                 Print_Float_Matrix
---                   (Routine_Name & "Policy row" &
---                      Integer'Image (Policy_Row), Slice (Policy, Policy_Row,
---                        Policy_Row));
                Action := act;
             end if;
          end loop;
 
          Policy_Grid (Row, Col) := Action;
-         Put_Line (Routine_Name & "Action" & Integer'Image (Action));
-         --  Actions: ((-1,0), (0,1), (1,0), (0,-1), (0,0))
          Row := Row + Actions (Action, 1);
          Col := Col + Actions (Action, 2);
-         --  Col := Clip (Col + Actions (Action, 2), 1, Num_Cols);
-         Put_Line (Routine_Name & "next Row" & Integer'Image (Row));
-         Put_Line (Routine_Name & "next Col" & Integer'Image (Col));
-         New_Line;
          Find_Policy (Policy_Grid, Policy, Actions, Num_Grid_Cols, Row, Col);
       end loop;
 
@@ -208,14 +189,11 @@ package body Support_21A is
    --  ------------------------------------------------------------------------
 
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float is
-      Routine_Name : constant String := "Support_21A.Pi_Max ";
+--        Routine_Name : constant String := "Support_21A.Pi_Max ";
       Result       : Float := Policy (Row, 1);
    begin
-      Print_Float_Array (Routine_Name & "Policy, Row:" & Integer'Image (Row),
-                         Get_Row (Policy, Row));
       for col in Policy'Range (2) loop
          if Policy (Row, col) > Result then
---              Put_Line (Routine_Name & "Policy, max col:" & Integer'Image (col));
             Result := Policy (Row, col);
          end if;
       end loop;
@@ -226,23 +204,22 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Plot_Policy (Num_Grid_Cols : Positive; Policy  : Real_Float_Matrix;
+   procedure Plot_Policy (Num_Rows, Num_Cols : Positive;
+                          Policy : Real_Float_Matrix;
                           Actions : Actions_Matrix) is
       use Ada.Strings.Unbounded;
       Routine_Name : constant String := "Support_21A.Plot_Policy ";
-      Signs        : constant String (1 .. 7) := "^>v<x? ";
-      Policy_Grid  : Integer_Matrix (Policy'Range, Policy'Range (2)) :=
+      Signs        : constant String (1 .. 7) := "^>v<x ?";
+      Policy_Grid  : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
         (others => (others => 6));
       Line         : Unbounded_String;
    begin
-      Print_Actions_Matrix (Routine_Name & "Actions", Actions);
-      Find_Policy (Policy_Grid, Policy, Actions, Num_Grid_Cols, 1, 1);
-      Print_Integer_Matrix (Routine_Name & "Policy_Grid", Policy_Grid);
+      Find_Policy (Policy_Grid, Policy, Actions, Num_Cols, 1, 1);
 
-      for row in Policy'Range loop
+      for row in 1 .. Num_Rows loop
          Line := To_Unbounded_String ("");
-         for col in Policy'Range (2) loop
-            Line := Line & Signs (Policy_Grid (row, col) + 1);
+         for col in 1 .. Num_Cols loop
+            Line := Line & Signs (Policy_Grid (row, col));
          end loop;
          Put_Line (To_String (Line));
       end loop;
@@ -251,7 +228,7 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Print_Actions_Matrix  (Name : String; aMatrix : Actions_Matrix) is
+   procedure Print_Actions_Matrix (Name : String; aMatrix : Actions_Matrix) is
    begin
       Put_Line (Name & ": ");
       for row in aMatrix'Range loop
