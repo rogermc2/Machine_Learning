@@ -62,7 +62,7 @@ package body Support_21A is
            Python_21A.Set_Policy (Classifier, Rewards, Mat_Map, Mat_Transition);
       begin
 --           Print_Float_Matrix (Routine_Name & "Result.Policy", Result.Policy);
-         Plot_Policy (Result.Policy, Actions);
+         Plot_Policy ( Num_Cols, Result.Policy, Actions);
       end;
 
       return Mat_Transition;
@@ -148,10 +148,8 @@ package body Support_21A is
 
    procedure Find_Policy
      (Policy_Grid : in out Integer_Matrix; Policy : Real_Float_Matrix;
-      Actions     : Actions_Matrix; Row_In, Col_In : Positive) is
+      Actions     : Actions_Matrix; Num_Grid_Cols, Row_In, Col_In : Positive) is
       Routine_Name : constant String := "Support_21A.Find_Policy ";
-      Num_Cols     : constant Positive := Policy_Grid'Length (2);
-      --        Num_Rows     : constant Positive := Policy_Grid'Length;
       Row          : Positive := Row_In;
       Col          : Positive := Col_In;
       Policy_Row   : Positive;
@@ -163,10 +161,8 @@ package body Support_21A is
       while Policy_Grid (Row, Col) = 6 loop
          Put_Line (Routine_Name & "Row, Col:" &
                      Integer'Image (Row) & Integer'Image (Col));
-         Put_Line (Routine_Name & "Policy_Grid (Row, Col): " &
-                     Integer'Image (Policy_Grid (Row, Col)));
          --  Policy dimensions rows x cols, actions
-         Policy_Row := (Row - 1) * Num_Cols + col;
+         Policy_Row := (Row - 1) * Num_Grid_Cols + Col;
          Max_Prob := Pi_Max (Policy, Policy_Row);
          Put_Line (Routine_Name & "Max_Prob: " & Float'Image (Max_Prob));
 
@@ -182,7 +178,7 @@ package body Support_21A is
          end loop;
 
          Policy_Grid (Row, Col) := Action;
-         Put_Line (Routine_Name & "next Action" & Integer'Image (Action));
+         Put_Line (Routine_Name & "Action" & Integer'Image (Action));
          --  Actions: ((-1,0), (0,1), (1,0), (0,-1), (0,0))
          Row := Row + Actions (Action, 1);
          Col := Col + Actions (Action, 2);
@@ -190,7 +186,7 @@ package body Support_21A is
          Put_Line (Routine_Name & "next Row" & Integer'Image (Row));
          Put_Line (Routine_Name & "next Col" & Integer'Image (Col));
          New_Line;
-         Find_Policy (Policy_Grid, Policy, Actions, Row, Col);
+         Find_Policy (Policy_Grid, Policy, Actions, Num_Grid_Cols, Row, Col);
       end loop;
 
    end Find_Policy;
@@ -212,11 +208,11 @@ package body Support_21A is
    --  ------------------------------------------------------------------------
 
    function Pi_Max (Policy : Real_Float_Matrix; Row : Positive) return Float is
---        Routine_Name : constant String := "Support_21A.Pi_Max ";
+      Routine_Name : constant String := "Support_21A.Pi_Max ";
       Result       : Float := Policy (Row, 1);
    begin
---        Print_Float_Array (Routine_Name & "Policy, Row:" & Integer'Image (Row),
---                           Get_Row (Policy, Row));
+      Print_Float_Array (Routine_Name & "Policy, Row:" & Integer'Image (Row),
+                         Get_Row (Policy, Row));
       for col in Policy'Range (2) loop
          if Policy (Row, col) > Result then
 --              Put_Line (Routine_Name & "Policy, max col:" & Integer'Image (col));
@@ -230,7 +226,7 @@ package body Support_21A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Plot_Policy (Policy  : Real_Float_Matrix;
+   procedure Plot_Policy (Num_Grid_Cols : Positive; Policy  : Real_Float_Matrix;
                           Actions : Actions_Matrix) is
       use Ada.Strings.Unbounded;
       Routine_Name : constant String := "Support_21A.Plot_Policy ";
@@ -240,7 +236,7 @@ package body Support_21A is
       Line         : Unbounded_String;
    begin
       Print_Actions_Matrix (Routine_Name & "Actions", Actions);
-      Find_Policy (Policy_Grid, Policy, Actions, 1, 1);
+      Find_Policy (Policy_Grid, Policy, Actions, Num_Grid_Cols, 1, 1);
       Print_Integer_Matrix (Routine_Name & "Policy_Grid", Policy_Grid);
 
       for row in Policy'Range loop
