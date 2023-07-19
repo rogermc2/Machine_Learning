@@ -35,8 +35,7 @@ def policy(rewards, matmap, mattrans):
         pi = K.softmax(beta*Q)
         v = rffk + gamma * K.reshape(K.sum(Q * pi,axis=1),(-1,1))
     planner = K.function([rk], [pi, Q])
-    r = np.array([0, -1, -1, -1, 10])
-    piout, Qout = planner([r])
+    piout, Qout = planner([np.asarray(rewards)])
     return (tuple (map (tuple, piout)), tuple(map (tuple, Qout)))
 
 def plot_matrix(matrix):
