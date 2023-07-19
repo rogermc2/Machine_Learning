@@ -24,6 +24,7 @@ package body Parsers is
          T_Row := PyTuple_GetItem (Tuple, row - 1);
          Vec (Integer (row)) := PyObject_IsTrue (T_Row) /= 0;
       end loop;
+
    end Parse_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -40,6 +41,7 @@ package body Parsers is
          Value := PyTuple_GetItem (Tuple, row - 1);
          Vec (Integer (row)) := Integer (PyLong_AsLong (Value));
       end loop;
+
    end Parse_Tuple;
 
    --  -------------------------------------------------------------------------
@@ -100,6 +102,15 @@ package body Parsers is
       end loop;
 
       return Result;
+
+   end Parse_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function Parse_Tuple (Tuple : PyObject_Ptr) return Float is
+      --        Routine_Name : constant String := "Parsers.Parse_Tuple Float ";
+   begin
+         return Float (PyFloat_AsDouble (PyTuple_GetItem (Tuple, 0)));
 
    end Parse_Tuple;
 

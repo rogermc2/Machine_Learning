@@ -15,7 +15,7 @@ def fetch_newsgroups():
     groups = ['rec.sport.baseball', 'rec.sport.hockey']
     newsgroups = fetch_20newsgroups(subset='all', remove = ['headers', 'footers', 'quotes'], categories = groups)
     print ("fetch_newsgroups newsgroups loaded")
-    print ("newsgroups", newsgroups.__dir__())
+    print ("fetch_newsgroups newsgroups", newsgroups.__dir__())
     return (tuple(map (tuple, newsgroups['data'])), tuple(map (tuple, newsgroups['filenames'])), tuple(map (tuple, newsgroups['target_names'])))
 
 def init_tokenizer(max_words):

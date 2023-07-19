@@ -24,6 +24,8 @@ package body Python_16A is
                   return Support_16A.Occurrences_Dictionary is
       use Interfaces.C;
       use Python_API;
+      Routine_Name    : constant String :=
+                          "Python_16A.CallOccurrences_Dictionary  ";
 
       function Py_BuildValue (Format : char_array; O1 : PyObject_Ptr)
                               return PyObject_Ptr;
@@ -34,12 +36,15 @@ package body Python_16A is
       PyResult : PyObject_Ptr;
       Result   : Support_16A.Occurrences_Dictionary;
    begin
+      Put_Line (Routine_Name);
       PyParams := Py_BuildValue (To_C ("(O)"), Tokeniser);
       PyResult := Python.Call_Object (F, PyParams);
       Py_DecRef (F);
-
-      Result := Parse_Occurrences_Dictionary (PyResult);
       Py_DecRef (PyParams);
+
+      Put_Line (Routine_Name & "Parse_Occurrences_Dictionary");
+      Result := Parse_Occurrences_Dictionary (PyResult);
+      Put_Line (Routine_Name & "Occurrences_Dictionary parsed");
       Py_DecRef (PyResult);
 
       return Result;
@@ -51,15 +56,20 @@ package body Python_16A is
    function Call (M : Python.Module; Function_Name : String)
                   return Support_16A.Newsgroups_Record is
       use Python_API;
+      Routine_Name    : constant String :=
+                          "Python_16A.Newsgroups_Record ";
       F        : constant PyObject_Ptr := Python.Get_Symbol (M, Function_Name);
       PyResult : PyObject_Ptr;
       Result   : Support_16A.Newsgroups_Record;
    begin
+      Put_Line (Routine_Name & Function_Name);
       PyResult := Python.Call_Object (F);
       Py_DecRef (F);
 
+      Put_Line (Routine_Name & "setting Result");
       Result := Parse_Tuples (PyResult);
       Py_DecRef (PyResult);
+      Put_Line (Routine_Name & "done");
 
       return Result;
 
@@ -106,6 +116,9 @@ package body Python_16A is
          end if;
       end loop;
 
+      Py_DecRef (Item_Ptr);
+      Py_DecRef (Py_Str_Ptr);
+
       return Data;
 
    end Parse_Occurrences_Dictionary;
@@ -128,6 +141,7 @@ package body Python_16A is
    begin
       New_Line;
       Assert (Tuple /= System.Null_Address, Routine_Name & "Tuple is null.");
+      Put_Line (Routine_Name);
 
       for item in 0 .. Tuple_Size - 1 loop
          Tuple_Item := PyTuple_GetItem (Tuple, item);
@@ -136,14 +150,12 @@ package body Python_16A is
          Tuple_Item_Size := Integer (PyTuple_Size (Tuple_Item));
 
          declare
---              Text          : String (1 .. Tuple_Item_Size);
             Text          : Unbounded_String;
             Has_Long_Char : Boolean := False;
             Count         : Natural := 0;
             Continue      : Boolean := True;
             Index         : Natural := 0;
          begin
---              for index in 0 .. Tuple_Item_Size - 1 loop
             while Continue and then index < Tuple_Item_Size loop
                Py_Str_Ptr := PyTuple_GetItem (Tuple_Item, int (index));
                declare
@@ -175,6 +187,12 @@ package body Python_16A is
 
       end loop;
 
+      Py_DecRef (Tuple_Item);
+      Py_DecRef (Py_Str_Ptr);
+      Put_Line (Routine_Name & "Data_List length " &
+               Integer'Image (Integer (Data_List.Length)));
+      Put_Line (Routine_Name & "done.");
+
       return Data_List;
 
    end Parse_Text_Tuple;
@@ -185,12 +203,13 @@ package body Python_16A is
                           return Support_16A.Newsgroups_Record is
       use Interfaces.C;
       use Python_API;
-      --        Routine_Name : constant String := "Python_16A.Parse_Tuples  ";
+      Routine_Name : constant String := "Python_16A.Parse_Tuples  ";
       --        Tuples_Size  : constant int := PyTuple_Size (Tuples);
       Result       : Support_16A.Newsgroups_Record;
    begin
-      --        Put_Line (Routine_Name & "Tuple_Size" & int'Image (Tuples_Size));
       Result.Data := Parse_Text_Tuple (PyTuple_GetItem (Tuples, 0));
+      Put_Line (Routine_Name & "Result.Data length: " &
+                  Integer'Image (Integer (Result.Data.Length)));
       --        Result.Target := PyTuple_GetItem (Tuple, 1);
       --        Result.File_Names := PyTuple_GetItem (Tuple, 2);
       --        Result.Descr := PyTuple_GetItem (Tuple, 3);

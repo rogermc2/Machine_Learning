@@ -34,7 +34,9 @@ begin
                Integer'Image (Integer (Newsgroups.Data.Length)));
    New_Line;
    Tokenizer := Python.Call (Classifier, "init_tokenizer", Max_Words);
+   Put_Line (Program_Name  & "Tokenizer initialised");
    Python_CLF.Call (Classifier, "fit", Tokenizer, Newsgroups.Data);
+   Put_Line (Program_Name  & "data fitted");
    Sequences := Python_CLF.Call (Classifier, "get_sequences", Tokenizer,
                                  Newsgroups.Data);
    Put_Line (Program_Name  & "Sequences: " &
@@ -43,6 +45,7 @@ begin
    Word_Index := Python_16A.Call (Classifier, "get_word_index", Tokenizer);
    Put_Line (Program_Name & Integer'Image (Integer (Word_Index.Length)) &
                " unique tokens found.");
+
    declare
       Embedding_Matrix : Embedding_Matrix_Type := Prepare_Embedding_Matrix
         (Word_Index, Max_Words, Embedding_Dimension);
@@ -55,6 +58,7 @@ begin
    end;
    --     Python.Call (Classifier, "plot", Alphas, Result);
 
+   Python_API.Py_DecRef (Tokenizer);
    Python.Close_Module (Classifier);
    Python.Finalize;
 

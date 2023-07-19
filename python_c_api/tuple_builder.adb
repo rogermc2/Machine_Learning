@@ -8,6 +8,8 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
+--  with Basic_Printing; use Basic_Printing;
+
 package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
@@ -15,7 +17,7 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array) 
                       return PyObject_Ptr is
       use Interfaces.C;
-      Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      Routine_Name : constant String := "Python.To_Tuple Float_Array ";
       Value        : Float;
       Py_Row       : int := -1;
       Result       : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
@@ -37,18 +39,45 @@ package body Tuple_Builder is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array_3D) 
+                      return PyObject_Ptr is
+      use Interfaces.C;
+      use ML_Arrays_And_Matrices;
+      Routine_Name  : constant String := "Python.To_Tuple Float_Array_3D ";
+      Result        : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
+      Py_Matrix     : PyObject_Ptr;
+      aMatrix       : Real_Float_Matrix (Data'Range (2), Data'Range (3));
+      Py_Index      : int := -1;
+   begin
+      for mat in Data'Range loop
+         Py_Index := Py_Index + 1;
+         aMatrix := Get_Matrix (Data, mat);
+         Py_Matrix := To_Tuple (aMatrix);
+         PyTuple_SetItem (Result, Py_Index, Py_Matrix);
+      end loop;
+
+      return Result;
+
+   exception
+      when E : others =>
+         Put_Line (Routine_Name & "error" & Exception_Message (E));
+         raise;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array) 
                       return PyObject_Ptr is
       use Interfaces.C;
       Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
-      Value        : Integer;
       Py_Row       : int := -1;
       Result       : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
    begin
-      for row in Data'Range loop
+      for index in Data'Range loop
          Py_Row := Py_Row + 1;
-         Value := Data (row);
-         PyTuple_SetItem (Result, Py_Row, PyLong_FromLong (long (Value)));
+         PyTuple_SetItem (Result, Py_Row,
+                          PyLong_FromLong (long (Data (index))));
       end loop;
 
       return Result;
@@ -229,25 +258,14 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Matrix) 
                       return PyObject_Ptr is
       use Interfaces.C;
-      --        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
-      Num_Cols     : constant Positive := Data'Length (2);
-      Row_Size     : constant int := int (Num_Cols);
-      Value        : Integer;
-      Item         : PyObject_Ptr;
-      Py_Row       : int := -1;
-      Py_Col       : int := -1;
+      use ML_Arrays_And_Matrices;
+--        Routine_Name : constant String := "Python.To_Tuple Integer_Matrix ";
+      Py_Index     : int := -1;
       Result       : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
    begin
       for row in Data'Range loop
-         Item := PyTuple_New (Row_Size);
-         Py_Row := Py_Row + 1;
-         Py_Col := -1;
-         for col in Data'Range (2) loop
-            Py_Col := Py_Col + 1;
-            Value := Data (row, col);
-            PyTuple_SetItem (Item, Py_Col, PyLong_FromLong (long (Value)));
-         end loop;
-         PyTuple_SetItem (Result, Py_Row, Item);
+         Py_Index := Py_Index + 1;
+         PyTuple_SetItem (Result, Py_Index, To_Tuple (Get_Row (Data, row)));
       end loop;
       
       return Result;

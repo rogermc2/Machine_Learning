@@ -545,6 +545,27 @@ package body ML_Arrays_And_Matrices is
 
    --  ----------------------------------------------------------------------------
 
+   function Dot (L, R : Integer_Matrix) return Integer_Matrix is
+      L_Row  : Integer_Array (L'Range (2));
+      R_Col  : Integer_Array (R'Range);
+      Result : Integer_Matrix (L'Range, R'Range (2));
+   begin
+      Assert (L'Length = R'Length (2), "Dot, L'Length /= R'Length (2)");
+      for row in L'Range loop
+         L_Row := Get_Row (L, row);
+         for col in R'Range (2) loop
+            R_Col := Get_Col (R, col);
+            Result (row, col) := Dot (L_Row, R_Col);
+         end loop;
+
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
    function Dot (L : Real_Float_Vector; R : Integer_Matrix)
                  return Real_Float_Vector is
       Sum    : Float;
@@ -562,6 +583,19 @@ package body ML_Arrays_And_Matrices is
          end loop;
 
          Result (row) := Sum;
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
+   function Dot (L, R : Integer_Array) return Integer is
+      Result : Integer := 0;
+   begin
+      for index in L'Range loop
+         Result := Result + L (index) * R (index);
       end loop;
 
       return Result;
@@ -655,6 +689,20 @@ package body ML_Arrays_And_Matrices is
 
    --  -------------------------------------------------------------------------
 
+   function Get_Col (Matrix : Integer_Matrix; Col : Integer)
+                     return Integer_Array is
+      Result : Integer_Array (Matrix'Range);
+   begin
+      for row in Matrix'Range loop
+         Result (row) := Matrix  (row, Col);
+      end loop;
+
+      return Result;
+
+   end Get_Col;
+
+   --  ------------------------------------------------------------------------
+
    function Get_Row (Matrix : Binary_Matrix; Row : Integer)
                      return Binary_Array is
       Result : Binary_Array (Matrix'Range (2));
@@ -694,6 +742,22 @@ package body ML_Arrays_And_Matrices is
       return Result;
 
    end Get_Row;
+
+   --  ------------------------------------------------------------------------
+
+   function Get_Matrix (Array_3D : Float_Array_3D; Level : Integer)
+                        return Real_Float_Matrix is
+      Result : Real_Float_Matrix (Array_3D'Range (2), Array_3D'Range (3));
+   begin
+      for row in Array_3D'Range (2) loop
+         for col in Array_3D'Range (3) loop
+            Result (row, col) := Array_3D (Level, row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Get_Matrix;
 
    --  ------------------------------------------------------------------------
    --  Hadamard product

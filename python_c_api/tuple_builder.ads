@@ -10,6 +10,8 @@ package Tuple_Builder is
 
    function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array) 
                       return PyObject_Ptr;
+   function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array_3D) 
+                      return PyObject_Ptr;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Integer_Array) 
                       return PyObject_Ptr;
    function To_Tuple (Data : ML_Arrays_And_Matrices.Float_Array_List)

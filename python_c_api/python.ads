@@ -74,6 +74,9 @@ package Python is
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Integer_Array);
    function Call (M : Python.Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Integer_Array)
+                  return Python_API.PyObject_Ptr;
+   function Call (M : Python.Module; Function_Name : String;
                   A : ML_Arrays_And_Matrices.Integer_Array_List;
                   B : ML_Types.Integer_List) return Python_API.PyObject_Ptr;
    procedure Call (M    : Module; Function_Name : String;
@@ -112,6 +115,11 @@ package Python is
                   return ML_Arrays_And_Matrices.Real_Float_Vector;
    procedure Call (M    : Module; Function_Name : String;
                    A, B : ML_Arrays_And_Matrices.Real_Float_Matrix);
+   function Call (M : Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Real_Float_Matrix) return Float;
+   function Call (M : Module; Function_Name : String;
+                  A : ML_Arrays_And_Matrices.Real_Float_Matrix)
+                  return ML_Arrays_And_Matrices.Real_Float_Matrix;
    procedure Call (M : Module; Function_Name : String;
                    A : ML_Arrays_And_Matrices.Real_Float_Matrix;
                    B : ML_Arrays_And_Matrices.Boolean_Array);
@@ -137,6 +145,9 @@ package Python is
                    B : ML_Arrays_And_Matrices.Integer_Array);
    procedure Call (M          : Module; Function_Name : String;
                    A, B, C, D : ML_Arrays_And_Matrices.Real_Float_Vector);
+   procedure Call (M       : Module; Function_Name : String;
+                   A, B, C : ML_Arrays_And_Matrices.Real_Float_Vector;
+                   D       : ML_Arrays_And_Matrices.Float_Array_3D);
    procedure Call (M    : Module; Function_Name : String;
                    A, B : NL_Types.Float_List);
    procedure Call (M    : Module; Function_Name : String;
