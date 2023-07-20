@@ -1,4 +1,4 @@
-project Lesson_22a is
+project Lesson_22A is
 
    type Operating_System_Type is
       ("high_sierra", "ventura");
@@ -19,12 +19,12 @@ project Lesson_22a is
       case Operating_System is
 
          when "high_sierra" =>
-            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.9.16/Frameworks/Python.framework/Versions/3.9/lib", "-lpython3.9");
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.9/3.9.16/Frameworks/Python.framework/Versions/3.9/lib", "-lpython3.9");
 
          when "ventura" =>
-            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.11/3.9.16/Frameworks/Python.framework/Versions/3.9/lib", "-lpython3.9");
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.9/3.9.16/Frameworks/Python.framework/Versions/3.9/lib", "-lpython3.9");
       end case;
    end Linker;
 
-end Lesson_22a;
+end Lesson_22A;
 

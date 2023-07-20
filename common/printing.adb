@@ -33,22 +33,6 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Indefinite_List (Name    : String;
-                                    theList : ML_Types.Indef_String_List) is
-      use  ML_Types.Indefinite_String_Package;
-      Curs : Cursor := theList.First;
-   begin
-      Put_Line (Name & ": ");
-      while Has_Element (Curs) loop
-         Put_Line (Element (Curs));
-         Next (Curs);
-      end loop;
-      New_Line;
-
-   end Print_Indefinite_List;
-
-   --  ------------------------------------------------------------------------
-
    procedure Print_Integer_List (Name    : String;
                                  theList : ML_Types.Integer_List;
                                  Start : Positive := 1; Last : Positive := 10)

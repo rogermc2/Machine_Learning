@@ -26,5 +26,6 @@ package Support_22A is
    end record;
 
    function Get_Data (File_Name : String) return Data_Record;
+   procedure Print_Data (theList : Data_Record);
 
 end Support_22A;

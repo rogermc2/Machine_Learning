@@ -10,8 +10,6 @@ package Printing is
    procedure Print_Array_Of_Integer_Lists
      (Name    : String; theArray : ML_Types.Array_Of_Integer_Lists;
       Start   : Integer := 1; Finish : Integer := 0);
-   procedure Print_Indefinite_List (Name    : String;
-                                    theList : ML_Types.Indef_String_List);
    procedure Print_Integer_List (Name    : String;
                                  theList : ML_Types.Integer_List;
                                  Start : Positive := 1; Last : Positive := 10);

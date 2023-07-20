@@ -1,26 +1,26 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with Neural_Loader;
 
 package body Support_22A is
 
    function Feature_Names return ML_Types.Indef_String_List;
 
-  --  -------------------------------------------------------------------------
-  --  Feature: treatment, y_factual, y_cfactual, mu0, mu1, x1 .. x25
+   --  -------------------------------------------------------------------------
+   --  Feature: treatment, y_factual, y_cfactual, mu0, mu1, x1 .. x25
    function Get_Data (File_Name : String) return Data_Record is
       --        use Neural_Loader;
       use ML_Types;
       use Raw_Data_Package;
       --        Routine_Name : constant String := "Support_22A.Get_Data ";
---        File_ID         : File_Type;
+      --        File_ID         : File_Type;
       Raw_Data        : constant ML_Types.Raw_Data_Vector :=
-        Neural_Loader.Load_Raw_CSV_Data (File_Name);
+                          Neural_Loader.Load_Raw_CSV_Data (File_Name);
       CSV_Line        : Unbounded_List;
---        Value           : Unbounded_String;
+      --        Value           : Unbounded_String;
       Features_Row    : Row_Record;
       Data            : Data_Record;
    begin
@@ -32,9 +32,9 @@ package body Support_22A is
          --  Float_Data : Float_Data_Array (2 .. 11);
          --  X7_25      : Boolean_Data_Array (12 .. 25);
          for col in CSV_Line.First_Index + 1 .. CSV_Line.First_Index + 11 loop
---              Value := CSV_Line (col);
+            --              Value := CSV_Line (col);
             Features_Row.Float_Data (col) := Float'Value (To_String (CSV_Line (col)));
---              Value := CSV_Line (col + 11);
+            --              Value := CSV_Line (col + 11);
             Features_Row.X7_25 (col + 11) :=
               Integer'Value (To_String (CSV_Line (col + 11))) = 1;
          end loop;
@@ -74,5 +74,39 @@ package body Support_22A is
    end Feature_Names;
 
    --  -------------------------------------------------------------------------
+
+   procedure Print_Data (theList : Data_Record) is
+      use Data_Package;
+      Curs     : Cursor := theList.Data.First;
+      Data_Row : Row_Record;
+--        Count    : Positive := 1;
+   begin
+      Print_Indefinite_List ("", theList.Col_Names);
+      while Has_Element (Curs) loop
+         Data_Row := theList.Data (Curs);
+         Put (Boolean'Image (Data_Row.Treatment));
+         for col in Data_Row.Float_Data'Range loop
+            Put (Float'Image (Data_Row.Float_Data (col)) & "  ");
+--              Count := Count + 1;
+--              if Count > 10 then
+--                 New_Line;
+--                 Count := 1;
+--              end if;
+         end loop;
+         for col in Data_Row.X7_25'Range loop
+            Put (Boolean'Image (Data_Row.X7_25 (col)) & "  ");
+--              Count := Count + 1;
+--              if Count > 10 then
+--                 New_Line;
+--                 Count := 1;
+--              end if;
+         end loop;
+         New_Line;
+         Next (Curs);
+      end loop;
+
+   end Print_Data;
+
+   --  ------------------------------------------------------------------------
 
 end Support_22A;
