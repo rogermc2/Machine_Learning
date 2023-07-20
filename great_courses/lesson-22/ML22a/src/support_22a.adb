@@ -1,35 +1,54 @@
 
-with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
+with Neural_Loader;
 
 package body Support_22A is
 
    function Feature_Names return ML_Types.Indef_String_List;
 
   --  -------------------------------------------------------------------------
-
+  --  Feature: treatment, y_factual, y_cfactual, mu0, mu1, x1 .. x25
    function Get_Data (File_Name : String) return Data_Record is
+      --        use Neural_Loader;
+      use ML_Types;
+      use Raw_Data_Package;
       --        Routine_Name : constant String := "Support_22A.Get_Data ";
-      File_ID         : File_Type;
+--        File_ID         : File_Type;
+      Raw_Data        : constant ML_Types.Raw_Data_Vector :=
+        Neural_Loader.Load_Raw_CSV_Data (File_Name);
+      CSV_Line        : Unbounded_List;
+      Value           : Unbounded_String;
+      Features_Row    : Row_Record;
       Data            : Data_Record;
    begin
       Data.Col_Names := Feature_Names;
-      Open (File_ID, In_File, File_Name);
-      while not End_Of_File (File_ID) loop
-         declare
-            aLine : constant String := Get_Line (File_ID);
-            Label : constant Integer := Integer'Value (aLine (1 .. 1));
-            Token : constant Integer_Array :=
-                      Tokenize (aLine (3 .. aLine'Last), Dictionary);
-         begin
-            Data.Labels.Append (Label);
-            Data.Features.Append (Token);
-         end;
+      for row in Raw_Data.First_Index .. Raw_Data.Last_Index loop
+         CSV_Line := Raw_Data (row);
+         Features_Row.Treatment :=
+           Integer'Value (To_String (CSV_Line.First_Element)) = 1;
+         for col in CSV_Line.First_Index + 1 .. CSV_Line.Last_Index loop
+            Value := CSV_Line (col);
+         end loop;
       end loop;
+      --        Open (File_ID, In_File, File_Name);
+--        while not End_Of_File (File_ID) loop
+--           declare
+--              aLine     : constant String := Get_Line (File_ID);
+--              Treatment : constant Integer := Integer'Value (aLine (1 .. 1));
+--              Token : constant Integer_Array :=
+--                        Tokenize (aLine (3 .. aLine'Last), Dictionary);
+--           begin
+--              Row.Treatment := Treatment = 1;
+--              Data.Labels.Append (Label);
+--              Data.Features.Append (Token);
+--           end;
+--        end loop;
+--
+--        Close (File_ID);
 
-      Close (File_ID);
       return Data;
 
    end Get_Data;
