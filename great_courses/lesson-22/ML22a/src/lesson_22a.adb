@@ -11,6 +11,14 @@ with Python_CLF;
 
 with Support_22A; use Support_22A;
 
+--  A clinical trial in the 1980s called the Infant Health and Development
+--  Program or IHDP looked at the cognitive capacity of premature infants
+--  and the impact of treatments on their development.
+--  The IHDP dataset contains instances from their randomized study and
+--  records properties of the children and their caregivers.
+--  An important question the data can address is: does treatment from a
+--  specialized therapist result in better outcomes than treatment from other
+--  care givers?
 procedure Lesson_22A is
 --     subtype String_10 is String (1 .. 10);
 --     type String10_Array is array (1 .. 5) of String_10;

@@ -6,37 +6,16 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Support_22A is
 
-   function Set_Col_Names return ML_Types.Indef_String_List;
+   function Feature_Names return ML_Types.Indef_String_List;
 
   --  -------------------------------------------------------------------------
-
-   function Find_Item
-     (Dictionary : Dictionary_List; Key : Unbounded_String;
-      Item       : out Dictionary_Record) return Boolean is
-      use Dictionary_Package;
-      --        Routine_Name : constant String := "Support_6A.Find_Item ";
-      Curs  : Cursor := Dictionary.First;
-      Found : Boolean := False;
-
-   begin
-      while Has_Element (Curs) and not Found loop
-         Item := Element (Curs);
-         Found := Item.Key = Key;
-         Next (Curs);
-      end loop;
-
-      return Found;
-
-   end Find_Item;
-
-   --  -------------------------------------------------------------------------
 
    function Get_Data (File_Name : String) return Data_Record is
       --        Routine_Name : constant String := "Support_22A.Get_Data ";
       File_ID         : File_Type;
       Data            : Data_Record;
    begin
-      Data.Col_Names := Set_Col_Names;
+      Data.Col_Names := Feature_Names;
       Open (File_ID, In_File, File_Name);
       while not End_Of_File (File_ID) loop
          declare
@@ -56,8 +35,13 @@ package body Support_22A is
    end Get_Data;
 
    --  -------------------------------------------------------------------------
-
-   function Set_Col_Names return ML_Types.Indef_String_List is
+   --  Treatment is a 0/1 variable that indicates the absence or presence of
+   --  specialized treatment for each child.
+   --  The feature labeled y_factual is an assessment of the child's
+   --  improvements in cognitive development.
+   --  The other features are not given semantically meaningful names to
+   --  protect the privacy of the participants.
+   function Feature_Names return ML_Types.Indef_String_List is
       use Ada.Strings;
       use ML_Types;
       use Indefinite_String_Package;
@@ -77,7 +61,7 @@ package body Support_22A is
 
       return Cols;
 
-   end Set_Col_Names;
+   end Feature_Names;
 
    --  -------------------------------------------------------------------------
 
