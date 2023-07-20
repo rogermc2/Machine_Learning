@@ -20,7 +20,7 @@ package body Support_22A is
       Raw_Data        : constant ML_Types.Raw_Data_Vector :=
         Neural_Loader.Load_Raw_CSV_Data (File_Name);
       CSV_Line        : Unbounded_List;
-      Value           : Unbounded_String;
+--        Value           : Unbounded_String;
       Features_Row    : Row_Record;
       Data            : Data_Record;
    begin
@@ -29,25 +29,17 @@ package body Support_22A is
          CSV_Line := Raw_Data (row);
          Features_Row.Treatment :=
            Integer'Value (To_String (CSV_Line.First_Element)) = 1;
-         for col in CSV_Line.First_Index + 1 .. CSV_Line.Last_Index loop
-            Value := CSV_Line (col);
+         --  Float_Data : Float_Data_Array (2 .. 11);
+         --  X7_25      : Boolean_Data_Array (12 .. 25);
+         for col in CSV_Line.First_Index + 1 .. CSV_Line.First_Index + 11 loop
+--              Value := CSV_Line (col);
+            Features_Row.Float_Data (col) := Float'Value (To_String (CSV_Line (col)));
+--              Value := CSV_Line (col + 11);
+            Features_Row.X7_25 (col + 11) :=
+              Integer'Value (To_String (CSV_Line (col + 11))) = 1;
          end loop;
+         Data.Data.Append (Features_Row);
       end loop;
-      --        Open (File_ID, In_File, File_Name);
---        while not End_Of_File (File_ID) loop
---           declare
---              aLine     : constant String := Get_Line (File_ID);
---              Treatment : constant Integer := Integer'Value (aLine (1 .. 1));
---              Token : constant Integer_Array :=
---                        Tokenize (aLine (3 .. aLine'Last), Dictionary);
---           begin
---              Row.Treatment := Treatment = 1;
---              Data.Labels.Append (Label);
---              Data.Features.Append (Token);
---           end;
---        end loop;
---
---        Close (File_ID);
 
       return Data;
 
@@ -62,8 +54,7 @@ package body Support_22A is
    --  protect the privacy of the participants.
    function Feature_Names return ML_Types.Indef_String_List is
       use Ada.Strings;
-      use ML_Types;
-      use Indefinite_String_Package;
+      use ML_Types.Indefinite_String_Package;
       --        Routine_Name : constant String := "Support_22A.Set_Col_Names ";
       X_String    : Unbounded_String;
       Cols        : ML_Types.Indef_String_List;

@@ -12,8 +12,8 @@ package Support_22A is
 
    type Row_Record is record
       Treatment  : Boolean;
-      X1_6       : Float_Data_Array (1 .. 6);
-      X7_25      : Boolean_Data_Array (7 .. 25);
+      Float_Data : Float_Data_Array (2 .. 11);
+      X7_25      : Boolean_Data_Array (12 .. 25);
    end record;
 
    package Data_Package is new
