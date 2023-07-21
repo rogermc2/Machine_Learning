@@ -26,6 +26,8 @@ package Support_22A is
    end record;
 
    function Get_Data (File_Name : String) return Data_Record;
+   function Get_X_Names (Names : ML_Types.Indef_String_List)
+                         return Unbounded_String;
    procedure Print_Data (theList : Data_Record; Start : Positive := 1;
                          Finish  : Natural := 0);
 

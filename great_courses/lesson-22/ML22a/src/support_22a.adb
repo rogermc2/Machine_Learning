@@ -13,15 +13,12 @@ package body Support_22A is
    --  -------------------------------------------------------------------------
    --  Feature: treatment, y_factual, y_cfactual, mu0, mu1, x1 .. x25
    function Get_Data (File_Name : String) return Data_Record is
-      --        use Neural_Loader;
       use ML_Types;
       use Raw_Data_Package;
       --        Routine_Name : constant String := "Support_22A.Get_Data ";
-      --        File_ID         : File_Type;
       Raw_Data        : constant ML_Types.Raw_Data_Vector :=
                           Neural_Loader.Load_Raw_CSV_Data (File_Name);
       CSV_Line        : Unbounded_List;
-      --        Value           : Unbounded_String;
       Features_Row    : Row_Record;
       Data            : Data_Record;
    begin
@@ -30,15 +27,12 @@ package body Support_22A is
          CSV_Line := Raw_Data (row);
          Features_Row.Treatment :=
            Integer'Value (To_String (CSV_Line.First_Element)) = 1;
-         --  Float_Data : Float_Data_Array (2 .. 11);
-         --  X7_25      : Boolean_Data_Array (12 .. 25);
          for col in Features_Row.Float_Data'Range loop
-            --              Value := CSV_Line (col);
             Features_Row.Float_Data (col) :=
               Float'Value (To_String (CSV_Line (col)));
          end loop;
+
          for col in Features_Row.X7_25'Range loop
-            --              Value := CSV_Line (col + 11);
             Features_Row.X7_25 (col) :=
               Integer'Value (To_String (CSV_Line (col))) = 1;
          end loop;
@@ -78,6 +72,33 @@ package body Support_22A is
    end Feature_Names;
 
    --  -------------------------------------------------------------------------
+
+   function Get_X_Names (Names : ML_Types.Indef_String_List)
+                         return Unbounded_String is
+      use  ML_Types.Indefinite_String_Package;
+      Curs   : Cursor := Names.First;
+      Name   : Unbounded_String;
+      Count  : Natural := 0;
+      Result : Unbounded_String;
+   begin
+      New_Line;
+      while Has_Element (Curs) loop
+         Count := Count + 1;
+         if Count > 5 then
+            Name := To_Unbounded_String (Element (Curs));
+            Result := Result & Name;
+            if Count < Integer (Names.Length) then
+               Result := Result & To_Unbounded_String ("+");
+            end if;
+         end if;
+         Next (Curs);
+      end loop;
+
+      return Result;
+
+   end Get_X_Names;
+
+   --  ------------------------------------------------------------------------
 
    procedure Print_Data (theList : Data_Record; Start : Positive := 1;
                          Finish  : Natural := 0) is

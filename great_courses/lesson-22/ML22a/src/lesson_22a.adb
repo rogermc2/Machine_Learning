@@ -32,18 +32,17 @@ procedure Lesson_22A is
 
    --  -------------------------------------------------------------------------
 begin
+   Put_Line (Project_Name);
    Print_Data (Data, 1, 3);
-   for index in 1 .. 25 loop
-      X_String := Trim (To_Unbounded_String (Integer'Image(index)),
-                        Ada.Strings.Both);
-   end loop;
+   X_String := Get_X_Names (Data.Col_Names);
+   Put_Line (Project_Name & "X_String set.");
 
    Python.Initialize;
-   Classifier := Import_File ("lesson_22a");
-   Python.Call (Classifier, "init_model");
-   --     Python_API.Py_DecRef (CLF);
-   --     CLF := Python_CLF.Call (Classifier, "multinomial_fit",
-   --                             Train_Data.Features, Train_Data.Labels);
+   Classifier := Python.Import_File ("lesson_22a");
+--     Python.Call (Classifier, "init_model");
+--     --     Python_API.Py_DecRef (CLF);
+--     --     CLF := Python_CLF.Call (Classifier, "multinomial_fit",
+--     --                             Train_Data.Features, Train_Data.Labels);
 
    Python.Finalize;
 
