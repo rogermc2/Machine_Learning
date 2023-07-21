@@ -1,12 +1,14 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 --  with Basic_Printing; use Basic_Printing;
 --  with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with ML_Types;
 --  with Neural_Utilities;
 with Python; use Python;
---  with Python_API;
+with Python_API;
 --  with Python_CLF;
 
 with Support_22A; use Support_22A;
@@ -24,18 +26,24 @@ procedure Lesson_22A is
    Project_Name           : constant String := "Lesson_22A ";
    Data_File_Name         : constant String := "../../data/ihdp_npci_1.csv";
    Data                   : constant Data_Record := Get_Data (Data_File_Name);
+   X_String               : Unbounded_String ;
    Classifier             : Module;
---     CLF                    : Python_API.PyObject_Ptr;
+   Model                  : Python_API.PyObject_Ptr;
 
    --  -------------------------------------------------------------------------
 begin
    Print_Data (Data, 1, 3);
+   for index in 1 .. 25 loop
+      X_String := Trim (To_Unbounded_String (Integer'Image(index)),
+                        Ada.Strings.Both);
+   end loop;
+
    Python.Initialize;
    Classifier := Import_File ("lesson_22a");
---     Python_CLF.Call (Classifier, "show_tree", CLF, Words);
---     Python_API.Py_DecRef (CLF);
---     CLF := Python_CLF.Call (Classifier, "multinomial_fit",
---                             Train_Data.Features, Train_Data.Labels);
+   Python.Call (Classifier, "init_model");
+   --     Python_API.Py_DecRef (CLF);
+   --     CLF := Python_CLF.Call (Classifier, "multinomial_fit",
+   --                             Train_Data.Features, Train_Data.Labels);
 
    Python.Finalize;
 
