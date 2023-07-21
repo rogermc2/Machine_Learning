@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Neural_Utilities;
 with Python; use Python;
 with Python_API;
---  with Python_CLF;
+with Python_CLF;
 
 with Support_22A; use Support_22A;
 
@@ -24,8 +24,8 @@ with Support_22A; use Support_22A;
 procedure Lesson_22A is
 
    Project_Name           : constant String := "Lesson_22A ";
-   Data_File_Name         : constant String := "../../data/ihdp_npci_1.csv";
-   Data                   : constant Data_Record := Get_Data (Data_File_Name);
+   Data_File              : constant String := "../../data/ihdp_npci_1.csv";
+   Data                   : constant Data_Record := Get_Data (Data_File);
    X_String               : Unbounded_String ;
    Classifier             : Module;
    Model                  : Python_API.PyObject_Ptr;
@@ -33,14 +33,14 @@ procedure Lesson_22A is
    --  -------------------------------------------------------------------------
 begin
    Put_Line (Project_Name);
-   Print_Data (Data, 1, 3);
+--     Print_Data (Data, 1, 3);
    X_String := Get_X_Names (Data.Col_Names);
    Put_Line (Project_Name & "X_String set.");
 
    Python.Initialize;
-   Classifier := Python.Import_File ("lesson_22a");
---     Python.Call (Classifier, "init_model");
---     --     Python_API.Py_DecRef (CLF);
+   Classifier := Python.Import_File ("py_22a");
+   Model := Call (Classifier, "init_model", Data);
+   Python_API.Py_DecRef (Model);
 --     --     CLF := Python_CLF.Call (Classifier, "multinomial_fit",
 --     --                             Train_Data.Features, Train_Data.Labels);
 

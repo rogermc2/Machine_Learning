@@ -46,7 +46,7 @@ package body Support_22A is
    --  -------------------------------------------------------------------------
    --  Treatment is a 0/1 variable that indicates the absence or presence of
    --  specialized treatment for each child.
-   --  The feature labeled y_factual is an assessment of the child's
+   --  The feature labeled y_factual is an assessment of the childs
    --  improvements in cognitive development.
    --  The other features are not given semantically meaningful names to
    --  protect the privacy of the participants.
