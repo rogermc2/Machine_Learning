@@ -39,6 +39,7 @@ begin
 
    Python.Initialize;
    Classifier := Python.Import_File ("py_22a");
+   Python.Call (Classifier, "install", "dowhy");
 --     Model := Call (Classifier, "init_model", Data);
    Python_API.Py_DecRef (Model);
 --     --     CLF := Python_CLF.Call (Classifier, "multinomial_fit",
