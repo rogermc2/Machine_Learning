@@ -29,7 +29,7 @@ procedure Lesson_22A is
 
    --  -------------------------------------------------------------------------
 begin
-   Print_Data (Data);
+   Print_Data (Data, 1, 3);
    Python.Initialize;
    Classifier := Import_File ("lesson_22a");
 --     Python_CLF.Call (Classifier, "show_tree", CLF, Words);

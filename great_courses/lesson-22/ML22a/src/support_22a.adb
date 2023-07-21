@@ -2,12 +2,13 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Neural_Loader;
 
 package body Support_22A is
 
    function Feature_Names return ML_Types.Indef_String_List;
+   procedure Print_Feature_Names (Names : ML_Types.Indef_String_List);
 
    --  -------------------------------------------------------------------------
    --  Feature: treatment, y_factual, y_cfactual, mu0, mu1, x1 .. x25
@@ -31,12 +32,15 @@ package body Support_22A is
            Integer'Value (To_String (CSV_Line.First_Element)) = 1;
          --  Float_Data : Float_Data_Array (2 .. 11);
          --  X7_25      : Boolean_Data_Array (12 .. 25);
-         for col in CSV_Line.First_Index + 1 .. CSV_Line.First_Index + 11 loop
+         for col in Features_Row.Float_Data'Range loop
             --              Value := CSV_Line (col);
-            Features_Row.Float_Data (col) := Float'Value (To_String (CSV_Line (col)));
+            Features_Row.Float_Data (col) :=
+              Float'Value (To_String (CSV_Line (col)));
+         end loop;
+         for col in Features_Row.X7_25'Range loop
             --              Value := CSV_Line (col + 11);
-            Features_Row.X7_25 (col + 11) :=
-              Integer'Value (To_String (CSV_Line (col + 11))) = 1;
+            Features_Row.X7_25 (col) :=
+              Integer'Value (To_String (CSV_Line (col))) = 1;
          end loop;
          Data.Data.Append (Features_Row);
       end loop;
@@ -75,37 +79,53 @@ package body Support_22A is
 
    --  -------------------------------------------------------------------------
 
-   procedure Print_Data (theList : Data_Record) is
+   procedure Print_Data (theList : Data_Record; Start : Positive := 1;
+                         Finish  : Natural := 0) is
       use Data_Package;
-      Curs     : Cursor := theList.Data.First;
-      Data_Row : Row_Record;
---        Count    : Positive := 1;
+      Curs      : Cursor := theList.Data.First;
+      Data_Row  : Row_Record;
+      Last_Item : Positive;
+      Count     : Natural := 0;
    begin
-      Print_Indefinite_List ("", theList.Col_Names);
+      Print_Feature_Names (theList.Col_Names);
+      if Finish > 0 then
+         Last_Item := Finish;
+      else
+         Last_Item := Integer (theList.Data.Length);
+      end if;
+
       while Has_Element (Curs) loop
-         Data_Row := theList.Data (Curs);
-         Put (Boolean'Image (Data_Row.Treatment));
-         for col in Data_Row.Float_Data'Range loop
-            Put (Float'Image (Data_Row.Float_Data (col)) & "  ");
---              Count := Count + 1;
---              if Count > 10 then
---                 New_Line;
---                 Count := 1;
---              end if;
-         end loop;
-         for col in Data_Row.X7_25'Range loop
-            Put (Boolean'Image (Data_Row.X7_25 (col)) & "  ");
---              Count := Count + 1;
---              if Count > 10 then
---                 New_Line;
---                 Count := 1;
---              end if;
-         end loop;
-         New_Line;
+         Count := Count + 1;
+         if Count >= Start and Count <= Last_Item then
+            Data_Row := theList.Data (Curs);
+            Put (Boolean'Image (Data_Row.Treatment));
+            for col in Data_Row.Float_Data'Range loop
+               Put (Float'Image (Data_Row.Float_Data (col)) & "  ");
+            end loop;
+            for col in Data_Row.X7_25'Range loop
+               Put (Boolean'Image (Data_Row.X7_25 (col)) & "  ");
+            end loop;
+            New_Line;
+         end if;
          Next (Curs);
       end loop;
 
    end Print_Data;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Feature_Names (Names : ML_Types.Indef_String_List) is
+      use  ML_Types.Indefinite_String_Package;
+      Curs : Cursor := Names.First;
+   begin
+      New_Line;
+      while Has_Element (Curs) loop
+         Put (Element (Curs) & " ");
+         Next (Curs);
+      end loop;
+      New_Line;
+
+   end Print_Feature_Names;
 
    --  ------------------------------------------------------------------------
 
