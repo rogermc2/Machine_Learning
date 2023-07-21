@@ -88,7 +88,7 @@ package body Python_22A is
 --        Col_Names  : ML_Types.Indef_String_List;
 --        Data       : Data_List;
 --     end record;
-      Tuple := PyTuple_New (int (Data'Length));
+      Col_Tuple := PyTuple_New (int (Data.Col_Names'Length));
       for row in Tensor'Range loop
          Row_Tuple := PyTuple_New (int (Tensor'Length (2)));
          Py_1 := Py_1 + 1;

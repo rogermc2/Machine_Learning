@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Neural_Utilities;
 with Python; use Python;
 with Python_API;
-with Python_CLF;
+--  with Python_CLF;
 
 with Support_22A; use Support_22A;
 
@@ -39,7 +39,7 @@ begin
 
    Python.Initialize;
    Classifier := Python.Import_File ("py_22a");
-   Model := Call (Classifier, "init_model", Data);
+--     Model := Call (Classifier, "init_model", Data);
    Python_API.Py_DecRef (Model);
 --     --     CLF := Python_CLF.Call (Classifier, "multinomial_fit",
 --     --                             Train_Data.Features, Train_Data.Labels);
