@@ -58,6 +58,48 @@ package body Python_22A is
 
    --  -------------------------------------------------------------------------
 
+   function To_Tuple (Data : Support_22A.Boolean_Data_Array)
+                      return PyObject_Ptr is
+      --        Routine_Name : constant String := "Python_22a.To_Tuple Boolean_Data_Array ";
+      Value        : long;
+      Py_Row       : int := -1;
+      Result       : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
+   begin
+      for row in Data'Range loop
+         Py_Row := Py_Row + 1;
+         if Data (row) then
+            Value := 1;
+         else
+            Value := 0;
+         end if;
+         PyTuple_SetItem (Result, Py_Row, PyBool_FromLong (Value));
+      end loop;
+
+      return Result;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Tuple (Data : Support_22A.Float_Data_Array)
+                      return PyObject_Ptr is
+      --        Routine_Name : constant String := "Python_22a.To_Tuple Float_Data_Array ";
+      Value        : Float;
+      Py_Row       : int := -1;
+      Result       : constant PyObject_Ptr := PyTuple_New (int (Data'Length));
+   begin
+      for row in Data'Range loop
+         Py_Row := Py_Row + 1;
+         Value := Data (row);
+         PyTuple_SetItem (Result, Py_Row, PyFloat_FromDouble (double (Value)));
+      end loop;
+
+      return Result;
+
+   end To_Tuple;
+
+   --  -------------------------------------------------------------------------
+
    function To_Tuple (Data : Support_22A.Data_Record) return PyObject_Ptr is
       use Tuple_Builder;
       use Support_22A;
@@ -65,35 +107,33 @@ package body Python_22A is
       --        Routine_Name : constant String := "Python_22a.To_Tuple Data_Package ";
       Curs            : Cursor := Data.Data.First;
       Row             : Row_Record;
-      Col_Tuple       : PyObject_Ptr;
-      Treatment       : Boolean;
-      Data_Tuple      : PyObject_Ptr := PyTuple_New (int (Data.Data.Length));
-      Tuple           : PyObject_Ptr;
+      Row_Tuple       : constant PyObject_Ptr := PyTuple_New (3);
+      Treatment       : long;
+      --        Float_Data      : Float_Data_Array (1 .. 10);
+      --        Float_Tuple     : PyObject_Ptr := PyTuple_New (10);
+      Data_Tuple      : constant PyObject_Ptr := PyTuple_New (int (Data.Data.Length));
+      Py_Row          : int := -1;
+      Tuple           : constant PyObject_Ptr := PyTuple_New (2);
    begin
-      Col_Tuple := To_Tuple (Data.Col_Names);
-
-      --  data = data.astype({"treatment": bool})
-
-      --     type Row_Record is record
-      --        Treatment  : Boolean;
-      --        Float_Data : Float_Data_Array (2 .. 11);
-      --        X7_25      : Boolean_Data_Array (12 .. 25);
-      --     end record;
-
-      --     package Data_Package is new
-      --       Ada.Containers.Doubly_Linked_Lists (Row_Record);
-      --     subtype Data_List is Data_Package.List;
-
-      --     type Data_Record is record
-      --        Col_Names  : ML_Types.Indef_String_List;
-      --        Data       : Data_List;
-      --     end record;
+      PyTuple_SetItem (Tuple, 0, To_Tuple (Data.Col_Names));
 
       while Has_Element (Curs) loop
          Row := Element (Curs);
-         Treatment := Row.Treatment;
+         if Row.Treatment then
+            Treatment := 1;
+         else
+            Treatment := 0;
+         end if;
+         PyTuple_SetItem (Row_Tuple, 0, PyBool_FromLong (Treatment));
+         PyTuple_SetItem (Row_Tuple, 1, To_Tuple (Row.Float_Data));
+         PyTuple_SetItem (Row_Tuple, 2, To_Tuple (Row.X7_25));
+         Py_Row := Py_Row + 1;
+         PyTuple_SetItem (Data_Tuple, Py_Row, To_Tuple (Row.X7_25));
+
          Next (Curs);
       end loop;
+
+      PyTuple_SetItem (Tuple, 1, Data_Tuple);
 
       return Tuple;
 
