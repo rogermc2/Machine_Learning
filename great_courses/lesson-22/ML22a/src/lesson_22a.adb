@@ -8,7 +8,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with ML_Types;
 --  with Neural_Utilities;
 with Python; use Python;
---  with Python_22A;
+with Python_22A;
 with Python_API;
 --  with Python_CLF;
 
@@ -40,7 +40,7 @@ begin
 
    Python.Initialize;
    Classifier := Python.Import_File ("py_22a");
---     Model := Python_22A.Set_Model (Classifier, Data);
+   Model := Python_22A.Set_Model (Classifier, Data);
    Python_API.Py_DecRef (Model);
 
    Python.Finalize;
