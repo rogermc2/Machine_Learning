@@ -30,12 +30,12 @@ package body Python_22A is
 
    --  -------------------------------------------------------------------------
 
-   function Set_Model (Classifier : Python.Module; Data : Support_22A.Data_Record)
+   function Set_Model (Classifier : Python.Module; Data : Data_Record;
+                       X_String   : Unbounded_String)
                        return Python_API.PyObject_Ptr is
-      --        use Tuple_Builder;
       --        Routine_Name    : constant String := "Python_22A.Set_Model  ";
 
-      function Py_BuildValue (Format : char_array; T1 : PyObject_Ptr)
+      function Py_BuildValue (Format : char_array; T1, S1 : PyObject_Ptr)
                               return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
@@ -45,7 +45,8 @@ package body Python_22A is
       PyParams    : PyObject_Ptr;
       PyResult    : PyObject_Ptr;
    begin
-      PyParams := Py_BuildValue (To_C ("(O)"), Data_Tuple);
+      PyParams := Py_BuildValue (To_C ("Os"), Data_Tuple,
+                                 PyBytes_AsString (To_String (X_String)));
       PyResult := Python.Call_Object (F, PyParams);
 
       Py_DecRef (F);
@@ -102,7 +103,6 @@ package body Python_22A is
 
    function To_Tuple (Data : Support_22A.Data_Record) return PyObject_Ptr is
       use Tuple_Builder;
-      use Support_22A;
       use Support_22A.Data_Package;
       --        Routine_Name : constant String := "Python_22a.To_Tuple Data_Package ";
       Curs            : Cursor := Data.Data.First;

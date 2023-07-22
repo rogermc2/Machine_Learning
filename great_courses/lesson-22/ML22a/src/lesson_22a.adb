@@ -27,7 +27,7 @@ procedure Lesson_22A is
    Project_Name           : constant String := "Lesson_22A ";
    Data_File              : constant String := "../../data/ihdp_npci_1.csv";
    Data                   : constant Data_Record := Get_Data (Data_File);
-   X_String               : Unbounded_String ;
+   X_String               : Unbounded_String;
    Classifier             : Module;
    Model                  : Python_API.PyObject_Ptr;
 
@@ -40,7 +40,7 @@ begin
 
    Python.Initialize;
    Classifier := Python.Import_File ("py_22a");
-   Model := Python_22A.Set_Model (Classifier, Data);
+   Model := Python_22A.Set_Model (Classifier, Data, X_String);
    Python_API.Py_DecRef (Model);
 
    Python.Finalize;
