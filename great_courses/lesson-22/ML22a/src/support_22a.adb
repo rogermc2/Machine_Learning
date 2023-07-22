@@ -15,7 +15,7 @@ package body Support_22A is
    function Get_Data (File_Name : String) return Data_Record is
       use ML_Types;
       use Raw_Data_Package;
-      --        Routine_Name : constant String := "Support_22A.Get_Data ";
+--        Routine_Name : constant String := "Support_22A.Get_Data ";
       Raw_Data        : constant ML_Types.Raw_Data_Vector :=
                           Neural_Loader.Load_Raw_CSV_Data (File_Name);
       CSV_Line        : Unbounded_List;
@@ -23,6 +23,7 @@ package body Support_22A is
       Data            : Data_Record;
    begin
       Data.Col_Names := Feature_Names;
+--        Print_Indefinite_List (Routine_Name & "Data.Col_Names", Data.Col_Names);
       for row in Raw_Data.First_Index .. Raw_Data.Last_Index loop
          CSV_Line := Raw_Data (row);
          Features_Row.Treatment :=

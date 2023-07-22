@@ -1,4 +1,5 @@
-
+import numpy as np
+import pandas as pd
 import dowhy
 from dowhy import CausalModel
 
@@ -9,6 +10,10 @@ from dowhy import CausalModel
 #import matplotlib
 #from matplotlib import pyplot
 
-def init_model(data):
-    print ("init_model")
-    return CausalModel(data = data, treatment='treatment', outcome='y_factual', common_causes=xs.split('+'))
+def init_model(col, data_in, xs):
+    print ("init_model data_in", len (data_in))
+    print ("init_model col", col)
+    data = pd.DataFrame(list(data_in))
+    print("data", data.shape)
+    data.columns = col
+    return CausalModel(data = data_array, treatment='treatment', outcome='y_factual', common_causes=xs.split('+'))

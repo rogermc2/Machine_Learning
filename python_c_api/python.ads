@@ -50,15 +50,15 @@ package Python is
                   return Python_API.PyObject_Ptr;
    procedure Call (M : Module; Function_Name : String;
                    A : Python_API.PyObject_Ptr);
-   function Call (M : Module; Function_Name : String; A : Python_API.PyObject_Ptr)
-                  return Integer;
+   function Call (M : Module; Function_Name : String;
+                  A : Python_API.PyObject_Ptr) return Integer;
    procedure Call (M : Module; Function_Name, A : String);
    function Call (M : Module; Function_Name, A : String)
                   return Python_API.PyObject_Ptr;
    function Call (M : Module; Function_Name : String; A : Float)
                   return Python_API.PyObject_Ptr;
-   function Call (M : Module; Function_Name : String; A : Python_API.PyObject_Ptr)
-                  return Boolean;
+   function Call (M : Module; Function_Name : String;
+                  A : Python_API.PyObject_Ptr) return Boolean;
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer)
