@@ -1,9 +1,3 @@
-#import sys
-#import subprocess
-
-# implement pip as a subprocess:
-#def install(package):
-#    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'dowhy'])
 
 import dowhy
 from dowhy import CausalModel
@@ -16,4 +10,5 @@ from dowhy import CausalModel
 #from matplotlib import pyplot
 
 def init_model(data):
+    print ("init_model")
     return CausalModel(data = data, treatment='treatment', outcome='y_factual', common_causes=xs.split('+'))

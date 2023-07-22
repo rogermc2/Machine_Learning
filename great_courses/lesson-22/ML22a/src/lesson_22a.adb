@@ -8,6 +8,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with ML_Types;
 --  with Neural_Utilities;
 with Python; use Python;
+--  with Python_22A;
 with Python_API;
 --  with Python_CLF;
 
@@ -39,11 +40,8 @@ begin
 
    Python.Initialize;
    Classifier := Python.Import_File ("py_22a");
-   Python.Call (Classifier, "install", "dowhy");
---     Model := Call (Classifier, "init_model", Data);
+--     Model := Python_22A.Set_Model (Classifier, Data);
    Python_API.Py_DecRef (Model);
---     --     CLF := Python_CLF.Call (Classifier, "multinomial_fit",
---     --                             Train_Data.Features, Train_Data.Labels);
 
    Python.Finalize;
 
