@@ -25,7 +25,7 @@ model=CausalModel(data = data,
                   common_causes=xs.split('+'))
 
 #Identify the causal effect
-print("identifying estimand takes many minutes")
+print("Identifying estimand takes many minutes")
 identified_estimand = model.identify_effect()
 print("identified_estimand: ", identified_estimand)
 print("done")

@@ -63,6 +63,9 @@ package Python is
                   return Integer;
    function Call (M : Module; Function_Name : String; A : Integer)
                   return Python_API.PyObject_Ptr;
+   function Call (M : Module; Function_Name : String; A, B : Integer;
+                  C : ML_Arrays_And_Matrices.Integer_Array)
+                  return Python_API.PyObject_Ptr;
    function Call (M : Module; Function_Name : String; A : Integer;
                   B : ML_Arrays_And_Matrices.Real_Float_Matrix)
                   return Python_API.PyObject_Ptr;
