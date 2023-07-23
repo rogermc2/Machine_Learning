@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-import dowhy
-from dowhy import CausalModel
+#import dowhy
+#from dowhy import CausalModel
 
 #from sklearn import tree
 #from sklearn.naive_bayes import MultinomialNB

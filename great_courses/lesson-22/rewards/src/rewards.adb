@@ -1,6 +1,16 @@
 --  Based on:
 --  https://github.com/py-why/dowhy/blob/main/docs/source/example_notebooks/dowhy_example_effect_of_memberrewards_program.ipynb
 
+--  Suppose that a website has a membership rewards program where customers
+--  receive additional benefits if they sign up.
+--  How do we know if the program is effective?
+--  Here the relevant causal question is:
+--  What is the impact of offering membership rewards on total sales?
+--  And the equivalent counterfactual question is,
+--  If the current members had not signed up for the program, how much less
+--  would they have spent on the website?
+--  In formal language, we are interested in finding the Average Treatment
+--   Effect on the Treated (ATT).
 with Ada.Text_IO; use Ada.Text_IO;
 --  with Ada.Strings;
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
