@@ -34,9 +34,7 @@ procedure Lesson_22A is
    --  -------------------------------------------------------------------------
 begin
    Put_Line (Project_Name);
---     Print_Data (Data, 1, 3);
    X_String := Get_X_Names (Data.Col_Names);
-   Put_Line (Project_Name & "X_String set.");
 
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_22a");

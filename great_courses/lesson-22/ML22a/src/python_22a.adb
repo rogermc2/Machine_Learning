@@ -1,6 +1,6 @@
 
 with Interfaces.C; use Interfaces.C;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
 --  with Parsers;
@@ -33,14 +33,14 @@ package body Python_22A is
    function Set_Model (Classifier : Python.Module; Data : Data_Record;
                        X_String   : Unbounded_String)
                        return Python_API.PyObject_Ptr is
-      Routine_Name    : constant String := "Python_22A.Set_Model ";
+--        Routine_Name    : constant String := "Python_22A.Set_Model ";
 
       function Py_BuildValue (Format : char_array; T1, T2, S1 : PyObject_Ptr)
                               return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F           : constant PyObject_Ptr :=
-                      Python.Get_Symbol (Classifier, "init");
+                      Python.Get_Symbol (Classifier, "init_model");
       Col_Tuple   : constant PyObject_Ptr :=
                       Tuple_Builder.To_Tuple (Data.Col_Names);
       Data_Tuple  : constant PyObject_Ptr := To_Tuple (Data.Data);
@@ -48,14 +48,9 @@ package body Python_22A is
       PyParams    : PyObject_Ptr;
       PyResult    : PyObject_Ptr;
    begin
-      Put_Line (Routine_Name & "Data.Col_Names length: " &
-                  Integer'Image (Integer (Data.Col_Names.Length)));
-      Put_Line (Routine_Name & "Data.Data length: " &
-                  Integer'Image (Integer (Data.Data.Length)));
-      Put_Line (Routine_Name & "X_String: '" & To_String (X_String) & "'");
       PyParams := Py_BuildValue (To_C ("OOs"), Col_Tuple, Data_Tuple,
                                  PyString_FromString (C_String));
-      PyResult := Python.Call_Object (F);
+      PyResult := Python.Call_Object (F, PyParams);
 
       Py_DecRef (F);
       Py_DecRef (Col_Tuple);
@@ -77,7 +72,7 @@ package body Python_22A is
       Treatment       : long;
       Data_Tuple      : constant PyObject_Ptr :=
                           PyTuple_New (int (Data.Length));
-      Py_Row          : int := 0;
+      Py_Row          : int := -1;
       Py_Col          : int;
    begin
       while Has_Element (Curs) loop
@@ -88,6 +83,7 @@ package body Python_22A is
          else
             Treatment := 0;
          end if;
+
          PyTuple_SetItem (Row_Tuple, Py_Col, PyBool_FromLong (Treatment));
          for col in Row.Float_Data'Range loop
             Py_Col := Py_Col + 1;
