@@ -39,6 +39,7 @@ begin
    Python.Initialize;
    Classifier := Python.Import_File ("lesson_22a");
    Model := Python_22A.Set_Model (Classifier, Data, X_String);
+   Call (Classifier, "identify_effect", Model);
    Python_API.Py_DecRef (Model);
 
    Python.Finalize;

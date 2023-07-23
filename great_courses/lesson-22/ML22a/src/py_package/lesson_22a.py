@@ -14,3 +14,6 @@ def init_model(col, data_in, xs):
     data = pd.DataFrame(list(data_in))
     data.columns = col
     return CausalModel(data = data, treatment='treatment', outcome='y_factual', common_causes=xs.split('+'))
+
+def identify_effect(model):
+    print ("identified_estimand: ", model.identify_effect())

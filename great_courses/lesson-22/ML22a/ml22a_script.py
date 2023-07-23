@@ -15,3 +15,17 @@ for i in range(1,26):
 data.columns = col
 data = data.astype({"treatment": bool})
 print(data.head())
+xs = ""
+for i in range(1,26):
+    xs += ("x"+str(i)+"+")
+ 
+model=CausalModel(data = data,
+                  treatment='treatment',
+                  outcome='y_factual',
+                  common_causes=xs.split('+'))
+
+#Identify the causal effect
+print("identifying estimand takes many minutes")
+identified_estimand = model.identify_effect()
+print("identified_estimand: ", identified_estimand)
+print("done")
