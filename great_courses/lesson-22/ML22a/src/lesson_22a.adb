@@ -39,7 +39,7 @@ begin
    Put_Line (Project_Name & "X_String set.");
 
    Python.Initialize;
-   Classifier := Python.Import_File ("py_22a");
+   Classifier := Python.Import_File ("lesson_22a");
    Model := Python_22A.Set_Model (Classifier, Data, X_String);
    Python_API.Py_DecRef (Model);
 

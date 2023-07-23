@@ -40,7 +40,7 @@ package body Python_22A is
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
 
       F           : constant PyObject_Ptr :=
-                      Python.Get_Symbol (Classifier, "init_model");
+                      Python.Get_Symbol (Classifier, "init");
       Col_Tuple   : constant PyObject_Ptr :=
                       Tuple_Builder.To_Tuple (Data.Col_Names);
       Data_Tuple  : constant PyObject_Ptr := To_Tuple (Data.Data);
@@ -52,11 +52,13 @@ package body Python_22A is
                   Integer'Image (Integer (Data.Col_Names.Length)));
       Put_Line (Routine_Name & "Data.Data length: " &
                   Integer'Image (Integer (Data.Data.Length)));
+      Put_Line (Routine_Name & "X_String: '" & To_String (X_String) & "'");
       PyParams := Py_BuildValue (To_C ("OOs"), Col_Tuple, Data_Tuple,
                                  PyString_FromString (C_String));
-      PyResult := Python.Call_Object (F, PyParams);
+      PyResult := Python.Call_Object (F);
 
       Py_DecRef (F);
+      Py_DecRef (Col_Tuple);
       Py_DecRef (Data_Tuple);
       Py_DecRef (PyParams);
 
