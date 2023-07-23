@@ -1,7 +1,9 @@
+--  Based on:
+--  https://github.com/py-why/dowhy/blob/main/docs/source/example_notebooks/dowhy_example_effect_of_memberrewards_program.ipynb
 
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Strings;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+--  with Ada.Strings;
+--  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Maths;
 
