@@ -11,60 +11,20 @@ with Structure; use Structure;
 
 procedure Sequential is
    Program_Name : constant String := "Sequential ";
-   --     X1 : Real_Float_Vector (1 .. 50);
-   --     X2 : Real_Float_Vector (1 .. 50);
-   --     Y1 : Real_Float_Vector (1 .. 50);
-   --     Y2 : Real_Float_Vector (1 .. 50);
 
-   X            : Real_Float_Matrix (1 .. 100, 1 ..2);
-   Y            : Integer_Array (1 .. 100);
-   X_Train      : Real_Float_Matrix (1 .. 100, 1 ..2);
-   Y_Train      : Integer_Array (1 .. 100);
-   X_Test       : Real_Float_Matrix (1 .. 100, 1 ..2);
-   Y_Test       : Integer_Array (1 .. 100);
+   Level_1      : constant Real_Float_Vector (1 .. 3) := (0.5, 3.7, -0.2);
+   Levels_List  : Float_Vector_List;
 
-   Classifier           : Python.Module;
+--     Classifier           : Python.Module;
 
 begin
-   --  generate two data clusters.
-   --     for index in X1'Range loop
-   --        X1 (index) := Maths.Random_Float - 0.3;
-   --        X2 (index) := Maths.Random_Float + 0.3;
-   --        Y1 (index) := Maths.Random_Float + 0.3;
-   --        Y2 (index) := Maths.Random_Float - 0.3;
-   --     end loop;
-
-   for row in X'Range loop
-      if row <= 50 then
-         X (row, 1) := Maths.Random_Float - 0.3;
-         X (row, 2) := Maths.Random_Float + 0.3;
-         Y (row) := 0;
-      else
-         X (row, 1) := Maths.Random_Float + 0.3;
-         X (row, 2) := Maths.Random_Float - 0.3;
-         Y (row) := 1;
-      end if;
-
-   end loop;
-
-   Shuffler.Shuffle (X, Y);
-
-   X_Train := Slice (X, 1, 75);
-   X_Test := Slice (X, 76, 100);
-   for row in Y'Range loop
-      if row <= 75 then
-         Y_Train (row) := Y (row);
-      else
-         Y_Test (row) := Y (row);
-      end if;
-
-   end loop;
-   Python.Initialize;
-   Classifier := Python.Import_File ("sequential");
-
-   Python.Call (Classifier, "plot", X);
-
-   Python.Finalize;
+   Levels_List.Append (Level_1);
+--     Python.Initialize;
+--     Classifier := Python.Import_File ("sequential");
+--
+--     Python.Call (Classifier, "plot", X);
+--
+--     Python.Finalize;
 
    Put_Line ("----------------------------------------------");
 

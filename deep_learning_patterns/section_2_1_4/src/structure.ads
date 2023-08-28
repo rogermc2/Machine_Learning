@@ -5,10 +5,6 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Structure is
 
---     package Real_Float_Arrays is new Ada.Numerics.Generic_Real_Arrays (Float);
---     subtype Real_Float_Matrix is Real_Float_Arrays.Real_Matrix;
---     subtype Real_Float_Vector is Real_Float_Arrays.Real_Vector;
-
 --     use Real_Float_Arrays;
 --     package Float_Vector_Package is new
 --       Ada.Containers.Indefinite_Vectors (Positive, Real_Float_Vector);
