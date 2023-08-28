@@ -84,8 +84,8 @@
 \begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
-P\left(S\right) & = & \sum_{ARWU}P\left(W|S,R\right)P\left(U|R\right)P\left(R|A\right)P\left(A\right)P\left(S|A\right)\\
- & = & \sum_{A}P\left(R|A\right)P\left(A\right)P\left(S|A\right)\sum_{R}P\left(R|A\right)\sum_{W}P\left(W|S,R\right)\sum_{U}P\left(U|R\right)
+P\left(S\right) & = & \sum_{ARWU=False}^{True}P\left(W|S,R\right)P\left(U|R\right)P\left(R|A\right)P\left(A\right)P\left(S|A\right)\\
+ & = & \sum_{A}P\left(R|A\right)P\left(A\right)P\left(S|A\right)\sum_{R}P\left(R|A\right)\sum_{W}P\left(W|S,R\right)\sum_{U=F}^{T}P\left(U|R\right)
 \end{eqnarray*}
 
 \end_inset
@@ -93,9 +93,9 @@ P\left(S\right) & = & \sum_{ARWU}P\left(W|S,R\right)P\left(U|R\right)P\left(R|A\
 
 \begin_inset Formula 
 \begin{eqnarray*}
-\sum_{U}P\left(U|R\right) & = & P\left(U=True|R\right)+P\left(U=False|R\right)=1\\
-\sum_{W}P\left(W|S,R\right) & = & P\left(W=True|S,R\right)+P\left(U=False|S,R\right)=1\\
-\sum_{R}P\left(R|A\right) & = & P\left(R=True|A\right)+P\left(R=False|A\right)=1
+\sum_{U=F}^{T}P\left(U|R\right) & = & P\left(U=True|R\right)+P\left(U=False|R\right)=1\\
+\sum_{W=F}^{T}P\left(W|S,R\right) & = & P\left(W=True|S,R\right)+P\left(U=False|S,R\right)=1\\
+\sum_{R=F}^{T}P\left(R|A\right) & = & P\left(R=True|A\right)+P\left(R=False|A\right)=1
 \end{eqnarray*}
 
 \end_inset
@@ -103,7 +103,7 @@ P\left(S\right) & = & \sum_{ARWU}P\left(W|S,R\right)P\left(U|R\right)P\left(R|A\
 Therefore
 \begin_inset Formula 
 \begin{eqnarray*}
-P\left(S\right) & = & \sum_{A}P\left(A\right)P\left(S|A\right)\\
+P\left(S\right) & = & \sum_{A=F}^{T}P\left(A\right)P\left(S|A\right)\\
  & = & P\left(A=True\right)P\left(S|A=True\right)+P\left(A=False\right)P\left(S|A=False\right)
 \end{eqnarray*}
 
