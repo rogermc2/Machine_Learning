@@ -12,15 +12,18 @@ package Structure is
 
    --     subtype Network_Level is Real_Float_Vector;
 
-   type Node is record
-      null;
+   type Activation_Kind is (Identity_Activation, ReLu_Activation,
+                           Sigmoid_Activation, Soft_Max_Activation);
+
+   type Node (Dim : Positive) is record
+      Level      : Real_Float_Vector (1 .. Dim);
+      Activation : Activation_Kind := Identity_Activation;
    end record;
 
-   --     package Nodes_Packge is new Ada.Containers.Vectors (Positive, Node);
-   --     subtype Node_List is Nodes_Packge.Vector;
+      package Nodes_Packge is new Ada.Containers.Indefinite_Vectors (Positive, Node);
+      subtype Node_List is Nodes_Packge.Vector;
    --     package Neural_Network is new Ada.Containers.Vectors (Positive, Node_List);
 
-   function Connect (Level_A, Level_B : Real_Float_Vector)
-                     return Real_Float_Matrix;
+   function Connect (Level_A, Level_B : Node) return Real_Float_Matrix;
 
 end Structure;
