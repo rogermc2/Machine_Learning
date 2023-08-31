@@ -12,6 +12,7 @@ with Structure; use Structure;
 procedure Sequential is
    Program_Name : constant String := "Sequential ";
 
+   Loss_Type    : Loss_Kind := Mean_Square_Error_Loss;
    Level_1      : Node (13);
    Level_2      : Node (10);
    Level_3      : Node (10);

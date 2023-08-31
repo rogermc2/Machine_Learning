@@ -15,7 +15,8 @@ package Structure is
    --  Sigmoid_Activation for binary output
    --  Soft_Max_Activation other output types
    type Activation_Kind is (Identity_Activation, ReLu_Activation,
-                           Sigmoid_Activation, Soft_Max_Activation);
+                            Sigmoid_Activation, Soft_Max_Activation);
+   type Loss_Kind is (Mean_Square_Error_Loss);
 
    type Node (Dim : Positive) is record
       Level      : Real_Float_Vector (1 .. Dim);
