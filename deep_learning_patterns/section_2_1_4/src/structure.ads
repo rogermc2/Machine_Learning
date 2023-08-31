@@ -12,12 +12,15 @@ package Structure is
 
    --     subtype Network_Level is Real_Float_Vector;
 
+   --  Sigmoid_Activation for binary output
+   --  Soft_Max_Activation other output types
    type Activation_Kind is (Identity_Activation, ReLu_Activation,
                            Sigmoid_Activation, Soft_Max_Activation);
 
    type Node (Dim : Positive) is record
       Level      : Real_Float_Vector (1 .. Dim);
       Activation : Activation_Kind := Identity_Activation;
+      Bias       : Float := 0.0;
    end record;
 
       package Nodes_Packge is new Ada.Containers.Indefinite_Vectors (Positive, Node);
