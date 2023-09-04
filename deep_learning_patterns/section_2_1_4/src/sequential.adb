@@ -15,20 +15,16 @@ procedure Sequential is
    Input_Data   : constant Real_Float_Vector (1 .. 13) :=
                     (1.0, 0.0, 0.5, -0.5, 2.3, -5.2, 10.9, -12.0,
                      4.5, 6.9, -0.1, 7.0, -8.0);
-   theModel     : Model (Input_Data'Length);
---     Level_1      : Node (10);
---     Level_2      : Node (10);
---     Level_3      : Node (1);
---     Levels_List  : Node_List;
    Loss_Type    : Loss_Kind := Mean_Square_Error_Loss;
-
+   theModel     : Model (Input_Data'Length, Loss_Type);
+   Output_Node  : Node (1);
    --     Classifier           : Python.Module;
-
 begin
    Add_Node (theModel, 10, ReLu_Activation);
    Add_Node (theModel, 10, ReLu_Activation);
    Add_Node (theModel, 1);
    Make_Connections (theModel);
+   Output_Node := Get_Output_Node (theModel);
 
       --     Python.Initialize;
       --     Classifier := Python.Import_File ("sequential");

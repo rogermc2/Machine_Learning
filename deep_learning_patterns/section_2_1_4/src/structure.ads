@@ -24,21 +24,23 @@ package Structure is
       Bias       : Float := 0.0;
    end record;
 
-      package Nodes_Packge is new Ada.Containers.Indefinite_Vectors (Positive, Node);
+   package Nodes_Packge is new
+     Ada.Containers.Indefinite_Vectors (Positive, Node);
       subtype Node_List is Nodes_Packge.Vector;
    --     package Neural_Network is new Ada.Containers.Vectors (Positive, Node_List);
 
-   type Model (Input_Size : Positive) is private;
+   type Model (Input_Size : Positive; Loss_Type : Loss_Kind) is private;
 
    procedure Add_Node (aModel : in out Model; Node_Size : Positive;
                        Activation : Activation_Kind := Identity_Activation);
+   function Get_Output_Node (aModel : Model) return Node;
    procedure Make_Connections (aModel : in out Model);
 --     function Connect (Data : Real_Float_Vector; Level_1 : Node)
 --                       return Real_Float_Matrix;
 --     function Connect (Level_A, Level_B : Node) return Real_Float_Matrix;
 
 private
-   type Model (Input_Size : Positive) is record
+   type Model (Input_Size : Positive; Loss_Type : Loss_Kind) is record
       Input_Data   : Real_Float_Vector (1 .. Input_Size);
       Nodes        : Node_List;
       Connect_List : Float_Matrix_List;

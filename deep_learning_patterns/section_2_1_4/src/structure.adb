@@ -18,7 +18,6 @@ package body Structure is
                      return Real_Float_Matrix is
       Connection : Real_Float_Matrix (Data'Range, Level_1.Level'Range);
    begin
-      --  Initialze connection weights
       for row in Connection'Range loop
          for col in Connection'Range (2) loop
             Connection (row, col) := 1.0;
@@ -63,6 +62,15 @@ package body Structure is
       end loop;
 
    end Make_Connections;
+
+   --  ---------------------------------------------------------------------------
+
+   function Get_Output_Node (aModel : Model) return Node is
+   begin
+
+      return aModel.Nodes.Last_Element;
+
+   end Get_Output_Node;
 
    --  ---------------------------------------------------------------------------
 
