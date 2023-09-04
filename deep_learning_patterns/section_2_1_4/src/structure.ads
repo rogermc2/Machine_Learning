@@ -28,8 +28,20 @@ package Structure is
       subtype Node_List is Nodes_Packge.Vector;
    --     package Neural_Network is new Ada.Containers.Vectors (Positive, Node_List);
 
-   function Connect (Data : Real_Float_Vector; Level_1 : Node)
-                     return Real_Float_Matrix;
-   function Connect (Level_A, Level_B : Node) return Real_Float_Matrix;
+   type Model (Input_Size : Positive) is private;
+
+   procedure Add_Node (aModel : in out Model; Node_Size : Positive;
+                       Activation : Activation_Kind := Identity_Activation);
+   procedure Make_Connections (aModel : in out Model);
+--     function Connect (Data : Real_Float_Vector; Level_1 : Node)
+--                       return Real_Float_Matrix;
+--     function Connect (Level_A, Level_B : Node) return Real_Float_Matrix;
+
+private
+   type Model (Input_Size : Positive) is record
+      Input_Data   : Real_Float_Vector (1 .. Input_Size);
+      Nodes        : Node_List;
+      Connect_List : Float_Matrix_List;
+   end record;
 
 end Structure;
