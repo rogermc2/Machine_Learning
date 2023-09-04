@@ -28,6 +28,8 @@ package Structure is
       subtype Node_List is Nodes_Packge.Vector;
    --     package Neural_Network is new Ada.Containers.Vectors (Positive, Node_List);
 
+   function Connect (Data : Real_Float_Vector; Level_1 : Node)
+                     return Real_Float_Matrix;
    function Connect (Level_A, Level_B : Node) return Real_Float_Matrix;
 
 end Structure;
