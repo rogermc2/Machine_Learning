@@ -16,7 +16,7 @@ procedure Sequential is
                     (1.0, 0.0, 0.5, -0.5, 2.3, -5.2, 10.9, -12.0,
                      4.5, 6.9, -0.1, 7.0, -8.0);
    Loss_Type    : Loss_Kind := Mean_Square_Error_Loss;
-   theModel     : Model (Input_Data'Length, Loss_Type);
+   theModel     : Model (Input_Data'Length);
    Output_Node  : Node (1);
    --     Classifier           : Python.Module;
 begin

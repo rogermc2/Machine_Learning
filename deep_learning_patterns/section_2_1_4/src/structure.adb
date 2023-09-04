@@ -1,6 +1,8 @@
 
 with Maths;
 
+with Stochastic_Optimizers;
+
 package body Structure is
 
    procedure Add_Node (aModel     : in out Model; Node_Size : Positive;
@@ -11,6 +13,14 @@ package body Structure is
       aModel.Nodes.Append (Level);
 
    end Add_Node;
+
+   --  ---------------------------------------------------------------------------
+
+   procedure Compile (aModel : Model; Loss_Method : Loss_Kind) is
+   begin
+      null;
+
+   end Compile;
 
    --  ---------------------------------------------------------------------------
 
