@@ -5,13 +5,6 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 
 package Structure is
 
-   --     use Real_Float_Arrays;
-   --     package Float_Vector_Package is new
-   --       Ada.Containers.Indefinite_Vectors (Positive, Real_Float_Vector);
-   --     subtype Float_Vector_List is Float_Vector_Package.Vector;
-
-   --     subtype Network_Level is Real_Float_Vector;
-
    --  Sigmoid_Activation for binary output
    --  Soft_Max_Activation other output types
    type Activation_Kind is (Identity_Activation, ReLu_Activation,
@@ -33,7 +26,7 @@ package Structure is
 
    procedure Add_Node (aModel : in out Model; Node_Size : Positive;
                        Activation : Activation_Kind := Identity_Activation);
-   procedure Compile (aModel : Model; Loss_Method : Loss_Kind);
+   procedure Compile (aModel : in out Model; Loss_Method : Loss_Kind);
    function Get_Output_Node (aModel : Model) return Node;
    procedure Make_Connections (aModel : in out Model);
 

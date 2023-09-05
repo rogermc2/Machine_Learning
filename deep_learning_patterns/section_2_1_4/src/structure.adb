@@ -5,6 +5,11 @@ with Stochastic_Optimizers;
 
 package body Structure is
 
+   procedure Forward (aModel : in out Model; Loss_Method : Loss_Kind);
+
+   --  ---------------------------------------------------------------------------
+
+
    procedure Add_Node (aModel     : in out Model; Node_Size : Positive;
                        Activation : Activation_Kind := Identity_Activation) is
       Level : Node (Node_Size);
@@ -16,9 +21,18 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   procedure Compile (aModel : Model; Loss_Method : Loss_Kind) is
+   procedure Back (aModel : Model; Loss_Method : Loss_Kind) is
    begin
       null;
+
+   end Back;
+
+   --  ---------------------------------------------------------------------------
+
+
+   procedure Compile (aModel : in out Model; Loss_Method : Loss_Kind) is
+   begin
+      Forward (aModel, Loss_Method);
 
    end Compile;
 
@@ -56,7 +70,21 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
+   procedure Forward (aModel : in out Model; Loss_Method : Loss_Kind) is
+      use Real_Float_Arrays;
+      use Nodes_Packge;
+   begin
+      for index in aModel.Nodes.First_Index .. aModel.Nodes.Last_Index - 1 loop
+         aModel.Nodes (index + 1).Level :=
+           aModel.Nodes (index).Level * aModel.Connect_List (index + 1);
+      end loop;
+
+   end Forward;
+
+   --  ---------------------------------------------------------------------------
+
    procedure Make_Connections (aModel : in out Model) is
+      use Real_Float_Arrays;
       Connect_Inputs : constant Real_Float_Matrix
         := Connect (aModel.Input_Data, aModel.Nodes.First_Element);
    begin
@@ -70,6 +98,10 @@ package body Structure is
             aModel.Connect_List.Append (Connect_Nodes);
          end;
       end loop;
+
+      aModel.Nodes (aModel.Nodes.First_Index).Level :=
+        aModel.Input_Data *
+          aModel.Connect_List (aModel.Connect_List.First_Index);
 
    end Make_Connections;
 
