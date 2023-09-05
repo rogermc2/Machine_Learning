@@ -21,14 +21,13 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   procedure Back (aModel : Model; Loss_Method : Loss_Kind) is
+   procedure Back_Propogate (aModel : Model; Loss_Method : Loss_Kind) is
    begin
       null;
 
-   end Back;
+   end Back_Propogate;
 
    --  ---------------------------------------------------------------------------
-
 
    procedure Compile (aModel : in out Model; Loss_Method : Loss_Kind) is
    begin
