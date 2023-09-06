@@ -39,7 +39,7 @@ package body Structure is
          Input_Data (index) := Prev_Layer.Nodes (index).Out_Value;
       end loop;
 
-      --  Initialze weights
+      --  Initialize weights
       for index in thisLayer.Weights'Range loop
          --  Random_Float generates a random number in the range  -1.0 .. 1.0
          thisLayer.Weights (index) := Maths.Random_Float;
@@ -153,14 +153,12 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   function Get_Output_Layer (aModel : Sequential_Model) return Layer is
+   function Get_Output_Value (aModel : Sequential_Model) return Float is
    begin
+      return aModel.Layers.Last_Element.Nodes.Last_Element.Out_Value;
 
-      return aModel.Layers.Last_Element;
-
-   end Get_Output_Layer;
+   end Get_Output_Value;
 
    --  ---------------------------------------------------------------------------
-
 
 end Structure;

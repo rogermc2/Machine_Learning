@@ -48,7 +48,7 @@ package Structure is
    procedure Add_Node (aLayer     : in out Layer; Features : Real_Float_Vector);
    procedure Compile (aModel      : in out Sequential_Model;
                       Loss_Method : Loss_Kind);
-   function Get_Output_Layer (aModel : Sequential_Model) return Layer;
+   function Get_Output_Value (aModel : Sequential_Model) return Float;
 
 private
    type Sequential_Model (Num_Features : Positive) is record
