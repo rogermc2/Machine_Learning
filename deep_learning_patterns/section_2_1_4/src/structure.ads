@@ -13,7 +13,9 @@ package Structure is
 
    type Node (Dim : Positive) is record
       Features  : Real_Float_Vector (1 .. Dim);
+      Weights   : Real_Float_Vector (1 .. Dim);
       Bias      : Float := 0.0;
+      Activation : Activation_Kind := Identity_Activation;
       Out_Value : Float := 0.0;
    end record;
 
@@ -21,9 +23,11 @@ package Structure is
      Ada.Containers.Indefinite_Vectors (Positive, Node);
    subtype Node_List is Nodes_Package.Vector;
 
-   type Layer is record
-      Nodes      : Node_List;
+   type Layer (Dim : Positive) is record
+      Weights    : Real_Float_Vector (1 .. Dim);
+      Bias       : Float := 0.0;
       Activation : Activation_Kind := Identity_Activation;
+      Nodes      : Node_List;
    end record;
 
    package Layer_Packge is new
@@ -41,8 +45,7 @@ package Structure is
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Activation : Activation_Kind := Identity_Activation);
-   procedure Add_Node (aLayer     : in out Layer; Features : Real_Float_Vector;
-                       Activation : Activation_Kind := Identity_Activation);
+   procedure Add_Node (aLayer     : in out Layer; Features : Real_Float_Vector);
    procedure Compile (aModel      : in out Sequential_Model;
                       Loss_Method : Loss_Kind);
    function Get_Output_Layer (aModel : Sequential_Model) return Layer;

@@ -19,7 +19,7 @@ procedure Sequential_Network is
    Labels       : constant Real_Float_Vector (1 .. 1) := (others => 0.0);
    Loss_Type    : Loss_Kind := Mean_Square_Error_Loss;
    theModel     : Sequential_Model (Num_Features);
-   Output_Layer : Layer;
+   Output_Layer : Layer (1);
    --     Classifier           : Python.Module;
 begin
    Add_Layer (theModel, 10, Input_Data, ReLu_Activation);
