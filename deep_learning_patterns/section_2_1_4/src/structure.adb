@@ -39,11 +39,17 @@ package body Structure is
          Input_Data (index) := Prev_Layer.Nodes (index).Out_Value;
       end loop;
 
-      for index in 1 .. Num_Nodes loop
-           Add_Node (thisLayer, Input_Data);
+      --  Initialze weights
+      for index in thisLayer.Weights'Range loop
+         --  Random_Float generates a random number in the range  -1.0 .. 1.0
+         thisLayer.Weights (index) := Maths.Random_Float;
       end loop;
 
       thisLayer.Activation := Activation;
+
+      for index in 1 .. Num_Nodes loop
+         Add_Node (thisLayer, Input_Data);
+      end loop;
 
       aModel.Layers.Append (thisLayer);
 
@@ -80,31 +86,31 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
---     procedure Connect (Data : Real_Float_Vector; Layer_1 : in out Layer) is
---        --        Connection : Real_Float_Matrix (Data'Range, 1 .. Layer_1.Dim);
---     begin
---        for index in Layer_1.Nodes.First_Index .. Layer_1.Nodes.Last_Index loop
---           Layer_1.Nodes (index).Data := Data;
---        end loop;
---        --        return Connection;
---
---     end Connect;
+   --     procedure Connect (Data : Real_Float_Vector; Layer_1 : in out Layer) is
+   --        --        Connection : Real_Float_Matrix (Data'Range, 1 .. Layer_1.Dim);
+   --     begin
+   --        for index in Layer_1.Nodes.First_Index .. Layer_1.Nodes.Last_Index loop
+   --           Layer_1.Nodes (index).Data := Data;
+   --        end loop;
+   --        --        return Connection;
+   --
+   --     end Connect;
 
    --  ---------------------------------------------------------------------------
 
---     function Connect (Layer_A, Layer_B : Layer) return Real_Float_Matrix is
---        Connection : Real_Float_Matrix (1 .. Layer_A.Dim, 1 .. Layer_B.Dim);
---     begin
---        --  Initialze connection weights
---        for row in Connection'Range loop
---           for col in Connection'Range (2) loop
---              --  Random_Float generates a random number in the range  -1.0 .. 1.0
---              Connection (row, col) := Maths.Random_Float;
---           end loop;
---        end loop;
---        return Connection;
---
---     end Connect;
+   --     function Connect (Layer_A, Layer_B : Layer) return Real_Float_Matrix is
+   --        Connection : Real_Float_Matrix (1 .. Layer_A.Dim, 1 .. Layer_B.Dim);
+   --     begin
+   --        --  Initialze connection weights
+   --        for row in Connection'Range loop
+   --           for col in Connection'Range (2) loop
+   --              --  Random_Float generates a random number in the range  -1.0 .. 1.0
+   --              Connection (row, col) := Maths.Random_Float;
+   --           end loop;
+   --        end loop;
+   --        return Connection;
+   --
+   --     end Connect;
 
    --  ---------------------------------------------------------------------------
 
