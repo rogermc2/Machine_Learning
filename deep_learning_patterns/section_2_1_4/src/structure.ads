@@ -15,6 +15,7 @@ package Structure is
       Level      : Real_Float_Vector (1 .. Dim);
       Activation : Activation_Kind := Identity_Activation;
       Bias       : Float := 0.0;
+      Out_Value  : Float := 0.0;
    end record;
 
    package Nodes_Packge is new
@@ -22,16 +23,16 @@ package Structure is
       subtype Node_List is Nodes_Packge.Vector;
    --     package Neural_Network is new Ada.Containers.Vectors (Positive, Node_List);
 
-   type Model (Input_Size : Positive) is private;
+   type Sequential_Model (Input_Size : Positive) is private;
 
-   procedure Add_Node (aModel : in out Model; Node_Size : Positive;
+   procedure Add_Node (aModel : in out Sequential_Model; Node_Size : Positive;
                        Activation : Activation_Kind := Identity_Activation);
-   procedure Compile (aModel : in out Model; Loss_Method : Loss_Kind);
-   function Get_Output_Node (aModel : Model) return Node;
-   procedure Make_Connections (aModel : in out Model);
+   procedure Compile (aModel : in out Sequential_Model; Loss_Method : Loss_Kind);
+   function Get_Output_Node (aModel : Sequential_Model) return Node;
+   procedure Make_Connections (aModel : in out Sequential_Model);
 
 private
-   type Model (Input_Size : Positive) is record
+   type Sequential_Model (Input_Size : Positive) is record
       Input_Data   : Real_Float_Vector (1 .. Input_Size);
       Nodes        : Node_List;
       Connect_List : Float_Matrix_List;

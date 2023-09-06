@@ -1,8 +1,8 @@
-project Sequential_Api is
+project Sequential_Network is
 
    for Source_Dirs use ("src", "../../common", "../../python_c_api", "../../python", "../../neural_learning/datasets", "../../neural_learning/neural_network");
    for Object_Dir use "obj";
-   for Main use ("sequential.adb");
+   for Main use ("sequential_network.adb");
 
-end Sequential_Api;
+end Sequential_Network;
 

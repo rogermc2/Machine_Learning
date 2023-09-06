@@ -5,12 +5,11 @@ with Stochastic_Optimizers;
 
 package body Structure is
 
-   procedure Forward (aModel : in out Model; Loss_Method : Loss_Kind);
+   procedure Forward (aModel : in out Sequential_Model; Loss_Method : Loss_Kind);
 
    --  ---------------------------------------------------------------------------
 
-
-   procedure Add_Node (aModel     : in out Model; Node_Size : Positive;
+   procedure Add_Node (aModel     : in out Sequential_Model; Node_Size : Positive;
                        Activation : Activation_Kind := Identity_Activation) is
       Level : Node (Node_Size);
    begin
@@ -21,7 +20,7 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   procedure Back_Propogate (aModel : Model; Loss_Method : Loss_Kind) is
+   procedure Back_Propogate (aModel : Sequential_Model; Loss_Method : Loss_Kind) is
    begin
       null;
 
@@ -29,7 +28,7 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   procedure Compile (aModel : in out Model; Loss_Method : Loss_Kind) is
+   procedure Compile (aModel : in out Sequential_Model; Loss_Method : Loss_Kind) is
    begin
       Forward (aModel, Loss_Method);
 
@@ -69,7 +68,7 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   procedure Forward (aModel : in out Model; Loss_Method : Loss_Kind) is
+   procedure Forward (aModel : in out Sequential_Model; Loss_Method : Loss_Kind) is
       use Real_Float_Arrays;
       use Nodes_Packge;
    begin
@@ -82,7 +81,7 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   procedure Make_Connections (aModel : in out Model) is
+   procedure Make_Connections (aModel : in out Sequential_Model) is
       use Real_Float_Arrays;
       Connect_Inputs : constant Real_Float_Matrix
         := Connect (aModel.Input_Data, aModel.Nodes.First_Element);
@@ -106,7 +105,7 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   function Get_Output_Node (aModel : Model) return Node is
+   function Get_Output_Node (aModel : Sequential_Model) return Node is
    begin
 
       return aModel.Nodes.Last_Element;
