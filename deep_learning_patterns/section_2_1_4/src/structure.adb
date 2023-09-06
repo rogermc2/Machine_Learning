@@ -49,7 +49,7 @@ package body Structure is
 
    function Connect (Data : Real_Float_Vector; Layer_1 : Layer)
                      return Real_Float_Matrix is
-      Connection : Real_Float_Matrix (Data'Range, Layer_1.Level'Range);
+      Connection : Real_Float_Matrix (Data'Range, 1 .. Layer_1.Dim);
    begin
       for row in Connection'Range loop
          for col in Connection'Range (2) loop
@@ -63,8 +63,7 @@ package body Structure is
    --  ---------------------------------------------------------------------------
 
    function Connect (Layer_A, Layer_B : Layer) return Real_Float_Matrix is
-      Connection : Real_Float_Matrix (Layer_A.Level'Range,
-                                      Layer_B.Level'Range);
+      Connection : Real_Float_Matrix (1 .. Layer_A.Dim, 1 .. Layer_B.Dim);
    begin
       --  Initialze connection weights
       for row in Connection'Range loop
@@ -110,9 +109,9 @@ package body Structure is
          end;
       end loop;
 
-      aModel.Layers (aModel.Layers.First_Index).Level :=
-        aModel.Input_Data *
-          aModel.Connect_List (aModel.Connect_List.First_Index);
+--        aModel.Layers (aModel.Layers.First_Index).Data :=
+--          aModel.Input_Data *
+--            aModel.Connect_List (aModel.Connect_List.First_Index);
 
    end Make_Connections;
 

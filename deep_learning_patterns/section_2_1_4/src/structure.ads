@@ -12,7 +12,7 @@ package Structure is
    type Loss_Kind is (Mean_Square_Error_Loss);
 
    type Node (Dim : Positive) is record
-      Level      : Real_Float_Vector (1 .. Dim);
+      Data       : Real_Float_Vector (1 .. Dim);
       Activation : Activation_Kind := Identity_Activation;
       Bias       : Float := 0.0;
       Out_Value  : Float := 0.0;
@@ -23,7 +23,7 @@ package Structure is
    subtype Node_List is Nodes_Package.Vector;
 
    type Layer (Dim : Positive) is record
-      Level      : Real_Float_Vector (1 .. Dim);
+--        Data       : Real_Float_Vector (1 .. Dim);
       Nodes      : Node_List;
       Activation : Activation_Kind := Identity_Activation;
    end record;
