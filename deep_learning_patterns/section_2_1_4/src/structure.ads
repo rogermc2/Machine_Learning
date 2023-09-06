@@ -12,18 +12,16 @@ package Structure is
    type Loss_Kind is (Mean_Square_Error_Loss);
 
    type Node (Dim : Positive) is record
-      Data       : Real_Float_Vector (1 .. Dim);
-      Activation : Activation_Kind := Identity_Activation;
-      Bias       : Float := 0.0;
-      Out_Value  : Float := 0.0;
+      Features  : Real_Float_Vector (1 .. Dim);
+      Bias      : Float := 0.0;
+      Out_Value : Float := 0.0;
    end record;
 
    package Nodes_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Node);
    subtype Node_List is Nodes_Package.Vector;
 
-   type Layer (Dim : Positive) is record
-      --        Data       : Real_Float_Vector (1 .. Dim);
+   type Layer is record
       Nodes      : Node_List;
       Activation : Activation_Kind := Identity_Activation;
    end record;
@@ -43,12 +41,11 @@ package Structure is
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Activation : Activation_Kind := Identity_Activation);
-   procedure Add_Node (aLayer     : in out Layer; Data : Real_Float_Vector;
+   procedure Add_Node (aLayer     : in out Layer; Features : Real_Float_Vector;
                        Activation : Activation_Kind := Identity_Activation);
    procedure Compile (aModel      : in out Sequential_Model;
                       Loss_Method : Loss_Kind);
    function Get_Output_Layer (aModel : Sequential_Model) return Layer;
-   --     procedure Make_Connections (aModel : in out Sequential_Model);
 
 private
    type Sequential_Model (Num_Features : Positive) is record

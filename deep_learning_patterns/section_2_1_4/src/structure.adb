@@ -14,12 +14,13 @@ package body Structure is
                         Num_Nodes  : Positive;
                         Input_Data : Real_Float_Vector;
                         Activation : Activation_Kind := Identity_Activation) is
-      thisLayer : Layer (Num_Nodes);
+      thisLayer : Layer;
    begin
-      thisLayer.Activation := Activation;
       for index in 1 .. Num_Nodes loop
          Add_Node (thisLayer, Input_Data);
       end loop;
+
+      thisLayer.Activation := Activation;
       aModel.Layers.Append (thisLayer);
 
    end Add_Layer;
@@ -31,28 +32,29 @@ package body Structure is
       Prev_Layer : constant Layer := aModel.Layers.Last_Element;
       Prev_Nodes : constant Node_List := Prev_Layer.Nodes;
       Input_Data : Real_Float_Vector (1 .. Positive (Prev_Nodes.Length));
-      thisLayer  : Layer (Num_Nodes);
+      thisLayer  : Layer;
    begin
       for index in Prev_Nodes.First_Index .. Prev_Nodes.Last_Index loop
          Input_Data (index) := Prev_Layer.Nodes (index).Out_Value;
       end loop;
 
-      thisLayer.Activation := Activation;
       for index in 1 .. Num_Nodes loop
            Add_Node (thisLayer, Input_Data);
       end loop;
+
+      thisLayer.Activation := Activation;
+
       aModel.Layers.Append (thisLayer);
 
    end Add_Layer;
 
    --  ---------------------------------------------------------------------------
 
-   procedure Add_Node (aLayer     : in out Layer; Data : Real_Float_Vector;
+   procedure Add_Node (aLayer     : in out Layer; Features : Real_Float_Vector;
                        Activation : Activation_Kind := Identity_Activation) is
-      aNode : Node (Data'Length);
+      aNode : Node (Features'Length);
    begin
-      aNode.Data := Data;
-      aNode.Activation := Activation;
+      aNode.Features := Features;
       aLayer.Nodes.Append (aNode);
 
    end Add_Node;
