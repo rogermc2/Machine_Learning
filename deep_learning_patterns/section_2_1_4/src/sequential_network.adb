@@ -12,19 +12,20 @@ with Structure; use Structure;
 procedure Sequential_Network is
    Program_Name : constant String := "Sequential_Network ";
 
-   Input_Data   : constant Real_Float_Matrix (1 .. 1, 1 .. 13) :=
-                    (others => (1.0, 0.0, 0.5, -0.5, 2.3, -5.2, 10.9, -12.0,
-                     4.5, 6.9, -0.1, 7.0, -8.0));
+   Num_Features : constant Positive := 13;
+   Input_Data   : constant Real_Float_Vector (1 .. Num_Features) :=
+                    (1.0, 0.0, 0.5, -0.5, 2.3, -5.2, 10.9, -12.0,
+                     4.5, 6.9, -0.1, 7.0, -8.0);
    Labels       : constant Real_Float_Vector (1 .. 1) := (others => 0.0);
    Loss_Type    : Loss_Kind := Mean_Square_Error_Loss;
-   theModel     : Sequential_Model (Input_Data'Length);
+   theModel     : Sequential_Model (Num_Features);
    Output_Layer : Layer (1);
    --     Classifier           : Python.Module;
 begin
-   Add_Layer (theModel, 10, ReLu_Activation);
+   Add_Layer (theModel, 10, Input_Data, ReLu_Activation);
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 1);
-   Make_Connections (theModel);
+--     Make_Connections (theModel);
    Output_Layer := Get_Output_Layer (theModel);
 
       --     Python.Initialize;

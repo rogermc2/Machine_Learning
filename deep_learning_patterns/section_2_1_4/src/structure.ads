@@ -23,7 +23,7 @@ package Structure is
    subtype Node_List is Nodes_Package.Vector;
 
    type Layer (Dim : Positive) is record
---        Data       : Real_Float_Vector (1 .. Dim);
+      --        Data       : Real_Float_Vector (1 .. Dim);
       Nodes      : Node_List;
       Activation : Activation_Kind := Identity_Activation;
    end record;
@@ -34,19 +34,25 @@ package Structure is
 
    --     package Neural_Network is new Ada.Containers.Vectors (Positive, Node_List);
 
-   type Sequential_Model (Input_Size : Positive) is private;
+   type Sequential_Model (Num_Features : Positive) is private;
 
-   procedure Add_Layer (aModel     : in out Sequential_Model; Layer_Size : Positive;
+   procedure Add_Layer (aModel     : in out Sequential_Model;
+                        Num_Nodes  : Positive;
+                        Input_Data : Real_Float_Vector;
+                        Activation : Activation_Kind := Identity_Activation);
+   procedure Add_Layer (aModel     : in out Sequential_Model;
+                        Num_Nodes  : Positive;
+                        Activation : Activation_Kind := Identity_Activation);
+   procedure Add_Node (aLayer     : in out Layer; Data : Real_Float_Vector;
                        Activation : Activation_Kind := Identity_Activation);
-   procedure Add_Node (aLayer     : in out Layer; Node_Size : Positive;
-                       Activation : Activation_Kind := Identity_Activation);
-   procedure Compile (aModel : in out Sequential_Model; Loss_Method : Loss_Kind);
+   procedure Compile (aModel      : in out Sequential_Model;
+                      Loss_Method : Loss_Kind);
    function Get_Output_Layer (aModel : Sequential_Model) return Layer;
-   procedure Make_Connections (aModel : in out Sequential_Model);
+   --     procedure Make_Connections (aModel : in out Sequential_Model);
 
 private
-   type Sequential_Model (Input_Size : Positive) is record
-      Input_Data   : Real_Float_Vector (1 .. Input_Size);
+   type Sequential_Model (Num_Features : Positive) is record
+      Input_Data   : Real_Float_Vector (1 .. Num_Features);
       Layers       : Layer_List;
       Connect_List : Float_Matrix_List;
    end record;

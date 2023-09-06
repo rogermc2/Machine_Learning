@@ -9,23 +9,49 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   procedure Add_Layer (aModel    : in out Sequential_Model; Layer_Size : Positive;
-                       Activation : Activation_Kind := Identity_Activation) is
-      Level : Layer (Layer_Size);
+   procedure Add_Layer (aModel     : in out Sequential_Model;
+                        Num_Nodes  : Positive;
+                        Input_Data : Real_Float_Vector;
+                        Activation : Activation_Kind := Identity_Activation) is
+      thisLayer : Layer (Num_Nodes);
    begin
-      Level.Activation := Activation;
-      aModel.Layers.Append (Level);
+      thisLayer.Activation := Activation;
+      for index in 1 .. Num_Nodes loop
+         Add_Node (thisLayer, Input_Data);
+      end loop;
+      aModel.Layers.Append (thisLayer);
 
    end Add_Layer;
 
    --  ---------------------------------------------------------------------------
 
-   procedure Add_Node (aLayer     : in out Layer; Node_Size : Positive;
+
+   procedure Add_Layer (aModel    : in out Sequential_Model; Num_Nodes : Positive;
                        Activation : Activation_Kind := Identity_Activation) is
-      Level : Node (Node_Size);
+      thisLayer  : Layer (Num_Nodes);
+      Prev_Layer : Layer := aModel.Layers.Last_Element;
+      Prev_Nodes : Node_List := Prev_Layer.Nodes;
    begin
-      Level.Activation := Activation;
-      aLayer.Nodes.Append (Level);
+      thisLayer.Activation := Activation;
+      for index in 1 .. Num_Nodes loop
+         for prev in Prev_Nodes.First_Index .. Prev_Nodes.Last_Index loop
+            null;
+--              Add_Node (thisLayer, Prev_Layer.Nodes (prev).o);
+         end loop;
+      end loop;
+      aModel.Layers.Append (thisLayer);
+
+   end Add_Layer;
+
+   --  ---------------------------------------------------------------------------
+
+   procedure Add_Node (aLayer     : in out Layer; Data : Real_Float_Vector;
+                       Activation : Activation_Kind := Identity_Activation) is
+      aNode : Node (Data'Length);
+   begin
+      aNode.Data := Data;
+      aNode.Activation := Activation;
+      aLayer.Nodes.Append (aNode);
 
    end Add_Node;
 
@@ -47,16 +73,13 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   function Connect (Data : Real_Float_Vector; Layer_1 : Layer)
-                     return Real_Float_Matrix is
-      Connection : Real_Float_Matrix (Data'Range, 1 .. Layer_1.Dim);
+   procedure Connect (Data : Real_Float_Vector; Layer_1 : in out Layer) is
+--        Connection : Real_Float_Matrix (Data'Range, 1 .. Layer_1.Dim);
    begin
-      for row in Connection'Range loop
-         for col in Connection'Range (2) loop
-            Connection (row, col) := 1.0;
-         end loop;
+      for index in Layer_1.Nodes.First_Index .. Layer_1.Nodes.Last_Index loop
+         Layer_1.Nodes (index).Data := Data;
       end loop;
-      return Connection;
+--        return Connection;
 
    end Connect;
 
@@ -93,27 +116,27 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   procedure Make_Connections (aModel : in out Sequential_Model) is
-      use Real_Float_Arrays;
-      Connect_Inputs : constant Real_Float_Matrix
-        := Connect (aModel.Input_Data, aModel.Layers.First_Element);
-   begin
-      aModel.Connect_List.Append (Connect_Inputs);
-      for item in aModel.Layers.First_Index ..
-        aModel.Layers.Last_Index - 1 loop
-         declare
-            Connect_Nodes : Real_Float_Matrix
-              := Connect (aModel.Layers (item), aModel.Layers (item + 1));
-         begin
-            aModel.Connect_List.Append (Connect_Nodes);
-         end;
-      end loop;
-
+--     procedure Make_Connections (aModel : in out Sequential_Model) is
+--        use Real_Float_Arrays;
+--        Connect_Inputs : constant Real_Float_Matrix
+--          := Connect (aModel.Input_Data, aModel.Layers.First_Element);
+--     begin
+--        aModel.Connect_List.Append (Connect_Inputs);
+--        for item in aModel.Layers.First_Index ..
+--          aModel.Layers.Last_Index - 1 loop
+--           declare
+--              Connect_Nodes : Real_Float_Matrix
+--                := Connect (aModel.Layers (item), aModel.Layers (item + 1));
+--           begin
+--              aModel.Connect_List.Append (Connect_Nodes);
+--           end;
+--        end loop;
+--
 --        aModel.Layers (aModel.Layers.First_Index).Data :=
 --          aModel.Input_Data *
 --            aModel.Connect_List (aModel.Connect_List.First_Index);
-
-   end Make_Connections;
+--
+--     end Make_Connections;
 
    --  ---------------------------------------------------------------------------
 
