@@ -3,6 +3,8 @@ with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
+
+with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with Python;
 with Shuffler;
@@ -19,7 +21,6 @@ procedure Sequential_Network is
    Labels       : constant Real_Float_Vector (1 .. 1) := (others => 0.0);
    Loss_Type    : Loss_Kind := Mean_Square_Error_Loss;
    theModel     : Sequential_Model (Num_Features);
-   Output_Value : Float;
    --     Classifier           : Python.Module;
 begin
    New_Line;
@@ -29,8 +30,11 @@ begin
    Add_Layer (theModel, 1);
 
    Compile (theModel, Loss_Type);
-   Output_Value := Get_Output_Value (theModel);
-   Put_Line (Program_Name & "Output Value: " & Float'Image (Output_Value));
+   declare
+      Output_Data : Real_Float_Vector := Get_Output_Value (theModel);
+   begin
+      Print_Float_Vector (Program_Name & "Output_Data", Output_Data);
+   end;
 
       --     Python.Initialize;
       --     Classifier := Python.Import_File ("sequential");
