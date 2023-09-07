@@ -118,11 +118,17 @@ package body Structure is
                       Loss_Method : Loss_Kind) is
       use Real_Float_Arrays;
       use Layer_Packge;
+      use Nodes_Package;
    begin
       for index in aModel.Layers.First_Index .. aModel.Layers.Last_Index - 1 loop
-         null;
-         --           aModel.Nodes (index + 1).Level :=
-         --             aModel.Nodes (index).Level * aModel.Connect_List (index + 1);
+         declare
+            aLayer : Layer := aModel.Layers (index);
+         begin
+            for index_2 in aLayer.Nodes.First_Index ..
+              aLayer.Nodes.Last_Index - 1 loop
+               null;
+            end loop;
+         end;
       end loop;
 
    end Forward;
