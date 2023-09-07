@@ -22,10 +22,13 @@ procedure Sequential_Network is
    Output_Value : Float;
    --     Classifier           : Python.Module;
 begin
+   New_Line;
+   Put_Line ("Program " & Program_Name);
    Add_Layer (theModel, 10, Input_Data, ReLu_Activation);
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 1);
 
+   Compile (theModel, Loss_Type);
    Output_Value := Get_Output_Value (theModel);
    Put_Line (Program_Name & "Output Value: " & Float'Image (Output_Value));
 

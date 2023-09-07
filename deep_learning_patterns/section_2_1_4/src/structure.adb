@@ -1,4 +1,6 @@
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Maths;
 
 with Base_Neural;
@@ -84,91 +86,67 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   --     procedure Connect (Data : Real_Float_Vector; Layer_1 : in out Layer) is
-   --        --        Connection : Real_Float_Matrix (Data'Range, 1 .. Layer_1.Dim);
-   --     begin
-   --        for index in Layer_1.Nodes.First_Index .. Layer_1.Nodes.Last_Index loop
-   --           Layer_1.Nodes (index).Data := Data;
-   --        end loop;
-   --        --        return Connection;
-   --
-   --     end Connect;
-
-   --  ---------------------------------------------------------------------------
-
-   --     function Connect (Layer_A, Layer_B : Layer) return Real_Float_Matrix is
-   --        Connection : Real_Float_Matrix (1 .. Layer_A.Dim, 1 .. Layer_B.Dim);
-   --     begin
-   --        --  Initialze connection weights
-   --        for row in Connection'Range loop
-   --           for col in Connection'Range (2) loop
-   --              --  Random_Float generates a random number in the range  -1.0 .. 1.0
-   --              Connection (row, col) := Maths.Random_Float;
-   --           end loop;
-   --        end loop;
-   --        return Connection;
-   --
-   --     end Connect;
-
-   --  ---------------------------------------------------------------------------
-
    procedure Forward (aModel      : in out Sequential_Model;
                       Loss_Method : Loss_Kind) is
       use Real_Float_Arrays;
       use Layer_Packge;
       use Nodes_Package;
+      Routine_Name : constant String := "Structure.Forward ";
    begin
+      Put_Line (Routine_Name & "Num layers:" &
+                  Integer'Image (Integer (aModel.Layers.Length)));
       for index in aModel.Layers.First_Index ..
         aModel.Layers.Last_Index - 1 loop
+         for index_2 in aModel.Layers (index).Nodes.First_Index ..
+           aModel.Layers (index).Nodes.Last_Index - 1 loop
+            aModel.Layers (index).Nodes (index_2).Out_Value :=
+              aModel.Layers (index).Weights * aModel.Layers (index).Nodes (index_2).Features +
+              aModel.Layers (index).Bias;
+
+            case aModel.Layers (index).Activation is
+               when Identity_Activation => null;
+               when ReLu_Activation =>
+                  Base_Neural.Rect_LU
+                    (aModel.Layers (index).Nodes (index_2).Out_Value);
+               when Sigmoid_Activation =>
+                  aModel.Layers (index).Nodes
+                    (index_2).Out_Value := Base_Neural.Sigmoid
+                    (aModel.Layers (index).Nodes (index_2).Out_Value);
+               when Soft_Max_Activation => null;
+            end case;
+            Put_Line (Routine_Name & "Layer, Node" & Integer'Image (index) &
+                        "," & Integer'Image (index_2) & " Out_Value: " &
+                        Float'Image (aModel.Layers (index).Nodes
+                        (index_2).Out_Value));
+         end loop;
+      end loop;
+
+      for index_2 in aModel.Layers.Last_Element.Nodes.First_Index ..
+        aModel.Layers.Last_Element.Nodes.Last_Index loop
          declare
-            aLayer : Layer := aModel.Layers (index);
+            aNode : Node := aModel.Layers.Last_Element.Nodes (index_2);
          begin
-            for index_2 in aLayer.Nodes.First_Index ..
-              aLayer.Nodes.Last_Index - 1 loop
-               declare
-                  aNode : Node := aLayer.Nodes (index_2);
-               begin
-                  aNode.Out_Value :=
-                    aLayer.Weights * aNode.Features + aLayer.Bias;
-                  case aLayer.Activation is
-                     when Identity_Activation => null;
-                     when ReLu_Activation =>
-                        Base_Neural.Rect_LU (aNode.Out_Value);
-                     when Sigmoid_Activation =>
-                        aNode.Out_Value := Base_Neural.Sigmoid
-                          (aNode.Out_Value);
-                     when Soft_Max_Activation => null;
-                  end case;
-               end;
-            end loop;
+            aNode.Out_Value :=
+              aModel.Layers.Last_Element.Weights * aNode.Features +
+                aModel.Layers.Last_Element.Bias;
+            case aModel.Layers.Last_Element.Activation is
+            when Identity_Activation => null;
+            when ReLu_Activation =>
+               Base_Neural.Rect_LU (aNode.Out_Value);
+            when Sigmoid_Activation =>
+               aNode.Out_Value := Base_Neural.Sigmoid (aNode.Out_Value);
+            when Soft_Max_Activation => null;
+            end case;
+            aModel.Layers (aModel.Layers.Last_Index).Nodes (index_2) := aNode;
          end;
+         Put_Line (Routine_Name & "Layer, Node" &
+                     Integer'Image (aModel.Layers.Last_Index) &
+                     "," & Integer'Image (index_2) & " Out_Value: " &
+                     Float'Image (aModel.Layers (aModel.Layers.Last_Index).Nodes
+                     (index_2).Out_Value));
       end loop;
 
    end Forward;
-
-   --  ---------------------------------------------------------------------------
-
-   --     procedure Make_Connections (aModel : in out Sequential_Model) is
-   --        use Real_Float_Arrays;
-   --        Connect_Inputs : constant Real_Float_Matrix
-   --          := Connect (aModel.Input_Data, aModel.Layers.First_Element);
-   --     begin
-   --        aModel.Connect_List.Append (Connect_Inputs);
-   --        for item in aModel.Layers.First_Index ..
-   --          aModel.Layers.Last_Index - 1 loop
-   --           declare
-   --              Connect_Nodes : Real_Float_Matrix
-   --                := Connect (aModel.Layers (item), aModel.Layers (item + 1));
-   --           begin
-   --              aModel.Connect_List.Append (Connect_Nodes);
-   --           end;
-   --        end loop;
-   --
-   --        aModel.Layers (aModel.Layers.First_Index).Data :=
-   --          aModel.Input_Data *
-   --            aModel.Connect_List (aModel.Connect_List.First_Index);
-   --
-   --     end Make_Connections;
 
    --  ---------------------------------------------------------------------------
 
