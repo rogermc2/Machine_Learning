@@ -135,8 +135,8 @@ package body Structure is
                      when ReLu_Activation =>
                         Base_Neural.Rect_LU (aNode.Out_Value);
                      when Sigmoid_Activation =>
-                        aNode.Out_Value := Base_Neural.Logistic_Sigmoid
-                          (Long_Float (aNode.Out_Value));
+                        aNode.Out_Value := Base_Neural.Sigmoid
+                          (aNode.Out_Value);
                      when Soft_Max_Activation => null;
                   end case;
                end;

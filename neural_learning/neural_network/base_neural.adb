@@ -291,6 +291,15 @@ package body Base_Neural is
    end Rect_LU_Derivative;
 
    --  -------------------------------------------------------------------------
+
+   function Sigmoid (X : Float) return Float is
+      use Maths.Float_Math_Functions;
+   begin
+      return 1.0 / (1.0 + Exp (-X));
+
+   end Sigmoid;
+
+   --  ------------------------------------------------------------------------
    --  SoftMax returns the probability of each class
    --  probability = exp (value) / sum of all exp (v)
    --  Activation: n_samples x n_features
