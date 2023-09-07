@@ -13,9 +13,6 @@ package Structure is
 
    type Node (Dim : Positive) is record
       Features  : Real_Float_Vector (1 .. Dim);
-      Weights   : Real_Float_Vector (1 .. Dim);
-      Bias      : Float := 0.0;
-      Activation : Activation_Kind := Identity_Activation;
       Out_Value : Float := 0.0;
    end record;
 

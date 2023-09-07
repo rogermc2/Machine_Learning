@@ -38,6 +38,7 @@ package Base_Neural is
    procedure Tanh_Derivative (Z   : Real_Float_Matrix;
                               Del : in out Real_Float_Matrix);
    pragma Inline (Tanh_Derivative);
+   procedure Rect_LU (Activation : in out Float);
    procedure Rect_LU (Activation : in out Real_Float_Matrix);
    pragma Inline (Rect_LU);
    procedure Rect_LU_Derivative (Z : Real_Float_Matrix;

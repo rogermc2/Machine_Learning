@@ -1,6 +1,7 @@
 
 with Maths;
 
+with Base_Neural;
 with Stochastic_Optimizers;
 
 package body Structure is
@@ -61,9 +62,6 @@ package body Structure is
       aNode : Node (Features'Length);
    begin
       aNode.Features := Features;
-      aNode.Weights := aLayer.Weights;
-      aNode.Bias := aLayer.Bias;
-      aNode.Activation :=aLayer.Activation;
       aLayer.Nodes.Append (aNode);
 
    end Add_Node;
@@ -120,13 +118,28 @@ package body Structure is
       use Layer_Packge;
       use Nodes_Package;
    begin
-      for index in aModel.Layers.First_Index .. aModel.Layers.Last_Index - 1 loop
+      for index in aModel.Layers.First_Index ..
+        aModel.Layers.Last_Index - 1 loop
          declare
             aLayer : Layer := aModel.Layers (index);
          begin
             for index_2 in aLayer.Nodes.First_Index ..
               aLayer.Nodes.Last_Index - 1 loop
-               null;
+               declare
+                  aNode : Node := aLayer.Nodes (index_2);
+               begin
+                  aNode.Out_Value :=
+                    aLayer.Weights * aNode.Features + aLayer.Bias;
+                  case aLayer.Activation is
+                     when Identity_Activation => null;
+                     when ReLu_Activation =>
+                        Base_Neural.Rect_LU (aNode.Out_Value);
+                     when Sigmoid_Activation =>
+                        aNode.Out_Value := Base_Neural.Logistic_Sigmoid
+                          (Long_Float (aNode.Out_Value));
+                     when Soft_Max_Activation => null;
+                  end case;
+               end;
             end loop;
          end;
       end loop;
