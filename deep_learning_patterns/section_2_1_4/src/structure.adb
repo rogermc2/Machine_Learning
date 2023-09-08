@@ -10,8 +10,6 @@ package body Structure is
 
    procedure Forward (aModel      : in out Sequential_Model;
                       Loss_Method : Loss_Kind);
---     procedure Update_Next_Layer (aModel : in out Sequential_Model;
---                                  Index  : Positive);
 
    --  -------------------------------------------------------------------------
    --  Add first layer
@@ -102,6 +100,10 @@ package body Structure is
              aModel.Layers.First_Element.Nodes (node_id).Features +
            aModel.Layers.First_Element.Bias;
 
+         Put_Line (Routine_Name & "Layer, Node" & Integer'Image (aModel.Layers.First_Index) &
+                     "," & Integer'Image (node_id) & " Out_Value: " &
+                     Float'Image (aModel.Layers (aModel.Layers.First_Index).Output_Data
+                     (node_id)));
          case aModel.Layers.First_Element.Activation is
             when Identity_Activation => null;
             when ReLu_Activation =>
@@ -110,10 +112,14 @@ package body Structure is
             when Sigmoid_Activation =>
                aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id) :=
                  Base_Neural.Sigmoid
-                 (aModel.Layers.First_Element.Output_Data (node_id));
+                   (aModel.Layers.First_Element.Output_Data (node_id));
             when Soft_Max_Activation => null;
          end case;
 
+         Put_Line (Routine_Name & "Layer, Node" & Integer'Image (aModel.Layers.First_Index) &
+                     "," & Integer'Image (node_id) & " Out_Value: " &
+                     Float'Image (aModel.Layers (aModel.Layers.First_Index).Output_Data
+                     (node_id)));
       end loop;
       --  Update other layers
       for index in aModel.Layers.First_Index + 1 ..
@@ -145,7 +151,7 @@ package body Structure is
                         (node_id)));
          end loop;
 
---           Update_Next_Layer (aModel, index);
+         --           Update_Next_Layer (aModel, index);
       end loop;
 
    end Forward;
@@ -160,29 +166,29 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
    --  Update_Next_Layer sets the
---     procedure Update_Next_Layer (aModel : in out Sequential_Model;
---                                  Index  : Positive) is
---        aLayer     : constant Layer := aModel.Layers (Index);
---        Next_Layer : Layer := aModel.Layers (Index + 1);
---        Features   : Real_Float_Vector (1 .. aLayer.Dim);
---     begin
---        for index_2 in aLayer.Nodes.First_Index .. aLayer.Nodes.Last_Index loop
---           Features (index_2) := aLayer.Nodes (index_2).Out_Value;
---        end loop;
---
---        for index_2 in Next_Layer.Nodes.First_Index ..
---          Next_Layer.Nodes.Last_Index loop
---           declare
---              aNode : Node (aLayer.Dim);
---           begin
---              for index_3 in aNode.Features.First_Index ..
---                aNode.Features.Last_Index loop
---                 aNode.Features (index_3) := Features (index_3);
---              end loop;
---           end;
---        end loop;
---
---     end Update_Next_Layer;
+   --     procedure Update_Next_Layer (aModel : in out Sequential_Model;
+   --                                  Index  : Positive) is
+   --        aLayer     : constant Layer := aModel.Layers (Index);
+   --        Next_Layer : Layer := aModel.Layers (Index + 1);
+   --        Features   : Real_Float_Vector (1 .. aLayer.Dim);
+   --     begin
+   --        for index_2 in aLayer.Nodes.First_Index .. aLayer.Nodes.Last_Index loop
+   --           Features (index_2) := aLayer.Nodes (index_2).Out_Value;
+   --        end loop;
+   --
+   --        for index_2 in Next_Layer.Nodes.First_Index ..
+   --          Next_Layer.Nodes.Last_Index loop
+   --           declare
+   --              aNode : Node (aLayer.Dim);
+   --           begin
+   --              for index_3 in aNode.Features.First_Index ..
+   --                aNode.Features.Last_Index loop
+   --                 aNode.Features (index_3) := Features (index_3);
+   --              end loop;
+   --           end;
+   --        end loop;
+   --
+   --     end Update_Next_Layer;
 
    --  ---------------------------------------------------------------------------
 
