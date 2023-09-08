@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Base_Neural;
+with Basic_Printing; use Basic_Printing;
 with Stochastic_Optimizers;
 
 package body Structure is
@@ -21,6 +22,12 @@ package body Structure is
    begin
       for index in 1 .. Num_Nodes loop
          Add_Node (thisLayer, Input_Data);
+      end loop;
+
+      --  Initialize weights
+      for index in thisLayer.Weights'Range loop
+         --  Random_Float generates a random number in the range  -1.0 .. 1.0
+         thisLayer.Weights (index) := Maths.Random_Float;
       end loop;
 
       thisLayer.Activation := Activation;
@@ -100,10 +107,15 @@ package body Structure is
              aModel.Layers.First_Element.Nodes (node_id).Features +
            aModel.Layers.First_Element.Bias;
 
-         Put_Line (Routine_Name & "Layer, Node" & Integer'Image (aModel.Layers.First_Index) &
+--           Print_Float_Vector (Routine_Name & "Layer, Node" &
+--                       Integer'Image (aModel.Layers.First_Index) &
+--                                 "," & Integer'Image (node_id) & " Weights",
+--                               aModel.Layers.First_Element.Weights);
+         Put_Line (Routine_Name & "Layer, Node" &
+                     Integer'Image (aModel.Layers.First_Index) &
                      "," & Integer'Image (node_id) & " Out_Value: " &
-                     Float'Image (aModel.Layers (aModel.Layers.First_Index).Output_Data
-                     (node_id)));
+                     Float'Image (aModel.Layers
+                     (aModel.Layers.First_Index).Output_Data (node_id)));
          case aModel.Layers.First_Element.Activation is
             when Identity_Activation => null;
             when ReLu_Activation =>
