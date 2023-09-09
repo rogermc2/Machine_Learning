@@ -25,6 +25,7 @@ package Structure is
       Activation  : Activation_Kind := Identity_Activation;
       Nodes       : Node_List;
       Output_Data : Real_Float_Vector (1 .. Num_Nodes);
+      Loss        : Real_Float_Vector (1 .. Num_Nodes);
    end record;
 
    package Layer_Packge is new
@@ -51,8 +52,8 @@ package Structure is
 private
    type Sequential_Model (Num_Features : Positive) is record
       Input_Data   : Real_Float_Vector (1 .. Num_Features);
+      Labels       : Real_Float_Vector (1 .. 1);
       Layers       : Layer_List;
-      Connect_List : Float_Matrix_List;
    end record;
 
 end Structure;

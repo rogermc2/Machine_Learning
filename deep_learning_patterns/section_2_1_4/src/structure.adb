@@ -90,6 +90,7 @@ package body Structure is
       use Layer_Packge;
       use Nodes_Package;
       Routine_Name : constant String := "Structure.Forward ";
+      Out_Value    : Float;
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
@@ -97,24 +98,23 @@ package body Structure is
       for node_id in aModel.Layers.First_Element.Nodes.First_Index ..
         aModel.Layers.First_Element.Nodes.Last_Index loop
 
-         aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id) :=
+         Out_Value :=
            aModel.Layers.First_Element.Nodes (node_id).Weights *
-             aModel.Layers.First_Element.Nodes (node_id).Features +
+           aModel.Layers.First_Element.Nodes (node_id).Features +
            aModel.Layers.First_Element.Nodes (node_id).Bias;
 
          case aModel.Layers.First_Element.Activation is
             when Identity_Activation => null;
-            when ReLu_Activation =>
-               Rect_LU
-                 (aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id));
+            when ReLu_Activation => Rect_LU (Out_Value);
             when Sigmoid_Activation =>
-               aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id) :=
-                 Sigmoid
-                   (aModel.Layers.First_Element.Output_Data (node_id));
-            when Soft_Max_Activation =>
-               Softmax
-                 (aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id));
+               Out_Value := Sigmoid (Out_Value);
+            when Soft_Max_Activation => Softmax (Out_Value);
          end case;
+
+         aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id) :=
+           Out_Value;
+         aModel.Layers (aModel.Layers.First_Index).Loss (node_id) :=
+           Out_Value - aModel.Labels (1);
 
          Put_Line (Routine_Name & "Layer, Node" & Integer'Image (aModel.Layers.First_Index) &
                      "," & Integer'Image (node_id) & " Out_Value: " &
@@ -126,27 +126,28 @@ package body Structure is
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "Layer:" & Integer'Image (layer));
+
          for node_id in aModel.Layers (layer).Nodes.First_Index ..
            aModel.Layers (layer).Nodes.Last_Index loop
             aModel.Layers (layer).Nodes (node_id).Features :=
               aModel.Layers (layer - 1).Output_Data;
 
-            aModel.Layers (layer).Output_Data (node_id) :=
+            Out_Value :=
               aModel.Layers (layer).Nodes (node_id).Weights *
               aModel.Layers (layer).Nodes (node_id).Features +
               aModel.Layers (layer).Nodes (node_id).Bias;
 
             case aModel.Layers (layer).Activation is
                when Identity_Activation => null;
-               when ReLu_Activation =>
-                  Rect_LU (aModel.Layers (layer ).Output_Data (node_id));
-               when Sigmoid_Activation =>
-                  aModel.Layers (layer ).Output_Data (node_id) :=
-                    Sigmoid (aModel.Layers (layer).Output_Data (node_id));
-               when Soft_Max_Activation =>
-                  Softmax (aModel.Layers (layer).Output_Data (node_id));
+               when ReLu_Activation => Rect_LU (Out_Value);
+               when Sigmoid_Activation => Out_Value := Sigmoid (Out_Value);
+               when Soft_Max_Activation => Softmax (Out_Value);
             end case;
 
+            aModel.Layers (layer).Output_Data (node_id) :=
+              Out_Value;
+            aModel.Layers (layer).Loss (node_id) :=
+              Out_Value - aModel.Labels (1);
             Put_Line (Routine_Name & "Layer, Node" & Integer'Image (layer) &
                         "," & Integer'Image (node_id) & " Out_Value: " &
                         Float'Image (aModel.Layers (layer).Output_Data
