@@ -327,6 +327,18 @@ package body Base_Neural is
    end Softmax;
 
    --  ------------------------------------------------------------------------
+
+   function Squared_Loss (Y_True, Y_Pred : Real_Float_Vector)
+                          return Float is
+      use Real_Float_Arrays;
+      Diff : constant Real_Float_Vector := Y_True - Y_Pred;
+   begin
+
+      return Neural_Maths.Mean (Diff * Diff);
+
+   end Squared_Loss;
+
+   --  -------------------------------------------------------------------------
    --  L158
    function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix)
                           return Float is

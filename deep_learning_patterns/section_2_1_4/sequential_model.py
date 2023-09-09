@@ -10,3 +10,5 @@ model.add (Dense (10, activation='relu'))
 model.add (Dense (1))
 
 model.summary()
+
+model.compile(loss='mse', optimizer='rmsprop')
