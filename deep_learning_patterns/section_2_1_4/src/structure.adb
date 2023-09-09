@@ -24,12 +24,6 @@ package body Structure is
          Add_Node (thisLayer, Input_Data);
       end loop;
 
-      --  Initialize weights
-      for index in thisLayer.Weights'Range loop
-         --  Random_Float generates a random number in the range  -1.0 .. 1.0
-         thisLayer.Weights (index) := Maths.Random_Float;
-      end loop;
-
       thisLayer.Activation := Activation;
       aModel.Layers.Append (thisLayer);
 
@@ -44,12 +38,6 @@ package body Structure is
       Prev_Nodes : constant Node_List := Prev_Layer.Nodes;
       thisLayer  : Layer (Num_Nodes, Positive (Prev_Nodes.Length));
    begin
-      --  Initialize weights
-      for index in thisLayer.Weights'Range loop
-         --  Random_Float generates a random number in the range  -1.0 .. 1.0
-         thisLayer.Weights (index) := Maths.Random_Float;
-      end loop;
-
       thisLayer.Activation := Activation;
 
       for index in 1 .. Num_Nodes loop
@@ -66,6 +54,11 @@ package body Structure is
       aNode : Node (Features'Length);
    begin
       aNode.Features := Features;
+      --  Initialize weights
+      for index in aNode.Weights'Range loop
+         --  Random_Float generates a random number in the range  -1.0 .. 1.0
+         aNode.Weights (index) := Maths.Random_Float;
+      end loop;
       aLayer.Nodes.Append (aNode);
 
    end Add_Node;
@@ -102,20 +95,25 @@ package body Structure is
       --  Update first layer
       for node_id in aModel.Layers.First_Element.Nodes.First_Index ..
         aModel.Layers.First_Element.Nodes.Last_Index loop
+         --           Print_Float_Vector (Routine_Name & "Layer, Node " &
+         --                                 Integer'Image (aModel.Layers.First_Index) &
+         --                                 "," & Integer'Image (node_id) & "Features",
+         --                               aModel.Layers.First_Element.Nodes (node_id).Features);
+
          aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id) :=
-           aModel.Layers.First_Element.Weights *
+           aModel.Layers.First_Element.Nodes (node_id).Weights *
              aModel.Layers.First_Element.Nodes (node_id).Features +
-           aModel.Layers.First_Element.Bias;
+           aModel.Layers.First_Element.Nodes (node_id).Bias;
 
 --           Print_Float_Vector (Routine_Name & "Layer, Node" &
---                       Integer'Image (aModel.Layers.First_Index) &
+--                                 Integer'Image (aModel.Layers.First_Index) &
 --                                 "," & Integer'Image (node_id) & " Weights",
---                               aModel.Layers.First_Element.Weights);
-         Put_Line (Routine_Name & "Layer, Node" &
-                     Integer'Image (aModel.Layers.First_Index) &
-                     "," & Integer'Image (node_id) & " Out_Value: " &
-                     Float'Image (aModel.Layers
-                     (aModel.Layers.First_Index).Output_Data (node_id)));
+--                               aModel.Layers.First_Element.Nodes (node_id).Weights);
+--           Put_Line (Routine_Name & "Layer, Node" &
+--                       Integer'Image (aModel.Layers.First_Index) &
+--                       "," & Integer'Image (node_id) & " Out_Value: " &
+--                       Float'Image (aModel.Layers
+--                       (aModel.Layers.First_Index).Output_Data (node_id)));
          case aModel.Layers.First_Element.Activation is
             when Identity_Activation => null;
             when ReLu_Activation =>
@@ -142,9 +140,9 @@ package body Structure is
               aModel.Layers (index - 1).Output_Data;
 
             aModel.Layers (index ).Output_Data (node_id) :=
-              aModel.Layers (index).Weights *
+              aModel.Layers (index).Nodes (node_id).Weights *
               aModel.Layers (index).Nodes (node_id).Features +
-              aModel.Layers (index).Bias;
+              aModel.Layers (index).Nodes (node_id).Bias;
 
             case aModel.Layers (index).Activation is
                when Identity_Activation => null;

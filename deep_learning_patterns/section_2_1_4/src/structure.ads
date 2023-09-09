@@ -13,6 +13,8 @@ package Structure is
 
    type Node (Dim : Positive) is record
       Features  : Real_Float_Vector (1 .. Dim);
+      Weights   : Real_Float_Vector (1 .. Dim);
+      Bias      : Float := 0.0;
    end record;
 
    package Nodes_Package is new
@@ -20,8 +22,6 @@ package Structure is
    subtype Node_List is Nodes_Package.Vector;
 
    type Layer (Num_Nodes, Dim : Positive) is record
-      Weights     : Real_Float_Vector (1 .. Dim);
-      Bias        : Float := 0.0;
       Activation  : Activation_Kind := Identity_Activation;
       Nodes       : Node_List;
       Output_Data : Real_Float_Vector (1 .. Num_Nodes);
