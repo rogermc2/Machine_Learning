@@ -300,12 +300,20 @@ package body Base_Neural is
    end Sigmoid;
 
    --  ------------------------------------------------------------------------
-   --  SoftMax returns the probability of each class
+
+   procedure Softmax (Activation : in out Float) is
+   begin
+      null;
+
+   end Softmax;
+
+   --  ------------------------------------------------------------------------
+     --  SoftMax returns the probability of each class
    --  probability = exp (value) / sum of all exp (v)
    --  Activation: n_samples x n_features
    procedure Softmax (Activation : in out Real_Float_Matrix) is
       use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Base_Neural.Softmax ";
+      --        Routine_Name : constant String := "Base_Neural.Softmax Real_Float_Matrix";
       --  Max returns a vector with the maximum value of each row of a matrix
       Max_Act      : constant Real_Float_Vector := Max (Activation);
       Tmp          : Real_Float_Matrix := Activation - Max_Act;

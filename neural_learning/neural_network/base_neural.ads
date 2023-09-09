@@ -46,6 +46,7 @@ package Base_Neural is
    pragma Inline (Rect_LU_Derivative);
    function Sigmoid (X : Float) return Float;
    pragma Inline (Sigmoid);
+   procedure Softmax (Activation : in out Float);
    procedure Softmax (Activation : in out Real_Float_Matrix);
    pragma Inline (Softmax);
    function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
