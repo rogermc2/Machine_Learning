@@ -13,15 +13,22 @@ package body Structure_V2 is
                       Loss_Method : Loss_Kind);
 
    --  -------------------------------------------------------------------------
+
+   procedure Add_Connections (aModel : in out Sequential_Model;
+                              Prev_Layer, thisLayer : Layer) is
+   begin
+      Null;
+   end Add_Connections;
+
+   --  ---------------------------------------------------------------------------
+
    --  Add first layer
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Input_Data : Real_Float_Vector) is
-      thisLayer : Layer (Num_Nodes, Input_Data'Length);
+      thisLayer : Layer (Num_Nodes);
    begin
-      for index in 1 .. Num_Nodes loop
-         Add_Node (thisLayer, Input_Data);
-      end loop;
+      thisLayer.Nodes := Input_Data;
 
       aModel.Layers.Append (thisLayer);
 
@@ -32,32 +39,29 @@ package body Structure_V2 is
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive) is
       Prev_Layer : constant Layer := aModel.Layers.Last_Element;
-      Prev_Nodes : constant Node_List := Prev_Layer.Nodes;
-      thisLayer  : Layer (Num_Nodes, Positive (Prev_Nodes.Length));
+      Prev_Nodes : constant Real_Float_Vector := Prev_Layer.Nodes;
+      thisLayer  : Layer (Prev_Nodes'Length);
    begin
-      for index in 1 .. Num_Nodes loop
-         Add_Node (thisLayer, Prev_Layer.Output_Data);
-      end loop;
-
       aModel.Layers.Append (thisLayer);
+      Add_Connections (aModel, Prev_Layer, thisLayer);
 
    end Add_Layer;
 
    --  ---------------------------------------------------------------------------
 
-   procedure Add_Node (aLayer : in out Layer; Features : Real_Float_Vector) is
-      aNode : Node (Features'Length);
-   begin
-      aNode.Features := Features;
-      --  Initialize weights
-      for index in aNode.Weights'Range loop
-         --  Random_Float generates a random number in the range  -1.0 .. 1.0
-         aNode.Weights (index) := Maths.Random_Float;
-      end loop;
-      aLayer.Nodes.Append (aNode);
-
-   end Add_Node;
-
+--     procedure Add_Node (aLayer : in out Layer; Features : Real_Float_Vector) is
+--        aNode : Node (1 .. Features'Length);
+--     begin
+--        aNode.Features := Features;
+--        --  Initialize weights
+--        for index in aNode.Weights'Range loop
+--           --  Random_Float generates a random number in the range  -1.0 .. 1.0
+--           aNode.Weights (index) := Maths.Random_Float;
+--        end loop;
+--        aLayer.Nodes.Append (aNode);
+--
+--     end Add_Node;
+--
    --  ---------------------------------------------------------------------------
 
    procedure Back_Propogate (aModel      : Sequential_Model;
@@ -83,7 +87,7 @@ package body Structure_V2 is
       use Real_Float_Arrays;
       use Base_Neural;
       use Layer_Packge;
-      use Nodes_Package;
+--        use Nodes_Package;
       Routine_Name : constant String := "Structure.Forward ";
       Out_Value    : Float;
    begin
