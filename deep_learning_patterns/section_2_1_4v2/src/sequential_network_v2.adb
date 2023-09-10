@@ -25,7 +25,8 @@ procedure Sequential_Network_V2 is
 begin
    New_Line;
    Put_Line ("Program " & Program_Name);
-   Add_Layer (theModel, 10, Input_Data);
+   Add_Layer (theModel, Input_Data'Length, Input_Data);
+   Add_Layer (theModel, 10);
    Add_Layer (theModel, 10);
    Add_Layer (theModel, 1);
 
