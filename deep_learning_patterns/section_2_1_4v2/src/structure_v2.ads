@@ -46,8 +46,8 @@ package Structure_V2 is
 --     procedure Add_Node (aLayer     : in out Layer; Features : Real_Float_Vector);
    procedure Compile (aModel      : in out Sequential_Model;
                       Loss_Method : Loss_Kind);
-   function Get_Output_Value (aModel : Sequential_Model)
-                              return Real_Float_Vector;
+--     function Get_Output_Value (aModel : Sequential_Model)
+--                                return Real_Float_Vector;
 
 private
    type Sequential_Model (Num_Features : Positive) is record

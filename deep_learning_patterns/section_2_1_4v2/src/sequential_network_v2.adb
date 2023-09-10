@@ -30,11 +30,11 @@ begin
    Add_Layer (theModel, 1);
 
    Compile (theModel, Loss_Type);
-   declare
-      Output_Data : Real_Float_Vector := Get_Output_Value (theModel);
-   begin
-      Print_Float_Vector (Program_Name & "Output_Data", Output_Data);
-   end;
+--     declare
+--        Output_Data : Real_Float_Vector := Get_Output_Value (theModel);
+--     begin
+--        Print_Float_Vector (Program_Name & "Output_Data", Output_Data);
+--     end;
 
       --     Python.Initialize;
       --     Classifier := Python.Import_File ("sequential");
