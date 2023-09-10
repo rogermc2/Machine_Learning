@@ -114,8 +114,8 @@ package body Structure is
          aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id) :=
            Out_Value;
          case Loss_Method is
-            when Mean_Square_Error_Loss => ms
-         en case;
+            when Mean_Square_Error_Loss => null;
+         end case;
          aModel.Layers (aModel.Layers.First_Index).Loss (node_id) :=
            Out_Value - aModel.Labels (1);
 
