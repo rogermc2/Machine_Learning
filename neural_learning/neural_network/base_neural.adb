@@ -273,6 +273,16 @@ package body Base_Neural is
    end Rect_LU;
 
    --  -------------------------------------------------------------------------
+
+   procedure Rect_LU (Activation : in out Real_Float_Vector) is
+   begin
+      for index in Activation'Range loop
+         Activation (index) := Float'Max (0.0, Activation (index));
+      end loop;
+
+   end Rect_LU;
+
+   --  -------------------------------------------------------------------------
    --  L132  del[Z == 0] = 0 means
    --        for each element of Z that is 0, repalce the corresponding
    --        element of del with 0   (f(x) = max(0 , x))
@@ -308,7 +318,7 @@ package body Base_Neural is
    end Softmax;
 
    --  ------------------------------------------------------------------------
-     --  SoftMax returns the probability of each class
+   --  SoftMax returns the probability of each class
    --  probability = exp (value) / sum of all exp (v)
    --  Activation: n_samples x n_features
    procedure Softmax (Activation : in out Real_Float_Matrix) is
@@ -323,6 +333,19 @@ package body Base_Neural is
       Activation := Tmp;
       Sum_Tmp := Sum (Tmp);
       Activation := Activation / Sum_Tmp;
+
+   end Softmax;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Softmax (Activation : in out Real_Float_Vector) is
+      use Real_Float_Arrays;
+      --        Routine_Name : constant String := "Base_Neural.Softmax Real_Float_Vector";
+      Max_Act      : constant Float := Max (Activation);
+      Tmp          : Real_Float_Vector := Activation - Max_Act;
+   begin
+      Tmp := ML_Arrays_And_Matrices.Exp (Tmp);
+      Activation := Tmp / Sum (Tmp);
 
    end Softmax;
 

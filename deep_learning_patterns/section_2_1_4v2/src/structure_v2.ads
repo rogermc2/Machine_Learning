@@ -20,7 +20,7 @@ package Structure_V2 is
 
    type Connection (Dim1, Dim2 : Positive) is record
       Connection_Matrix  : Real_Float_Matrix (1 .. Dim1, 1 .. Dim2);
-      Bias       : Float := 0.0;
+      Bias       : Real_Float_Vector (1 .. Dim2) := (others => 0.0);
       Activation : Activation_Kind := Identity_Activation;
    end record;
 
@@ -45,8 +45,7 @@ package Structure_V2 is
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive);
 --     procedure Add_Node (aLayer     : in out Layer; Features : Real_Float_Vector);
-   procedure Compile (aModel      : in out Sequential_Model;
-                      Loss_Method : Loss_Kind);
+   procedure Compile (aModel      : in out Sequential_Model);
 --     function Get_Output_Value (aModel : Sequential_Model)
 --                                return Real_Float_Vector;
 

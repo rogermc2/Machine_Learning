@@ -27,11 +27,11 @@ package Base_Neural is
    pragma Inline (Logistic_Derivative);
    function Logistic_Sigmoid (X : Long_Float) return Float;
    function Logistic_Sigmoid (X : Real_Float_Matrix)
-                               return Real_Float_Matrix;
+                              return Real_Float_Matrix;
    pragma Inline (Logistic_Sigmoid);
    function Log_Loss (Y_True, Y_Prob : Real_Float_Matrix) return Float;
---     function Log_Loss (Y_True : Integer_Matrix; Y_Prob : Real_Float_Matrix)
---                        return Float;
+   --     function Log_Loss (Y_True : Integer_Matrix; Y_Prob : Real_Float_Matrix)
+   --                        return Float;
    pragma Inline (Log_Loss);
    procedure Tanh (Activation : in out Real_Float_Matrix);
    pragma Inline (Tanh);
@@ -40,17 +40,19 @@ package Base_Neural is
    pragma Inline (Tanh_Derivative);
    procedure Rect_LU (Activation : in out Float);
    procedure Rect_LU (Activation : in out Real_Float_Matrix);
+   procedure Rect_LU (Activation : in out Real_Float_Vector);
    pragma Inline (Rect_LU);
-   procedure Rect_LU_Derivative (Z : Real_Float_Matrix;
-                              Del : in out Real_Float_Matrix);
+   procedure Rect_LU_Derivative (Z   : Real_Float_Matrix;
+                                 Del : in out Real_Float_Matrix);
    pragma Inline (Rect_LU_Derivative);
    function Sigmoid (X : Float) return Float;
    pragma Inline (Sigmoid);
    procedure Softmax (Activation : in out Float);
    procedure Softmax (Activation : in out Real_Float_Matrix);
+   procedure Softmax (Activation : in out Real_Float_Vector);
    pragma Inline (Softmax);
    function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
-                           return Float;
+                          return Float;
    function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float;
    pragma Inline (Squared_Loss);
    function X_Log_Y (X, Y : Real_Float_Matrix) return Real_Float_Matrix;

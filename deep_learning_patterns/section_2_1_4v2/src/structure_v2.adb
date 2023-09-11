@@ -9,8 +9,7 @@ with Stochastic_Optimizers;
 
 package body Structure_V2 is
 
-   procedure Forward (aModel      : in out Sequential_Model;
-                      Loss_Method : Loss_Kind);
+   procedure Forward (aModel : in out Sequential_Model);
 
    --  -------------------------------------------------------------------------
 
@@ -85,8 +84,7 @@ package body Structure_V2 is
 
    --  -------------------------------------------------------------------------
 
-   procedure Compile (aModel      : in out Sequential_Model;
-                      Loss_Method : Loss_Kind) is
+   procedure Compile (aModel : in out Sequential_Model) is
       use Stochastic_Optimizers;
       Routine_Name : constant String := "Structure.Compile ";
       Pred         : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
@@ -103,7 +101,7 @@ package body Structure_V2 is
       --  Intercepts is a 2D list of bias vectors where the vector at index
       --  the bias values added to layer i + 1.
    begin
-      Forward (aModel, Loss_Method);
+      Forward (aModel);
       for row in aModel.Labels'Range loop
          for col in aModel.Labels'Range loop
             Pred (row, col) := aModel.Labels (col);
@@ -126,17 +124,15 @@ package body Structure_V2 is
 
    --  -------------------------------------------------------------------------
 
-   procedure Forward (aModel : in out Sequential_Model;
-                      Loss_Method : Loss_Kind) is
+   procedure Forward (aModel : in out Sequential_Model) is
       use Real_Float_Arrays;
       use Base_Neural;
       use Layer_Packge;
       Routine_Name : constant String := "Structure.Forward ";
-      Out_Value    : Float;
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
-       for layer in aModel.Layers.First_Index + 1 ..
+      for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "Layer:" & Integer'Image (layer));
          declare
@@ -146,24 +142,21 @@ package body Structure_V2 is
               Connect.Connection_Matrix (layer - 1, layer) *
               aModel.Layers (layer - 1).Nodes;
 
-            Out_Value :=
-              Sum (aModel.Layers (layer).Nodes) + Connect.Bias;
+            aModel.Layers (layer).Nodes :=
+              aModel.Layers (layer).Nodes + Connect.Bias;
 
             case aModel.Connections (layer).Activation is
             when Identity_Activation => null;
-            when ReLu_Activation => Rect_LU (Out_Value);
-            when Sigmoid_Activation => Out_Value := Sigmoid (Out_Value);
-            when Soft_Max_Activation => Softmax (Out_Value);
+            when ReLu_Activation => Rect_LU (aModel.Layers (layer).Nodes);
+            when Sigmoid_Activation => null;
+            when Soft_Max_Activation => Softmax (aModel.Layers (layer).Nodes);
             end case;
 
-            aModel.Layers (layer).Output_Data (node_id) :=
-              Out_Value;
-            Put_Line (Routine_Name & "Layer, Node" & Integer'Image (layer) &
-                        "," & Integer'Image (node_id) & " Out_Value: " &
-                        Float'Image (aModel.Layers (layer).Output_Data
-                        (node_id)));
-            end;
-         end loop;
+            Print_Float_Vector (Routine_Name & "Layer" &
+                                  Integer'Image (layer) & " nodes",
+                      aModel.Layers (layer).Nodes);
+         end;
+      end loop;
 
    end Forward;
 

@@ -22,8 +22,7 @@ procedure Sequential_Network_V2 is
                     (1.0, 0.0, 0.5, -0.5, 2.3, -5.2, 10.9, -12.0,
                      4.5, 6.9, -0.1, 7.0, -8.0);
    Labels       : constant Real_Float_Vector (1 .. 1) := (others => 0.0);
-   Loss_Type    : Loss_Kind := Mean_Square_Error_Loss;
-   theModel     : Sequential_Model (Num_Features);
+   theModel     : Sequential_Model (Num_Features, Mean_Square_Error_Loss);
    --     Classifier           : Python.Module;
 begin
    New_Line;
@@ -33,7 +32,7 @@ begin
    Add_Layer (theModel, 10);
    Add_Layer (theModel, 1);
 
-   Compile (theModel, Loss_Type);
+   Compile (theModel);
 --     declare
 --        Output_Data : Real_Float_Vector := Get_Output_Value (theModel);
 --     begin
