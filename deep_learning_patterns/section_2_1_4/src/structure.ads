@@ -9,7 +9,7 @@ package Structure is
    --  Soft_Max_Activation other output types
    type Activation_Kind is (Identity_Activation, ReLu_Activation,
                             Sigmoid_Activation, Soft_Max_Activation);
-   type Loss_Kind is (Mean_Square_Error_Loss);
+   type Loss_Kind is (Binary_Log_Loss, Log_Loss, Mean_Square_Error_Loss);
 
    type Node (Dim : Positive) is record
       Features  : Real_Float_Vector (1 .. Dim);
@@ -25,7 +25,6 @@ package Structure is
       Activation  : Activation_Kind := Identity_Activation;
       Nodes       : Node_List;
       Output_Data : Real_Float_Vector (1 .. Num_Nodes);
-      Loss        : Real_Float_Vector (1 .. Num_Nodes);
    end record;
 
    package Layer_Packge is new
@@ -34,7 +33,8 @@ package Structure is
 
    --     package Neural_Network is new Ada.Containers.Vectors (Positive, Node_List);
 
-   type Sequential_Model (Num_Features : Positive) is private;
+   type Sequential_Model (Num_Features : Positive;
+                          Loss_Method  : Loss_Kind) is private;
 
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
@@ -44,16 +44,16 @@ package Structure is
                         Num_Nodes  : Positive;
                         Activation : Activation_Kind := Identity_Activation);
    procedure Add_Node (aLayer     : in out Layer; Features : Real_Float_Vector);
-   procedure Compile (aModel      : in out Sequential_Model;
-                      Loss_Method : Loss_Kind);
-   function Get_Output_Value (aModel : Sequential_Model)
-                              return Real_Float_Vector;
+   procedure Compile (aModel      : in out Sequential_Model);
+--     function Get_Output_Value (aModel : Sequential_Model)
+--                                return Real_Float_Vector;
 
 private
-   type Sequential_Model (Num_Features : Positive) is record
-      Input_Data   : Real_Float_Vector (1 .. Num_Features);
-      Labels       : Real_Float_Vector (1 .. 1);
-      Layers       : Layer_List;
+   type Sequential_Model (Num_Features : Positive;
+                          Loss_Method  : Loss_Kind) is record
+      Input_Data  : Real_Float_Vector (1 .. Num_Features);
+      Labels      : Real_Float_Vector (1 .. 1);
+      Layers      : Layer_List;
    end record;
 
 end Structure;

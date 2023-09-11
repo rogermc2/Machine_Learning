@@ -9,8 +9,7 @@ with Stochastic_Optimizers;
 
 package body Structure is
 
-   procedure Forward (aModel      : in out Sequential_Model;
-                      Loss_Method : Loss_Kind);
+   procedure Forward (aModel : in out Sequential_Model);
 
    --  -------------------------------------------------------------------------
    --  Add first layer
@@ -74,17 +73,34 @@ package body Structure is
 
    --  -------------------------------------------------------------------------
 
-   procedure Compile (aModel      : in out Sequential_Model;
-                      Loss_Method : Loss_Kind) is
+   procedure Compile (aModel : in out Sequential_Model) is
+      Routine_Name : constant String := "Structure.Compile ";
+      Pred   : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
+      Actual : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
+      Loss   : Float;
    begin
-      Forward (aModel, Loss_Method);
+      Forward (aModel);
+      for row in aModel.Labels'Range loop
+         for col in aModel.Labels'Range loop
+            Pred (row, col) := aModel.Labels (col);
+            Actual (row, col) := aModel.Layers.Last_Element.Output_Data (col);
+         end loop;
+      end loop;
+
+      case aModel.Loss_Method is
+         when Binary_Log_Loss => null;
+         when Log_Loss => null;
+         when Mean_Square_Error_Loss =>
+            Loss := Base_Neural.Squared_Loss (Pred, Actual);
+      end case;
+
+      Put_Line (Routine_Name & "Loss " & Float'Image (Loss));
 
    end Compile;
 
    --  -------------------------------------------------------------------------
 
-   procedure Forward (aModel      : in out Sequential_Model;
-                      Loss_Method : Loss_Kind) is
+   procedure Forward (aModel : in out Sequential_Model) is
       use Real_Float_Arrays;
       use Base_Neural;
       use Layer_Packge;
@@ -113,11 +129,6 @@ package body Structure is
 
          aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id) :=
            Out_Value;
-         case Loss_Method is
-            when Mean_Square_Error_Loss => null;
-         end case;
-         aModel.Layers (aModel.Layers.First_Index).Loss (node_id) :=
-           Out_Value - aModel.Labels (1);
 
          Put_Line (Routine_Name & "Layer, Node" & Integer'Image (aModel.Layers.First_Index) &
                      "," & Integer'Image (node_id) & " Out_Value: " &
@@ -149,8 +160,6 @@ package body Structure is
 
             aModel.Layers (layer).Output_Data (node_id) :=
               Out_Value;
-            aModel.Layers (layer).Loss (node_id) :=
-              Out_Value - aModel.Labels (1);
             Put_Line (Routine_Name & "Layer, Node" & Integer'Image (layer) &
                         "," & Integer'Image (node_id) & " Out_Value: " &
                         Float'Image (aModel.Layers (layer).Output_Data
@@ -163,11 +172,11 @@ package body Structure is
 
    --  ---------------------------------------------------------------------------
 
-   function Get_Output_Value (aModel : Sequential_Model) return Real_Float_Vector is
-   begin
-      return aModel.Layers.Last_Element.Output_Data;
-
-   end Get_Output_Value;
+--     function Get_Output_Value (aModel : Sequential_Model) return Real_Float_Vector is
+--     begin
+--        return aModel.Layers.Last_Element.Output_Data;
+--
+--     end Get_Output_Value;
 
    --  ---------------------------------------------------------------------------
 

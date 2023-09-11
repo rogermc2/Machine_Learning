@@ -11,6 +11,9 @@ with Shuffler;
 
 with Structure_V2; use Structure_V2;
 
+--  Each neuron is a very simple function that considers a weighted sum of
+--  incoming signals and then fires in a characteristic way by comparing the
+--  value of that sum against some threshold.
 procedure Sequential_Network_V2 is
    Program_Name : constant String := "Sequential_Network_V2 ";
 
