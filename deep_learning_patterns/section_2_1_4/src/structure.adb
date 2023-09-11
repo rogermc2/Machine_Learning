@@ -78,122 +78,124 @@ package body Structure is
 
    procedure Compile (aModel : in out Sequential_Model) is
       use Stochastic_Optimizers;
-      Routine_Name : constant String := "Structure.Compile ";
-      Pred      : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
-      Actual    : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
-      Loss      : Float;
-      Optimiser : Adam_Optimizer;
-      Params    : Parameters_List;
---        Parameters_Record (Num_Rows, Num_Cols : Positive) is record
---        Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
---                            (others => (others => 0.0));
---        Intercept_Grads : Real_Float_Vector (1 .. Num_Cols) := (others => 0.0);
---  Coefs is a 3D list of weight matrices where the weight matrix at index i
---  represents the weights between layer i and layer i + 1.
---  Intercepts is a 2D list of bias vectors where the vector at index
---  the bias values added to layer i + 1.
-   begin
-      Forward (aModel);
-      for row in aModel.Labels'Range loop
-         for col in aModel.Labels'Range loop
-            Pred (row, col) := aModel.Labels (col);
-            Actual (row, col) := aModel.Layers.Last_Element.Output_Data (col);
-         end loop;
-      end loop;
+      Routine_Name   : constant String := "Structure.Compile ";
+      Pred           : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
+      Actual         : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
+      Loss           : Float;
+      Optimiser      : Adam_Optimizer;
+      Optimizer_Data : Optimizer_Record;
+      Params         : Parameters_Record (1, aModel.Labels'Length);
+      Params_List    : Parameters_List;
+      Gradients      : Parameters_List;
+        --        Parameters_Record (Num_Rows, Num_Cols : Positive) is record
+        --        Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
+        --                            (others => (others => 0.0));
+        --        Intercept_Grads : Real_Float_Vector (1 .. Num_Cols) := (others => 0.0);
 
-      case aModel.Loss_Method is
+      begin
+         Forward (aModel);
+         for row in aModel.Labels'Range loop
+            for col in aModel.Labels'Range loop
+               Pred (row, col) := aModel.Labels (col);
+               Actual (row, col) := aModel.Layers.Last_Element.Output_Data (col);
+            end loop;
+         end loop;
+
+         case aModel.Loss_Method is
          when Binary_Log_Loss => null;
          when Log_Loss => null;
          when Mean_Square_Error_Loss =>
             Loss := Base_Neural.Squared_Loss (Pred, Actual);
-      end case;
+         end case;
 
-      C_Init (Optimiser, Params);
+         C_Init (Optimiser, Params_List);
+         Update_Params (Optimizer_Data, Params_List, Gradients);
 
-      Put_Line (Routine_Name & "Loss " & Float'Image (Loss));
 
-   end Compile;
+         Put_Line (Routine_Name & "Loss " & Float'Image (Loss));
 
-   --  -------------------------------------------------------------------------
+      end Compile;
 
-   procedure Forward (aModel : in out Sequential_Model) is
-      use Real_Float_Arrays;
-      use Base_Neural;
-      use Layer_Packge;
-      use Nodes_Package;
-      Routine_Name : constant String := "Structure.Forward ";
-      Out_Value    : Float;
-   begin
-      Put_Line (Routine_Name & "Num layers:" &
-                  Integer'Image (Integer (aModel.Layers.Length)));
-      --  Update first layer
-      for node_id in aModel.Layers.First_Element.Nodes.First_Index ..
-        aModel.Layers.First_Element.Nodes.Last_Index loop
+      --  -------------------------------------------------------------------------
 
-         Out_Value :=
-           aModel.Layers.First_Element.Nodes (node_id).Weights *
-           aModel.Layers.First_Element.Nodes (node_id).Features +
-           aModel.Layers.First_Element.Nodes (node_id).Bias;
+      procedure Forward (aModel : in out Sequential_Model) is
+         use Real_Float_Arrays;
+         use Base_Neural;
+         use Layer_Packge;
+         use Nodes_Package;
+         Routine_Name : constant String := "Structure.Forward ";
+         Out_Value    : Float;
+      begin
+         Put_Line (Routine_Name & "Num layers:" &
+                     Integer'Image (Integer (aModel.Layers.Length)));
+         --  Update first layer
+         for node_id in aModel.Layers.First_Element.Nodes.First_Index ..
+           aModel.Layers.First_Element.Nodes.Last_Index loop
 
-         case aModel.Layers.First_Element.Activation is
+            Out_Value :=
+              aModel.Layers.First_Element.Nodes (node_id).Weights *
+              aModel.Layers.First_Element.Nodes (node_id).Features +
+              aModel.Layers.First_Element.Nodes (node_id).Bias;
+
+            case aModel.Layers.First_Element.Activation is
             when Identity_Activation => null;
             when ReLu_Activation => Rect_LU (Out_Value);
             when Sigmoid_Activation =>
                Out_Value := Sigmoid (Out_Value);
             when Soft_Max_Activation => Softmax (Out_Value);
-         end case;
+            end case;
 
-         aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id) :=
-           Out_Value;
+            aModel.Layers (aModel.Layers.First_Index).Output_Data (node_id) :=
+              Out_Value;
 
-         Put_Line (Routine_Name & "Layer, Node" & Integer'Image (aModel.Layers.First_Index) &
-                     "," & Integer'Image (node_id) & " Out_Value: " &
-                     Float'Image (aModel.Layers (aModel.Layers.First_Index).Output_Data
-                     (node_id)));
-      end loop;  --  first layer nodes updatd
+            Put_Line (Routine_Name & "Layer, Node" & Integer'Image (aModel.Layers.First_Index) &
+                        "," & Integer'Image (node_id) & " Out_Value: " &
+                        Float'Image (aModel.Layers (aModel.Layers.First_Index).Output_Data
+                        (node_id)));
+         end loop;  --  first layer nodes updatd
 
-      --  Update other layers
-      for layer in aModel.Layers.First_Index + 1 ..
-        aModel.Layers.Last_Index loop
-         Put_Line (Routine_Name & "Layer:" & Integer'Image (layer));
+         --  Update other layers
+         for layer in aModel.Layers.First_Index + 1 ..
+           aModel.Layers.Last_Index loop
+            Put_Line (Routine_Name & "Layer:" & Integer'Image (layer));
 
-         for node_id in aModel.Layers (layer).Nodes.First_Index ..
-           aModel.Layers (layer).Nodes.Last_Index loop
-            aModel.Layers (layer).Nodes (node_id).Features :=
-              aModel.Layers (layer - 1).Output_Data;
+            for node_id in aModel.Layers (layer).Nodes.First_Index ..
+              aModel.Layers (layer).Nodes.Last_Index loop
+               aModel.Layers (layer).Nodes (node_id).Features :=
+                 aModel.Layers (layer - 1).Output_Data;
 
-            Out_Value :=
-              aModel.Layers (layer).Nodes (node_id).Weights *
-              aModel.Layers (layer).Nodes (node_id).Features +
-              aModel.Layers (layer).Nodes (node_id).Bias;
+               Out_Value :=
+                 aModel.Layers (layer).Nodes (node_id).Weights *
+                 aModel.Layers (layer).Nodes (node_id).Features +
+                 aModel.Layers (layer).Nodes (node_id).Bias;
 
-            case aModel.Layers (layer).Activation is
+               case aModel.Layers (layer).Activation is
                when Identity_Activation => null;
                when ReLu_Activation => Rect_LU (Out_Value);
                when Sigmoid_Activation => Out_Value := Sigmoid (Out_Value);
                when Soft_Max_Activation => Softmax (Out_Value);
-            end case;
+               end case;
 
-            aModel.Layers (layer).Output_Data (node_id) :=
-              Out_Value;
-            Put_Line (Routine_Name & "Layer, Node" & Integer'Image (layer) &
-                        "," & Integer'Image (node_id) & " Out_Value: " &
-                        Float'Image (aModel.Layers (layer).Output_Data
-                        (node_id)));
-         end loop;  --  node updated
+               aModel.Layers (layer).Output_Data (node_id) :=
+                 Out_Value;
+               Put_Line (Routine_Name & "Layer, Node" & Integer'Image (layer) &
+                           "," & Integer'Image (node_id) & " Out_Value: " &
+                           Float'Image (aModel.Layers (layer).Output_Data
+                           (node_id)));
+            end loop;  --  node updated
 
-      end loop;  --  other layer nodes
+         end loop;  --  other layer nodes
 
-   end Forward;
+      end Forward;
 
-   --  ---------------------------------------------------------------------------
+      --  ---------------------------------------------------------------------------
 
---     function Get_Output_Value (aModel : Sequential_Model) return Real_Float_Vector is
---     begin
---        return aModel.Layers.Last_Element.Output_Data;
---
---     end Get_Output_Value;
+      --     function Get_Output_Value (aModel : Sequential_Model) return Real_Float_Vector is
+      --     begin
+      --        return aModel.Layers.Last_Element.Output_Data;
+      --
+      --     end Get_Output_Value;
 
-   --  ---------------------------------------------------------------------------
+      --  ---------------------------------------------------------------------------
 
-end Structure;
+   end Structure;
