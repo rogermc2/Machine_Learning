@@ -48,7 +48,10 @@ package body Structure is
    end Add_Layer;
 
    --  ---------------------------------------------------------------------------
-
+--  Coefs is a 3D list of weight matrices where the weight matrix at index i
+--  represents the weights between layer i and layer i + 1.
+--  Intercepts is a 2D list of bias vectors where the vector at index
+--  the bias values added to layer i + 1.
    procedure Add_Node (aLayer : in out Layer; Features : Real_Float_Vector) is
       aNode : Node (Features'Length);
    begin
@@ -85,7 +88,10 @@ package body Structure is
 --        Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
 --                            (others => (others => 0.0));
 --        Intercept_Grads : Real_Float_Vector (1 .. Num_Cols) := (others => 0.0);
-
+--  Coefs is a 3D list of weight matrices where the weight matrix at index i
+--  represents the weights between layer i and layer i + 1.
+--  Intercepts is a 2D list of bias vectors where the vector at index
+--  the bias values added to layer i + 1.
    begin
       Forward (aModel);
       for row in aModel.Labels'Range loop
