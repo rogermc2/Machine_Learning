@@ -74,10 +74,18 @@ package body Structure is
    --  -------------------------------------------------------------------------
 
    procedure Compile (aModel : in out Sequential_Model) is
+      use Stochastic_Optimizers;
       Routine_Name : constant String := "Structure.Compile ";
-      Pred   : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
-      Actual : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
-      Loss   : Float;
+      Pred      : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
+      Actual    : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
+      Loss      : Float;
+      Optimiser : Adam_Optimizer;
+      Params    : Parameters_List;
+--        Parameters_Record (Num_Rows, Num_Cols : Positive) is record
+--        Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
+--                            (others => (others => 0.0));
+--        Intercept_Grads : Real_Float_Vector (1 .. Num_Cols) := (others => 0.0);
+
    begin
       Forward (aModel);
       for row in aModel.Labels'Range loop
@@ -93,6 +101,8 @@ package body Structure is
          when Mean_Square_Error_Loss =>
             Loss := Base_Neural.Squared_Loss (Pred, Actual);
       end case;
+
+      C_Init (Optimiser, Params);
 
       Put_Line (Routine_Name & "Loss " & Float'Image (Loss));
 
