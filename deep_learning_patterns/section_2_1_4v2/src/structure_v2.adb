@@ -16,14 +16,14 @@ package body Structure_V2 is
    procedure Add_Connections (aModel     : in out Sequential_Model;
                               Prev_Layer : Layer; thisLayer : in out Layer) is
       use Stochastic_Optimizers;
-      Routine_Name : constant String := "Structure.Add_Connections ";
-      Connect : Parameters_Record (Prev_Layer.Nodes'Length,
-                                   thisLayer.Nodes'Length);
+--        Routine_Name : constant String := "Structure.Add_Connections ";
+      Connect : Parameters_Record (thisLayer.Nodes'Length,
+                                   Prev_Layer.Nodes'Length);
    begin
-      Put_Line (Routine_Name & "Prev_Layer.Nodes'Length" &
-                  Integer'Image (Integer (Prev_Layer.Nodes'Length)));
-      Put_Line (Routine_Name & "thisLayer.Nodes'Length" &
-                  Integer'Image (Integer (thisLayer.Nodes'Length)));
+--        Put_Line (Routine_Name & "Prev_Layer.Nodes'Length" &
+--                    Integer'Image (Integer (Prev_Layer.Nodes'Length)));
+--        Put_Line (Routine_Name & "thisLayer.Nodes'Length" &
+--                    Integer'Image (Integer (thisLayer.Nodes'Length)));
       for row in Connect.Coeff_Gradients'Range loop
          for col in Connect.Coeff_Gradients'Range (2) loop
             --  Random_Float generates a random number in the range  -1.0 .. 1.0
@@ -54,25 +54,28 @@ package body Structure_V2 is
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive) is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Structure.Add_Layer others  ";
+--        Routine_Name : constant String := "Structure.Add_Layer others  ";
       Prev_Layer : constant Layer := aModel.Layers.Last_Element;
       Prev_Nodes : constant Real_Float_Vector := Prev_Layer.Nodes;
       thisLayer  : Layer (Num_Nodes);
    begin
-      Put_Line (Routine_Name);
-      Put_Line (Routine_Name & "Prev_Layer length"&
-                  Integer'Image (Integer (aModel.Layers.Length)));
+--        Put_Line (Routine_Name);
+--        Put_Line (Routine_Name & "Prev_Layer length"&
+--                    Integer'Image (Integer (aModel.Layers.Length)));
       Add_Connections (aModel, Prev_Layer, thisLayer);
-      Put_Line ( Routine_Name & "Connections added");
-      Put_Line (Routine_Name & "Prev_Layer Nodes length"&
-                  Integer'Image (Prev_Layer.Nodes'Length));
-      Put_Line (Routine_Name & "thisLayer Nodes length" &
-                  Integer'Image (thisLayer.Nodes'Length));
+--        Put_Line ( Routine_Name & "Connections added");
+--        Put_Line (Routine_Name & "Prev_Layer Nodes length"&
+--                    Integer'Image (Prev_Layer.Nodes'Length));
+--        Put_Line (Routine_Name & "thisLayer Nodes length" &
+--                    Integer'Image (thisLayer.Nodes'Length));
+--        Print_Matrix_Dimensions (Routine_Name &
+--                                   "Connections.Last_Element.Coeff_Gradients",
+--                                 aModel.Connections.Last_Element.Coeff_Gradients);
       thisLayer.Nodes := aModel.Connections.Last_Element.Coeff_Gradients *
         Prev_Layer.Nodes;
       aModel.Layers.Append (thisLayer);
 
-      Put_Line (Routine_Name & "done");
+--        Put_Line (Routine_Name & "done");
    end Add_Layer;
 
    --  ---------------------------------------------------------------------------
