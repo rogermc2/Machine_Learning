@@ -14,16 +14,6 @@ package Structure_V2 is
 
    subtype Node is Float;
 
---     type Connection (Dim1, Dim2 : Positive) is record
---        Weights    : Real_Float_Matrix (1 .. Dim1, 1 .. Dim2);
---        Bias       : Real_Float_Vector (1 .. Dim2) := (others => 0.0);
---        Activation : Activation_Kind := Identity_Activation;
---     end record;
---
---     package Connection_Package is new
---       Ada.Containers.Indefinite_Vectors (Positive, Connection);
---     subtype Connection_List is Connection_Package.Vector;
-
    package Activation_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Activation_Kind);
    subtype Activation_List is Activation_Package.Vector;
@@ -56,7 +46,6 @@ private
       Layers      : Layer_List;
       Connections : Stochastic_Optimizers.Parameters_List;
       Activations : Activation_List;
---        Connections : Connection_List;
    end record;
 
 end Structure_V2;

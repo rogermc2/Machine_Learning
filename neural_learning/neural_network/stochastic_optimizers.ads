@@ -25,7 +25,7 @@ package Stochastic_Optimizers is
    type Parameters_Record (Num_Rows, Num_Cols : Positive) is record
       Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
                           (others => (others => 0.0));
-      Intercept_Grads : Real_Float_Vector (1 .. Num_Cols) := (others => 0.0);
+      Intercept_Grads : Real_Float_Vector (1 .. Num_Rows) := (others => 0.0);
    end record;
 
    function "*" (L : Float; R : Parameters_Record) return Parameters_Record;

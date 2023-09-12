@@ -142,33 +142,12 @@ package body Structure_V2 is
 
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
-         Put_Line (Routine_Name & "Layer:" & Integer'Image (layer));
          declare
             Connect : constant Parameters_Record :=
                         aModel.Connections (layer - 1);
-            Prev_Length : constant Integer :=
-                            aModel.Layers (layer - 1).Nodes'Length;
-            This_Length : constant Integer :=
-                            aModel.Layers (layer).Nodes'Length;
-            Update_Nodes  : Real_Float_Vector :=
-              Connect.Coeff_Gradients (This_Length, Prev_Length) *
-                            aModel.Layers (layer - 1).Nodes;
          begin
-            Put_Line (Routine_Name & "Connect rows, cols: " &
-                        Integer'Image (Connect.Num_Rows) & "," &
-                        Integer'Image (Connect.Num_Cols));
-            Put_Line (Routine_Name & "This_Length" &
-                        Integer'Image (This_Length));
-            Print_Matrix_Dimensions (Routine_Name & "Connect.Coeff_Gradients",
-                                     Connect.Coeff_Gradients);
-            Put_Line (Routine_Name & "Prev_Length" &
-                        Integer'Image (Prev_Length));
-            Put_Line (Routine_Name & "Update_Nodes length" &
-                        Integer'Image (Update_Nodes'Length));
-            aModel.Layers (layer).Nodes := Update_Nodes;
---                Connect.Coeff_Gradients (This_Length, Prev_Length) *
---                  aModel.Layers (layer - 1).Nodes;
-
+             aModel.Layers (layer).Nodes := Connect.Coeff_Gradients *
+                aModel.Layers (layer - 1).Nodes;
             aModel.Layers (layer).Nodes :=
               aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
 
@@ -182,7 +161,7 @@ package body Structure_V2 is
             Print_Float_Vector (Routine_Name & "Layer" &
                                   Integer'Image (layer) & " nodes",
                                 aModel.Layers (layer).Nodes);
-         end;
+         end;  --  declare block
       end loop;
 
    end Forward;
