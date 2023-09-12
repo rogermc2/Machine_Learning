@@ -18,10 +18,10 @@ package body Structure_V2 is
       Connect : Connection (Prev_Layer.Nodes'Length,
                             thisLayer.Nodes'Length);
    begin
-      for row in Connect.Connection_Matrix'Range loop
-         for col in Connect.Connection_Matrix'Range (2) loop
+      for row in Connect.Weights'Range loop
+         for col in Connect.Weights'Range (2) loop
             --  Random_Float generates a random number in the range  -1.0 .. 1.0
-            Connect.Connection_Matrix (row, col) := Maths.Random_Float;
+            Connect.Weights (row, col) := Maths.Random_Float;
          end loop;
       end loop;
 
@@ -52,7 +52,7 @@ package body Structure_V2 is
       thisLayer  : Layer (Prev_Nodes'Length);
    begin
       Add_Connections (aModel, Prev_Layer, thisLayer);
-      thisLayer.Nodes := aModel.Connections.Last_Element.Connection_Matrix *
+      thisLayer.Nodes := aModel.Connections.Last_Element.Weights *
         Prev_Layer.Nodes;
       aModel.Layers.Append (thisLayer);
 
@@ -139,7 +139,7 @@ package body Structure_V2 is
             Connect : constant Connection := aModel.Connections (layer);
          begin
             aModel.Layers (layer).Nodes :=
-              Connect.Connection_Matrix (layer - 1, layer) *
+              Connect.Weights (layer - 1, layer) *
               aModel.Layers (layer - 1).Nodes;
 
             aModel.Layers (layer).Nodes :=
@@ -154,7 +154,7 @@ package body Structure_V2 is
 
             Print_Float_Vector (Routine_Name & "Layer" &
                                   Integer'Image (layer) & " nodes",
-                      aModel.Layers (layer).Nodes);
+                                aModel.Layers (layer).Nodes);
          end;
       end loop;
 

@@ -19,7 +19,7 @@ package Structure_V2 is
 --     subtype Node_List is Nodes_Package.Vector;
 
    type Connection (Dim1, Dim2 : Positive) is record
-      Connection_Matrix  : Real_Float_Matrix (1 .. Dim1, 1 .. Dim2);
+      Weights    : Real_Float_Matrix (1 .. Dim1, 1 .. Dim2);
       Bias       : Real_Float_Vector (1 .. Dim2) := (others => 0.0);
       Activation : Activation_Kind := Identity_Activation;
    end record;
