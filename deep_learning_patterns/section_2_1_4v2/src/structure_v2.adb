@@ -15,14 +15,21 @@ package body Structure_V2 is
 
    procedure Add_Connections (aModel     : in out Sequential_Model;
                               Prev_Layer : Layer; thisLayer : in out Layer) is
-      Connect : Connection (Prev_Layer.Nodes'Length,
-                            thisLayer.Nodes'Length);
+      use Stochastic_Optimizers;
+      Routine_Name : constant String := "Structure.Add_Connections ";
+      Connect : Parameters_Record (Prev_Layer.Nodes'Length,
+                                   thisLayer.Nodes'Length);
    begin
-      for row in Connect.Weights'Range loop
-         for col in Connect.Weights'Range (2) loop
+      Put_Line (Routine_Name & "Prev_Layer.Nodes'Length" &
+                  Integer'Image (Integer (Prev_Layer.Nodes'Length)));
+      Put_Line (Routine_Name & "thisLayer.Nodes'Length" &
+                  Integer'Image (Integer (thisLayer.Nodes'Length)));
+      for row in Connect.Coeff_Gradients'Range loop
+         for col in Connect.Coeff_Gradients'Range (2) loop
             --  Random_Float generates a random number in the range  -1.0 .. 1.0
-            Connect.Weights (row, col) := Maths.Random_Float;
+            Connect.Coeff_Gradients (row, col) := Maths.Random_Float;
          end loop;
+         aModel.Activations.Append (Identity_Activation);
       end loop;
 
       aModel.Connections.Append (Connect);
@@ -47,32 +54,27 @@ package body Structure_V2 is
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive) is
       use Real_Float_Arrays;
+      Routine_Name : constant String := "Structure.Add_Layer others  ";
       Prev_Layer : constant Layer := aModel.Layers.Last_Element;
       Prev_Nodes : constant Real_Float_Vector := Prev_Layer.Nodes;
-      thisLayer  : Layer (Prev_Nodes'Length);
+      thisLayer  : Layer (Num_Nodes);
    begin
+      Put_Line (Routine_Name);
+      Put_Line (Routine_Name & "Prev_Layer length"&
+                  Integer'Image (Integer (aModel.Layers.Length)));
       Add_Connections (aModel, Prev_Layer, thisLayer);
-      thisLayer.Nodes := aModel.Connections.Last_Element.Weights *
+      Put_Line ( Routine_Name & "Connections added");
+      Put_Line (Routine_Name & "Prev_Layer Nodes length"&
+                  Integer'Image (Prev_Layer.Nodes'Length));
+      Put_Line (Routine_Name & "thisLayer Nodes length" &
+                  Integer'Image (thisLayer.Nodes'Length));
+      thisLayer.Nodes := aModel.Connections.Last_Element.Coeff_Gradients *
         Prev_Layer.Nodes;
       aModel.Layers.Append (thisLayer);
 
+      Put_Line (Routine_Name & "done");
    end Add_Layer;
 
-   --  ---------------------------------------------------------------------------
-
-   --     procedure Add_Node (aLayer : in out Layer; Features : Real_Float_Vector) is
-   --        aNode : Node (1 .. Features'Length);
-   --     begin
-   --        aNode.Features := Features;
-   --        --  Initialize weights
-   --        for index in aNode.Weights'Range loop
-   --           --  Random_Float generates a random number in the range  -1.0 .. 1.0
-   --           aNode.Weights (index) := Maths.Random_Float;
-   --        end loop;
-   --        aLayer.Nodes.Append (aNode);
-   --
-   --     end Add_Node;
-   --
    --  ---------------------------------------------------------------------------
 
    procedure Back_Propogate (aModel      : Sequential_Model;
@@ -91,7 +93,7 @@ package body Structure_V2 is
       Actual       : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
       Loss         : Float;
       Optimiser    : Adam_Optimizer;
-      Params       : Parameters_List;
+--        Params       : Parameters_List;  --  list of Parameters_Record
       --        Parameters_Record (Num_Rows, Num_Cols : Positive) is record
       --        Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
       --                            (others => (others => 0.0));
@@ -102,6 +104,7 @@ package body Structure_V2 is
       --  the bias values added to layer i + 1.
    begin
       Forward (aModel);
+
       for row in aModel.Labels'Range loop
          for col in aModel.Labels'Range loop
             Pred (row, col) := aModel.Labels (col);
@@ -116,7 +119,7 @@ package body Structure_V2 is
          Loss := Base_Neural.Squared_Loss (Pred, Actual);
       end case;
 
-      C_Init (Optimiser, Params);
+      C_Init (Optimiser, aModel.Connections);
 
       Put_Line (Routine_Name & "Loss " & Float'Image (Loss));
 
@@ -127,25 +130,27 @@ package body Structure_V2 is
    procedure Forward (aModel : in out Sequential_Model) is
       use Real_Float_Arrays;
       use Base_Neural;
+      use Stochastic_Optimizers;
       use Layer_Packge;
       Routine_Name : constant String := "Structure.Forward ";
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
+
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "Layer:" & Integer'Image (layer));
          declare
-            Connect : constant Connection := aModel.Connections (layer);
+            Connect : constant Parameters_Record := aModel.Connections (layer - 1);
          begin
             aModel.Layers (layer).Nodes :=
-              Connect.Weights (layer - 1, layer) *
+              Connect.Coeff_Gradients (layer - 1, layer) *
               aModel.Layers (layer - 1).Nodes;
 
             aModel.Layers (layer).Nodes :=
-              aModel.Layers (layer).Nodes + Connect.Bias;
+              aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
 
-            case aModel.Connections (layer).Activation is
+            case aModel.Activations (layer) is
             when Identity_Activation => null;
             when ReLu_Activation => Rect_LU (aModel.Layers (layer).Nodes);
             when Sigmoid_Activation => null;

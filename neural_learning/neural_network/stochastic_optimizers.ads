@@ -27,6 +27,7 @@ package Stochastic_Optimizers is
                           (others => (others => 0.0));
       Intercept_Grads : Real_Float_Vector (1 .. Num_Cols) := (others => 0.0);
    end record;
+
    function "*" (L : Float; R : Parameters_Record) return Parameters_Record;
    pragma Inline ("*");
    function "/" (L, R : Parameters_Record) return Parameters_Record;
@@ -47,6 +48,7 @@ package Stochastic_Optimizers is
    package Coeffs_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Coeffs_Matrix);
    subtype Coeffs_List is Coeffs_Package.Vector;
+
    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
                  return Coeffs_Matrix;
    pragma Inline ("+");
