@@ -11,6 +11,7 @@ with Stochastic_Optimizers;
 
 package body Neural_Model is
 
+   function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
    procedure Forward (aModel : in out Sequential_Model);
 
    --  -------------------------------------------------------------------------
@@ -134,15 +135,16 @@ package body Neural_Model is
    --  -------------------------------------------------------------------------
 
    function Backward_Activation (aModel : in out Sequential_Model;
-                      Loss   : Real_Float_Vector)
-                      return Real_Float_Vector is
+                                 Loss   : Real_Float_Vector)
+                                 return Real_Float_Vector is
       use Real_Float_Arrays;
---        Routine_Name        : constant String :=
---                                "Neural_Model.Backward_Activation ";
+      --        Routine_Name        : constant String :=
+      --                                "Neural_Model.Backward_Activation ";
    begin
       --  From Multilayer_Perceptron.Update_Hidden_Layer_Gradients:
       --  Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
-      return Neural_Maths.Sigmoid_Deriv (Loss);
+      --        return Neural_Maths.Sigmoid_Deriv (Loss);
+      return Deriv_ReLU (Loss);
 
    end Backward_Activation;
 
@@ -189,6 +191,25 @@ package body Neural_Model is
       Gradients := Back_Propogate (aModel, Optimiser, Loss);
 
    end Compile;
+
+   --  -------------------------------------------------------------------------
+
+   function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector is
+      RLU   : Real_Float_Vector := X;
+      Deriv : Real_Float_Vector (X'Range);
+   begin
+      Base_Neural.Rect_LU (RLU);
+      for index in X'Range loop
+         if X (index) <= 0.0 then
+            Deriv (index) := 0.0;
+         else
+            Deriv (index) := RLU (index) / X (index);
+         end if;
+      end loop;
+
+      return RLU;
+
+   end Deriv_ReLU;
 
    --  -------------------------------------------------------------------------
 
