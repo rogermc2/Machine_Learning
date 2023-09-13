@@ -95,8 +95,9 @@ package body Structure_V2 is
       Pred         : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
       Actual       : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
       Loss         : Float;
-      Optimiser    : Adam_Optimizer;
-      --        Params       : Parameters_List;  --  list of Parameters_Record
+      Optimiser    : Optimizer_Record (Optimizer_Adam);
+      Params       : Parameters_List;  --  list of Parameters_Record
+      Gradients    : Parameters_List;
       --        Parameters_Record (Num_Rows, Num_Cols : Positive) is record
       --        Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
       --                            (others => (others => 0.0));
@@ -116,15 +117,20 @@ package body Structure_V2 is
       end loop;
 
       case aModel.Loss_Method is
-      when Binary_Log_Loss => null;
-      when Log_Loss => null;
+      when Binary_Log_Loss =>
+         Put_Line (Routine_Name & "Binary_Log_Loss method not implemented");
+      when Log_Loss =>
+         Put_Line (Routine_Name & "Log_Loss method not implemented");
       when Mean_Square_Error_Loss =>
          Loss := Base_Neural.Squared_Loss (Pred, Actual);
       end case;
-
-      C_Init (Optimiser, aModel.Connections);
-
       Put_Line (Routine_Name & "Loss " & Float'Image (Loss));
+
+      C_Init (Optimiser.Adam, aModel.Connections);
+--        Update_Params (Self      : in out Optimizer_Record;
+--                       Params    : in out Parameters_List;
+--                       Gradients : Parameters_List);
+      Update_Params (Optimiser, aModel.Connections, Gradients);
 
    end Compile;
 
@@ -146,15 +152,16 @@ package body Structure_V2 is
             Connect : constant Parameters_Record :=
                         aModel.Connections (layer - 1);
          begin
-             aModel.Layers (layer).Nodes := Connect.Coeff_Gradients *
-                aModel.Layers (layer - 1).Nodes;
+            aModel.Layers (layer).Nodes := Connect.Coeff_Gradients *
+              aModel.Layers (layer - 1).Nodes;
             aModel.Layers (layer).Nodes :=
               aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
 
             case aModel.Activations (layer) is
             when Identity_Activation => null;
             when ReLu_Activation => Rect_LU (aModel.Layers (layer).Nodes);
-            when Sigmoid_Activation => null;
+            when Sigmoid_Activation =>
+               Put_Line (Routine_Name & "Sigmoid_Activation not implemented");
             when Soft_Max_Activation => Softmax (aModel.Layers (layer).Nodes);
             end case;
 
