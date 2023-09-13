@@ -44,6 +44,8 @@ package Base_Neural is
    pragma Inline (Rect_LU);
    procedure Rect_LU_Derivative (Z   : Real_Float_Matrix;
                                  Del : in out Real_Float_Matrix);
+   procedure Rect_LU_Derivative (Z   : Real_Float_Vector;
+                                 Del : in out Real_Float_Vector);
    pragma Inline (Rect_LU_Derivative);
    function Sigmoid (X : Float) return Float;
    pragma Inline (Sigmoid);

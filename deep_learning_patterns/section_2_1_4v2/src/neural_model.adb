@@ -140,7 +140,8 @@ package body Neural_Model is
 --        Routine_Name        : constant String :=
 --                                "Neural_Model.Backward_Activation ";
    begin
-
+      --  From Multilayer_Perceptron.Update_Hidden_Layer_Gradients:
+      --  Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
       return Neural_Maths.Sigmoid_Deriv (Loss);
 
    end Backward_Activation;
