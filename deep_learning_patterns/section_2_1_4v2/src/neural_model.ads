@@ -4,7 +4,7 @@ with Ada.Numerics.Generic_Real_Arrays;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Stochastic_Optimizers;
 
-package Structure_V2 is
+package Neural_Model is
 
    --  Sigmoid_Activation for binary output
    --  Soft_Max_Activation other output types
@@ -37,18 +37,22 @@ package Structure_V2 is
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive);
    procedure Compile (aModel      : in out Sequential_Model);
---     function Get_Output_Value (aModel : Sequential_Model)
---                                return Real_Float_Vector;
+   --     function Get_Output_Value (aModel : Sequential_Model)
+   --                                return Real_Float_Vector;
 
 private
-   type Sequential_Model (Num_Samples : Positive;
+   type Sequential_Model (Num_Samples  : Positive;
                           Num_Features : Positive;
                           Loss_Method  : Loss_Kind) is record
-      Input_Data  : Real_Float_Vector (1 .. Num_Features);
-      Labels      : Real_Float_Vector (1 .. 1);
-      Layers      : Layer_List;
-      Connections : Stochastic_Optimizers.Parameters_List;
-      Activations : Activation_List;
+      Input_Data    : Real_Float_Vector (1 .. Num_Features);
+      Labels        : Real_Float_Vector (1 .. 1);
+      Layers        : Layer_List;
+      Connections   : Stochastic_Optimizers.Parameters_List;
+      Activations   : Activation_List;
+      Delta_Weights : Real_Float_Vector (1 .. Num_Features) :=
+                        (others => 0.0);
+      Delta_Bias    : Real_Float_Vector (1 .. Num_Features) :=
+                        (others => 0.0);
    end record;
 
-end Structure_V2;
+end Neural_Model;

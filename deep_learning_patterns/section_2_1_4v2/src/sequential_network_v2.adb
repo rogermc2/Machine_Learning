@@ -9,7 +9,7 @@ with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with Python;
 with Shuffler;
 
-with Structure_V2; use Structure_V2;
+with Neural_Model; use Neural_Model;
 
 --  Each neuron is a very simple function that considers a weighted sum of
 --  incoming signals and then fires in a characteristic way by comparing the

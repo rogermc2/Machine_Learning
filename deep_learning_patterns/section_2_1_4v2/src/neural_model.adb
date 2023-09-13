@@ -8,7 +8,7 @@ with Base_Neural;
 with Basic_Printing; use Basic_Printing;
 with Stochastic_Optimizers;
 
-package body Structure_V2 is
+package body Neural_Model is
 
    procedure Forward (aModel : in out Sequential_Model);
 
@@ -17,7 +17,7 @@ package body Structure_V2 is
    procedure Add_Connections (aModel     : in out Sequential_Model;
                               Prev_Layer : Layer; thisLayer : in out Layer) is
       use Stochastic_Optimizers;
-      --        Routine_Name : constant String := "Structure.Add_Connections ";
+      --        Routine_Name : constant String := "Neural_Model.Add_Connections ";
       Connect : Parameters_Record (thisLayer.Nodes'Length,
                                    Prev_Layer.Nodes'Length);
    begin
@@ -55,7 +55,7 @@ package body Structure_V2 is
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive) is
       use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Structure.Add_Layer others  ";
+      --        Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
       Prev_Layer : constant Layer := aModel.Layers.Last_Element;
       Prev_Nodes : constant Real_Float_Vector := Prev_Layer.Nodes;
       thisLayer  : Layer (Num_Nodes);
@@ -89,7 +89,7 @@ package body Structure_V2 is
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
       Routine_Name       : constant String :=
-                             "Structure_V2.Back_Propogate ";
+                             "Neural_Model.Back_Propogate ";
       --        Pred_Params (Self      : in out Optimizer_Record;
       --                       Params    : in out Parameters_List;
       --                       Gradients : Parameters_List);
@@ -114,7 +114,7 @@ package body Structure_V2 is
 
    procedure Compile (aModel : in out Sequential_Model) is
       use Stochastic_Optimizers;
-      Routine_Name : constant String := "Structure.Compile ";
+      Routine_Name : constant String := "Neural_Model.Compile ";
       Pred         : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
       Actual       : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
       Loss         : Float;
@@ -161,7 +161,7 @@ package body Structure_V2 is
       use Base_Neural;
       use Stochastic_Optimizers;
       use Layer_Packge;
-      Routine_Name : constant String := "Structure.Forward ";
+      Routine_Name : constant String := "Neural_Model.Forward ";
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
@@ -205,4 +205,4 @@ package body Structure_V2 is
 
    --  ---------------------------------------------------------------------------
 
-end Structure_V2;
+end Neural_Model;
