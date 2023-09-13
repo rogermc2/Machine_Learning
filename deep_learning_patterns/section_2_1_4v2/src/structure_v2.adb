@@ -81,24 +81,30 @@ package body Structure_V2 is
 
    --  -------------------------------------------------------------------------
 
-   function Back_Propogate (aModel      : Sequential_Model;
-                             Optimiser  : Stochastic_Optimizers.Optimizer_Record;
-                            Loss_Method : Loss_Kind)
+   function Back_Propogate (aModel    : in out Sequential_Model;
+                            Optimiser : Stochastic_Optimizers.Optimizer_Record;
+                            Loss      : Float)
                             return Stochastic_Optimizers.Parameters_List is
-      use Ada.Assertions;
-      use Ada.Containers;
-      use Base_Neural;
       use Stochastic_Optimizers;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
       Routine_Name       : constant String :=
                              "Structure_V2.Back_Propogate ";
+      --        Pred_Params (Self      : in out Optimizer_Record;
+      --                       Params    : in out Parameters_List;
+      --                       Gradients : Parameters_List);
       Pred               : constant Real_Float_Matrix :=
                              To_Real_Float_Matrix (aModel.Labels);
       Deltas             : Real_Matrix_List;
       Sum_Sq_Coeffs      : Float := 0.0;
       Pred_Gradients     : Parameters_List;
    begin
+      --    Pred_Params (Optimiser, aModel.Connections, Gradients);
+
+      for layer_index in reverse
+        aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
+         null;
+      end loop;
 
       return Pred_Gradients;
 
@@ -144,11 +150,7 @@ package body Structure_V2 is
       Put_Line (Routine_Name & "Loss " & Float'Image (Loss));
 
       C_Init (Optimiser.Adam, aModel.Connections);
---        Pred_Params (Self      : in out Optimizer_Record;
---                       Params    : in out Parameters_List;
---                       Gradients : Parameters_List);
-      Gradients := Back_Propogate (aModel, Optimiser, Loss_Mean_Square_Error);
---        Pred_Params (Optimiser, aModel.Connections, Gradients);
+      Gradients := Back_Propogate (aModel, Optimiser, Loss);
 
    end Compile;
 
