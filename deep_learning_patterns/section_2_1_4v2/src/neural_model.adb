@@ -28,8 +28,10 @@ package body Neural_Model is
       for row in Connect.Coeff_Gradients'Range loop
          for col in Connect.Coeff_Gradients'Range (2) loop
             --  Random_Float generates a random number in the range  -1.0 .. 1.0
-            Connect.Coeff_Gradients (row, col) := Maths.Random_Float;
+            Connect.Coeff_Gradients (row, col) :=
+              0.5 * abs (Maths.Random_Float);
          end loop;
+         Connect.Intercept_Grads (row)  := 0.5 * abs (Maths.Random_Float);
          aModel.Activations.Append (Identity_Activation);
       end loop;
 
@@ -83,21 +85,19 @@ package body Neural_Model is
 
    function Back_Propogate (aModel    : in out Sequential_Model;
                             Optimiser : Stochastic_Optimizers.Optimizer_Record;
-                            Loss      : Float)
+                            Loss      : Real_Float_Vector)
                             return Stochastic_Optimizers.Parameters_List is
       use Stochastic_Optimizers;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      Routine_Name       : constant String :=
-                             "Neural_Model.Back_Propogate ";
+      Routine_Name        : constant String :=
+                              "Neural_Model.Back_Propogate ";
       --        Pred_Params (Self      : in out Optimizer_Record;
       --                       Params    : in out Parameters_List;
       --                       Gradients : Parameters_List);
-      Pred               : constant Real_Float_Matrix :=
-                             To_Real_Float_Matrix (aModel.Labels);
-      Deltas             : Real_Matrix_List;
-      Sum_Sq_Coeffs      : Float := 0.0;
-      Pred_Gradients     : Parameters_List;
+      Deltas              : Real_Matrix_List;
+      Sum_Sq_Coeffs       : Float := 0.0;
+      Pred_Gradients      : Parameters_List;
    begin
       --    Pred_Params (Optimiser, aModel.Connections, Gradients);
 
@@ -112,12 +112,32 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
+   function Backward (aModel : in out Sequential_Model;
+                      Loss   : Real_Float_Vector)
+                      return Real_Float_Vector is
+      use Real_Float_Arrays;
+      Routine_Name        : constant String :=
+                              "Neural_Model.Backward ";
+      Input_Error         : constant Real_Float_Vector
+        := Loss * Transpose (aModel.Connections.Last_Element.Coeff_Gradients);
+      Weights_Error       : constant Real_Float_Vector
+        := Transpose (aModel.Connections.First_Element.Coeff_Gradients) * Loss;
+   begin
+      aModel.Delta_Weights := aModel.Delta_Weights + Input_Error;
+      aModel.Delta_Bias := aModel.Delta_Bias + Loss;
+
+      return Input_Error;
+
+   end Backward;
+
+   --  -------------------------------------------------------------------------
+
    procedure Compile (aModel : in out Sequential_Model) is
       use Stochastic_Optimizers;
       Routine_Name : constant String := "Neural_Model.Compile ";
       Pred         : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
       Actual       : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
-      Loss         : Float;
+      Loss         : Real_Float_Vector (1 .. 1);
       Optimiser    : Optimizer_Record (Optimizer_Adam);
       Params       : Parameters_List;  --  list of Parameters_Record
       Gradients    : Parameters_List;
@@ -145,9 +165,9 @@ package body Neural_Model is
       when Loss_Log =>
          Put_Line (Routine_Name & "Log_Loss method not implemented");
       when Loss_Mean_Square_Error =>
-         Loss := Base_Neural.Squared_Loss (Pred, Actual);
+         Loss (1):= Base_Neural.Squared_Loss (Pred, Actual);
       end case;
-      Put_Line (Routine_Name & "Loss " & Float'Image (Loss));
+      Put_Line (Routine_Name & "Loss " & Float'Image (Loss (1)));
 
       C_Init (Optimiser.Adam, aModel.Connections);
       Gradients := Back_Propogate (aModel, Optimiser, Loss);
