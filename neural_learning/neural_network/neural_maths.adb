@@ -275,6 +275,20 @@ package body Neural_Maths is
    end Sigmoid_Deriv;
 
    --  -------------------------------------------------------------------------
+
+   function Sigmoid_Deriv (V : Real_Float_Vector)
+                           return Real_Float_Vector is
+      Result : Real_Float_Vector (V'Range);
+   begin
+      for row in V'Range loop
+         Result (row) := Sigmoid_Deriv (V (row));
+      end loop;
+
+      return Result;
+
+   end Sigmoid_Deriv;
+
+   --  -------------------------------------------------------------------------
    --  Riemann zeta function of two arguments
    function Zeta (X : Natural; Q : Float) return Float is
       Routine_Name : constant String := "Neural_Maths.Zeta ";

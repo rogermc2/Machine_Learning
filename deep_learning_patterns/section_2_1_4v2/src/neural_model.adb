@@ -6,6 +6,7 @@ with Maths;
 
 with Base_Neural;
 with Basic_Printing; use Basic_Printing;
+with Neural_Maths;
 with Stochastic_Optimizers;
 
 package body Neural_Model is
@@ -129,6 +130,20 @@ package body Neural_Model is
       return Input_Error;
 
    end Backward;
+
+   --  -------------------------------------------------------------------------
+
+   function Backward_Activation (aModel : in out Sequential_Model;
+                      Loss   : Real_Float_Vector)
+                      return Real_Float_Vector is
+      use Real_Float_Arrays;
+--        Routine_Name        : constant String :=
+--                                "Neural_Model.Backward_Activation ";
+   begin
+
+      return Neural_Maths.Sigmoid_Deriv (Loss);
+
+   end Backward_Activation;
 
    --  -------------------------------------------------------------------------
 
