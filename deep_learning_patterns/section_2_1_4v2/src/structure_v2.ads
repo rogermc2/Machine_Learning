@@ -8,9 +8,10 @@ package Structure_V2 is
 
    --  Sigmoid_Activation for binary output
    --  Soft_Max_Activation other output types
-   type Activation_Kind is (Identity_Activation, ReLu_Activation,
-                            Sigmoid_Activation, Soft_Max_Activation);
-   type Loss_Kind is (Binary_Log_Loss, Log_Loss, Mean_Square_Error_Loss);
+   type Activation_Kind is (Identity_Activation, Logistic_Activation,
+                            ReLu_Activation, Sigmoid_Activation,
+                            Soft_Max_Activation);
+   type Loss_Kind is (Loss_Binary_Log, Loss_Log, Loss_Mean_Square_Error);
 
    subtype Node is Float;
 
@@ -26,7 +27,8 @@ package Structure_V2 is
      Ada.Containers.Indefinite_Vectors (Positive, Layer);
    subtype Layer_List is Layer_Packge.Vector;
 
-   type Sequential_Model (Num_Features : Positive;
+   type Sequential_Model (Num_Samples  : Positive;
+                          Num_Features : Positive;
                           Loss_Method  : Loss_Kind) is private;
 
    procedure Add_Layer (aModel     : in out Sequential_Model;
@@ -39,7 +41,8 @@ package Structure_V2 is
 --                                return Real_Float_Vector;
 
 private
-   type Sequential_Model (Num_Features : Positive;
+   type Sequential_Model (Num_Samples : Positive;
+                          Num_Features : Positive;
                           Loss_Method  : Loss_Kind) is record
       Input_Data  : Real_Float_Vector (1 .. Num_Features);
       Labels      : Real_Float_Vector (1 .. 1);
