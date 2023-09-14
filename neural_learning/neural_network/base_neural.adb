@@ -262,6 +262,14 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
+   function Rect_LU (Activation : Float) return Float is
+   begin
+      return Float'Max (0.0, Activation);
+
+   end Rect_LU;
+
+   --  -------------------------------------------------------------------------
+
    procedure Rect_LU (Activation : in out Real_Float_Matrix) is
    begin
       for row in Activation'Range loop
@@ -279,6 +287,20 @@ package body Base_Neural is
       for index in Activation'Range loop
          Activation (index) := Float'Max (0.0, Activation (index));
       end loop;
+
+   end Rect_LU;
+
+   --  -------------------------------------------------------------------------
+
+   function Rect_LU (Activation : Real_Float_Vector)
+                     return Real_Float_Vector is
+      Result : Real_Float_Vector (Activation'Range);
+   begin
+      for index in Activation'Range loop
+         Result (index) := Float'Max (0.0, Activation (index));
+      end loop;
+
+      return Result;
 
    end Rect_LU;
 
@@ -309,6 +331,23 @@ package body Base_Neural is
             Del (row) := 0.0;
          end if;
       end loop;
+
+   end Rect_LU_Derivative;
+
+   --  -------------------------------------------------------------------------
+
+   function Rect_LU_Derivative (Z : Real_Float_Vector)
+                                return Real_Float_Vector is
+      use Real_Float_Arrays;
+      Del : Real_Float_Vector (Z'Range) := (others => 0.0);
+   begin
+      for row in Z'Range loop
+         if Z (row) > 0.0 then
+            Del (row) := Rect_LU (Z (row)) / Z (row);
+         end if;
+      end loop;
+
+      return Del;
 
    end Rect_LU_Derivative;
 
