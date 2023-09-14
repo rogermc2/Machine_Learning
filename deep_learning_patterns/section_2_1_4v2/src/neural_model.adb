@@ -95,14 +95,13 @@ package body Neural_Model is
       use Stochastic_Optimizers;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      Routine_Name        : constant String :=
-                              "Neural_Model.Back_Propogate ";
+      Routine_Name   : constant String := "Neural_Model.Back_Propogate ";
       --        Pred_Params (Self      : in out Optimizer_Record;
       --                       Params    : in out Parameters_List;
       --                       Gradients : Parameters_List);
-      Deltas              : Real_Matrix_List;
-      Sum_Sq_Coeffs       : Float := 0.0;
-      Pred_Gradients      : Parameters_List;
+      Deltas         : Real_Matrix_List;
+      Sum_Sq_Coeffs  : Float := 0.0;
+      Pred_Gradients : Parameters_List;
    begin
       --    Pred_Params (Optimiser, aModel.Connections, Gradients);
 
@@ -124,7 +123,11 @@ package body Neural_Model is
             when Sigmoid_Activation => null;
             when Soft_Max_Activation =>
                Deriv_Matrix := Deriv_Softmax (Nodes);
-               Print_Float_Matrix (Routine_Name & "Deriv_Matrix", Deriv_Matrix);
+               if Nodes'Length = 1 then
+                  Deriv (1) := 0.0;
+               else
+                  Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
+               end if;
             end case;
          end;  --  declare block
       end loop;
@@ -234,10 +237,11 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
    --  When calculating the derivative of the softmax function,
-   --  a Jacobian matrix, which is the matrix of all first-order
-   --  partial derivatives is neede.
+   --  a Jacobian matrix which is the matrix of all first-order
+   --  partial derivatives is needed.
    function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix is
-      Jacobian : Real_Float_Matrix (X'Range, X'Range);
+--        Routine_Name : constant String := "Neural_Model.Deriv_Softmax ";
+      Jacobian     : Real_Float_Matrix (X'Range, X'Range);
    begin
       for row in Jacobian'Range loop
          for col in Jacobian'Range (2) loop
