@@ -30,9 +30,9 @@ begin
    New_Line;
    Put_Line ("Program " & Program_Name);
    Add_Layer (theModel, Input_Data'Length, Input_Data);
-   Add_Layer (theModel, 10);
-   Add_Layer (theModel, 10);
-   Add_Layer (theModel, 1);
+   Add_Layer (theModel, 10, ReLu_Activation);
+   Add_Layer (theModel, 10, ReLu_Activation);
+   Add_Layer (theModel, 1, Soft_Max_Activation);
 
    Compile (theModel);
 --     declare

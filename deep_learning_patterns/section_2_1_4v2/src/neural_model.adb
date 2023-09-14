@@ -12,7 +12,7 @@ with Stochastic_Optimizers;
 package body Neural_Model is
 
    function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
-   function Deriv_Softmax (X : Real_Float_Matrix) return Real_Float_Matrix;
+   function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
    procedure Forward (aModel : in out Sequential_Model);
    function To_Matrix (Data : Real_Float_Vector) return Real_Float_Matrix;
 
@@ -36,7 +36,7 @@ package body Neural_Model is
               0.5 * abs (Maths.Random_Float);
          end loop;
          Connect.Intercept_Grads (row)  := 0.5 * abs (Maths.Random_Float);
-         aModel.Activations.Append (Identity_Activation);
+--           aModel.Activations.Append (Identity_Activation);
       end loop;
 
       aModel.Connections.Append (Connect);
@@ -59,7 +59,8 @@ package body Neural_Model is
    --  ---------------------------------------------------------------------------
    --  Add other layers
    procedure Add_Layer (aModel     : in out Sequential_Model;
-                        Num_Nodes  : Positive) is
+                        Num_Nodes  : Positive;
+                        Activation : Activation_Kind := Identity_Activation) is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
       Prev_Layer : constant Layer := aModel.Layers.Last_Element;
@@ -80,9 +81,9 @@ package body Neural_Model is
       --                                 aModel.Connections.Last_Element.Coeff_Gradients);
       thisLayer.Nodes := aModel.Connections.Last_Element.Coeff_Gradients *
         Prev_Layer.Nodes;
+      thisLayer.Activation := Activation;
       aModel.Layers.Append (thisLayer);
 
-      --        Put_Line (Routine_Name & "done");
    end Add_Layer;
 
    --  -------------------------------------------------------------------------
@@ -107,27 +108,24 @@ package body Neural_Model is
 
       for index in reverse
         aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
+         Put_Line (Routine_Name & "layer index" & Integer'Image (index));
          declare
-            Nodes        : constant Real_Float_Vector := aModel.Layers (index).Nodes;
-            Node_Matrix  : Real_Float_Matrix (1 ..1, Nodes'Range);
+            Nodes        : constant Real_Float_Vector :=
+                             aModel.Layers (index).Nodes;
             Deriv        : Real_Float_Vector (Nodes'Range);
-            Deriv_Matrix : Real_Float_Matrix (Node_Matrix'Range, Node_Matrix'Range (2));
+            Deriv_Matrix : Real_Float_Matrix (Nodes'Range, Nodes'Range);
          begin
-            case aModel.Layers (index).Activ is
+            Put_Line (Routine_Name & "Activation: " &
+                        Activation_Kind'Image (aModel.Layers (index).Activation));
+            case aModel.Layers (index).Activation is
             when Identity_Activation => null;
             when Logistic_Activation => null;
             when ReLu_Activation => Deriv := Deriv_ReLU (Nodes);
             when Sigmoid_Activation => null;
             when Soft_Max_Activation =>
-               Node_Matrix := To_Matrix (Nodes);
-               Deriv_Matrix := Deriv_Softmax (Node_Matrix);
+               Deriv_Matrix := Deriv_Softmax (Nodes);
+               Print_Float_Matrix (Routine_Name & "Deriv_Matrix", Deriv_Matrix);
             end case;
-
-            if index = aModel.Layers.Last_Index then
-               null;
-            elsif index > aModel.Layers.First_Index then
-               null;
-            end if;
          end;  --  declare block
       end loop;
 
@@ -235,8 +233,10 @@ package body Neural_Model is
    end Deriv_ReLU;
 
    --  -------------------------------------------------------------------------
-
-   function Deriv_Softmax (X : Real_Float_Matrix) return Real_Float_Matrix is
+   --  When calculating the derivative of the softmax function,
+   --  a Jacobian matrix, which is the matrix of all first-order
+   --  partial derivatives is neede.
+   function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix is
       Jacobian : Real_Float_Matrix (X'Range, X'Range);
    begin
       for row in Jacobian'Range loop
@@ -276,7 +276,7 @@ package body Neural_Model is
             aModel.Layers (layer).Nodes :=
               aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
 
-            case aModel.Activations (layer) is
+            case aModel.Layers (layer).Activation is
             when Identity_Activation => null;
             when Logistic_Activation =>
                Put_Line (Routine_Name & "Logistic_Activation not implemented");
