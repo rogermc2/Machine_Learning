@@ -111,7 +111,8 @@ package body Neural_Model is
          declare
             Nodes        : constant Real_Float_Vector :=
                              aModel.Layers (index).Nodes;
-            Deriv        : Real_Float_Vector (Nodes'Range);
+            Gradient     : Real_Float_Vector (Nodes'Range) :=
+                                    (others => 0.0);
             Deriv_Matrix : Real_Float_Matrix (Nodes'Range, Nodes'Range);
          begin
             Put_Line (Routine_Name & "Activation: " &
@@ -119,16 +120,17 @@ package body Neural_Model is
             case aModel.Layers (index).Activation is
             when Identity_Activation => null;
             when Logistic_Activation => null;
-            when ReLu_Activation => Deriv := Deriv_ReLU (Nodes);
+            when ReLu_Activation => Gradient := Deriv_ReLU (Nodes);
             when Sigmoid_Activation => null;
             when Soft_Max_Activation =>
                Deriv_Matrix := Deriv_Softmax (Nodes);
                if Nodes'Length = 1 then
-                  Deriv (1) := 0.0;
+                  Gradient (1) := 0.0;
                else
                   Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
                end if;
             end case;
+
          end;  --  declare block
       end loop;
 
