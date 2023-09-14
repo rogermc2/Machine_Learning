@@ -12,7 +12,9 @@ with Stochastic_Optimizers;
 package body Neural_Model is
 
    function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
+   function Deriv_Softmax (X : Real_Float_Matrix) return Real_Float_Matrix;
    procedure Forward (aModel : in out Sequential_Model);
+   function To_Matrix (Data : Real_Float_Vector) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -103,9 +105,30 @@ package body Neural_Model is
    begin
       --    Pred_Params (Optimiser, aModel.Connections, Gradients);
 
-      for layer_index in reverse
+      for index in reverse
         aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
-         null;
+         declare
+            Nodes        : constant Real_Float_Vector := aModel.Layers (index).Nodes;
+            Node_Matrix  : Real_Float_Matrix (1 ..1, Nodes'Range);
+            Deriv        : Real_Float_Vector (Nodes'Range);
+            Deriv_Matrix : Real_Float_Matrix (Node_Matrix'Range, Node_Matrix'Range (2));
+         begin
+            case aModel.Layers (index).Activ is
+            when Identity_Activation => null;
+            when Logistic_Activation => null;
+            when ReLu_Activation => Deriv := Deriv_ReLU (Nodes);
+            when Sigmoid_Activation => null;
+            when Soft_Max_Activation =>
+               Node_Matrix := To_Matrix (Nodes);
+               Deriv_Matrix := Deriv_Softmax (Node_Matrix);
+            end case;
+
+            if index = aModel.Layers.Last_Index then
+               null;
+            elsif index > aModel.Layers.First_Index then
+               null;
+            end if;
+         end;  --  declare block
       end loop;
 
       return Pred_Gradients;
@@ -213,6 +236,25 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
+   function Deriv_Softmax (X : Real_Float_Matrix) return Real_Float_Matrix is
+      Jacobian : Real_Float_Matrix (X'Range, X'Range);
+   begin
+      for row in Jacobian'Range loop
+         for col in Jacobian'Range (2) loop
+            if col = row then
+               Jacobian (row, col) := X (col) * (1.0 - X (col));
+            else
+               Jacobian (row, col) := -X (col) * X (row);
+            end if;
+         end loop;
+      end loop;
+
+      return Jacobian;
+
+   end Deriv_Softmax;
+
+   --  -------------------------------------------------------------------------
+
    procedure Forward (aModel : in out Sequential_Model) is
       use Real_Float_Arrays;
       use Base_Neural;
@@ -259,6 +301,19 @@ package body Neural_Model is
    --        return aModel.Layers.Last_Element.Output_Data;
    --
    --     end Get_Output_Value;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Matrix (Data : Real_Float_Vector) return Real_Float_Matrix is
+      Result   : Real_Float_Matrix (1 .. 1, Data'Range);
+   begin
+      for col in Data'Range loop
+         Result (1, col) := Data (col);
+      end loop;
+
+      return Result;
+
+   end To_Matrix;
 
    --  ---------------------------------------------------------------------------
 

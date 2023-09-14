@@ -21,6 +21,7 @@ package Neural_Model is
 
    type Layer (Num_Features : Positive) is record
       Nodes : Real_Float_Vector (1 .. Num_Features);
+      Activ : Activation_Kind := Identity_Activation;
    end record;
 
    package Layer_Packge is new
