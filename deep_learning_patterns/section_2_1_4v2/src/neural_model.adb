@@ -11,11 +11,12 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package body Neural_Model is
 
---     procedure Compute_Coeff_Gradient (Params     : in out Parameters_Record;
---                                       Activation : Real_Float_Vector;
---                                       Loss_Deriv : Real_Float_Vector);
---     procedure Compute_Intercept_Gradient (Params     : in out Parameters_Record;
---                                           Loss_Deriv : Real_Float_Vector);
+   procedure Compute_Coeff_Gradient (aModel     : in out Sequential_Model;
+                                     Layer      : Positive;
+                                     Loss_Deriv : Real_Float_Vector);
+   procedure Compute_Intercept_Gradient (aModel     : in out Sequential_Model;
+                                         Layer      : Positive;
+                                         Loss_Deriv : Real_Float_Matrix);
    function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
    function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
    procedure Forward (aModel : in out Sequential_Model);
@@ -114,35 +115,7 @@ package body Neural_Model is
       for index in reverse
         aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "layer index" & Integer'Image (index));
-         declare
-            Nodes           : constant Real_Float_Vector :=
-                                aModel.Layers (index).Nodes;
-            Coeff_Grads     : Real_Float_Matrix (Nodes'Range, Nodes'Range) :=
-                                (others => (others => 0.0));
-            Intercept_Grads : Real_Float_Vector (Nodes'Range) :=
-                                (others => 0.0);
-            Deriv_Matrix    : Real_Float_Matrix (Nodes'Range, Nodes'Range);
-            Gradients       : Parameters_Record (Nodes'Length, Nodes'Length);
-         begin
-            Put_Line (Routine_Name & "Activation: " &
-                        Activation_Kind'Image (aModel.Layers (index).Activation));
-            case aModel.Layers (index).Activation is
-            when Identity_Activation => null;
-            when Logistic_Activation => null;
-            when ReLu_Activation => Gradients.Intercept_Grads := Deriv_ReLU (Nodes);
-            when Sigmoid_Activation => null;
-            when Soft_Max_Activation =>
-               Deriv_Matrix := Deriv_Softmax (Nodes);
-               if Nodes'Length = 1 then
-                  Gradients.Intercept_Grads (1) := 0.0;
-               else
-                  Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
-               end if;
-            end case;
-
-            --  Calculate non-activation
-
-         end;  --  declare block
+         Compute_Intercept_Gradient (aModel, index, Loss_Deriv);
       end loop;
 
       return Pred_Gradients;
@@ -231,27 +204,47 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
---     procedure Compute_Coeff_Gradient (Params     : in out Parameters_Record;
---                                       Activation : Real_Float_Vector;
---                                       Loss_Deriv : Real_Float_Vector) is
---     begin
+   procedure Compute_Coeff_Gradient (aModel     : in out Sequential_Model;
+                                     Layer      : Positive;
+                                     Loss_Deriv : Real_Float_Vector) is
+   begin
+      null;
 --        for row in Params.Coeff_Gradients'Range loop
 --           for col in Params.Coeff_Gradients'Range (2) loop
 --              Params.Coeff_Gradients (row, col) :=
 --                Loss_Deriv (row) * Activation (col);
 --           end loop;
 --        end loop;
---
---     end Compute_Coeff_Gradient;
+
+   end Compute_Coeff_Gradient;
 
    --  -------------------------------------------------------------------------
 
---     procedure Compute_Intercept_Gradient (Params     : in out Parameters_Record;
---                                           Loss_Deriv : Real_Float_Vector) is
---     begin
---        Params.Intercept_Grads := Loss_Deriv;
---
---     end Compute_Intercept_Gradient;
+   procedure Compute_Intercept_Gradient (aModel     : in out Sequential_Model;
+                                         Layer      : Positive;
+                                         Loss_Deriv : Real_Float_Matrix) is
+      Routine_Name : constant String := "Neural_Model.Compile ";
+      Nodes        : constant Real_Float_Vector := aModel.Layers (Layer).Nodes;
+      Deriv_Matrix : Real_Float_Matrix (Nodes'Range, Nodes'Range);
+   begin
+       Put_Line (Routine_Name & "Activation: " &
+                        Activation_Kind'Image (aModel.Layers (Layer).Activation));
+            case aModel.Layers (Layer).Activation is
+            when Identity_Activation => null;
+            when Logistic_Activation => null;
+         when ReLu_Activation =>
+            aModel.Connections (Layer).Intercept_Grads := Deriv_ReLU (Nodes);
+            when Sigmoid_Activation => null;
+            when Soft_Max_Activation =>
+               Deriv_Matrix := Deriv_Softmax (Nodes);
+               if Nodes'Length = 1 then
+                  aModel.Connections (Layer).Intercept_Grads (1) := 0.0;
+               else
+                  Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
+               end if;
+            end case;
+
+   end Compute_Intercept_Gradient;
 
    --  -------------------------------------------------------------------------
 
