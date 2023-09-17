@@ -11,10 +11,11 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package body Neural_Model is
 
-   procedure Compute_Coeff_Gradient (Params : in out Parameters_Record;
-                                     Loss   : Float);
-   procedure Compute_Intercept_Gradient (Params : in out Parameters_Record;
-                                         Loss   : Float);
+--     procedure Compute_Coeff_Gradient (Params     : in out Parameters_Record;
+--                                       Activation : Real_Float_Vector;
+--                                       Loss_Deriv : Real_Float_Vector);
+--     procedure Compute_Intercept_Gradient (Params     : in out Parameters_Record;
+--                                           Loss_Deriv : Real_Float_Vector);
    function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
    function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
    procedure Forward (aModel : in out Sequential_Model);
@@ -92,9 +93,10 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   function Back_Propogate (aModel    : in out Sequential_Model;
-                            Optimiser : Stochastic_Optimizers.Optimizer_Record;
-                            Loss      : Real_Float_Vector)
+   function Back_Propogate (aModel     : in out Sequential_Model;
+                            Optimiser  : Stochastic_Optimizers.Optimizer_Record;
+                            Loss       : Real_Float_Matrix;
+                            Loss_Deriv : Real_Float_Matrix)
                             return Stochastic_Optimizers.Parameters_List is
       use Stochastic_Optimizers;
       use Real_Float_Arrays;
@@ -113,12 +115,14 @@ package body Neural_Model is
         aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "layer index" & Integer'Image (index));
          declare
-            Nodes          : constant Real_Float_Vector :=
-                               aModel.Layers (index).Nodes;
-            Intercept_Grad : Real_Float_Vector (Nodes'Range) :=
-                               (others => 0.0);
-            Deriv_Matrix   : Real_Float_Matrix (Nodes'Range, Nodes'Range);
-            Gradients      : Parameters_Record (Nodes'Length, Nodes'Length);
+            Nodes           : constant Real_Float_Vector :=
+                                aModel.Layers (index).Nodes;
+            Coeff_Grads     : Real_Float_Matrix (Nodes'Range, Nodes'Range) :=
+                                (others => (others => 0.0));
+            Intercept_Grads : Real_Float_Vector (Nodes'Range) :=
+                                (others => 0.0);
+            Deriv_Matrix    : Real_Float_Matrix (Nodes'Range, Nodes'Range);
+            Gradients       : Parameters_Record (Nodes'Length, Nodes'Length);
          begin
             Put_Line (Routine_Name & "Activation: " &
                         Activation_Kind'Image (aModel.Layers (index).Activation));
@@ -188,7 +192,7 @@ package body Neural_Model is
       Routine_Name : constant String := "Neural_Model.Compile ";
       Actual       : Real_Float_Matrix (1 .. 1, aModel.Labels'Range);
       Pred         : Real_Float_Matrix (Actual'Range, Actual'Range (2));
-      Loss         : Real_Float_Vector (Actual'Range);
+      Loss         : Real_Float_Matrix (Actual'Range, Actual'Range (2));
       Loss_Deriv   : Real_Float_Matrix (Actual'Range, Actual'Range (2));
       Optimiser    : Optimizer_Record (Optimizer_Adam);
       Params       : Parameters_List;  --  list of Parameters_Record
@@ -204,11 +208,9 @@ package body Neural_Model is
    begin
       Forward (aModel);
 
-      for row in aModel.Labels'Range loop
-         for col in aModel.Labels'Range loop
-            Pred (row, col) := aModel.Labels (col);
-            Actual (row, col) := aModel.Layers.Last_Element.Nodes (col);
-         end loop;
+      for col in aModel.Labels'Range loop
+         Pred (1, col) := aModel.Labels (col);
+         Actual (1, col) := aModel.Layers.Last_Element.Nodes (col);
       end loop;
 
       case aModel.Loss_Method is
@@ -217,31 +219,39 @@ package body Neural_Model is
       when Loss_Log =>
          Put_Line (Routine_Name & "Log_Loss method not implemented");
       when Loss_Mean_Square_Error =>
-         Loss (1):= Base_Neural.Squared_Loss (Pred, Actual);
+         Loss (1, 1):= Base_Neural.Squared_Loss (Pred, Actual);
          Loss_Deriv := Base_Neural.Squared_Loss_Derivative (Pred, Actual);
       end case;
-      Put_Line (Routine_Name & "Loss " & Float'Image (Loss (1)));
+      Put_Line (Routine_Name & "Loss " & Float'Image (Loss (1, 1)));
 
       C_Init (Optimiser.Adam, aModel.Connections);
-      Gradients := Back_Propogate (aModel, Optimiser, Loss);
+      Gradients := Back_Propogate (aModel, Optimiser, Loss, Loss_Deriv);
 
    end Compile;
 
    --  -------------------------------------------------------------------------
 
-   procedure Compute_Coeff_Gradient (Params : in out Parameters_Record;
-                                     Loss   : Float) is
-   begin
-      null;
-   end Compute_Coeff_Gradient;
+--     procedure Compute_Coeff_Gradient (Params     : in out Parameters_Record;
+--                                       Activation : Real_Float_Vector;
+--                                       Loss_Deriv : Real_Float_Vector) is
+--     begin
+--        for row in Params.Coeff_Gradients'Range loop
+--           for col in Params.Coeff_Gradients'Range (2) loop
+--              Params.Coeff_Gradients (row, col) :=
+--                Loss_Deriv (row) * Activation (col);
+--           end loop;
+--        end loop;
+--
+--     end Compute_Coeff_Gradient;
 
    --  -------------------------------------------------------------------------
 
-   procedure Compute_Intercept_Gradient (Params : in out Parameters_Record;
-                                         Loss   : Float) is
-   begin
-      null;
-   end Compute_Intercept_Gradient;
+--     procedure Compute_Intercept_Gradient (Params     : in out Parameters_Record;
+--                                           Loss_Deriv : Real_Float_Vector) is
+--     begin
+--        Params.Intercept_Grads := Loss_Deriv;
+--
+--     end Compute_Intercept_Gradient;
 
    --  -------------------------------------------------------------------------
 
