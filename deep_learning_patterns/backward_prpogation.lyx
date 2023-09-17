@@ -89,12 +89,12 @@ Backward Propogation
 Overview of forward propagation equations:
 \begin_inset Formula 
 \begin{eqnarray*}
-x & = & a^{\left(1\right)}\,\,\,\,input\,layer\\
-z^{\left(2\right)} & = & W^{\left(1\right)}x+b^{\left(1\right)}\,\,\,\,neuron\,value\,at\,hidden\,layer\,1\\
-a^{\left(2\right)} & = & f\left(z^{\left(2\right)}\right)\,\,\,\,activation\,value\,at\,hidden\,layer\,1\\
-z^{\left(3\right)} & = & W^{\left(2\right)}a^{\left(2\right)}+b^{\left(2\right)}\,\,\,\,neuron\,value\,at\,hidden\,layer\,2\\
-a^{\left(3\right)} & = & f\left(z^{\left(2\right)}\right)\,\,\,\,activation\,value\,at\,hidden\,layer\,2\\
-s & = & W^{\left(3\right)}a^{\left(3\right)}\,\,\,\,output\,value\,predicted\,by\,output\,layer
+\mathbf{x} & = & \mathbf{a}^{\left(1\right)}=\begin{bmatrix}a_{1}^{\left(1\right)} & a_{2}^{\left(1\right)} & a_{3}^{\left(1\right)} & a_{4}^{\left(1\right)}\end{bmatrix}\,\,\,\,input\,layer\\
+\mathbf{z}^{\left(2\right)} & = & \mathbf{W}^{\left(1\right)}\mathbf{x}+\mathbf{b}^{\left(1\right)}=\begin{bmatrix}z_{1}^{\left(2\right)} & z_{2}^{\left(2\right)}\end{bmatrix}\,\,\,\,neuron\,value\,at\,hidden\,layer\,1\\
+\mathbf{a}^{\left(2\right)} & = & f\left(\mathbf{z}^{\left(2\right)}\right)=\begin{bmatrix}a_{1}^{\left(2\right)} & a_{2}^{\left(2\right)}\end{bmatrix}\,\,\,\,activation\,value\,at\,hidden\,layer\,1\\
+\mathbf{z}^{\left(3\right)} & = & \mathbf{W}^{\left(2\right)}\mathbf{a}^{\left(2\right)}+\mathbf{b}^{\left(2\right)}=\begin{bmatrix}z_{1}^{\left(3\right)} & z_{2}^{\left(3\right)}\end{bmatrix}\,\,\,\,neuron\,value\,at\,hidden\,layer\,2\\
+\mathbf{a}^{\left(3\right)} & = & f\left(\mathbf{z}^{\left(2\right)}\right)=\begin{bmatrix}a_{1}^{\left(3\right)} & a_{2}^{\left(3\right)}\end{bmatrix}\,\,\,\,activation\,value\,at\,hidden\,layer\,2\\
+\mathbf{s} & = & \mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}=\begin{bmatrix}s_{1}\end{bmatrix}\,\,\,\,output\,value\,predicted\,by\,output\,layer
 \end{eqnarray*}
 
 \end_inset
@@ -103,11 +103,10 @@ s & = & W^{\left(3\right)}a^{\left(3\right)}\,\,\,\,output\,value\,predicted\,by
 \end_layout
 
 \begin_layout Standard
-Cost function (for example mean squared error):
+Cost function :
 \begin_inset Formula 
 \begin{eqnarray*}
-C & = & cost\left(s,y\right)\\
- & = & MSE\left(s,y\right)\,\,\,\,for\,example
+C & = & cost\left(\mathbf{s},\mathbf{y}\right)
 \end{eqnarray*}
 
 \end_inset
@@ -116,17 +115,55 @@ where:
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $s$
+\begin_inset Formula $\mathbf{s}$
 \end_inset
 
  is the value predicted by the output layer,
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $y$
+\begin_inset Formula $\mathbf{y}$
 \end_inset
 
  is the expected value (label) from the input data.
+\end_layout
+
+\begin_layout Standard
+Mean squared error
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ example:
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula 
+\begin{eqnarray*}
+C & = & MSE\left(\mathbf{s},\mathbf{y}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -195,7 +232,7 @@ x
 \begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
-\frac{\partial C}{\partial\mathbf{x}} & = & \left[\frac{\partial C}{\partial x_{1}},\frac{\partial C}{\partial x_{2}},\cdots,\frac{\partial C}{\partial x_{m}}\right]
+\frac{\partial C}{\partial\mathbf{x}} & = & \begin{bmatrix}\frac{\partial C}{\partial x_{1}} & \frac{\partial C}{\partial x_{2}} & \cdots & \frac{\partial C}{\partial x_{m}}\end{bmatrix}
 \end{eqnarray*}
 
 \end_inset
@@ -231,17 +268,25 @@ where:
 \begin_inset Formula $j$
 \end_inset
 
- is the output index,
+ is the index of the neuron in layer 
+\begin_inset Formula $l+1$
+\end_inset
+
+,
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula $k$
 \end_inset
 
- is the input index.
+ is the index of the neuron in layer 
+\begin_inset Formula $l$
+\end_inset
+
+.
 \begin_inset Formula 
 \begin{eqnarray*}
-z_{j}^{l} & = & \sum_{k=l}^{m}w_{jk}^{l}a_{k}^{l-1}+b_{j}^{l}\,\,\,\,by\,definition\\
+z_{j}^{l} & = & \sum_{k=1}^{m}w_{jk}^{l}a_{k}^{l-1}+b_{j}^{l}\,\,\,\,by\,definition\\
 \frac{\partial z_{j}^{l}}{\partial w_{jk}^{l}} & = & a_{k}^{l-1}\,\,\,\,by\,differentiation\\
 \frac{\partial C}{\partial w_{jk}^{l}} & = & \frac{\partial C}{\partial z_{j}^{l}}a_{k}^{l-1}\,\,\,\,final\,value
 \end{eqnarray*}
@@ -354,13 +399,16 @@ the initial values of
  is the learning rate.
 \end_layout
 
-\begin_layout Standard
-Example calculation of the gradient of C with respect to a single weight
- 
+\begin_layout Section
+Examples
+\end_layout
+
+\begin_layout Subsection
+Calculation of the gradient of C with respect to a single weight 
 \begin_inset Formula $w_{22}^{\left(2\right)}$
 \end_inset
 
-.
+
 \end_layout
 
 \begin_layout Standard
@@ -373,7 +421,7 @@ Weight
 \end_inset
 
  and 
-\begin_inset Formula $z_{2}^{\left(2\right)}$
+\begin_inset Formula $z_{2}^{\left(3\right)}$
 \end_inset
 
  , so computing the gradient requires applying the chain rule through 
@@ -408,6 +456,109 @@ As C is dependent on
 \end_inset
 
  , calculating the derivative should be fairly straightforward.
+\end_layout
+
+\begin_layout Subsection
+Calculation of the gradients of C for layer 3
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+Cost,\,C\left(\mathbf{s},\mathbf{y}\right) & = & MSE\left(\mathbf{s},\mathbf{y}\right)\\
+ & = & \left(\mathbf{s}-\mathbf{y}\right)^{2}\\
+ & = & \left(\mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}-\mathbf{y}\right)^{2}\\
+ & = & \left(\mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}\right)^{2}-\mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}\mathbf{y}+\mathbf{y}^{2}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+C'\left(\mathbf{s},\mathbf{y}\right) & = & 2\mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}-\mathbf{a}^{\left(3\right)}\mathbf{y}\\
+ & = & \mathbf{a}^{\left(3\right)}\left(2\mathbf{W}^{\left(3\right)}-\mathbf{y}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial\mathbf{W}^{\left(3\right)}} & = & \begin{bmatrix}\frac{\partial C}{\partial w_{11}^{\left(3\right)}}\\
+\frac{\partial C}{\partial w_{21}^{\left(3\right)}}\\
+\frac{\partial C}{\partial w_{31}^{\left(3\right)}}
+\end{bmatrix}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\mathbf{s} & = & \mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}\\
+ & = & \begin{bmatrix}w_{11}^{\left(3\right)} & w_{12}^{\left(3\right)}\end{bmatrix}\begin{bmatrix}\mathbf{a}_{1}^{\left(3\right)}\\
+\mathbf{a}_{2}^{\left(3\right)}
+\end{bmatrix}\\
+ & = & w_{11}^{\left(3\right)}\mathbf{a}_{1}^{\left(3\right)}+w_{12}^{\left(3\right)}\mathbf{a}_{2}^{\left(3\right)}\\
+\begin{bmatrix}s_{1}\\
+s_{2}\\
+s_{3}
+\end{bmatrix} & = & w_{11}^{\left(3\right)}\begin{bmatrix}a_{11}^{\left(3\right)}\\
+a_{12}^{\left(3\right)}\\
+a_{13}^{\left(3\right)}
+\end{bmatrix}+w_{12}^{\left(3\right)}\begin{bmatrix}a_{21}^{\left(3\right)}\\
+a_{21}^{\left(3\right)}\\
+a_{21}^{\left(3\right)}
+\end{bmatrix}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial w_{11}^{\left(3\right)}} & = & \frac{\partial C}{\partial s_{1}}\frac{\partial s_{1}}{\partial w_{11}^{\left(3\right)}}\\
+s_{1} & = & w_{11}^{\left(3\right)}a_{11}^{\left(3\right)}+w_{12}^{\left(3\right)}a_{21}^{\left(3\right)}
+\end{eqnarray*}
+
+\end_inset
+
+Therefore, the derivatives 
+\begin_inset Formula $\frac{\partial s_{1}}{\partial w_{1k}^{\left(3\right)}}$
+\end_inset
+
+ are:
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial s_{1}}{\partial w_{11}^{\left(3\right)}} & = & a_{11}^{\left(3\right)}\\
+\frac{\partial s_{1}}{\partial w_{12}^{\left(3\right)}} & = & a_{21}^{\left(3\right)}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial w_{11}^{\left(3\right)}} & = & \frac{\partial C}{\partial s_{1}}\frac{\partial s_{1}}{\partial w_{11}^{\left(3\right)}}\\
+ & = & \frac{\partial C}{\partial s_{1}}a_{11}^{\left(3\right)}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial w_{12}^{\left(3\right)}} & = & \frac{\partial C}{\partial s_{1}}\frac{\partial s_{1}}{\partial w_{12}^{\left(3\right)}}\\
+ & = & \frac{\partial C}{\partial s_{1}}a_{12}^{\left(3\right)}
+\end{eqnarray*}
+
+\end_inset
+
+
 \end_layout
 
 \end_body

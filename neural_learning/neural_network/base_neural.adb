@@ -438,6 +438,32 @@ package body Base_Neural is
    end Squared_Loss;
 
    --  -------------------------------------------------------------------------
+   --  Squared Loss = (predicted - expected) ^ 2
+   --  = predicted^2 - 2 x predicted x expected + expected^2
+   --  Squared_Loss_Derivative wrt predicted
+   --  = 2 x predicted - 2 x expected = 2 x (predicted - expected)
+
+   function Squared_Loss_Derivative (Y_True, Y_Pred : Real_Float_Matrix)
+                          return Real_Float_Matrix is
+      use Real_Float_Arrays;
+   begin
+
+      return 2.0 * (Y_True - Y_Pred);
+
+   end Squared_Loss_Derivative;
+
+   --  -------------------------------------------------------------------------
+
+   function Squared_Loss_Derivative (Y_True, Y_Pred : Real_Float_Vector)
+                          return Real_Float_Vector is
+      use Real_Float_Arrays;
+   begin
+
+      return 2.0 * (Y_True - Y_Pred);
+
+   end Squared_Loss_Derivative;
+
+   --  -------------------------------------------------------------------------
 
    procedure Tanh (Activation : in out Real_Float_Matrix) is
       use Maths.Float_Math_Functions;

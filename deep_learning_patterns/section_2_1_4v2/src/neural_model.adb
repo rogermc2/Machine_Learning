@@ -7,10 +7,14 @@ with Maths;
 with Base_Neural;
 with Basic_Printing; use Basic_Printing;
 with Neural_Maths;
-with Stochastic_Optimizers;
+with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package body Neural_Model is
 
+   procedure Compute_Coeff_Gradient (Params : in out Parameters_Record;
+                                     Loss   : Float);
+   procedure Compute_Intercept_Gradient (Params : in out Parameters_Record;
+                                         Loss   : Float);
    function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
    function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
    procedure Forward (aModel : in out Sequential_Model);
@@ -36,7 +40,7 @@ package body Neural_Model is
               0.5 * abs (Maths.Random_Float);
          end loop;
          Connect.Intercept_Grads (row)  := 0.5 * abs (Maths.Random_Float);
---           aModel.Activations.Append (Identity_Activation);
+         --           aModel.Activations.Append (Identity_Activation);
       end loop;
 
       aModel.Connections.Append (Connect);
@@ -109,27 +113,30 @@ package body Neural_Model is
         aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "layer index" & Integer'Image (index));
          declare
-            Nodes        : constant Real_Float_Vector :=
-                             aModel.Layers (index).Nodes;
-            Gradient     : Real_Float_Vector (Nodes'Range) :=
-                                    (others => 0.0);
-            Deriv_Matrix : Real_Float_Matrix (Nodes'Range, Nodes'Range);
+            Nodes          : constant Real_Float_Vector :=
+                               aModel.Layers (index).Nodes;
+            Intercept_Grad : Real_Float_Vector (Nodes'Range) :=
+                               (others => 0.0);
+            Deriv_Matrix   : Real_Float_Matrix (Nodes'Range, Nodes'Range);
+            Gradients      : Parameters_Record (Nodes'Length, Nodes'Length);
          begin
             Put_Line (Routine_Name & "Activation: " &
                         Activation_Kind'Image (aModel.Layers (index).Activation));
             case aModel.Layers (index).Activation is
             when Identity_Activation => null;
             when Logistic_Activation => null;
-            when ReLu_Activation => Gradient := Deriv_ReLU (Nodes);
+            when ReLu_Activation => Gradients.Intercept_Grads := Deriv_ReLU (Nodes);
             when Sigmoid_Activation => null;
             when Soft_Max_Activation =>
                Deriv_Matrix := Deriv_Softmax (Nodes);
                if Nodes'Length = 1 then
-                  Gradient (1) := 0.0;
+                  Gradients.Intercept_Grads (1) := 0.0;
                else
                   Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
                end if;
             end case;
+
+            --  Calculate non-activation
 
          end;  --  declare block
       end loop;
@@ -177,11 +184,12 @@ package body Neural_Model is
    --  -------------------------------------------------------------------------
 
    procedure Compile (aModel : in out Sequential_Model) is
-      use Stochastic_Optimizers;
+      use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Compile ";
-      Pred         : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
-      Actual       : Real_Float_Matrix (1 .. 1, 1 .. aModel.Labels'Length);
-      Loss         : Real_Float_Vector (1 .. 1);
+      Actual       : Real_Float_Matrix (1 .. 1, aModel.Labels'Range);
+      Pred         : Real_Float_Matrix (Actual'Range, Actual'Range (2));
+      Loss         : Real_Float_Vector (Actual'Range);
+      Loss_Deriv   : Real_Float_Matrix (Actual'Range, Actual'Range (2));
       Optimiser    : Optimizer_Record (Optimizer_Adam);
       Params       : Parameters_List;  --  list of Parameters_Record
       Gradients    : Parameters_List;
@@ -210,6 +218,7 @@ package body Neural_Model is
          Put_Line (Routine_Name & "Log_Loss method not implemented");
       when Loss_Mean_Square_Error =>
          Loss (1):= Base_Neural.Squared_Loss (Pred, Actual);
+         Loss_Deriv := Base_Neural.Squared_Loss_Derivative (Pred, Actual);
       end case;
       Put_Line (Routine_Name & "Loss " & Float'Image (Loss (1)));
 
@@ -217,6 +226,22 @@ package body Neural_Model is
       Gradients := Back_Propogate (aModel, Optimiser, Loss);
 
    end Compile;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Compute_Coeff_Gradient (Params : in out Parameters_Record;
+                                     Loss   : Float) is
+   begin
+      null;
+   end Compute_Coeff_Gradient;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Compute_Intercept_Gradient (Params : in out Parameters_Record;
+                                         Loss   : Float) is
+   begin
+      null;
+   end Compute_Intercept_Gradient;
 
    --  -------------------------------------------------------------------------
 
@@ -242,7 +267,7 @@ package body Neural_Model is
    --  a Jacobian matrix which is the matrix of all first-order
    --  partial derivatives is needed.
    function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix is
---        Routine_Name : constant String := "Neural_Model.Deriv_Softmax ";
+      --        Routine_Name : constant String := "Neural_Model.Deriv_Softmax ";
       Jacobian     : Real_Float_Matrix (X'Range, X'Range);
    begin
       for row in Jacobian'Range loop

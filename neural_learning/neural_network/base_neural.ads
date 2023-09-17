@@ -59,6 +59,10 @@ package Base_Neural is
    function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
                           return Float;
    function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float;
+   function Squared_Loss_Derivative (Y_True, Y_Pred : Real_Float_Matrix)
+                          return Real_Float_Matrix;
+   function Squared_Loss_Derivative (Y_True, Y_Pred : Real_Float_Vector)
+                          return Real_Float_Vector;
    pragma Inline (Squared_Loss);
    function X_Log_Y (X, Y : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline (X_Log_Y);
