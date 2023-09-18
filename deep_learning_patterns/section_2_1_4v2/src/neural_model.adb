@@ -74,10 +74,10 @@ package body Neural_Model is
       Prev_Nodes   : constant Real_Float_Vector := Prev_Layer.Nodes;
       thisLayer    : Layer (Prev_Nodes'Length, Num_Nodes);
    begin
---        Put_Line (Routine_Name & "Prev_Nodes length" &
---                    Integer'Image (Prev_Nodes'Length));
---        Put_Line (Routine_Name & "thisLayer.Input_Data length" &
---                    Integer'Image (thisLayer.Input_Data'Length));
+      --        Put_Line (Routine_Name & "Prev_Nodes length" &
+      --                    Integer'Image (Prev_Nodes'Length));
+      --        Put_Line (Routine_Name & "thisLayer.Input_Data length" &
+      --                    Integer'Image (thisLayer.Input_Data'Length));
 
       Add_Connections (aModel, Prev_Layer, thisLayer);
       --        Print_Matrix_Dimensions (Routine_Name &
@@ -93,40 +93,39 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   function Back_Propogate (aModel     : in out Sequential_Model;
-                            Optimiser  : Stochastic_Optimizers.Optimizer_Record;
-                            Loss       : Real_Float_Matrix;
-                            Loss_Deriv : Real_Float_Matrix)
-                            return Stochastic_Optimizers.Parameters_List is
-      use Stochastic_Optimizers;
-      use Real_Float_Arrays;
-      use Real_Matrix_List_Package;
-      Routine_Name   : constant String := "Neural_Model.Back_Propogate ";
-      --        Pred_Params (Self      : in out Optimizer_Record;
-      --                       Params    : in out Parameters_List;
-      --                       Gradients : Parameters_List);
-      Deltas         : Real_Matrix_List;
-      Sum_Sq_Coeffs  : Float := 0.0;
-      Pred_Gradients : Parameters_List;
-   begin
-      --    Pred_Params (Optimiser, aModel.Connections, Gradients);
-
-      for index in reverse
-        aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
-         Put_Line (Routine_Name & "layer index" & Integer'Image (index));
-         Compute_Coeff_Gradient (aModel, index, Loss_Deriv);
-         Compute_Intercept_Gradient (aModel, index, Loss_Deriv);
-      end loop;
-
-      return Pred_Gradients;
-
-   end Back_Propogate;
+   --     function Back_Propogate (aModel     : in out Sequential_Model;
+   --                              Optimiser  : Stochastic_Optimizers.Optimizer_Record;
+   --                              Loss       : Real_Float_Matrix;
+   --                              Loss_Deriv : Real_Float_Matrix)
+   --                              return Stochastic_Optimizers.Parameters_List is
+   --        use Stochastic_Optimizers;
+   --        use Real_Float_Arrays;
+   --        use Real_Matrix_List_Package;
+   --        Routine_Name   : constant String := "Neural_Model.Back_Propogate ";
+   --        --        Pred_Params (Self      : in out Optimizer_Record;
+   --        --                       Params    : in out Parameters_List;
+   --        --                       Gradients : Parameters_List);
+   --        Deltas         : Real_Matrix_List;
+   --        Sum_Sq_Coeffs  : Float := 0.0;
+   --        Pred_Gradients : Parameters_List;
+   --     begin
+   --        --    Pred_Params (Optimiser, aModel.Connections, Gradients);
+   --
+   --        for index in reverse
+   --          aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
+   --           Put_Line (Routine_Name & "layer index" & Integer'Image (index));
+   --           Compute_Coeff_Gradient (aModel, index, Loss_Deriv);
+   --           Compute_Intercept_Gradient (aModel, index, Loss_Deriv);
+   --        end loop;
+   --
+   --        return Pred_Gradients;
+   --
+   --     end Back_Propogate;
 
    --  -------------------------------------------------------------------------
 
    function Backward (aModel : in out Sequential_Model;
-                      Loss   : Real_Float_Vector)
-                      return Real_Float_Vector is
+                      Loss   : Real_Float_Vector) return Real_Float_Vector is
       use Real_Float_Arrays;
       Routine_Name        : constant String :=
                               "Neural_Model.Backward ";
@@ -163,7 +162,8 @@ package body Neural_Model is
    procedure Compile (aModel : in out Sequential_Model) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Compile ";
-      Actual       : Real_Float_Matrix (1 .. 1, aModel.Labels'Range);
+      Actual       : Real_Float_Matrix (1 .. aModel.Num_Samples,
+                                        aModel.Labels'Range);
       Pred         : Real_Float_Matrix (Actual'Range, Actual'Range (2));
       Loss         : Real_Float_Matrix (Actual'Range, Actual'Range (2));
       Loss_Deriv   : Real_Float_Matrix (Actual'Range, Actual'Range (2));
@@ -181,24 +181,31 @@ package body Neural_Model is
    begin
       Forward (aModel);
 
-      for col in aModel.Labels'Range loop
-         Pred (1, col) := aModel.Labels (col);
-         Actual (1, col) := aModel.Layers.Last_Element.Nodes (col);
-      end loop;
+      for row in 1 .. aModel.Num_Samples loop
+         for col in aModel.Labels'Range loop
+            Pred (row, col) := aModel.Labels (col);
+            Actual (row, col) := aModel.Layers.Last_Element.Nodes (col);
+         end loop;
 
-      case aModel.Loss_Method is
-      when Loss_Binary_Log =>
-         Put_Line (Routine_Name & "Binary_Log_Loss method not implemented");
-      when Loss_Log =>
-         Put_Line (Routine_Name & "Log_Loss method not implemented");
-      when Loss_Mean_Square_Error =>
-         Loss (1, 1):= Base_Neural.Squared_Loss (Pred, Actual);
-         Loss_Deriv := Base_Neural.Squared_Loss_Derivative (Pred, Actual);
-      end case;
+         case aModel.Loss_Method is
+         when Loss_Binary_Log =>
+            Put_Line (Routine_Name & "Binary_Log_Loss method not implemented");
+         when Loss_Log =>
+            Put_Line (Routine_Name & "Log_Loss method not implemented");
+         when Loss_Mean_Square_Error =>
+            Loss (row, 1):= Base_Neural.Squared_Loss (Pred, Actual);
+            Loss_Deriv := Base_Neural.Squared_Loss_Derivative (Pred, Actual);
+         end case;
+      end loop;
       Put_Line (Routine_Name & "Loss " & Float'Image (Loss (1, 1)));
 
       C_Init (Optimiser.Adam, aModel.Connections);
-      Gradients := Back_Propogate (aModel, Optimiser, Loss, Loss_Deriv);
+      declare
+         Input_Error : Real_Float_Vector := Backward (aModel, Loss_Deriv);
+      begin
+         null;
+      end;
+      --        Gradients := Back_Propogate (aModel, Optimiser, Loss, Loss_Deriv);
 
    end Compile;
 
@@ -212,10 +219,10 @@ package body Neural_Model is
       Nodes        : constant Real_Float_Vector := aModel.Layers (Layer).Nodes;
       Deriv_In     : constant Real_Float_Matrix := Loss_Deriv *
                        Transpose (aModel.Connections (Layer).Coeff_Gradients);
-      --        Weights_Err  : constant Real_Float_Vector :=
-      --                         aModel.Input_Data * Loss_Deriv;
+      Weights_Err  : constant Real_Float_Vector :=
+                       aModel.Input_Data * Loss_Deriv;
    begin
-      --        aModel.Delta_Weights := aModel.Delta_Weights + Weights_Err;
+      aModel.Delta_Weights := aModel.Delta_Weights + Weights_Err;
       aModel.Delta_Bias := aModel.Delta_Bias + Loss_Deriv;
 
    end Compute_Coeff_Gradient;
