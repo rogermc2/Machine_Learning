@@ -51,40 +51,39 @@ package body Neural_Model is
 
    --  ---------------------------------------------------------------------------
 
-   --  Add first layer
+   --  Initialization - add first layer
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Input_Data : Real_Float_Vector) is
-      thisLayer : Layer (Num_Nodes);
+      thisLayer : Layer (Input_Data'Length, Num_Nodes);
    begin
+      thisLayer.Input_Data := Input_Data;
       thisLayer.Nodes := Input_Data;
       aModel.Layers.Append (thisLayer);
 
    end Add_Layer;
 
    --  ---------------------------------------------------------------------------
-   --  Add other layers
+   --  Initialization - add other layers
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Activation : Activation_Kind := Identity_Activation) is
       use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
-      Prev_Layer : constant Layer := aModel.Layers.Last_Element;
-      Prev_Nodes : constant Real_Float_Vector := Prev_Layer.Nodes;
-      thisLayer  : Layer (Num_Nodes);
+      Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
+      Prev_Layer   : constant Layer := aModel.Layers.Last_Element;
+      Prev_Nodes   : constant Real_Float_Vector := Prev_Layer.Nodes;
+      thisLayer    : Layer (Prev_Nodes'Length, Num_Nodes);
    begin
-      --        Put_Line (Routine_Name);
-      --        Put_Line (Routine_Name & "Prev_Layer length"&
-      --                    Integer'Image (Integer (aModel.Layers.Length)));
+--        Put_Line (Routine_Name & "Prev_Nodes length" &
+--                    Integer'Image (Prev_Nodes'Length));
+--        Put_Line (Routine_Name & "thisLayer.Input_Data length" &
+--                    Integer'Image (thisLayer.Input_Data'Length));
+
       Add_Connections (aModel, Prev_Layer, thisLayer);
-      --        Put_Line ( Routine_Name & "Connections added");
-      --        Put_Line (Routine_Name & "Prev_Layer Nodes length"&
-      --                    Integer'Image (Prev_Layer.Nodes'Length));
-      --        Put_Line (Routine_Name & "thisLayer Nodes length" &
-      --                    Integer'Image (thisLayer.Nodes'Length));
       --        Print_Matrix_Dimensions (Routine_Name &
       --                                   "Connections.Last_Element.Coeff_Gradients",
       --                                 aModel.Connections.Last_Element.Coeff_Gradients);
+      thisLayer.Input_Data := Prev_Nodes;
       thisLayer.Nodes := aModel.Connections.Last_Element.Coeff_Gradients *
         Prev_Layer.Nodes;
       thisLayer.Activation := Activation;
@@ -207,14 +206,16 @@ package body Neural_Model is
    procedure Compute_Coeff_Gradient (aModel     : in out Sequential_Model;
                                      Layer      : Positive;
                                      Loss_Deriv : Real_Float_Vector) is
+      use Real_Float_Arrays;
+      Routine_Name : constant String := "Neural_Model.Compute_Coeff_Gradient ";
+      Nodes        : constant Real_Float_Vector := aModel.Layers (Layer).Nodes;
+      Deriv_In     : constant Real_Float_Vector := Loss_Deriv *
+                       Transpose (aModel.Connections (Layer).Coeff_Gradients);
+      --        Weights_Err  : constant Real_Float_Vector :=
+      --                         aModel.Input_Data * Loss_Deriv;
    begin
-      null;
---        for row in Params.Coeff_Gradients'Range loop
---           for col in Params.Coeff_Gradients'Range (2) loop
---              Params.Coeff_Gradients (row, col) :=
---                Loss_Deriv (row) * Activation (col);
---           end loop;
---        end loop;
+      --        aModel.Delta_Weights := aModel.Delta_Weights + Weights_Err;
+      aModel.Delta_Bias := aModel.Delta_Bias + Loss_Deriv;
 
    end Compute_Coeff_Gradient;
 
@@ -223,26 +224,27 @@ package body Neural_Model is
    procedure Compute_Intercept_Gradient (aModel     : in out Sequential_Model;
                                          Layer      : Positive;
                                          Loss_Deriv : Real_Float_Matrix) is
-      Routine_Name : constant String := "Neural_Model.Compile ";
+      Routine_Name : constant String :=
+                       "Neural_Model.Compute_Intercept_Gradient ";
       Nodes        : constant Real_Float_Vector := aModel.Layers (Layer).Nodes;
       Deriv_Matrix : Real_Float_Matrix (Nodes'Range, Nodes'Range);
    begin
-       Put_Line (Routine_Name & "Activation: " &
-                        Activation_Kind'Image (aModel.Layers (Layer).Activation));
-            case aModel.Layers (Layer).Activation is
-            when Identity_Activation => null;
-            when Logistic_Activation => null;
+      Put_Line (Routine_Name & "Activation: " &
+                  Activation_Kind'Image (aModel.Layers (Layer).Activation));
+      case aModel.Layers (Layer).Activation is
+         when Identity_Activation => null;
+         when Logistic_Activation => null;
          when ReLu_Activation =>
             aModel.Connections (Layer).Intercept_Grads := Deriv_ReLU (Nodes);
-            when Sigmoid_Activation => null;
-            when Soft_Max_Activation =>
-               Deriv_Matrix := Deriv_Softmax (Nodes);
-               if Nodes'Length = 1 then
-                  aModel.Connections (Layer).Intercept_Grads (1) := 0.0;
-               else
-                  Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
-               end if;
-            end case;
+         when Sigmoid_Activation => null;
+         when Soft_Max_Activation =>
+            Deriv_Matrix := Deriv_Softmax (Nodes);
+            if Nodes'Length = 1 then
+               aModel.Connections (Layer).Intercept_Grads (1) := 0.0;
+            else
+               Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
+            end if;
+      end case;
 
    end Compute_Intercept_Gradient;
 
@@ -305,8 +307,9 @@ package body Neural_Model is
             Connect : constant Parameters_Record :=
                         aModel.Connections (layer - 1);
          begin
+            aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
             aModel.Layers (layer).Nodes := Connect.Coeff_Gradients *
-              aModel.Layers (layer - 1).Nodes;
+              aModel.Layers (layer).Input_Data;
             aModel.Layers (layer).Nodes :=
               aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
 

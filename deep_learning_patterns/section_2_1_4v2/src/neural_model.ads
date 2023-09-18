@@ -15,7 +15,8 @@ package Neural_Model is
 
    subtype Node is Float;
 
-   type Layer (Num_Features : Positive) is record
+   type Layer (In_Length, Num_Features : Positive) is record
+      Input_Data : Real_Float_Vector (1 .. In_Length);
       Nodes      : Real_Float_Vector (1 .. Num_Features);
       Activation : Activation_Kind := Identity_Activation;
    end record;
@@ -46,6 +47,7 @@ private
       Labels        : Real_Float_Vector (1 .. 1);
       Layers        : Layer_List;
       Connections   : Stochastic_Optimizers.Parameters_List;
+      Params        : Stochastic_Optimizers.Parameters_List;
       Delta_Weights : Real_Float_Vector (1 .. Num_Features) :=
                         (others => 0.0);
       Delta_Bias    : Real_Float_Vector (1 .. Num_Features) :=
