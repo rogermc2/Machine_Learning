@@ -13,7 +13,7 @@ package body Neural_Model is
 
    procedure Compute_Coeff_Gradient (aModel     : in out Sequential_Model;
                                      Layer      : Positive;
-                                     Loss_Deriv : Real_Float_Vector);
+                                     Loss_Deriv : Real_Float_Matrix);
    procedure Compute_Intercept_Gradient (aModel     : in out Sequential_Model;
                                          Layer      : Positive;
                                          Loss_Deriv : Real_Float_Matrix);
@@ -114,6 +114,7 @@ package body Neural_Model is
       for index in reverse
         aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "layer index" & Integer'Image (index));
+         Compute_Coeff_Gradient (aModel, index, Loss_Deriv);
          Compute_Intercept_Gradient (aModel, index, Loss_Deriv);
       end loop;
 
@@ -205,11 +206,11 @@ package body Neural_Model is
 
    procedure Compute_Coeff_Gradient (aModel     : in out Sequential_Model;
                                      Layer      : Positive;
-                                     Loss_Deriv : Real_Float_Vector) is
+                                     Loss_Deriv : Real_Float_Matrix) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Compute_Coeff_Gradient ";
       Nodes        : constant Real_Float_Vector := aModel.Layers (Layer).Nodes;
-      Deriv_In     : constant Real_Float_Vector := Loss_Deriv *
+      Deriv_In     : constant Real_Float_Matrix := Loss_Deriv *
                        Transpose (aModel.Connections (Layer).Coeff_Gradients);
       --        Weights_Err  : constant Real_Float_Vector :=
       --                         aModel.Input_Data * Loss_Deriv;
