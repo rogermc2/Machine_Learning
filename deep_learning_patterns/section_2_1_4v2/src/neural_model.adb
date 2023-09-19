@@ -53,12 +53,13 @@ package body Neural_Model is
 
    --  Initialization - add first layer
    procedure Add_First_Layer (aModel     : in out Sequential_Model;
-                        Input_Data : Real_Float_Matrix) is
-      thisLayer : Layer (Input_Data'Length, Input_Data'Length (2));
+                              Input_Data : Real_Float_Matrix) is
+      First_Layer : Layer (Input_Data'Length, Input_Data'Length (2),
+                         Input_Data'Length (2));
    begin
-      thisLayer.Input_Data := Input_Data;
-      thisLayer.Nodes := Input_Data;
-      aModel.Layers.Append (thisLayer);
+      First_Layer.Input_Data := Input_Data;
+      First_Layer.Nodes := Input_Data;
+      aModel.Layers.Append (First_Layer);
 
    end Add_First_Layer;
 
@@ -71,7 +72,8 @@ package body Neural_Model is
       Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
       Prev_Layer   : constant Layer := aModel.Layers.Last_Element;
       Prev_Nodes   : constant Real_Float_Matrix := Prev_Layer.Nodes;
-      thisLayer    : Layer (Prev_Nodes'Length, Num_Nodes);
+      thisLayer    : Layer (aModel.Num_Samples, Prev_Nodes'Length (2),
+                            Num_Nodes);
    begin
       --        Put_Line (Routine_Name & "Prev_Nodes length" &
       --                    Integer'Image (Prev_Nodes'Length));
