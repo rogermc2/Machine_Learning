@@ -52,16 +52,15 @@ package body Neural_Model is
    --  ---------------------------------------------------------------------------
 
    --  Initialization - add first layer
-   procedure Add_Layer (aModel     : in out Sequential_Model;
-                        Num_Nodes  : Positive;
-                        Input_Data : Real_Float_Vector) is
-      thisLayer : Layer (Input_Data'Length, Num_Nodes);
+   procedure Add_First_Layer (aModel     : in out Sequential_Model;
+                        Input_Data : Real_Float_Matrix) is
+      thisLayer : Layer (Input_Data'Length, Input_Data'Length (2));
    begin
       thisLayer.Input_Data := Input_Data;
       thisLayer.Nodes := Input_Data;
       aModel.Layers.Append (thisLayer);
 
-   end Add_Layer;
+   end Add_First_Layer;
 
    --  ---------------------------------------------------------------------------
    --  Initialization - add other layers
@@ -71,7 +70,7 @@ package body Neural_Model is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
       Prev_Layer   : constant Layer := aModel.Layers.Last_Element;
-      Prev_Nodes   : constant Real_Float_Vector := Prev_Layer.Nodes;
+      Prev_Nodes   : constant Real_Float_Matrix := Prev_Layer.Nodes;
       thisLayer    : Layer (Prev_Nodes'Length, Num_Nodes);
    begin
       --        Put_Line (Routine_Name & "Prev_Nodes length" &
@@ -132,8 +131,9 @@ package body Neural_Model is
       Input_Error         : constant Real_Float_Vector
         := Loss * Transpose (aModel.Connections.Last_Element.Coeff_Gradients);
       Weights_Error       : constant Real_Float_Vector
-        := Transpose (aModel.Connections.First_Element.Coeff_Gradients) * Loss;
+        := aModel.Input_Data * Loss;
    begin
+      Put_Line (Routine_Name);
       aModel.Delta_Weights := aModel.Delta_Weights + Input_Error;
       aModel.Delta_Bias := aModel.Delta_Bias + Loss;
 
@@ -166,10 +166,10 @@ package body Neural_Model is
                                         aModel.Labels'Range);
       Pred         : Real_Float_Matrix (Actual'Range, Actual'Range (2));
       Loss         : Real_Float_Matrix (Actual'Range, Actual'Range (2));
-      Loss_Deriv   : Real_Float_Matrix (Actual'Range, Actual'Range (2));
+      Loss_Deriv   : Real_Float_Matrix (Loss'Range, Loss'Range (2));
       Optimiser    : Optimizer_Record (Optimizer_Adam);
       Params       : Parameters_List;  --  list of Parameters_Record
-      Gradients    : Parameters_List;
+      --        Gradients    : Parameters_List;
       --        Parameters_Record (Num_Rows, Num_Cols : Positive) is record
       --        Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
       --                            (others => (others => 0.0));
@@ -179,12 +179,13 @@ package body Neural_Model is
       --  Intercepts is a 2D list of bias vectors where the vector at index
       --  the bias values added to layer i + 1.
    begin
+      C_Init (Optimiser.Adam, aModel.Connections);
       Forward (aModel);
 
       for row in 1 .. aModel.Num_Samples loop
          for col in aModel.Labels'Range loop
             Pred (row, col) := aModel.Labels (col);
-            Actual (row, col) := aModel.Layers.Last_Element.Nodes (col);
+            Actual (row, col) := aModel.Layers.Last_Element.Nodes (row, col);
          end loop;
 
          case aModel.Loss_Method is
@@ -193,18 +194,31 @@ package body Neural_Model is
          when Loss_Log =>
             Put_Line (Routine_Name & "Log_Loss method not implemented");
          when Loss_Mean_Square_Error =>
-            Loss (row, 1):= Base_Neural.Squared_Loss (Pred, Actual);
+            Loss (row, 1) := Base_Neural.Squared_Loss (Pred, Actual);
             Loss_Deriv := Base_Neural.Squared_Loss_Derivative (Pred, Actual);
          end case;
-      end loop;
-      Put_Line (Routine_Name & "Loss " & Float'Image (Loss (1, 1)));
 
-      C_Init (Optimiser.Adam, aModel.Connections);
-      declare
-         Input_Error : Real_Float_Vector := Backward (aModel, Loss_Deriv);
-      begin
-         null;
-      end;
+         Put_Line (Routine_Name & "row " & Integer'Image (row));
+         Print_Matrix_Dimensions (Routine_Name & "Loss", Loss);
+         Print_Matrix_Dimensions (Routine_Name & "Loss_Deriv", Loss_Deriv);
+         Print_Float_Matrix (Routine_Name & "Loss", Loss);
+         Print_Float_Matrix (Routine_Name & "Loss_Deriv", Loss_Deriv);
+         Print_Float_Matrix (Routine_Name & "row " & Integer'Image (row) &
+                               " Coeff_Gradients",
+                             aModel.Connections.Last_Element.Coeff_Gradients);
+         Print_Matrix_Dimensions (Routine_Name & "row " & Integer'Image (row) &
+                                    " Coeff_Gradients",
+                                  aModel.Connections.Last_Element.Coeff_Gradients);
+         Print_Matrix_Dimensions (Routine_Name & "row " & Integer'Image (row) &
+                                    " Input_Data", aModel.Input_Data);
+
+         declare
+            Input_Error : Real_Float_Vector :=
+                            Backward (aModel, Get_Row (Loss_Deriv, row));
+         begin
+            null;
+         end;
+      end loop;
       --        Gradients := Back_Propogate (aModel, Optimiser, Loss, Loss_Deriv);
 
    end Compile;
@@ -216,11 +230,11 @@ package body Neural_Model is
                                      Loss_Deriv : Real_Float_Matrix) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Compute_Coeff_Gradient ";
-      Nodes        : constant Real_Float_Vector := aModel.Layers (Layer).Nodes;
+      Nodes        : constant Real_Float_Matrix := aModel.Layers (Layer).Nodes;
       Deriv_In     : constant Real_Float_Matrix := Loss_Deriv *
                        Transpose (aModel.Connections (Layer).Coeff_Gradients);
       Weights_Err  : constant Real_Float_Vector :=
-                       aModel.Input_Data * Loss_Deriv;
+                       Get_Row (aModel.Layers (Layer).Input_Data, 1) * Loss_Deriv;
    begin
       aModel.Delta_Weights := aModel.Delta_Weights + Weights_Err;
       aModel.Delta_Bias := aModel.Delta_Bias + Loss_Deriv;
@@ -234,25 +248,28 @@ package body Neural_Model is
                                          Loss_Deriv : Real_Float_Matrix) is
       Routine_Name : constant String :=
                        "Neural_Model.Compute_Intercept_Gradient ";
-      Nodes        : constant Real_Float_Vector := aModel.Layers (Layer).Nodes;
+      Nodes        : constant Real_Float_Matrix := aModel.Layers (Layer).Nodes;
       Deriv_Matrix : Real_Float_Matrix (Nodes'Range, Nodes'Range);
    begin
       Put_Line (Routine_Name & "Activation: " &
                   Activation_Kind'Image (aModel.Layers (Layer).Activation));
-      case aModel.Layers (Layer).Activation is
+      for row in Nodes'Range loop
+         case aModel.Layers (Layer).Activation is
          when Identity_Activation => null;
          when Logistic_Activation => null;
          when ReLu_Activation =>
-            aModel.Connections (Layer).Intercept_Grads := Deriv_ReLU (Nodes);
+            aModel.Connections (Layer).Intercept_Grads :=
+              Deriv_ReLU (Get_Row (Nodes, row));
          when Sigmoid_Activation => null;
          when Soft_Max_Activation =>
-            Deriv_Matrix := Deriv_Softmax (Nodes);
+            Deriv_Matrix := Deriv_Softmax (Get_Row (Nodes, row));
             if Nodes'Length = 1 then
                aModel.Connections (Layer).Intercept_Grads (1) := 0.0;
             else
                Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
             end if;
-      end case;
+         end case;
+      end loop;
 
    end Compute_Intercept_Gradient;
 
@@ -331,7 +348,7 @@ package body Neural_Model is
             when Soft_Max_Activation => Softmax (aModel.Layers (layer).Nodes);
             end case;
 
-            Print_Float_Vector (Routine_Name & "Layer" &
+            Print_Float_Matrix (Routine_Name & "Layer" &
                                   Integer'Image (layer) & " nodes",
                                 aModel.Layers (layer).Nodes);
          end;  --  declare block

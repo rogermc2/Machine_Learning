@@ -1,6 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -22,6 +22,8 @@ package body NN_By_Hand_Support is
    --  -------------------------------------------------------------------------
 
    function Build_Dataset return Dataset is
+      Routine_Name      : constant String :=
+                            "NN_By_Hand_Support.Build_Dataset ";
       Iris_Data         : constant Load_Dataset.Iris_Data_Record :=
                             Load_Dataset.Load_Iris ("../../datasets/iris.csv");
       Features          : constant NL_Types.Float_List_2D := Iris_Data.Features;
@@ -37,11 +39,14 @@ package body NN_By_Hand_Support is
       I1                : ML_Types.Integer_List;
       theDataset        : Dataset (Train_Length, Test_Length, 2);
    begin
+      Put_Line (Routine_Name);
       for row in X'Range loop
          Feature_Row := Features (row);
          X (row, 1) := Feature_Row (1);
          X (row, 2) := Feature_Row (2);
       end loop;
+      Put_Line (Routine_Name & "features set.");
+
       X_Means := Means (X);
       X_SDs := Standard_Deviation (X);
       for row in X'Range loop
@@ -110,6 +115,7 @@ package body NN_By_Hand_Support is
             end if;
          end loop;
       end;
+      Put_Line (Routine_Name & "done.");
 
       return theDataset;
 

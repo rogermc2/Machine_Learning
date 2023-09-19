@@ -15,9 +15,9 @@ package Neural_Model is
 
    subtype Node is Float;
 
-   type Layer (In_Length, Num_Features : Positive) is record
-      Input_Data : Real_Float_Vector (1 .. In_Length);
-      Nodes      : Real_Float_Vector (1 .. Num_Features);
+   type Layer (Num_Samples, Num_Features : Positive) is record
+      Input_Data : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
+      Nodes      : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
       Activation : Activation_Kind := Identity_Activation;
    end record;
 
@@ -29,9 +29,8 @@ package Neural_Model is
                           Num_Features : Positive;
                           Loss_Method  : Loss_Kind) is private;
 
-   procedure Add_Layer (aModel     : in out Sequential_Model;
-                        Num_Nodes  : Positive;
-                        Input_Data : Real_Float_Vector);
+   procedure Add_First_Layer (aModel     : in out Sequential_Model;
+                              Input_Data : Real_Float_Matrix);
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Activation : Activation_Kind := Identity_Activation);
@@ -43,8 +42,8 @@ private
    type Sequential_Model (Num_Samples  : Positive;
                           Num_Features : Positive;
                           Loss_Method  : Loss_Kind) is record
-      Input_Data    : Real_Float_Vector (1 .. Num_Features);
-      Labels        : Real_Float_Vector (1 .. 1);
+      Input_Data    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
+      Labels        : Real_Float_Vector (1 .. Num_Samples);
       Layers        : Layer_List;
       Connections   : Stochastic_Optimizers.Parameters_List;
       Params        : Stochastic_Optimizers.Parameters_List;
