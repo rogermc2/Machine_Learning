@@ -50,17 +50,6 @@ package body Neural_Model is
 --                          Integer'Image (aModel.Layers (layer + 1).Num_Nodes));
 --              Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
 --                                       Connect.Coeff_Gradients);
-            for sample in 1 .. aModel.Num_Samples loop
-               declare
-                  aNode : constant Real_Float_Vector :=
-                            Connect.Coeff_Gradients *
-                            Get_Row (aModel.Layers (layer).Nodes, sample);
-               begin
-                  for col in aNode'Range loop
-                     aModel.Layers (layer + 1).Nodes (sample, col) := aNode (col);
-                  end loop;
-               end;
-            end loop;
 
             aModel.Connections.Append (Connect);
          end;  --  declare block
@@ -346,10 +335,22 @@ package body Neural_Model is
             Connect : constant Parameters_Record :=
                         aModel.Connections (layer - 1);
          begin
+
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
             Put_Line (Routine_Name & "Input_Data set.");
-            aModel.Layers (layer).Nodes := Connect.Coeff_Gradients *
-              aModel.Layers (layer).Input_Data;
+            for sample in 1 .. aModel.Num_Samples loop
+               declare
+                  aNode : constant Real_Float_Vector :=
+                            Connect.Coeff_Gradients *
+                            Get_Row (aModel.Layers (layer).Nodes, sample);
+               begin
+                  for col in aNode'Range loop
+                     aModel.Layers (layer + 1).Nodes (sample, col) := aNode (col);
+                  end loop;
+               end;
+            end loop;
+--              aModel.Layers (layer).Nodes := Connect.Coeff_Gradients *
+--                aModel.Layers (layer).Input_Data;
             Put_Line (Routine_Name & "Nodes Coeff_Gradients set." );
             aModel.Layers (layer).Nodes :=
               aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
