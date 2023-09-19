@@ -29,6 +29,7 @@ package Neural_Model is
                           Num_Features : Positive;
                           Loss_Method  : Loss_Kind) is private;
 
+   procedure Add_Connections (aModel : in out Sequential_Model);
    procedure Add_First_Layer (aModel     : in out Sequential_Model;
                               Input_Data : Real_Float_Matrix);
    procedure Add_Layer (aModel     : in out Sequential_Model;

@@ -24,28 +24,47 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   procedure Add_Connections (aModel     : in out Sequential_Model;
-                              Prev_Layer : Layer; thisLayer : in out Layer) is
+   procedure Add_Connections (aModel : in out Sequential_Model) is
+      use Real_Float_Arrays;
       use Stochastic_Optimizers;
-      --        Routine_Name : constant String := "Neural_Model.Add_Connections ";
-      Connect : Parameters_Record (thisLayer.Nodes'Length,
-                                   Prev_Layer.Nodes'Length);
+      Routine_Name : constant String := "Neural_Model.Add_Connections ";
    begin
-      --        Put_Line (Routine_Name & "Prev_Layer.Nodes'Length" &
-      --                    Integer'Image (Integer (Prev_Layer.Nodes'Length)));
-      --        Put_Line (Routine_Name & "thisLayer.Nodes'Length" &
-      --                    Integer'Image (Integer (thisLayer.Nodes'Length)));
-      for row in Connect.Coeff_Gradients'Range loop
-         for col in Connect.Coeff_Gradients'Range (2) loop
-            --  Random_Float generates a random number in the range  -1.0 .. 1.0
-            Connect.Coeff_Gradients (row, col) :=
-              0.5 * abs (Maths.Random_Float);
-         end loop;
-         Connect.Intercept_Grads (row)  := 0.5 * abs (Maths.Random_Float);
-         --           aModel.Activations.Append (Identity_Activation);
-      end loop;
+      for layer in aModel.Layers.First_Index ..
+        aModel.Layers.Last_Index - 1 loop
+         declare
+            Connect : Parameters_Record (aModel.Layers (layer + 1).Num_Nodes,
+                                         aModel.Layers (layer).Num_Nodes);
+         begin
+            for row in Connect.Coeff_Gradients'Range loop
+               for col in Connect.Coeff_Gradients'Range (2) loop
+                  --  Random_Float generates a random number in the range  -1.0 .. 1.0
+                  Connect.Coeff_Gradients (row, col) :=
+                    0.5 * abs (Maths.Random_Float);
+               end loop;
+               Connect.Intercept_Grads (row)  := 0.5 * abs (Maths.Random_Float);
+            end loop;
 
-      aModel.Connections.Append (Connect);
+--              Put_Line (Routine_Name & "layer Nodes:" &
+--                          Integer'Image (aModel.Layers (layer).Num_Nodes));
+--              Put_Line (Routine_Name & "layer + 1 Nodes:" &
+--                          Integer'Image (aModel.Layers (layer + 1).Num_Nodes));
+--              Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
+--                                       Connect.Coeff_Gradients);
+            for sample in 1 .. aModel.Num_Samples loop
+               declare
+                  aNode : constant Real_Float_Vector :=
+                            Connect.Coeff_Gradients *
+                            Get_Row (aModel.Layers (layer).Nodes, sample);
+               begin
+                  for col in aNode'Range loop
+                     aModel.Layers (layer + 1).Nodes (sample, col) := aNode (col);
+                  end loop;
+               end;
+            end loop;
+
+            aModel.Connections.Append (Connect);
+         end;  --  declare block
+      end loop;
 
    end Add_Connections;
 
@@ -55,7 +74,7 @@ package body Neural_Model is
    procedure Add_First_Layer (aModel     : in out Sequential_Model;
                               Input_Data : Real_Float_Matrix) is
       First_Layer : Layer (Input_Data'Length, Input_Data'Length (2),
-                         Input_Data'Length (2));
+                           Input_Data'Length (2));
    begin
       First_Layer.Input_Data := Input_Data;
       First_Layer.Nodes := Input_Data;
@@ -79,14 +98,7 @@ package body Neural_Model is
       --                    Integer'Image (Prev_Nodes'Length));
       --        Put_Line (Routine_Name & "thisLayer.Input_Data length" &
       --                    Integer'Image (thisLayer.Input_Data'Length));
-
-      Add_Connections (aModel, Prev_Layer, thisLayer);
-      --        Print_Matrix_Dimensions (Routine_Name &
-      --                                   "Connections.Last_Element.Coeff_Gradients",
-      --                                 aModel.Connections.Last_Element.Coeff_Gradients);
       thisLayer.Input_Data := Prev_Nodes;
-      thisLayer.Nodes := aModel.Connections.Last_Element.Coeff_Gradients *
-        Prev_Layer.Nodes;
       thisLayer.Activation := Activation;
       aModel.Layers.Append (thisLayer);
 
@@ -335,8 +347,10 @@ package body Neural_Model is
                         aModel.Connections (layer - 1);
          begin
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
+            Put_Line (Routine_Name & "Input_Data set.");
             aModel.Layers (layer).Nodes := Connect.Coeff_Gradients *
               aModel.Layers (layer).Input_Data;
+            Put_Line (Routine_Name & "Nodes Coeff_Gradients set." );
             aModel.Layers (layer).Nodes :=
               aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
 
