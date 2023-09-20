@@ -340,20 +340,19 @@ package body Neural_Model is
             Put_Line (Routine_Name & "Input_Data set.");
             for sample in 1 .. aModel.Num_Samples loop
                declare
-                  aNode : constant Real_Float_Vector :=
+                  Node_Vec : constant Real_Float_Vector :=
                             Connect.Coeff_Gradients *
                             Get_Row (aModel.Layers (layer).Nodes, sample);
                begin
-                  for col in aNode'Range loop
-                     aModel.Layers (layer + 1).Nodes (sample, col) := aNode (col);
+                  for col in Node_Vec'Range loop
+                     aModel.Layers (layer + 1).Nodes (sample, col) :=
+                       Node_Vec (col);
                   end loop;
                end;
+               aModel.Layers (layer + 1).Nodes :=
+                 aModel.Layers (layer + 1).Nodes + Connect.Intercept_Grads;
             end loop;
---              aModel.Layers (layer).Nodes := Connect.Coeff_Gradients *
---                aModel.Layers (layer).Input_Data;
             Put_Line (Routine_Name & "Nodes Coeff_Gradients set." );
-            aModel.Layers (layer).Nodes :=
-              aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
 
             case aModel.Layers (layer).Activation is
             when Identity_Activation => null;
