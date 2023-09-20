@@ -44,13 +44,6 @@ package body Neural_Model is
                Connect.Intercept_Grads (row)  := 0.5 * abs (Maths.Random_Float);
             end loop;
 
---              Put_Line (Routine_Name & "layer Nodes:" &
---                          Integer'Image (aModel.Layers (layer).Num_Nodes));
---              Put_Line (Routine_Name & "layer + 1 Nodes:" &
---                          Integer'Image (aModel.Layers (layer + 1).Num_Nodes));
---              Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
---                                       Connect.Coeff_Gradients);
-
             aModel.Connections.Append (Connect);
          end;  --  declare block
       end loop;
@@ -83,10 +76,6 @@ package body Neural_Model is
       thisLayer    : Layer (aModel.Num_Samples, Prev_Nodes'Length (2),
                             Num_Nodes);
    begin
-      --        Put_Line (Routine_Name & "Prev_Nodes length" &
-      --                    Integer'Image (Prev_Nodes'Length));
-      --        Put_Line (Routine_Name & "thisLayer.Input_Data length" &
-      --                    Integer'Image (thisLayer.Input_Data'Length));
       thisLayer.Input_Data := Prev_Nodes;
       thisLayer.Activation := Activation;
       aModel.Layers.Append (thisLayer);
@@ -328,31 +317,39 @@ package body Neural_Model is
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
+--        Print_Float_Matrix (Routine_Name & "Layer 1 nodes",
+--                            aModel.Layers (1).Nodes);
 
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
+--           Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          declare
             Connect : constant Parameters_Record :=
                         aModel.Connections (layer - 1);
          begin
-
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
-            Put_Line (Routine_Name & "Input_Data set.");
+--              Print_Float_Matrix (Routine_Name  & " Input_Data",
+--                                  aModel.Layers (layer).Input_Data);
             for sample in 1 .. aModel.Num_Samples loop
+--                 Put_Line (Routine_Name & "sample" & Integer'Image (sample));
+--                 Put_Line (Routine_Name & "length" &
+--                             Integer'Image (Get_Row (aModel.Layers (layer).Nodes,
+--                             sample)'Length));
+--                 Print_Matrix_Dimensions
+--                   (Routine_Name & "Coeff_Gradients", Connect.Coeff_Gradients);
                declare
                   Node_Vec : constant Real_Float_Vector :=
-                            Connect.Coeff_Gradients *
-                            Get_Row (aModel.Layers (layer).Nodes, sample);
+                               Connect.Coeff_Gradients *
+                                 Get_Row (aModel.Layers (layer - 1).Nodes, sample);
                begin
                   for col in Node_Vec'Range loop
-                     aModel.Layers (layer + 1).Nodes (sample, col) :=
+                     aModel.Layers (layer).Nodes (sample, col) :=
                        Node_Vec (col);
                   end loop;
                end;
-               aModel.Layers (layer + 1).Nodes :=
-                 aModel.Layers (layer + 1).Nodes + Connect.Intercept_Grads;
+               aModel.Layers (layer).Nodes :=
+                 aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
             end loop;
-            Put_Line (Routine_Name & "Nodes Coeff_Gradients set." );
 
             case aModel.Layers (layer).Activation is
             when Identity_Activation => null;
@@ -364,9 +361,9 @@ package body Neural_Model is
             when Soft_Max_Activation => Softmax (aModel.Layers (layer).Nodes);
             end case;
 
-            Print_Float_Matrix (Routine_Name & "Layer" &
-                                  Integer'Image (layer) & " nodes",
-                                aModel.Layers (layer).Nodes);
+--              Print_Float_Matrix (Routine_Name & "Layer" &
+--                                    Integer'Image (layer) & " nodes",
+--                                  aModel.Layers (layer).Nodes);
          end;  --  declare block
       end loop;
 
