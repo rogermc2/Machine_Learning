@@ -35,7 +35,6 @@ begin
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 1, Soft_Max_Activation);
-   Put_Line (Program_Name & "layers added");
    Add_Connections (theModel);
    Put_Line (Program_Name & "connections added");
 

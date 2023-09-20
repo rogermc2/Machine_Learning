@@ -119,15 +119,19 @@ package body Neural_Model is
                       Sample :Positive;
                       Loss   : Real_Float_Vector) return Real_Float_Vector is
       use Real_Float_Arrays;
-      Routine_Name        : constant String :=
-                              "Neural_Model.Backward ";
-      Input_Error         : constant Real_Float_Vector
+      Routine_Name  : constant String := "Neural_Model.Backward ";
+      Input_Error   : constant Real_Float_Vector
         := Loss * aModel.Connections.Last_Element.Coeff_Gradients;
-      --        Weights_Error       : constant Real_Float_Vector
-      --          := aModel.Input_Data * Loss;
+      Weights_Error : constant Real_Float_Vector :=
+                        Loss * aModel.Input_Data;
+      D_Weights     : constant Real_Float_Vector :=
+                        Get_Row (aModel.Delta_Weights, Sample) + Input_Error;
    begin
       Put_Line (Routine_Name);
-      --        aModel.Delta_Weights := aModel.Delta_Weights + Input_Error;
+      for col in D_Weights'Range loop
+         aModel.Delta_Weights (Sample, col) := D_Weights (col);
+      end loop;
+
       for col in Loss'Range loop
          aModel.Delta_Bias (Sample, col) :=
            aModel.Delta_Bias (Sample, col) + Loss (col);
@@ -196,26 +200,18 @@ package body Neural_Model is
          end case;
 
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
-         Print_Matrix_Dimensions (Routine_Name & "Loss", Loss);
-         Print_Matrix_Dimensions (Routine_Name & "Loss_Deriv", Loss_Deriv);
          Print_Float_Matrix (Routine_Name & "Loss", Loss);
-         Print_Float_Matrix (Routine_Name & "Loss_Deriv", Loss_Deriv);
-         Print_Float_Matrix (Routine_Name & "sample " & Integer'Image (sample) &
-                               " Coeff_Gradients",
-                             aModel.Connections.Last_Element.Coeff_Gradients);
-         Print_Matrix_Dimensions
-           (Routine_Name & "sample " & Integer'Image (sample) &
-              " Coeff_Gradients",
-            aModel.Connections.Last_Element.Coeff_Gradients);
-         Put_Line (Routine_Name & "sample " & Integer'Image (sample) &
-                     " Loss_Deriv" &
-                     Integer'Image (Get_Row (Loss_Deriv, sample)'Length));
+         Print_Matrix_Dimensions (Routine_Name & "Input_Data", aModel.Input_Data);
+         Print_Matrix_Dimensions (Routine_Name & "Loss", Loss);
 
          declare
             Input_Error : Real_Float_Vector
               :=  Backward (aModel, sample, Get_Row (Loss_Deriv, sample));
          begin
-            null;
+            Put_Line (Routine_Name & "sample " & Integer'Image (sample) &
+                        " Input_Error length" &
+                        Integer'Image (Input_Error'Length));
+            Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error);
          end;
       end loop;
       --        Gradients := Back_Propogate (aModel, Optimiser, Loss, Loss_Deriv);
