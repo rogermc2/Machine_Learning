@@ -116,18 +116,22 @@ package body Neural_Model is
    --  -------------------------------------------------------------------------
 
    function Backward (aModel : in out Sequential_Model;
+                      Sample :Positive;
                       Loss   : Real_Float_Vector) return Real_Float_Vector is
       use Real_Float_Arrays;
       Routine_Name        : constant String :=
                               "Neural_Model.Backward ";
       Input_Error         : constant Real_Float_Vector
-        := Loss * Transpose (aModel.Connections.Last_Element.Coeff_Gradients);
-      Weights_Error       : constant Real_Float_Vector
-        := aModel.Input_Data * Loss;
+        := Loss * aModel.Connections.Last_Element.Coeff_Gradients;
+      --        Weights_Error       : constant Real_Float_Vector
+      --          := aModel.Input_Data * Loss;
    begin
       Put_Line (Routine_Name);
-      aModel.Delta_Weights := aModel.Delta_Weights + Input_Error;
-      aModel.Delta_Bias := aModel.Delta_Bias + Loss;
+      --        aModel.Delta_Weights := aModel.Delta_Weights + Input_Error;
+      for col in Loss'Range loop
+         aModel.Delta_Bias (Sample, col) :=
+           aModel.Delta_Bias (Sample, col) + Loss (col);
+      end loop;
 
       return Input_Error;
 
@@ -174,10 +178,11 @@ package body Neural_Model is
       C_Init (Optimiser.Adam, aModel.Connections);
       Forward (aModel);
 
-      for row in 1 .. aModel.Num_Samples loop
-         for col in aModel.Labels'Range loop
-            Pred (row, col) := aModel.Labels (col);
-            Actual (row, col) := aModel.Layers.Last_Element.Nodes (row, col);
+      for sample in 1 .. aModel.Num_Samples loop
+         for label in aModel.Labels'Range loop
+            Pred (sample, label) := aModel.Labels (label);
+            Actual (sample, label) :=
+              aModel.Layers.Last_Element.Nodes (sample, label);
          end loop;
 
          case aModel.Loss_Method is
@@ -186,27 +191,29 @@ package body Neural_Model is
          when Loss_Log =>
             Put_Line (Routine_Name & "Log_Loss method not implemented");
          when Loss_Mean_Square_Error =>
-            Loss (row, 1) := Base_Neural.Squared_Loss (Pred, Actual);
+            Loss (sample, 1) := Base_Neural.Squared_Loss (Pred, Actual);
             Loss_Deriv := Base_Neural.Squared_Loss_Derivative (Pred, Actual);
          end case;
 
-         Put_Line (Routine_Name & "row " & Integer'Image (row));
+         Put_Line (Routine_Name & "sample " & Integer'Image (sample));
          Print_Matrix_Dimensions (Routine_Name & "Loss", Loss);
          Print_Matrix_Dimensions (Routine_Name & "Loss_Deriv", Loss_Deriv);
          Print_Float_Matrix (Routine_Name & "Loss", Loss);
          Print_Float_Matrix (Routine_Name & "Loss_Deriv", Loss_Deriv);
-         Print_Float_Matrix (Routine_Name & "row " & Integer'Image (row) &
+         Print_Float_Matrix (Routine_Name & "sample " & Integer'Image (sample) &
                                " Coeff_Gradients",
                              aModel.Connections.Last_Element.Coeff_Gradients);
-         Print_Matrix_Dimensions (Routine_Name & "row " & Integer'Image (row) &
-                                    " Coeff_Gradients",
-                                  aModel.Connections.Last_Element.Coeff_Gradients);
-         Print_Matrix_Dimensions (Routine_Name & "row " & Integer'Image (row) &
-                                    " Input_Data", aModel.Input_Data);
+         Print_Matrix_Dimensions
+           (Routine_Name & "sample " & Integer'Image (sample) &
+              " Coeff_Gradients",
+            aModel.Connections.Last_Element.Coeff_Gradients);
+         Put_Line (Routine_Name & "sample " & Integer'Image (sample) &
+                     " Loss_Deriv" &
+                     Integer'Image (Get_Row (Loss_Deriv, sample)'Length));
 
          declare
-            Input_Error : Real_Float_Vector :=
-                            Backward (aModel, Get_Row (Loss_Deriv, row));
+            Input_Error : Real_Float_Vector
+              :=  Backward (aModel, sample, Get_Row (Loss_Deriv, sample));
          begin
             null;
          end;
@@ -247,19 +254,19 @@ package body Neural_Model is
                   Activation_Kind'Image (aModel.Layers (Layer).Activation));
       for row in Nodes'Range loop
          case aModel.Layers (Layer).Activation is
-         when Identity_Activation => null;
-         when Logistic_Activation => null;
-         when ReLu_Activation =>
-            aModel.Connections (Layer).Intercept_Grads :=
-              Deriv_ReLU (Get_Row (Nodes, row));
-         when Sigmoid_Activation => null;
-         when Soft_Max_Activation =>
-            Deriv_Matrix := Deriv_Softmax (Get_Row (Nodes, row));
-            if Nodes'Length = 1 then
-               aModel.Connections (Layer).Intercept_Grads (1) := 0.0;
-            else
-               Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
-            end if;
+            when Identity_Activation => null;
+            when Logistic_Activation => null;
+            when ReLu_Activation =>
+               aModel.Connections (Layer).Intercept_Grads :=
+                 Deriv_ReLU (Get_Row (Nodes, row));
+            when Sigmoid_Activation => null;
+            when Soft_Max_Activation =>
+               Deriv_Matrix := Deriv_Softmax (Get_Row (Nodes, row));
+               if Nodes'Length = 1 then
+                  aModel.Connections (Layer).Intercept_Grads (1) := 0.0;
+               else
+                  Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
+               end if;
          end case;
       end loop;
 
@@ -317,26 +324,26 @@ package body Neural_Model is
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
---        Print_Float_Matrix (Routine_Name & "Layer 1 nodes",
---                            aModel.Layers (1).Nodes);
+      --        Print_Float_Matrix (Routine_Name & "Layer 1 nodes",
+      --                            aModel.Layers (1).Nodes);
 
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
---           Put_Line (Routine_Name & "layer" & Integer'Image (layer));
+         --           Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          declare
             Connect : constant Parameters_Record :=
                         aModel.Connections (layer - 1);
          begin
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
---              Print_Float_Matrix (Routine_Name  & " Input_Data",
---                                  aModel.Layers (layer).Input_Data);
+            --              Print_Float_Matrix (Routine_Name  & " Input_Data",
+            --                                  aModel.Layers (layer).Input_Data);
             for sample in 1 .. aModel.Num_Samples loop
---                 Put_Line (Routine_Name & "sample" & Integer'Image (sample));
---                 Put_Line (Routine_Name & "length" &
---                             Integer'Image (Get_Row (aModel.Layers (layer).Nodes,
---                             sample)'Length));
---                 Print_Matrix_Dimensions
---                   (Routine_Name & "Coeff_Gradients", Connect.Coeff_Gradients);
+               --                 Put_Line (Routine_Name & "sample" & Integer'Image (sample));
+               --                 Put_Line (Routine_Name & "length" &
+               --                             Integer'Image (Get_Row (aModel.Layers (layer).Nodes,
+               --                             sample)'Length));
+               --                 Print_Matrix_Dimensions
+               --                   (Routine_Name & "Coeff_Gradients", Connect.Coeff_Gradients);
                declare
                   Node_Vec : constant Real_Float_Vector :=
                                Connect.Coeff_Gradients *
@@ -352,18 +359,18 @@ package body Neural_Model is
             end loop;
 
             case aModel.Layers (layer).Activation is
-            when Identity_Activation => null;
-            when Logistic_Activation =>
-               Put_Line (Routine_Name & "Logistic_Activation not implemented");
-            when ReLu_Activation => Rect_LU (aModel.Layers (layer).Nodes);
-            when Sigmoid_Activation =>
-               Put_Line (Routine_Name & "Sigmoid_Activation not implemented");
-            when Soft_Max_Activation => Softmax (aModel.Layers (layer).Nodes);
+               when Identity_Activation => null;
+               when Logistic_Activation =>
+                  Put_Line (Routine_Name & "Logistic_Activation not implemented");
+               when ReLu_Activation => Rect_LU (aModel.Layers (layer).Nodes);
+               when Sigmoid_Activation =>
+                  Put_Line (Routine_Name & "Sigmoid_Activation not implemented");
+               when Soft_Max_Activation => Softmax (aModel.Layers (layer).Nodes);
             end case;
 
---              Print_Float_Matrix (Routine_Name & "Layer" &
---                                    Integer'Image (layer) & " nodes",
---                                  aModel.Layers (layer).Nodes);
+            --              Print_Float_Matrix (Routine_Name & "Layer" &
+            --                                    Integer'Image (layer) & " nodes",
+            --                                  aModel.Layers (layer).Nodes);
          end;  --  declare block
       end loop;
 
