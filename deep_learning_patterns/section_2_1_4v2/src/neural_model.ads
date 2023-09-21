@@ -20,6 +20,11 @@ package Neural_Model is
       Nodes      : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Nodes) :=
                      (others => (others => 0.0));
       Activation : Activation_Kind := Identity_Activation;
+      Params        : Stochastic_Optimizers.Parameters_List;
+      Delta_Weights : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
+        := (others => (others => 0.0));
+      Delta_Bias    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
+        := (others => (others => 0.0));
    end record;
 
    package Layer_Packge is new
@@ -51,11 +56,6 @@ private
       Pred          : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Classes);
       Layers        : Layer_List;
       Connections   : Stochastic_Optimizers.Parameters_List;
-      Params        : Stochastic_Optimizers.Parameters_List;
-      Delta_Weights : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
-        := (others => (others => 0.0));
-      Delta_Bias    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
-        := (others => (others => 0.0));
    end record;
 
 end Neural_Model;
