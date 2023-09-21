@@ -122,20 +122,25 @@ package body Neural_Model is
       Routine_Name  : constant String := "Neural_Model.Backward ";
       Input_Error   : constant Real_Float_Vector
         := Loss * aModel.Connections.Last_Element.Coeff_Gradients;
-      Weights_Error : constant Real_Float_Vector :=
-                        Loss * aModel.Input_Data;
---        D_Weights     : constant Real_Float_Vector :=
---                          Get_Row (aModel.Delta_Weights, Sample) + Input_Error;
    begin
       Put_Line (Routine_Name);
---        for col in D_Weights'Range loop
---           aModel.Delta_Weights (Sample, col) := D_Weights (col);
---        end loop;
---
---        for col in Loss'Range loop
---           aModel.Delta_Bias (Sample, col) :=
---             aModel.Delta_Bias (Sample, col) + Loss (col);
---        end loop;
+      for aLayer of aModel.Layers loop
+         declare
+            Weights_Error : constant Real_Float_Vector :=
+                              Loss * aModel.Input_Data;
+            D_Weights     : constant Real_Float_Vector :=
+                              Get_Row (aLayer.Delta_Weights, Sample) + Input_Error;
+         begin
+            for col in D_Weights'Range loop
+               aLayer.Delta_Weights (Sample, col) := D_Weights (col);
+            end loop;
+
+            for col in Loss'Range loop
+               aLayer.Delta_Bias (Sample, col) :=
+                 aLayer.Delta_Bias (Sample, col) + Loss (col);
+            end loop;
+         end;
+      end loop;
 
       return Input_Error;
 
