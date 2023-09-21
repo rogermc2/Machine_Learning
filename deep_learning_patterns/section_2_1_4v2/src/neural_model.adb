@@ -162,10 +162,8 @@ package body Neural_Model is
    procedure Compile (aModel : in out Sequential_Model) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Compile ";
-      Actual       : Real_Float_Matrix (1 .. aModel.Num_Samples,
-                                        aModel.Labels'Range);
-      Pred         : Real_Float_Matrix (Actual'Range, Actual'Range (2));
-      Loss         : Real_Float_Matrix (Actual'Range, Actual'Range (2));
+      Loss         : Real_Float_Matrix (aModel.Labels'Range,
+                                        aModel.Labels'Range (2));
       Loss_Deriv   : Real_Float_Matrix (Loss'Range, Loss'Range (2));
       Optimiser    : Optimizer_Record (Optimizer_Adam);
       Params       : Parameters_List;  --  list of Parameters_Record
@@ -184,8 +182,7 @@ package body Neural_Model is
 
       for sample in 1 .. aModel.Num_Samples loop
          for label in aModel.Labels'Range loop
-            Pred (sample, label) := aModel.Labels (label);
-            Actual (sample, label) :=
+            aModel.Pred (sample, label) :=
               aModel.Layers.Last_Element.Nodes (sample, label);
          end loop;
 
@@ -195,8 +192,10 @@ package body Neural_Model is
          when Loss_Log =>
             Put_Line (Routine_Name & "Log_Loss method not implemented");
          when Loss_Mean_Square_Error =>
-            Loss (sample, 1) := Base_Neural.Squared_Loss (Pred, Actual);
-            Loss_Deriv := Base_Neural.Squared_Loss_Derivative (Pred, Actual);
+            Loss (sample, 1) :=
+              Base_Neural.Squared_Loss (aModel.Pred, aModel.Labels);
+            Loss_Deriv :=
+              Base_Neural.Squared_Loss_Derivative (aModel.Pred, aModel.Labels);
          end case;
 
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
@@ -325,21 +324,12 @@ package body Neural_Model is
 
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
-         --           Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          declare
             Connect : constant Parameters_Record :=
                         aModel.Connections (layer - 1);
          begin
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
-            --              Print_Float_Matrix (Routine_Name  & " Input_Data",
-            --                                  aModel.Layers (layer).Input_Data);
             for sample in 1 .. aModel.Num_Samples loop
-               --                 Put_Line (Routine_Name & "sample" & Integer'Image (sample));
-               --                 Put_Line (Routine_Name & "length" &
-               --                             Integer'Image (Get_Row (aModel.Layers (layer).Nodes,
-               --                             sample)'Length));
-               --                 Print_Matrix_Dimensions
-               --                   (Routine_Name & "Coeff_Gradients", Connect.Coeff_Gradients);
                declare
                   Node_Vec : constant Real_Float_Vector :=
                                Connect.Coeff_Gradients *

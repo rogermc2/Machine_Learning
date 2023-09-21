@@ -28,6 +28,7 @@ package Neural_Model is
 
    type Sequential_Model (Num_Samples  : Positive;
                           Num_Features : Positive;
+                          Num_Classes  : Positive;
                           Loss_Method  : Loss_Kind) is private;
 
    procedure Add_Connections (aModel : in out Sequential_Model);
@@ -43,9 +44,11 @@ package Neural_Model is
 private
    type Sequential_Model (Num_Samples  : Positive;
                           Num_Features : Positive;
+                          Num_Classes  : Positive;
                           Loss_Method  : Loss_Kind) is record
       Input_Data    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
-      Labels        : Real_Float_Vector (1 .. Num_Samples);
+      Labels        : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Classes);
+      Pred          : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Classes);
       Layers        : Layer_List;
       Connections   : Stochastic_Optimizers.Parameters_List;
       Params        : Stochastic_Optimizers.Parameters_List;
