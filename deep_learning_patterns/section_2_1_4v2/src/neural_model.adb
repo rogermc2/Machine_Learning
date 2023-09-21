@@ -115,15 +115,16 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   function Backward (aModel : in out Sequential_Model;
-                      Sample :Positive;
-                      Loss   : Real_Float_Vector) return Real_Float_Vector is
+   function Backward (aModel       : in out Sequential_Model;
+                      Sample       : Positive;
+                      Output_Error : Real_Float_Vector)
+                      return Real_Float_Vector is
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Neural_Model.Backward ";
       Input_Error   : constant Real_Float_Vector
-        := Loss * aModel.Connections.Last_Element.Coeff_Gradients;
+        := Output_Error * aModel.Connections.Last_Element.Coeff_Gradients;
       Weights_Error : constant Real_Float_Vector :=
-                        Loss * aModel.Input_Data;
+                        Output_Error * aModel.Input_Data;
       D_Weights     : constant Real_Float_Vector :=
                         Get_Row (aModel.Delta_Weights, Sample) + Input_Error;
    begin
@@ -132,9 +133,9 @@ package body Neural_Model is
          aModel.Delta_Weights (Sample, col) := D_Weights (col);
       end loop;
 
-      for col in Loss'Range loop
+      for col in Output_Error'Range loop
          aModel.Delta_Bias (Sample, col) :=
-           aModel.Delta_Bias (Sample, col) + Loss (col);
+           aModel.Delta_Bias (Sample, col) + Output_Error (col);
       end loop;
 
       return Input_Error;
@@ -331,18 +332,22 @@ package body Neural_Model is
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
             for sample in 1 .. aModel.Num_Samples loop
                declare
-                  Node_Vec : constant Real_Float_Vector :=
+                  Input_Vec : constant Real_Float_Vector :=
                                Connect.Coeff_Gradients *
                                  Get_Row (aModel.Layers (layer - 1).Nodes, sample);
                begin
-                  for col in Node_Vec'Range loop
+                  for col in Input_Vec'Range loop
+                     aModel.Layers (layer).Input_Data (sample, col) :=
+                       Input_Vec (col);
                      aModel.Layers (layer).Nodes (sample, col) :=
-                       Node_Vec (col);
+                       Input_Vec (col);
                   end loop;
                end;
                aModel.Layers (layer).Nodes :=
-                 aModel.Layers (layer).Nodes + Connect.Intercept_Grads;
+                 aModel.Layers (layer).Input_Data * Connect.Coeff_Gradients +
+                 Connect.Intercept_Grads;
             end loop;
+            aModel.Connections (layer) := Connect;
 
             case aModel.Layers (layer).Activation is
                when Identity_Activation => null;

@@ -51,7 +51,6 @@ private
       Pred          : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Classes);
       Layers        : Layer_List;
       Connections   : Stochastic_Optimizers.Parameters_List;
-      Params        : Stochastic_Optimizers.Parameters_List;
       Delta_Weights : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
         := (others => (others => 0.0));
       Delta_Bias    : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
