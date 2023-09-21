@@ -337,25 +337,25 @@ package body Neural_Model is
                Put_Line (Routine_Name & "sample" & Integer'Image (sample));
                declare
                   Input_Vec : constant Real_Float_Vector
-                    := Connect.Coeff_Gradients *
-                      Get_Row (aModel.Layers (layer - 1).Nodes, sample);
+                    := Get_Row (aModel.Layers (layer - 1).Nodes, sample);
+                  Update    : constant Real_Float_Vector
+                    := Connect.Coeff_Gradients * Input_Vec +
+                      Connect.Intercept_Grads;
                begin
-                  Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec);
                   for col in Input_Vec'Range loop
                      aModel.Layers (layer).Input_Data (sample, col) :=
                        Input_Vec (col);
-                     aModel.Layers (layer).Nodes (sample, col) :=
-                       Input_Vec (col);
                   end loop;
-                  Print_Float_Matrix (Routine_Name & "updated Input_Data",
-                                      aModel.Layers (layer).Input_Data);
+                  for col in Update'Range loop
+                     aModel.Layers (layer).Nodes (sample, col) :=
+                       Update (col);
+                  end loop;
                end;
-               aModel.Layers (layer).Nodes :=
-                 aModel.Layers (layer).Input_Data * Transpose (Connect.Coeff_Gradients) +
-                 Connect.Intercept_Grads;
-               Print_Float_Matrix (Routine_Name & "nodes",
-                                   aModel.Layers (layer).Nodes);
             end loop;  --  samples
+            Print_Float_Matrix (Routine_Name & "Input_Data",
+                                aModel.Layers (layer).Input_Data);
+            Print_Float_Matrix (Routine_Name & "nodes",
+                                aModel.Layers (layer).Nodes);
 
             case aModel.Layers (layer).Activation is
                when Identity_Activation => null;
