@@ -356,7 +356,7 @@ package body Neural_Model is
                Print_Float_Matrix (Routine_Name & "nodes",
                                    aModel.Layers (layer).Nodes);
             end loop;
-            aModel.Connections (layer) := Connect;
+            aModel.Connections (layer - 1) := Connect;
 
             case aModel.Layers (layer).Activation is
                when Identity_Activation => null;
