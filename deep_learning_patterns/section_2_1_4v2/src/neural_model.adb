@@ -325,27 +325,36 @@ package body Neural_Model is
 
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
+         Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          declare
             Connect : constant Parameters_Record :=
                         aModel.Connections (layer - 1);
          begin
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
+            Print_Float_Matrix (Routine_Name & "Input_Data",
+                                aModel.Layers (layer).Input_Data);
             for sample in 1 .. aModel.Num_Samples loop
+               Put_Line (Routine_Name & "sample" & Integer'Image (sample));
                declare
-                  Input_Vec : constant Real_Float_Vector :=
-                               Connect.Coeff_Gradients *
-                                 Get_Row (aModel.Layers (layer - 1).Nodes, sample);
+                  Input_Vec : constant Real_Float_Vector
+                    := Connect.Coeff_Gradients *
+                      Get_Row (aModel.Layers (layer - 1).Nodes, sample);
                begin
+                  Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec);
                   for col in Input_Vec'Range loop
                      aModel.Layers (layer).Input_Data (sample, col) :=
                        Input_Vec (col);
                      aModel.Layers (layer).Nodes (sample, col) :=
                        Input_Vec (col);
                   end loop;
+                  Print_Float_Matrix (Routine_Name & "updated Input_Data",
+                                      aModel.Layers (layer).Input_Data);
                end;
                aModel.Layers (layer).Nodes :=
-                 aModel.Layers (layer).Input_Data * Connect.Coeff_Gradients +
+                 aModel.Layers (layer).Input_Data * Transpose (Connect.Coeff_Gradients) +
                  Connect.Intercept_Grads;
+               Print_Float_Matrix (Routine_Name & "nodes",
+                                   aModel.Layers (layer).Nodes);
             end loop;
             aModel.Connections (layer) := Connect;
 
