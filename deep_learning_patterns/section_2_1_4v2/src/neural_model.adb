@@ -122,24 +122,19 @@ package body Neural_Model is
       Routine_Name  : constant String := "Neural_Model.Backward ";
       Input_Error   : constant Real_Float_Vector
         := Loss * aModel.Connections.Last_Element.Coeff_Gradients;
+      Weights_Error : constant Real_Float_Vector :=
+                        Loss * aModel.Input_Data;
+      D_Weights     : constant Real_Float_Vector :=
+                        Get_Row (aModel.Delta_Weights, Sample) + Input_Error;
    begin
       Put_Line (Routine_Name);
-      for aLayer of aModel.Layers loop
-         declare
-            Weights_Error : constant Real_Float_Vector :=
-                              Loss * aModel.Input_Data;
-            D_Weights     : constant Real_Float_Vector :=
-                              Get_Row (aLayer.Delta_Weights, Sample) + Input_Error;
-         begin
-            for col in D_Weights'Range loop
-               aLayer.Delta_Weights (Sample, col) := D_Weights (col);
-            end loop;
+      for col in D_Weights'Range loop
+         aModel.Delta_Weights (Sample, col) := D_Weights (col);
+      end loop;
 
-            for col in Loss'Range loop
-               aLayer.Delta_Bias (Sample, col) :=
-                 aLayer.Delta_Bias (Sample, col) + Loss (col);
-            end loop;
-         end;
+      for col in Loss'Range loop
+         aModel.Delta_Bias (Sample, col) :=
+           aModel.Delta_Bias (Sample, col) + Loss (col);
       end loop;
 
       return Input_Error;
@@ -199,7 +194,8 @@ package body Neural_Model is
          when Loss_Mean_Square_Error =>
             Loss (sample, 1) :=
               Base_Neural.Squared_Loss (aModel.Pred, aModel.Labels);
-            Loss_Deriv := Base_Neural.Squared_Loss_Derivative (aModel.Pred, aModel.Labels);
+            Loss_Deriv :=
+              Base_Neural.Squared_Loss_Derivative (aModel.Pred, aModel.Labels);
          end case;
 
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
@@ -232,13 +228,10 @@ package body Neural_Model is
       Deriv_In     : constant Real_Float_Matrix := Loss_Deriv *
                        Transpose (aModel.Connections (Layer).Coeff_Gradients);
       Weights_Err  : constant Real_Float_Vector :=
-                       Get_Row (aModel.Layers (Layer).Input_Data, 1) *
-                       Loss_Deriv;
+                       Get_Row (aModel.Layers (Layer).Input_Data, 1) * Loss_Deriv;
    begin
-      aModel.Layers (Layer).Delta_Weights :=
-        aModel.Layers (Layer).Delta_Weights + Weights_Err;
-      aModel.Layers (Layer).Delta_Bias :=
-        aModel.Layers (Layer).Delta_Bias + Loss_Deriv;
+      aModel.Delta_Weights := aModel.Delta_Weights + Weights_Err;
+      aModel.Delta_Bias := aModel.Delta_Bias + Loss_Deriv;
 
    end Compute_Coeff_Gradient;
 
