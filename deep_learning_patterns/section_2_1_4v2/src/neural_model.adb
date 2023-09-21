@@ -355,8 +355,7 @@ package body Neural_Model is
                  Connect.Intercept_Grads;
                Print_Float_Matrix (Routine_Name & "nodes",
                                    aModel.Layers (layer).Nodes);
-            end loop;
-            aModel.Connections (layer - 1) := Connect;
+            end loop;  --  samples
 
             case aModel.Layers (layer).Activation is
                when Identity_Activation => null;
@@ -372,7 +371,7 @@ package body Neural_Model is
             --                                    Integer'Image (layer) & " nodes",
             --                                  aModel.Layers (layer).Nodes);
          end;  --  declare block
-      end loop;
+      end loop;  --  layers
 
    end Forward;
 
