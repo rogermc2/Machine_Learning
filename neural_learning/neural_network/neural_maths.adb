@@ -103,8 +103,8 @@ package body Neural_Maths is
    --  ------------------------------------------------------------------------
 
    function Mean (A : Real_Float_Matrix) return Float is
-      Length  : constant Float := Float (A'Length * A'Length (2));
-      Sum     : Float := 0.0;
+      Length : constant Float := Float (A'Length * A'Length (2));
+      Sum    : Float := 0.0;
    begin
       for row in A'First .. A'Last loop
          for col in A'First (2) .. A'Last (2) loop

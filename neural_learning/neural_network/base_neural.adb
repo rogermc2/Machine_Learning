@@ -409,7 +409,7 @@ package body Base_Neural is
                To_Real_Float_Matrix (Y_True) - Y_Pred;
    begin
 
-      return Neural_Maths.Mean (Diff * Diff) / 2.0;
+      return Neural_Maths.Mean (Diff * Diff);
 
    end Squared_Loss;
 
@@ -419,7 +419,7 @@ package body Base_Neural is
       use Real_Float_Arrays;
    begin
 
-      return Neural_Maths.Mean ((Y_True - Y_Pred) ** 2) / 2.0;
+      return Neural_Maths.Mean ((Y_True - Y_Pred) ** 2);
 
    end Squared_Loss;
 
