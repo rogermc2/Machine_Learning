@@ -401,30 +401,6 @@ package body Base_Neural is
    end Softmax;
 
    --  ------------------------------------------------------------------------
-
-   function Squared_Loss (Y_True, Y_Pred : Real_Float_Vector)
-                          return Float is
-      use Real_Float_Arrays;
-      Diff : constant Real_Float_Vector := Y_True - Y_Pred;
-   begin
-
-      return Neural_Maths.Mean (Diff * Diff);
-
-   end Squared_Loss;
-
-   --  -------------------------------------------------------------------------
-   --  L158
-   function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix)
-                          return Float is
-      use Real_Float_Arrays;
-      Diff : constant Real_Float_Matrix := Y_True - Y_Pred;
-   begin
-
-      return Neural_Maths.Mean (Diff * Diff) / 2.0;
-
-   end Squared_Loss;
-
-   --  -------------------------------------------------------------------------
    --  L158
    function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
                           return Float is
@@ -438,13 +414,35 @@ package body Base_Neural is
    end Squared_Loss;
 
    --  -------------------------------------------------------------------------
+
+   function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float is
+      use Real_Float_Arrays;
+   begin
+
+      return Neural_Maths.Mean ((Y_True - Y_Pred) ** 2) / 2.0;
+
+   end Squared_Loss;
+
+   --  -------------------------------------------------------------------------
+
+   function Squared_Loss (Y_True, Y_Pred : Real_Float_Vector)
+                          return Float is
+      use Real_Float_Arrays;
+      Diff : constant Real_Float_Vector := Y_True - Y_Pred;
+   begin
+
+      return Neural_Maths.Mean (Diff * Diff);
+
+   end Squared_Loss;
+
+   --  -------------------------------------------------------------------------
    --  Squared Loss = (predicted - expected) ^ 2
    --  = predicted^2 - 2 x predicted x expected + expected^2
    --  Squared_Loss_Derivative wrt predicted
    --  = 2 x predicted - 2 x expected = 2 x (predicted - expected)
 
    function Squared_Loss_Derivative (Y_True, Y_Pred : Real_Float_Matrix)
-                          return Real_Float_Matrix is
+                                     return Real_Float_Matrix is
       use Real_Float_Arrays;
    begin
 
@@ -455,7 +453,7 @@ package body Base_Neural is
    --  -------------------------------------------------------------------------
 
    function Squared_Loss_Derivative (Y_True, Y_Pred : Real_Float_Vector)
-                          return Real_Float_Vector is
+                                     return Real_Float_Vector is
       use Real_Float_Arrays;
    begin
 
