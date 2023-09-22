@@ -182,11 +182,6 @@ package body Neural_Model is
       Forward (aModel);
 
       for sample in 1 .. aModel.Num_Samples loop
-         for label in aModel.Labels'Range loop
-            aModel.Pred (sample, label) :=
-              aModel.Layers.Last_Element.Nodes (sample, label);
-         end loop;
-
          case aModel.Loss_Method is
          when Loss_Binary_Log =>
             Put_Line (Routine_Name & "Binary_Log_Loss method not implemented");
@@ -372,6 +367,13 @@ package body Neural_Model is
             --                                  aModel.Layers (layer).Nodes);
          end;  --  declare block
       end loop;  --  layers
+
+      for sample in 1 .. aModel.Num_Samples loop
+         for label in aModel.Labels'Range loop
+            aModel.Pred (sample, label) :=
+              aModel.Layers.Last_Element.Nodes (sample, label);
+         end loop;
+      end loop;
 
    end Forward;
 
