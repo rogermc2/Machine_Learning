@@ -110,10 +110,11 @@ package body Neural_Model is
       for index in reverse
         aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "layer" & Integer'Image (index));
+         Print_Matrix_Dimensions (Routine_Name & "Input_Data",
+                                  aModel.Layers (index).Input_Data);
          declare
             Input_Error : Real_Float_Vector
-              :=  Backward (aModel, sample, index,
-                            Get_Row (Loss_Deriv, sample));
+              := Backward (aModel, sample, index, Get_Row (Loss, sample));
          begin
             Put_Line (Routine_Name & "sample " & Integer'Image (sample) &
                         " Input_Error length" &
@@ -132,15 +133,15 @@ package body Neural_Model is
 
    function Backward (aModel          : in out Sequential_Model;
                       Sample, L_Index : Positive;
-                      Output_Error  : Real_Float_Vector)
+                      Output_Error    : Real_Float_Vector)
                       return Real_Float_Vector is
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Neural_Model.Backward ";
       aLayer        : Layer := aModel.Layers (L_Index);
       Input_Error   : constant Real_Float_Vector
-        := Output_Error * aModel.Connections (L_Index).Coeff_Gradients;
+        := Output_Error * aModel.Connections (L_Index - 1).Coeff_Gradients;
       Weights_Error : constant Real_Float_Vector :=
-                        Output_Error * aModel.Input_Data;
+                        Output_Error * aLayer.Input_Data;
       D_Weights     : Real_Float_Vector :=
                         Get_Row (aLayer.Delta_Weights, Sample);
    begin
@@ -219,7 +220,6 @@ package body Neural_Model is
 
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
          Print_Float_Matrix (Routine_Name & "Loss", Loss);
-         Print_Matrix_Dimensions (Routine_Name & "Input_Data", aModel.Input_Data);
          Print_Matrix_Dimensions (Routine_Name & "Loss", Loss);
 
          Back_Propogate (aModel, Optimiser, sample, Loss, Loss_Deriv);
