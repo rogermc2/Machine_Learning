@@ -12,7 +12,7 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 package body Neural_Model is
 
    function Backward (aModel       : in out Sequential_Model;
-                      Sample       : Positive; alayer : in out Layer;
+                      Sample, L_Index : Positive;
                       Output_Error : Real_Float_Vector)
                       return Real_Float_Vector;
    procedure Compute_Coeff_Gradient (aModel      : in out Sequential_Model;
@@ -111,9 +111,8 @@ package body Neural_Model is
         aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "layer" & Integer'Image (index));
          declare
-            aLayer      : Layer := aModel.Layers (index);
             Input_Error : Real_Float_Vector
-              :=  Backward (aModel, sample, aLayer,
+              :=  Backward (aModel, sample, index,
                             Get_Row (Loss_Deriv, sample));
          begin
             Put_Line (Routine_Name & "sample " & Integer'Image (sample) &
@@ -131,14 +130,15 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   function Backward (aModel        : in out Sequential_Model;
-                      Sample        : Positive; aLayer : in out Layer;
+   function Backward (aModel          : in out Sequential_Model;
+                      Sample, L_Index : Positive;
                       Output_Error  : Real_Float_Vector)
                       return Real_Float_Vector is
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Neural_Model.Backward ";
+      aLayer        : Layer := aModel.Layers (L_Index);
       Input_Error   : constant Real_Float_Vector
-        := Output_Error * aModel.Connections.Last_Element.Coeff_Gradients;
+        := Output_Error * aModel.Connections (L_Index).Coeff_Gradients;
       Weights_Error : constant Real_Float_Vector :=
                         Output_Error * aModel.Input_Data;
       D_Weights     : Real_Float_Vector :=
@@ -158,6 +158,8 @@ package body Neural_Model is
          aLayer.Delta_Bias (Sample, col) :=
            aLayer.Delta_Bias (Sample, col) + Output_Error (col);
       end loop;
+
+      aModel.Layers (L_Index) := aLayer;
 
       return Input_Error;
 
