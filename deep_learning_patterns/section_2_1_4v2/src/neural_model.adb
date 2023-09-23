@@ -11,15 +11,16 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package body Neural_Model is
 
-   function Backward (aModel : in out Sequential_Model;
-                      Sample : Positive; Output_Error : Real_Float_Vector)
+   function Backward (aModel       : in out Sequential_Model;
+                      Sample       : Positive; alayer : in out Layer;
+                      Output_Error : Real_Float_Vector)
                       return Real_Float_Vector;
-   procedure Compute_Coeff_Gradient (aModel     : in out Sequential_Model;
-                                     Layer      : Positive;
-                                     Loss_Deriv : Real_Float_Matrix);
-   procedure Compute_Intercept_Gradient (aModel     : in out Sequential_Model;
-                                         Layer      : Positive;
-                                         Loss_Deriv : Real_Float_Matrix);
+   procedure Compute_Coeff_Gradient (aModel      : in out Sequential_Model;
+                                     Layer_Index : Positive;
+                                     Loss_Deriv  : Real_Float_Matrix);
+   procedure Compute_Intercept_Gradient (aModel      : in out Sequential_Model;
+                                         Layer_Index : Positive;
+                                         Loss_Deriv  : Real_Float_Matrix);
    function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
    function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
    procedure Forward (aModel : in out Sequential_Model);
@@ -100,18 +101,20 @@ package body Neural_Model is
       --        Pred_Params (Self      : in out Optimizer_Record;
       --                       Params    : in out Parameters_List;
       --                       Gradients : Parameters_List);
---        Deltas         : Real_Matrix_List;
---        Sum_Sq_Coeffs  : Float := 0.0;
---        Pred_Gradients : Parameters_List;
+      --        Deltas         : Real_Matrix_List;
+      --        Sum_Sq_Coeffs  : Float := 0.0;
+      --        Pred_Gradients : Parameters_List;
    begin
       --    Pred_Params (Optimiser, aModel.Connections, Gradients);
 
-      for layer in reverse
+      for index in reverse
         aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
-         Put_Line (Routine_Name & "layer" & Integer'Image (layer));
+         Put_Line (Routine_Name & "layer" & Integer'Image (index));
          declare
+            aLayer      : Layer := aModel.Layers (index);
             Input_Error : Real_Float_Vector
-              :=  Backward (aModel, sample, Get_Row (Loss_Deriv, sample));
+              :=  Backward (aModel, sample, aLayer,
+                            Get_Row (Loss_Deriv, sample));
          begin
             Put_Line (Routine_Name & "sample " & Integer'Image (sample) &
                         " Input_Error length" &
@@ -128,8 +131,9 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   function Backward (aModel : in out Sequential_Model;
-                      Sample : Positive; Output_Error : Real_Float_Vector)
+   function Backward (aModel        : in out Sequential_Model;
+                      Sample        : Positive; aLayer : in out Layer;
+                      Output_Error  : Real_Float_Vector)
                       return Real_Float_Vector is
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Neural_Model.Backward ";
@@ -138,7 +142,7 @@ package body Neural_Model is
       Weights_Error : constant Real_Float_Vector :=
                         Output_Error * aModel.Input_Data;
       D_Weights     : Real_Float_Vector :=
-                        Get_Row (aModel.Delta_Weights, Sample);
+                        Get_Row (aLayer.Delta_Weights, Sample);
    begin
       Put_Line (Routine_Name);
       Put_Line (Routine_Name & "D_Weights length " &
@@ -147,12 +151,12 @@ package body Neural_Model is
                   Integer'Image (Input_Error'Length));
       D_Weights := D_Weights + Input_Error;
       for col in D_Weights'Range loop
-         aModel.Delta_Weights (Sample, col) := D_Weights (col);
+         aLayer.Delta_Weights (Sample, col) := D_Weights (col);
       end loop;
 
       for col in Output_Error'Range loop
-         aModel.Delta_Bias (Sample, col) :=
-           aModel.Delta_Bias (Sample, col) + Output_Error (col);
+         aLayer.Delta_Bias (Sample, col) :=
+           aLayer.Delta_Bias (Sample, col) + Output_Error (col);
       end loop;
 
       return Input_Error;
@@ -235,51 +239,57 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   procedure Compute_Coeff_Gradient (aModel     : in out Sequential_Model;
-                                     Layer      : Positive;
-                                     Loss_Deriv : Real_Float_Matrix) is
+   procedure Compute_Coeff_Gradient (aModel      : in out Sequential_Model;
+                                     Layer_Index : Positive;
+                                     Loss_Deriv  : Real_Float_Matrix) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Compute_Coeff_Gradient ";
-      Nodes        : constant Real_Float_Matrix := aModel.Layers (Layer).Nodes;
       Deriv_In     : constant Real_Float_Matrix := Loss_Deriv *
-                       Transpose (aModel.Connections (Layer).Coeff_Gradients);
+                       Transpose
+                         (aModel.Connections (Layer_Index).Coeff_Gradients);
+      aLayer       : Layer := aModel.Layers (Layer_Index);
       Weights_Err  : constant Real_Float_Vector :=
-                       Get_Row (aModel.Layers (Layer).Input_Data, 1) * Loss_Deriv;
+                       Get_Row (aLayer.Input_Data, 1) * Loss_Deriv;
+      Nodes        : Real_Float_Matrix := aLayer.Nodes;
    begin
-      aModel.Delta_Weights := aModel.Delta_Weights + Weights_Err;
-      aModel.Delta_Bias := aModel.Delta_Bias + Loss_Deriv;
+      aLayer.Delta_Weights := aLayer.Delta_Weights + Weights_Err;
+      aLayer.Delta_Bias := aLayer.Delta_Bias + Loss_Deriv;
+      aModel.Layers (Layer_Index) := aLayer;
 
    end Compute_Coeff_Gradient;
 
    --  -------------------------------------------------------------------------
 
-   procedure Compute_Intercept_Gradient (aModel     : in out Sequential_Model;
-                                         Layer      : Positive;
-                                         Loss_Deriv : Real_Float_Matrix) is
+   procedure Compute_Intercept_Gradient (aModel      : in out Sequential_Model;
+                                         Layer_Index : Positive;
+                                         Loss_Deriv  : Real_Float_Matrix) is
       Routine_Name : constant String :=
                        "Neural_Model.Compute_Intercept_Gradient ";
-      Nodes        : constant Real_Float_Matrix := aModel.Layers (Layer).Nodes;
+      aLayer       : Layer := aModel.Layers (Layer_Index);
+      Nodes        : constant Real_Float_Matrix := aLayer.Nodes;
       Deriv_Matrix : Real_Float_Matrix (Nodes'Range, Nodes'Range);
    begin
       Put_Line (Routine_Name & "Activation: " &
-                  Activation_Kind'Image (aModel.Layers (Layer).Activation));
+                  Activation_Kind'Image (aLayer.Activation));
       for row in Nodes'Range loop
-         case aModel.Layers (Layer).Activation is
+         case aLayer.Activation is
             when Identity_Activation => null;
             when Logistic_Activation => null;
             when ReLu_Activation =>
-               aModel.Connections (Layer).Intercept_Grads :=
+               aModel.Connections (Layer_Index).Intercept_Grads :=
                  Deriv_ReLU (Get_Row (Nodes, row));
             when Sigmoid_Activation => null;
             when Soft_Max_Activation =>
                Deriv_Matrix := Deriv_Softmax (Get_Row (Nodes, row));
                if Nodes'Length = 1 then
-                  aModel.Connections (Layer).Intercept_Grads (1) := 0.0;
+                  aModel.Connections (Layer_Index).Intercept_Grads (1) := 0.0;
                else
                   Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
                end if;
          end case;
       end loop;
+
+      aModel.Layers (Layer_Index) := aLayer;
 
    end Compute_Intercept_Gradient;
 
