@@ -401,7 +401,7 @@ package body Base_Neural is
 
    --  ------------------------------------------------------------------------
    --  L158
-   function Mean_Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
+   function Mean_Squared_Error (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
                                return Float is
       use Real_Float_Arrays;
       Diff : Real_Float_Matrix :=
@@ -415,11 +415,11 @@ package body Base_Neural is
 
       return Neural_Maths.Mean (Diff);
 
-   end Mean_Squared_Loss;
+   end Mean_Squared_Error;
 
    --  -------------------------------------------------------------------------
 
-   function Mean_Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float is
+   function Mean_Squared_Error (Y_True, Y_Pred : Real_Float_Matrix) return Float is
       use Real_Float_Arrays;
       Diff : Real_Float_Matrix := Y_True - Y_Pred;
    begin
@@ -431,11 +431,11 @@ package body Base_Neural is
 
       return Neural_Maths.Mean (Diff);
 
-   end Mean_Squared_Loss;
+   end Mean_Squared_Error;
 
    --  -------------------------------------------------------------------------
 
-   function Mean_Squared_Loss (Y_True, Y_Pred : Real_Float_Vector)
+   function Mean_Squared_Error (Y_True, Y_Pred : Real_Float_Vector)
                                return Float is
       use Real_Float_Arrays;
       Diff : Real_Float_Vector := Y_True - Y_Pred;
@@ -446,7 +446,7 @@ package body Base_Neural is
 
       return Neural_Maths.Mean (Diff);
 
-   end Mean_Squared_Loss;
+   end Mean_Squared_Error;
 
    --  -------------------------------------------------------------------------
    --  Squared Loss = (predicted - expected) ^ 2

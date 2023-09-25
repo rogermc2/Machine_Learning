@@ -58,12 +58,12 @@ package Base_Neural is
    procedure Softmax (Activation : in out Real_Float_Matrix);
    procedure Softmax (Activation : in out Real_Float_Vector);
    pragma Inline (Softmax);
-   function Mean_Squared_Loss (Y_True : Integer_Matrix;
+   function Mean_Squared_Error (Y_True : Integer_Matrix;
                                Y_Pred : Real_Float_Matrix) return Float;
-   function Mean_Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float;
-   function Mean_Squared_Loss (Y_True, Y_Pred : Real_Float_Vector)
+   function Mean_Squared_Error (Y_True, Y_Pred : Real_Float_Matrix) return Float;
+   function Mean_Squared_Error (Y_True, Y_Pred : Real_Float_Vector)
                                return Float;
-   pragma Inline (Mean_Squared_Loss);
+   pragma Inline (Mean_Squared_Error);
    function MSE_Derivative (Y_True, Y_Pred : Real_Float_Matrix)
                                      return Real_Float_Matrix;
    function MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)

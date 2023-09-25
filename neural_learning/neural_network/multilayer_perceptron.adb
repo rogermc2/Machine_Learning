@@ -177,7 +177,7 @@ package body Multilayer_Perceptron is
          when Log_Loss_Function =>
             Loss := Log_Loss (Y_Float, Activations.Last_Element);
          when Squared_Error_Function =>
-            Loss := Mean_Squared_Loss (Y_Float, Activations.Last_Element);
+            Loss := Mean_Squared_Error (Y_Float, Activations.Last_Element);
       end case;
 
       --  L292  Add L2 regularization term to loss

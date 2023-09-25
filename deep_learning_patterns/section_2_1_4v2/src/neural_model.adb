@@ -403,7 +403,7 @@ package body Neural_Model is
                Put_Line (Routine_Name & "Log_Loss method not implemented");
             when Loss_Mean_Square_Error =>
                Loss (sample, aModel.Num_Classes) :=
-                 Base_Neural.Mean_Squared_Loss (aModel.Pred, aModel.Labels);
+                 Base_Neural.Mean_Squared_Error (aModel.Pred, aModel.Labels);
                Loss_Deriv :=
                  Base_Neural.MSE_Derivative (aModel.Pred, aModel.Labels);
          end case;
