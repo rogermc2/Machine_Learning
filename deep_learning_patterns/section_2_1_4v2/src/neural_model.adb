@@ -208,8 +208,8 @@ package body Neural_Model is
       C_Init (Optimiser.Adam, aModel.Connections);
       Forward (aModel, Loss, Loss_Deriv);
 
-      Print_Float_Matrix (Routine_Name & "Loss", Loss);
       Print_Matrix_Dimensions (Routine_Name & "Loss", Loss);
+      Print_Float_Matrix (Routine_Name & "Loss", Loss);
 
       Back_Propogate (aModel, Optimiser, Loss, Loss_Deriv);
 
@@ -402,10 +402,10 @@ package body Neural_Model is
             when Loss_Log =>
                Put_Line (Routine_Name & "Log_Loss method not implemented");
             when Loss_Mean_Square_Error =>
-               Loss (sample, 1) :=
-                 Base_Neural.Squared_Loss (aModel.Pred, aModel.Labels);
+               Loss (sample, aModel.Num_Classes) :=
+                 Base_Neural.Mean_Squared_Loss (aModel.Pred, aModel.Labels);
                Loss_Deriv :=
-                 Base_Neural.Squared_Loss_Derivative (aModel.Pred, aModel.Labels);
+                 Base_Neural.MSE_Derivative (aModel.Pred, aModel.Labels);
          end case;
       end loop;
 

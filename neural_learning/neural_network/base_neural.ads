@@ -49,6 +49,8 @@ package Base_Neural is
                                  Del : in out Real_Float_Matrix);
    procedure Rect_LU_Derivative (Z   : Real_Float_Vector;
                                  Del : in out Real_Float_Vector);
+   function Rect_LU_Derivative (Z : Real_Float_Vector)
+                                return Real_Float_Vector;
    pragma Inline (Rect_LU_Derivative);
    function Sigmoid (X : Float) return Float;
    pragma Inline (Sigmoid);
@@ -56,14 +58,17 @@ package Base_Neural is
    procedure Softmax (Activation : in out Real_Float_Matrix);
    procedure Softmax (Activation : in out Real_Float_Vector);
    pragma Inline (Softmax);
-   function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
-                          return Float;
-   function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float;
-   function Squared_Loss_Derivative (Y_True, Y_Pred : Real_Float_Matrix)
-                          return Real_Float_Matrix;
-   function Squared_Loss_Derivative (Y_True, Y_Pred : Real_Float_Vector)
-                          return Real_Float_Vector;
-   pragma Inline (Squared_Loss);
+   function Mean_Squared_Loss (Y_True : Integer_Matrix;
+                               Y_Pred : Real_Float_Matrix) return Float;
+   function Mean_Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float;
+   function Mean_Squared_Loss (Y_True, Y_Pred : Real_Float_Vector)
+                               return Float;
+   pragma Inline (Mean_Squared_Loss);
+   function MSE_Derivative (Y_True, Y_Pred : Real_Float_Matrix)
+                                     return Real_Float_Matrix;
+   function MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
+                                     return Real_Float_Vector;
+   pragma Inline (MSE_Derivative);
    function X_Log_Y (X, Y : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline (X_Log_Y);
 
