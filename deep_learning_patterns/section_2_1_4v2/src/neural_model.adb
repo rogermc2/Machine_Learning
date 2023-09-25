@@ -11,9 +11,9 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package body Neural_Model is
 
-   function Backward (aModel       : in out Sequential_Model;
+   function Backward (aModel          : in out Sequential_Model;
                       Sample, L_Index : Positive;
-                      Output_Error : Real_Float_Vector)
+                      Output_Error    : Real_Float_Vector)
                       return Real_Float_Vector;
    procedure Compute_Coeff_Gradient (aModel      : in out Sequential_Model;
                                      Layer_Index : Positive;
@@ -121,8 +121,6 @@ package body Neural_Model is
                         Integer'Image (Input_Error'Length));
             Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error);
          end;
-         --           Compute_Coeff_Gradient (aModel, index, Loss_Deriv);
-         --           Compute_Intercept_Gradient (aModel, index, Loss_Deriv);
       end loop;
 
       --           return Pred_Gradients;
@@ -145,6 +143,8 @@ package body Neural_Model is
       D_Weights     : Real_Float_Vector :=
                         Get_Row (aLayer.Delta_Weights, Sample);
    begin
+      --           Compute_Coeff_Gradient (aModel, index, Loss_Deriv);
+      --           Compute_Intercept_Gradient (aModel, index, Loss_Deriv);
       Put_Line (Routine_Name);
       Put_Line (Routine_Name & "D_Weights length " &
                   Integer'Image (D_Weights'Length));

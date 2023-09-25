@@ -405,11 +405,16 @@ package body Base_Neural is
    function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
                           return Float is
       use Real_Float_Arrays;
-      Diff : constant Real_Float_Matrix :=
+      Diff : Real_Float_Matrix :=
                To_Real_Float_Matrix (Y_True) - Y_Pred;
    begin
+      for row in Diff'Range loop
+         for col in Diff'Range (2) loop
+            Diff (row, col) := Diff (row, col) ** 2;
+         end loop;
+      end loop;
 
-      return Neural_Maths.Mean (Diff * Diff);
+      return Neural_Maths.Mean (Diff);
 
    end Squared_Loss;
 
@@ -417,9 +422,15 @@ package body Base_Neural is
 
    function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float is
       use Real_Float_Arrays;
+      Diff : Real_Float_Matrix := Y_True - Y_Pred;
    begin
+      for row in Diff'Range loop
+         for col in Diff'Range (2) loop
+            Diff (row, col) := Diff (row, col) ** 2;
+         end loop;
+      end loop;
 
-      return Neural_Maths.Mean ((Y_True - Y_Pred) ** 2);
+      return Neural_Maths.Mean (Diff);
 
    end Squared_Loss;
 
@@ -428,10 +439,13 @@ package body Base_Neural is
    function Squared_Loss (Y_True, Y_Pred : Real_Float_Vector)
                           return Float is
       use Real_Float_Arrays;
-      Diff : constant Real_Float_Vector := Y_True - Y_Pred;
+      Diff : Real_Float_Vector := Y_True - Y_Pred;
    begin
+      for col in Diff'Range loop
+         Diff (col) := Diff (col) ** 2;
+      end loop;
 
-      return Neural_Maths.Mean (Diff * Diff);
+      return Neural_Maths.Mean (Diff);
 
    end Squared_Loss;
 
