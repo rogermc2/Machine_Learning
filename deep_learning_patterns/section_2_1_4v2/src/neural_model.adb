@@ -11,10 +11,12 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package body Neural_Model is
 
-   function Backward (aModel          : in out Sequential_Model;
-                      Sample, L_Index : Positive;
-                      Output_Error    : Real_Float_Vector)
-                      return Real_Float_Vector;
+   procedure Backward (aModel          : in out Sequential_Model;
+                       Sample, L_Index : Positive);
+   --     function Backward (aModel          : in out Sequential_Model;
+   --                        Sample, L_Index : Positive;
+   --                        Output_Error    : Real_Float_Vector)
+   --                        return Real_Float_Vector;
    procedure Compute_Coeff_Gradient (aModel      : in out Sequential_Model;
                                      Layer_Index : Positive;
                                      Loss_Deriv  : Real_Float_Matrix);
@@ -108,23 +110,32 @@ package body Neural_Model is
    begin
       --    Pred_Params (Optimiser, aModel.Connections, Gradients);
 
-      for sample in 1 .. aModel.Num_Samples loop
+      --  Loss_Deriv is dE/dY for output layer
+      for sample in 1 .. aModel.Num_Samples - 1 loop
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
          for index in reverse
            aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
-            --  Loss_Deriv is dE/dY for output layer
+            if index = aModel.Layers.Last_Index then
+               for col in Loss'Range (2) loop
+                  aModel.Layers (index).Output_Error (col) := Loss (sample, col);
+                  aModel.Layers (index).D_Output_Error (col) := Loss_Deriv (sample, col);
+               end loop;
+            else
+               Backward (aModel, sample, index);
+            end if;
+            --  Loss_Deriv is dE/dY
             Put_Line (Routine_Name & "layer" & Integer'Image (index));
             Print_Matrix_Dimensions (Routine_Name & "Input_Data",
                                      aModel.Layers (index).Input_Data);
-            declare
-               Input_Error : Real_Float_Vector
-                 := Backward (aModel, sample, index, Get_Row (Loss, sample));
-            begin
-               Put_Line (Routine_Name & "sample " & Integer'Image (sample) &
-                           " Input_Error length" &
-                           Integer'Image (Input_Error'Length));
-               Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error);
-            end;
+            --              declare
+            --                 Input_Error : Real_Float_Vector
+            --                   := Backward (aModel, sample, index, Get_Row (Loss, sample));
+            --              begin
+            --                 Put_Line (Routine_Name & "sample " & Integer'Image (sample) &
+            --                             " Input_Error length" &
+            --                             Integer'Image (Input_Error'Length));
+            --                 Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error);
+            --              end;
          end loop;
       end loop;
 
@@ -134,19 +145,18 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   function Backward (aModel          : in out Sequential_Model;
-                      Sample, L_Index : Positive;
-                      Output_Error    : Real_Float_Vector)
-                      return Real_Float_Vector is
+   procedure Backward (aModel          : in out Sequential_Model;
+                       Sample, L_Index : Positive) is
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Neural_Model.Backward ";
+      Prev_Layer    : Layer := aModel.Layers (L_Index + 1);
       aLayer        : Layer := aModel.Layers (L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
       Input_Error   : constant Real_Float_Vector
-        := Output_Error *
+        := Prev_Layer.Output_Error *
           Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients);
       Weights_Error : constant Real_Float_Vector :=
-                        Output_Error * Transpose (aLayer.Input_Data);
+                        Prev_Layer.Output_Error * Transpose (aLayer.Input_Data);
       D_Weights     : Real_Float_Vector :=
                         Get_Row (aLayer.Delta_Weights, Sample);
    begin
@@ -162,16 +172,55 @@ package body Neural_Model is
          aLayer.Delta_Weights (Sample, col) := D_Weights (col);
       end loop;
 
-      for col in Output_Error'Range loop
+      for col in Prev_Layer.Output_Error'Range loop
          aLayer.Delta_Bias (Sample, col) :=
-           aLayer.Delta_Bias (Sample, col) + Output_Error (col);
+           aLayer.Delta_Bias (Sample, col) + Prev_Layer.Output_Error (col);
       end loop;
 
       aModel.Layers (L_Index) := aLayer;
 
-      return Input_Error;
-
    end Backward;
+
+   --  -------------------------------------------------------------------------
+
+   --     function Backward (aModel          : in out Sequential_Model;
+   --                        Sample, L_Index : Positive;
+   --                        Output_Error    : Real_Float_Vector)
+   --                        return Real_Float_Vector is
+   --        use Real_Float_Arrays;
+   --        Routine_Name  : constant String := "Neural_Model.Backward ";
+   --        aLayer        : Layer := aModel.Layers (L_Index);
+   --        --  Transpose of Coeff_Gradients is dX/dY
+   --        Input_Error   : constant Real_Float_Vector
+   --          := Output_Error *
+   --            Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients);
+   --        Weights_Error : constant Real_Float_Vector :=
+   --                          Output_Error * Transpose (aLayer.Input_Data);
+   --        D_Weights     : Real_Float_Vector :=
+   --                          Get_Row (aLayer.Delta_Weights, Sample);
+   --     begin
+   --        --           Compute_Coeff_Gradient (aModel, index, Loss_Deriv);
+   --        --           Compute_Intercept_Gradient (aModel, index, Loss_Deriv);
+   --        Put_Line (Routine_Name);
+   --        Put_Line (Routine_Name & "D_Weights length " &
+   --                    Integer'Image (D_Weights'Length));
+   --        Put_Line (Routine_Name & "Input_Error length " &
+   --                    Integer'Image (Input_Error'Length));
+   --        D_Weights := D_Weights + Input_Error;
+   --        for col in D_Weights'Range loop
+   --           aLayer.Delta_Weights (Sample, col) := D_Weights (col);
+   --        end loop;
+   --
+   --        for col in Output_Error'Range loop
+   --           aLayer.Delta_Bias (Sample, col) :=
+   --             aLayer.Delta_Bias (Sample, col) + Output_Error (col);
+   --        end loop;
+   --
+   --        aModel.Layers (L_Index) := aLayer;
+   --
+   --        return Input_Error;
+   --
+   --     end Backward;
 
    --  -------------------------------------------------------------------------
 
