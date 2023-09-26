@@ -94,6 +94,7 @@ package body Neural_Model is
                              Loss       : Real_Float_Matrix;
                              Loss_Deriv : Real_Float_Matrix) is
       --                              return Stochastic_Optimizers.Parameters_List is
+      --  Loss_Deriv is dE/dY for output layer
       use Stochastic_Optimizers;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
@@ -111,6 +112,7 @@ package body Neural_Model is
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
          for index in reverse
            aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
+            --  Loss_Deriv is dE/dY for output layer
             Put_Line (Routine_Name & "layer" & Integer'Image (index));
             Print_Matrix_Dimensions (Routine_Name & "Input_Data",
                                      aModel.Layers (index).Input_Data);
@@ -139,10 +141,12 @@ package body Neural_Model is
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Neural_Model.Backward ";
       aLayer        : Layer := aModel.Layers (L_Index);
+      --  Transpose of Coeff_Gradients is dX/dY
       Input_Error   : constant Real_Float_Vector
-        := Output_Error * aModel.Connections (L_Index - 1).Coeff_Gradients;
+        := Output_Error *
+          Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients);
       Weights_Error : constant Real_Float_Vector :=
-                        Output_Error * aLayer.Input_Data;
+                        Output_Error * Transpose (aLayer.Input_Data);
       D_Weights     : Real_Float_Vector :=
                         Get_Row (aLayer.Delta_Weights, Sample);
    begin
@@ -192,6 +196,7 @@ package body Neural_Model is
       Routine_Name : constant String := "Neural_Model.Compile ";
       Loss         : Real_Float_Matrix (aModel.Labels'Range,
                                         aModel.Labels'Range (2));
+      --  Loss_Deriv is dE/dY for output layer
       Loss_Deriv   : Real_Float_Matrix (Loss'Range, Loss'Range (2));
       Optimiser    : Optimizer_Record (Optimizer_Adam);
       Params       : Parameters_List;  --  list of Parameters_Record
@@ -404,6 +409,7 @@ package body Neural_Model is
             when Loss_Mean_Square_Error =>
                Loss (sample, aModel.Num_Classes) :=
                  Base_Neural.Mean_Squared_Error (aModel.Pred, aModel.Labels);
+               --  Loss_Deriv is dE/dY for output layer
                Loss_Deriv :=
                  Base_Neural.MSE_Derivative (aModel.Pred, aModel.Labels);
          end case;

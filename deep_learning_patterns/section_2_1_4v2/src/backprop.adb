@@ -58,7 +58,7 @@ package body Backprop is
 --           when Loss_Log =>
 --              Loss := Log_Loss (Pred,  aModel.Activations.Last_Element);
 --           when Loss_Mean_Square_Error =>
---              Loss := Squared_Loss (Pred,  aModel.Activations.Last_Element);
+--              Loss := Mean_Squared_Error (Pred,  aModel.Activations.Last_Element);
 --        end case;
 
       --  L292  Add L2 regularization term to loss
