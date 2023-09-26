@@ -101,17 +101,9 @@ package body Neural_Model is
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
       Routine_Name   : constant String := "Neural_Model.Back_Propogate ";
-      --        Pred_Params (Self      : in out Optimizer_Record;
-      --                       Params    : in out Parameters_List;
-      --                       Gradients : Parameters_List);
-      --        Deltas         : Real_Matrix_List;
-      --        Sum_Sq_Coeffs  : Float := 0.0;
-      --        Pred_Gradients : Parameters_List;
    begin
-      --    Pred_Params (Optimiser, aModel.Connections, Gradients);
-
       --  Loss_Deriv is dE/dY for output layer
-      for sample in 1 .. aModel.Num_Samples - 1 loop
+      for sample in 1 .. aModel.Num_Samples loop
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
          for index in reverse
            aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
@@ -127,19 +119,8 @@ package body Neural_Model is
             Put_Line (Routine_Name & "layer" & Integer'Image (index));
             Print_Matrix_Dimensions (Routine_Name & "Input_Data",
                                      aModel.Layers (index).Input_Data);
-            --              declare
-            --                 Input_Error : Real_Float_Vector
-            --                   := Backward (aModel, sample, index, Get_Row (Loss, sample));
-            --              begin
-            --                 Put_Line (Routine_Name & "sample " & Integer'Image (sample) &
-            --                             " Input_Error length" &
-            --                             Integer'Image (Input_Error'Length));
-            --                 Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error);
-            --              end;
          end loop;
       end loop;
-
-      --           return Pred_Gradients;
 
    end Back_Propogate;
 
@@ -277,7 +258,6 @@ package body Neural_Model is
       --              Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error);
       --           end;
       --        Gradients := Back_Propogate (aModel, Optimiser, Loss, Loss_Deriv);
-      Back_Propogate (aModel, Optimiser, Loss, Loss_Deriv);
       --        end loop;
 
    end Compile;
