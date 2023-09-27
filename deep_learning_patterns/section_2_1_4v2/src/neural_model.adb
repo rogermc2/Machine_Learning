@@ -62,7 +62,7 @@ package body Neural_Model is
    procedure Add_First_Layer (aModel     : in out Sequential_Model;
                               Input_Data : Real_Float_Matrix) is
       First_Layer : Layer (Input_Data'Length, Input_Data'Length (2),
-                           Input_Data'Length (2), aModel.Num_Classes);
+                           Input_Data'Length (2));
    begin
       First_Layer.Input_Data := Input_Data;
       First_Layer.Nodes := Input_Data;
@@ -80,7 +80,7 @@ package body Neural_Model is
       Prev_Layer   : constant Layer := aModel.Layers.Last_Element;
       Prev_Nodes   : constant Real_Float_Matrix := Prev_Layer.Nodes;
       thisLayer    : Layer (aModel.Num_Samples, Prev_Nodes'Length (2),
-                            Num_Nodes, aModel.Num_Classes);
+                            Num_Nodes);
    begin
       thisLayer.Input_Data := Prev_Nodes;
       thisLayer.Activation := Activation;
@@ -124,7 +124,7 @@ package body Neural_Model is
       --  Transpose of Coeff_Gradients is dX/dY
       Input_Error   : constant Real_Float_Vector
         := Prev_Layer.Output_Error *
-          Transpose (aModel.Connections (L_Index).Coeff_Gradients);
+          Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients);
 --        Weights_Error : constant Real_Float_Vector :=
 --                          Prev_Layer.Output_Error *
 --                            Transpose (This_Layer.Input_Data);
