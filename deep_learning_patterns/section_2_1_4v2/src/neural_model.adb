@@ -25,8 +25,7 @@ package body Neural_Model is
                                          Loss_Deriv  : Real_Float_Matrix);
    function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
    function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
-   procedure Forward (aModel           : in out Sequential_Model;
-                      Loss, Loss_Deriv : out Real_Float_Matrix);
+   procedure Forward (aModel : in out Sequential_Model);
    function To_Matrix (Data : Real_Float_Vector) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -91,11 +90,9 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   procedure Back_Propogate (aModel     : in out Sequential_Model;
-                             Optimiser  : Stochastic_Optimizers.Optimizer_Record;
-                             Loss       : Real_Float_Matrix;
-                             Loss_Deriv : Real_Float_Matrix) is
-      --                              return Stochastic_Optimizers.Parameters_List is
+   procedure Back_Propogate
+     (aModel     : in out Sequential_Model;
+      Optimiser  : Stochastic_Optimizers.Optimizer_Record) is
       --  Loss_Deriv is dE/dY for output layer
       use Stochastic_Optimizers;
       use Real_Float_Arrays;
@@ -107,12 +104,12 @@ package body Neural_Model is
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
          for index in reverse
            aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
-            if index = aModel.Layers.Last_Index then
-               for col in Loss'Range (2) loop
-                  aModel.Layers (index).Output_Error (col) := Loss (sample, col);
-                  aModel.Layers (index).D_Output_Error (col) := Loss_Deriv (sample, col);
-               end loop;
-            else
+            if index /= aModel.Layers.Last_Index then
+--                 for col in aModel.Layers (index).Output_Error'Range loop
+--                    aModel.Layers (index).Output_Error (col) :=
+--                      Loss_Deriv (sample, col);
+--                 end loop;
+--              else
                Backward (aModel, sample, index);
             end if;
             --  Loss_Deriv is dE/dY
@@ -224,20 +221,15 @@ package body Neural_Model is
    procedure Compile (aModel : in out Sequential_Model) is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Compile ";
-      Loss         : Real_Float_Matrix (aModel.Labels'Range,
-                                        aModel.Labels'Range (2));
       --  Loss_Deriv is dE/dY for output layer
-      Loss_Deriv   : Real_Float_Matrix (Loss'Range, Loss'Range (2));
+      Loss         : Float := 0.0;
       Optimiser    : Optimizer_Record (Optimizer_Adam);
       Params       : Parameters_List;  --  list of Parameters_Record
    begin
       C_Init (Optimiser.Adam, aModel.Connections);
-      Forward (aModel, Loss, Loss_Deriv);
+      Forward (aModel);
 
-      Print_Matrix_Dimensions (Routine_Name & "Loss", Loss);
-      Print_Float_Matrix (Routine_Name & "Loss", Loss);
-
-      Back_Propogate (aModel, Optimiser, Loss, Loss_Deriv);
+      Back_Propogate (aModel, Optimiser);
 
       --           declare
       --              Input_Error : Real_Float_Vector
@@ -352,13 +344,14 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   procedure Forward (aModel           : in out Sequential_Model;
-                      Loss, Loss_Deriv : out Real_Float_Matrix) is
+   procedure Forward (aModel : in out Sequential_Model) is
       use Real_Float_Arrays;
       use Base_Neural;
       use Stochastic_Optimizers;
       use Layer_Packge;
       Routine_Name : constant String := "Neural_Model.Forward ";
+      Loss         : Real_Float_Vector (1 .. aModel.Num_Samples) :=
+                       (others => 0.0);
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
@@ -427,11 +420,20 @@ package body Neural_Model is
             when Loss_Log =>
                Put_Line (Routine_Name & "Log_Loss method not implemented");
             when Loss_Mean_Square_Error =>
-               Loss (sample, aModel.Num_Classes) :=
-                 Base_Neural.Mean_Squared_Error (aModel.Pred, aModel.Labels);
-               --  Loss_Deriv is dE/dY for output layer
-               Loss_Deriv :=
-                 Base_Neural.MSE_Derivative (aModel.Pred, aModel.Labels);
+               Loss (sample) := Base_Neural.Mean_Squared_Error (aModel.Pred,
+                                                                aModel.Labels);
+               --  D_Output_Error is dE/dY for output layer
+               declare
+                  Pred       : constant Real_Float_Vector :=
+                                 Get_Row (aModel.Pred, sample);
+                  Actual     : constant Real_Float_Vector :=
+                                 Get_Row (aModel.Labels, sample);
+                  Last_Layer : Layer := aModel.Layers.Last_Element;
+               begin
+                  Last_Layer.Output_Error :=
+                    Base_Neural.MSE_Derivative (Pred, Actual);
+                  aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
+               end;
          end case;
       end loop;
 
