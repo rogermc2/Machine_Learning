@@ -123,28 +123,28 @@ package body Neural_Model is
       This_Layer    : Layer := aModel.Layers (L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
       Input_Error   : constant Real_Float_Vector
-        := Prev_Layer.Output_Error *
+        := Prev_Layer.Input_Error *
           Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients);
---        Weights_Error : constant Real_Float_Vector :=
---                          Prev_Layer.Output_Error *
---                            Transpose (This_Layer.Input_Data);
---        D_Weights     : Real_Float_Vector :=
---                          Get_Row (This_Layer.Delta_Weights, Sample);
+      --        Weights_Error : constant Real_Float_Vector :=
+      --                          Prev_Layer.Output_Error *
+      --                            Transpose (This_Layer.Input_Data);
+      --        D_Weights     : Real_Float_Vector :=
+      --                          Get_Row (This_Layer.Delta_Weights, Sample);
    begin
       Put_Line (Routine_Name);
---        Put_Line (Routine_Name & "D_Weights length " &
---                    Integer'Image (D_Weights'Length));
+      --        Put_Line (Routine_Name & "D_Weights length " &
+      --                    Integer'Image (D_Weights'Length));
       Put_Line (Routine_Name & "Input_Error length " &
                   Integer'Image (Input_Error'Length));
---        D_Weights := D_Weights + Input_Error;
---
---        for col in D_Weights'Range loop
---           This_Layer.Delta_Weights (Sample, col) := D_Weights (col);
---        end loop;
+      --        D_Weights := D_Weights + Input_Error;
+      --
+      --        for col in D_Weights'Range loop
+      --           This_Layer.Delta_Weights (Sample, col) := D_Weights (col);
+      --        end loop;
 
-      for col in Prev_Layer.Output_Error'Range loop
+      for col in Prev_Layer.Input_Error'Range loop
          This_Layer.Delta_Bias (Sample, col) :=
-           This_Layer.Delta_Bias (Sample, col) + Prev_Layer.Output_Error (col);
+           This_Layer.Delta_Bias (Sample, col) + Prev_Layer.Input_Error (col);
       end loop;
 
       aModel.Layers (L_Index) := This_Layer;
@@ -420,11 +420,13 @@ package body Neural_Model is
                                  Get_Row (aModel.Pred, sample);
                   Actual     : constant Real_Float_Vector :=
                                  Get_Row (aModel.Labels, sample);
+                  dEdY       : constant Real_Float_Vector :=
+                                 Base_Neural.MSE_Derivative (Pred, Actual);
                   Last_Layer : Layer := aModel.Layers.Last_Element;
                begin
-                  Last_Layer.Output_Error :=
-                    Base_Neural.MSE_Derivative (Pred, Actual) *
-                  Transpose (aModel.Connections.Last_Element.Coeff_Gradients);
+                  Last_Layer.Input_Error :=
+                    Transpose (aModel.Connections.Last_Element.Coeff_Gradients)
+                    * dEdY;
                   aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
                end;
          end case;
