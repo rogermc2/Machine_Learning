@@ -423,7 +423,8 @@ package body Neural_Model is
                   Last_Layer : Layer := aModel.Layers.Last_Element;
                begin
                   Last_Layer.Output_Error :=
-                    Base_Neural.MSE_Derivative (Pred, Actual);
+                    Base_Neural.MSE_Derivative (Pred, Actual) *
+                  Transpose (aModel.Connections.Last_Element.Coeff_Gradients);
                   aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
                end;
          end case;
