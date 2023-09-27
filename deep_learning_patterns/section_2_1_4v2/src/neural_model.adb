@@ -422,7 +422,7 @@ package body Neural_Model is
             when Loss_Mean_Square_Error =>
                Loss (sample) := Base_Neural.Mean_Squared_Error (aModel.Pred,
                                                                 aModel.Labels);
-               --  D_Output_Error is dE/dY for output layer
+               --  Output_Error is dE/dY for output layer
                declare
                   Pred       : constant Real_Float_Vector :=
                                  Get_Row (aModel.Pred, sample);

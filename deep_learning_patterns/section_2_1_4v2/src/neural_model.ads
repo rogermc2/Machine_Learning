@@ -24,9 +24,8 @@ package Neural_Model is
       Delta_Bias      : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
         := (others => (others => 0.0));
       Activation      : Activation_Kind := Identity_Activation;
+      --  Output_Error is dE/dY
       Output_Error    : Real_Float_Vector (1 .. Num_Features);
---        Output_Error    : Float := 0.0;
---        D_Output_Error  : Real_Float_Vector (1 .. Num_Features);
    end record;
 
    package Layer_Packge is new
