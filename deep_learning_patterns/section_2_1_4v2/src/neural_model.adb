@@ -13,6 +13,9 @@ package body Neural_Model is
 
    procedure Backward (aModel          : in out Sequential_Model;
                        Sample, L_Index : Positive);
+   function Backward_Activation (aModel          : in out Sequential_Model;
+                                 Sample, L_Index : Positive)
+                                 return Real_Float_Vector;
    --     function Backward (aModel          : in out Sequential_Model;
    --                        Sample, L_Index : Positive;
    --                        Output_Error    : Real_Float_Vector)
@@ -106,12 +109,39 @@ package body Neural_Model is
             Print_Matrix_Dimensions (Routine_Name & "Input_Data",
                                      aModel.Layers (layer_id).Input_Data);
             if layer_id < aModel.Layers.Last_Index then
+               aModel.Layers (layer_id).Input_Error :=
+                 Backward_Activation (aModel, Sample, layer_id);
                Backward (aModel, sample, layer_id);
             end if;
          end loop;
       end loop;
 
    end Back_Propogate;
+
+   --  -------------------------------------------------------------------------
+
+   function Backward_Activation (aModel          : in out Sequential_Model;
+                                 Sample, L_Index : Positive)
+                                 return Real_Float_Vector is
+   use Base_Neural;
+      Routine_Name  : constant String := "Neural_Model.Backward_Activation ";
+      This_Layer    : constant Layer := aModel.Layers (L_Index);
+      Result        : Real_Float_Vector (This_Layer.Input_Error'Range);
+   begin
+      case aModel.Layers (L_Index).Activation is
+         when Identity_Activation => null;
+         when Logistic_Activation =>
+            Put_Line (Routine_Name & "Logistic_Activation not implemented");
+         when ReLu_Activation => Result :=
+            Rect_LU_Derivative (aModel.Layers (L_Index + 1).Input_Error);
+         when Sigmoid_Activation =>
+            Put_Line (Routine_Name & "Sigmoid_Activation not implemented");
+         when Soft_Max_Activation => null;
+      end case;
+
+      return Result;
+
+   end Backward_Activation;
 
    --  -------------------------------------------------------------------------
 
@@ -122,6 +152,7 @@ package body Neural_Model is
       Prev_Layer    : Layer := aModel.Layers (L_Index + 1);
       This_Layer    : Layer := aModel.Layers (L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
+      --  Prev_Layer.Input_Error is output error for this layer
       Input_Error   : constant Real_Float_Vector
         := Prev_Layer.Input_Error *
           Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients);
@@ -132,10 +163,10 @@ package body Neural_Model is
       --                          Get_Row (This_Layer.Delta_Weights, Sample);
    begin
       Put_Line (Routine_Name);
-      --        Put_Line (Routine_Name & "D_Weights length " &
+         --        Put_Line (Routine_Name & "D_Weights length " &
       --                    Integer'Image (D_Weights'Length));
-      Put_Line (Routine_Name & "Input_Error length " &
-                  Integer'Image (Input_Error'Length));
+      Put_Line (Routine_Name & "This_Layer.Input_Error length " &
+                  Integer'Image (This_Layer.Input_Error'Length));
       --        D_Weights := D_Weights + Input_Error;
       --
       --        for col in D_Weights'Range loop
