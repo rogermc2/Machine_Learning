@@ -104,7 +104,8 @@ package body Neural_Model is
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
          for layer_id in reverse
            aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
-            if layer_id < aModel.Layers.Last_Index then
+            if layer_id < aModel.Layers.Last_Index and
+            layer_id >  aModel.Layers.First_Index then
                Print_Matrix_Dimensions
                  (Routine_Name & "layer" & Integer'Image (layer_id) &
                     " Input_Data", aModel.Layers (layer_id).Input_Data);
@@ -134,6 +135,7 @@ package body Neural_Model is
    begin
       Put_Line (Routine_Name);
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
+      Put_Line (Routine_Name & "prior layer " & Integer'Image (L_Index - 1));
       Print_Matrix_Dimensions (Routine_Name & "This_Layer.Input_Data",
                                This_Layer.Input_Data);
       Put_Line (Routine_Name & "Input_Error length " &
@@ -149,7 +151,7 @@ package body Neural_Model is
 --        Put_Line (Routine_Name & "D_Weights length " &
 --                    Integer'Image (D_Weights'Length));
 --        D_Weights := D_Weights + Input_Error;
---
+
 --        for col in D_Weights'Range loop
 --           This_Layer.Delta_Weights (Sample, col) := D_Weights (col);
 --        end loop;
