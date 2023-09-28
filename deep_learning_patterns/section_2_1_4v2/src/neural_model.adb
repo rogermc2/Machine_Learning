@@ -106,9 +106,9 @@ package body Neural_Model is
          for layer_id in reverse
            aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
             if layer_id < aModel.Layers.Last_Index then
-               Put_Line (Routine_Name & "layer" & Integer'Image (layer_id));
-               Print_Matrix_Dimensions (Routine_Name & "layer Input_Data",
-                                        aModel.Layers (layer_id).Input_Data);
+               Print_Matrix_Dimensions
+                 (Routine_Name & "layer" & Integer'Image (layer_id) &
+                    " Input_Data", aModel.Layers (layer_id).Input_Data);
                Backward (aModel, sample, layer_id);
             end if;
          end loop;
