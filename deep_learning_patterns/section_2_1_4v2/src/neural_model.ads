@@ -18,7 +18,7 @@ package Neural_Model is
    type Layer (Num_Features, Num_Nodes : Positive) is record
       Input_Data      : Real_Float_Vector (1 .. Num_Features);
       Nodes           : Real_Float_Vector (1 .. Num_Nodes) := (others => 0.0);
-      Delta_Weights   : Real_Float_Matrix (1 .. Num_Features, 1 .. Num_Nodes)
+      Delta_Weights   : Real_Float_Matrix (1 .. Num_Nodes, 1 .. Num_Features)
         := (others => (others => 0.0));
       Delta_Bias      : Float := 0.0;
       Activation      : Activation_Kind := Identity_Activation;

@@ -163,17 +163,18 @@ package body Neural_Model is
 
             for index in aModel.Connections.First_Index ..
               aModel.Connections.Last_Index loop
-               Put_Line (Routine_Name & "Connections index" &
-                           Integer'Image (index));
-               Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
-                                        aModel.Connections (index).Coeff_Gradients);
-               Print_Matrix_Dimensions (Routine_Name & "Delta_Weights",
-                                        aModel.Layers (index + 1).Delta_Weights);
+--                 Put_Line (Routine_Name & "Connections index" &
+--                             Integer'Image (index));
+--                 Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
+--                                          aModel.Connections (index).Coeff_Gradients);
+--                 Print_Matrix_Dimensions (Routine_Name & "Delta_Weights",
+--                                          aModel.Layers (index + 1).Delta_Weights);
                aModel.Connections (index).Coeff_Gradients :=
                  aModel.Connections (index).Coeff_Gradients - Learn_Rate *
                  aModel.Layers (index + 1).Delta_Weights /
                  Float (aModel.Layers (index + 1).Passes);
             end loop;
+            Put_Line (Routine_Name & "Connections updated");
          end loop;
       end loop;
 
