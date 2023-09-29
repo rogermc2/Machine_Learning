@@ -27,7 +27,8 @@ package body Neural_Model is
                         Sample, L_Index : Positive) return Real_Float_Vector;
    function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
    function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
-   procedure Forward (aModel : in out Sequential_Model);
+   procedure Forward (aModel       : in out Sequential_Model;
+                      Sample_Index : Positive);
    function To_Matrix (Data : Real_Float_Vector) return Real_Float_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -161,7 +162,7 @@ package body Neural_Model is
          Put_Line (Routine_Name & "epoch " & Integer'Image (epoch));
          for sample in 1 .. aModel.Num_Samples loop
             Put_Line (Routine_Name & "sample " & Integer'Image (sample));
-            Forward (aModel);
+            Forward (aModel, sample);
             Back_Propogate (aModel, Optimiser);
 
             for index in aModel.Connections.First_Index ..
@@ -307,7 +308,8 @@ package body Neural_Model is
 
    --  -------------------------------------------------------------------------
 
-   procedure Forward (aModel : in out Sequential_Model) is
+   procedure Forward (aModel       : in out Sequential_Model;
+                      Sample_Index : Positive) is
       use Real_Float_Arrays;
       use Base_Neural;
       use Stochastic_Optimizers;
@@ -318,7 +320,7 @@ package body Neural_Model is
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
-
+      aModel.Layers (1).Input_Data := Get_Row (aModel.Input_Data, Sample_Index);
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "layer" & Integer'Image (layer));
@@ -330,19 +332,19 @@ package body Neural_Model is
             Print_Float_Vector
               (Routine_Name & "layer" & Integer'Image (layer) &
                  " Input_Data", aModel.Layers (layer).Input_Data);
---              for sample in 1 .. aModel.Num_Samples loop
---                 Put_Line (Routine_Name & "sample" & Integer'Image (sample));
-               declare
-                  Input_Vec : constant Real_Float_Vector :=
-                                aModel.Layers (layer - 1).Nodes;
-                  Update    : constant Real_Float_Vector
-                    := Connect.Coeff_Gradients * Input_Vec +
-                      Connect.Intercept_Grads;
-               begin
-                  aModel.Layers (layer).Input_Data := Input_Vec;
-                  aModel.Layers (layer).Nodes := Update;
-               end;
---              end loop;  --  samples
+            --              for sample in 1 .. aModel.Num_Samples loop
+            --                 Put_Line (Routine_Name & "sample" & Integer'Image (sample));
+            declare
+               Input_Vec : constant Real_Float_Vector :=
+                             aModel.Layers (layer - 1).Nodes;
+               Update    : constant Real_Float_Vector
+                 := Connect.Coeff_Gradients * Input_Vec +
+                   Connect.Intercept_Grads;
+            begin
+               aModel.Layers (layer).Input_Data := Input_Vec;
+               aModel.Layers (layer).Nodes := Update;
+            end;
+            --              end loop;  --  samples
 
             Print_Float_Vector
               (Routine_Name & " after processing, layer" &
