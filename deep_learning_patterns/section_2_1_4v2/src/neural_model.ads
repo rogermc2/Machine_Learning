@@ -19,13 +19,15 @@ package Neural_Model is
       Input_Data      : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
       Nodes           : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Nodes) :=
                           (others => (others => 0.0));
-      Delta_Weights   : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
+      Delta_Weights   : Real_Float_Matrix (1 .. Num_Features, 1 .. Num_Nodes)
         := (others => (others => 0.0));
-      Delta_Bias      : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
-        := (others => (others => 0.0));
+--        Delta_Bias      : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
+--          := (others => (others => 0.0));
+      Delta_Bias      : Float := 0.0;
       Activation      : Activation_Kind := Identity_Activation;
       --  Input_Error is dE/dX
-      Input_Error    : Real_Float_Vector (1 .. Num_Features);
+      Input_Error     : Real_Float_Vector (1 .. Num_Features);
+      Passes          : Natural := 0;
    end record;
 
    package Layer_Packge is new
@@ -43,7 +45,8 @@ package Neural_Model is
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Activation : Activation_Kind := Identity_Activation);
-   procedure Compile (aModel      : in out Sequential_Model);
+   procedure Compile (aModel     : in out Sequential_Model; Num_Epochs : Positive;
+                      Learn_Rate : Float);
    --     function Get_Output_Value (aModel : Sequential_Model)
    --                                return Real_Float_Vector;
 

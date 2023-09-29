@@ -19,6 +19,8 @@ procedure Sequential_Network_V2 is
    Num_Samples  : constant Positive := 1;
    Num_Features : constant Positive := 13;
    Num_Classes  : constant Positive := 1;
+   Num_Epochs   : constant Positive := 1;
+   Learn_Rate   : constant Float := 0.1;
    Input_Data   : constant Real_Float_Matrix (1 .. Num_Samples,
                                               1 .. Num_Features)
      := (others => (1.0, 0.0, 0.5, -0.5, 2.3, -5.2, 10.9, -12.0,
@@ -37,7 +39,7 @@ begin
    Add_Layer (theModel, 1, Soft_Max_Activation);
    Add_Connections (theModel);
 
-   Compile (theModel);
+   Compile (theModel, Num_Epochs, Learn_Rate);
    --     declare
    --  Output_Data : Real_Float_Vector := Get_Output_Value (theModel);
    --     begin
