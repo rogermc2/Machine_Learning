@@ -100,13 +100,13 @@ package body Neural_Model is
       use Real_Matrix_List_Package;
       Routine_Name : constant String := "Neural_Model.Back_Propogate ";
    begin
---        for sample in 1 .. aModel.Num_Samples loop
---           Put_Line (Routine_Name & "sample " & Integer'Image (sample));
-         for layer_id in reverse
-           aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index - 1 loop
-            Backward (aModel, sample, layer_id);
-         end loop;
---        end loop;
+      --        for sample in 1 .. aModel.Num_Samples loop
+      --           Put_Line (Routine_Name & "sample " & Integer'Image (sample));
+      for layer_id in reverse
+        aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index - 1 loop
+         Backward (aModel, sample, layer_id);
+      end loop;
+      --        end loop;
 
    end Back_Propogate;
 
@@ -125,16 +125,11 @@ package body Neural_Model is
       --  Output error of this layer is Prev_Layer.Input_Error
       Weights_Error : constant Real_Float_Matrix :=
                         Prev_Layer.Input_Error * This_Layer.Input_Data;
-      D_Weights     : constant Real_Float_Vector :=
-                        Get_Row (This_Layer.Delta_Weights, Sample) +
-                        Input_Error;
    begin
       Put_Line (Routine_Name);
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
 
-      for col in D_Weights'Range loop
-         This_Layer.Delta_Weights (Sample, col) := D_Weights (col);
-      end loop;
+      This_Layer.Delta_Weights := This_Layer.Delta_Weights + Input_Error;
 
       --  Output error of this layer is Prev_Layer.Input_Error
       for col in Prev_Layer.Input_Error'Range loop
