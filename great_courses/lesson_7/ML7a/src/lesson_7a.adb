@@ -22,7 +22,7 @@ procedure Lesson_7A is
    Population        : constant Positive := 10000;
    Parsimony         : constant Float := 0.1;
    Classifier        : Python.Module;
-   Genetic_Estimator : Python_API.PyObject;
+   Genetic_Estimator : Python_API.PyObject_Ptr;
 
 begin
    Python.Initialize;
