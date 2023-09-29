@@ -33,7 +33,7 @@ procedure Sequential_Network_V2 is
 begin
    New_Line;
    Put_Line ("Program " & Program_Name);
-   Add_First_Layer (theModel, Input_Data);
+   Add_First_Layer (theModel, Get_Row (Input_Data, 1));
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 1, Soft_Max_Activation);

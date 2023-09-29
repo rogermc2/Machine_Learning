@@ -15,14 +15,11 @@ package Neural_Model is
 
    subtype Node is Float;
 
-   type Layer (Num_Samples, Num_Features, Num_Nodes : Positive) is record
-      Input_Data      : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
-      Nodes           : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Nodes) :=
-                          (others => (others => 0.0));
+   type Layer (Num_Features, Num_Nodes : Positive) is record
+      Input_Data      : Real_Float_Vector (1 .. Num_Features);
+      Nodes           : Real_Float_Vector (1 .. Num_Nodes) := (others => 0.0);
       Delta_Weights   : Real_Float_Matrix (1 .. Num_Features, 1 .. Num_Nodes)
         := (others => (others => 0.0));
---        Delta_Bias      : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features)
---          := (others => (others => 0.0));
       Delta_Bias      : Float := 0.0;
       Activation      : Activation_Kind := Identity_Activation;
       --  Input_Error is dE/dX
@@ -41,7 +38,7 @@ package Neural_Model is
 
    procedure Add_Connections (aModel : in out Sequential_Model);
    procedure Add_First_Layer (aModel     : in out Sequential_Model;
-                              Input_Data : Real_Float_Matrix);
+                              Input_Data : Real_Float_Vector);
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Activation : Activation_Kind := Identity_Activation);

@@ -62,9 +62,8 @@ package body Neural_Model is
 
    --  Initialization - add first layer
    procedure Add_First_Layer (aModel     : in out Sequential_Model;
-                              Input_Data : Real_Float_Matrix) is
-      First_Layer : Layer (Input_Data'Length, Input_Data'Length (2),
-                           Input_Data'Length (2));
+                              Input_Data : Real_Float_Vector) is
+      First_Layer : Layer (Input_Data'Length, Input_Data'Length);
    begin
       First_Layer.Input_Data := Input_Data;
       First_Layer.Nodes := Input_Data;
@@ -80,9 +79,8 @@ package body Neural_Model is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
       Prev_Layer   : constant Layer := aModel.Layers.Last_Element;
-      Prev_Nodes   : constant Real_Float_Matrix := Prev_Layer.Nodes;
-      thisLayer    : Layer (aModel.Num_Samples, Prev_Nodes'Length (2),
-                            Num_Nodes);
+      Prev_Nodes   : constant Real_Float_Vector := Prev_Layer.Nodes;
+      thisLayer    : Layer (Prev_Nodes'Length, Num_Nodes);
    begin
       thisLayer.Input_Data := Prev_Nodes;
       thisLayer.Activation := Activation;
@@ -124,8 +122,7 @@ package body Neural_Model is
                         Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients) * dEdY;
       --  Output error of this layer is Prev_Layer.Input_Error
       Weights_Error : constant Real_Float_Matrix :=
-                        Prev_Layer.Input_Error *
-                          Get_Row (This_Layer.Input_Data, Sample);
+                        Prev_Layer.Input_Error * This_Layer.Input_Data;
       D_Weights     : constant Real_Float_Vector :=
                         Get_Row (This_Layer.Delta_Weights, Sample) +
                         Input_Error;
@@ -327,36 +324,28 @@ package body Neural_Model is
                         aModel.Connections (layer - 1);
          begin
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
-            Print_Matrix_Dimensions
-              (Routine_Name & "layer" & Integer'Image (layer) &
-                 " Input_Data", aModel.Layers (layer).Input_Data);
-            Print_Float_Matrix
+            Print_Float_Vector
               (Routine_Name & "layer" & Integer'Image (layer) &
                  " Input_Data", aModel.Layers (layer).Input_Data);
             for sample in 1 .. aModel.Num_Samples loop
                Put_Line (Routine_Name & "sample" & Integer'Image (sample));
                declare
-                  Input_Vec : constant Real_Float_Vector
-                    := Get_Row (aModel.Layers (layer - 1).Nodes, sample);
+                  Input_Vec : constant Real_Float_Vector :=
+                                aModel.Layers (layer - 1).Nodes;
                   Update    : constant Real_Float_Vector
                     := Connect.Coeff_Gradients * Input_Vec +
                       Connect.Intercept_Grads;
                begin
-                  for col in Input_Vec'Range loop
-                     aModel.Layers (layer).Input_Data (sample, col) :=
-                       Input_Vec (col);
-                  end loop;
-                  for col in Update'Range loop
-                     aModel.Layers (layer).Nodes (sample, col) :=
-                       Update (col);
-                  end loop;
+                  aModel.Layers (layer).Input_Data := Input_Vec;
+                     aModel.Layers (layer).Nodes := Update;
                end;
             end loop;  --  samples
-            Print_Float_Matrix
+
+            Print_Float_Vector
               (Routine_Name & " after samples processing, layer" &
                  Integer'Image (layer) & " Input_Data",
                aModel.Layers (layer).Input_Data);
-            Print_Float_Matrix (Routine_Name & "nodes",
+            Print_Float_Vector (Routine_Name & "nodes",
                                 aModel.Layers (layer).Nodes);
 
             case aModel.Layers (layer).Activation is
@@ -374,7 +363,7 @@ package body Neural_Model is
       for sample in 1 .. aModel.Num_Samples loop
          for label in aModel.Labels'Range loop
             aModel.Pred (sample, label) :=
-              aModel.Layers.Last_Element.Nodes (sample, label);
+              aModel.Layers.Last_Element.Nodes (label);
          end loop;
 
          case aModel.Loss_Method is
