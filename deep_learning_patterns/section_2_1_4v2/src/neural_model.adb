@@ -93,19 +93,20 @@ package body Neural_Model is
 
    procedure Back_Propogate
      (aModel    : in out Sequential_Model;
+      Sample    : Positive;
       Optimiser : Stochastic_Optimizers.Optimizer_Record) is
       use Stochastic_Optimizers;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
       Routine_Name : constant String := "Neural_Model.Back_Propogate ";
    begin
-      for sample in 1 .. aModel.Num_Samples loop
-         Put_Line (Routine_Name & "sample " & Integer'Image (sample));
+--        for sample in 1 .. aModel.Num_Samples loop
+--           Put_Line (Routine_Name & "sample " & Integer'Image (sample));
          for layer_id in reverse
            aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index - 1 loop
             Backward (aModel, sample, layer_id);
          end loop;
-      end loop;
+--        end loop;
 
    end Back_Propogate;
 
@@ -163,7 +164,7 @@ package body Neural_Model is
          for sample in 1 .. aModel.Num_Samples loop
             Put_Line (Routine_Name & "sample " & Integer'Image (sample));
             Forward (aModel, sample);
-            Back_Propogate (aModel, Optimiser);
+            Back_Propogate (aModel, sample, Optimiser);
 
             for index in aModel.Connections.First_Index ..
               aModel.Connections.Last_Index loop
@@ -317,9 +318,10 @@ package body Neural_Model is
       Routine_Name : constant String := "Neural_Model.Forward ";
       Actual       : constant Real_Float_Vector :=
                        Get_Row (aModel.Labels, Sample_Index);
-      Loss         : Float := 0.0;
+      Last_Layer   : Layer := aModel.Layers.Last_Element;
       Predicted    : Real_Float_Vector (aModel.Labels'Range (2));
       dEdY         : Real_Float_Vector (Predicted'Range);
+      Loss         : Float := 0.0;
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
@@ -337,8 +339,6 @@ package body Neural_Model is
             Print_Float_Vector
               (Routine_Name & "layer" & Integer'Image (layer) &
                  " Input_Data", aModel.Layers (layer).Input_Data);
-            --              for sample in 1 .. aModel.Num_Samples loop
-            --                 Put_Line (Routine_Name & "sample" & Integer'Image (sample));
             declare
                Input_Vec : constant Real_Float_Vector :=
                              aModel.Layers (layer - 1).Nodes;
@@ -349,7 +349,6 @@ package body Neural_Model is
                aModel.Layers (layer).Input_Data := Input_Vec;
                aModel.Layers (layer).Nodes := Update;
             end;
-            --              end loop;  --  samples
 
             Print_Float_Vector
               (Routine_Name & " after processing, layer" &
@@ -381,18 +380,14 @@ package body Neural_Model is
          when Loss_Log =>
             Put_Line (Routine_Name & "Log_Loss method not implemented");
          when Loss_Mean_Square_Error =>
-            Loss := Base_Neural.Mean_Squared_Error (Predicted,
-                                                    Get_Row (aModel.Labels, Sample_Index));
+            Loss := Base_Neural.Mean_Squared_Error
+              (Predicted, Get_Row (aModel.Labels, Sample_Index));
             --  Output_Error is dE/dY for output layer
-            declare
-               Last_Layer : Layer := aModel.Layers.Last_Element;
-            begin
-               dEdY  := Base_Neural.MSE_Derivative (Predicted, Actual);
-               Last_Layer.Input_Error :=
-                 Transpose (aModel.Connections.Last_Element.Coeff_Gradients)
-                 * dEdY;
-               aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
-            end;
+            dEdY  := Base_Neural.MSE_Derivative (Predicted, Actual);
+            Last_Layer.Input_Error :=
+              Transpose (aModel.Connections.Last_Element.Coeff_Gradients)
+              * dEdY;
+            aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
       end case;
 
       Put_Line (Routine_Name & "Loss"& Float'Image (Loss));
