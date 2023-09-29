@@ -103,11 +103,8 @@ package body Neural_Model is
       for sample in 1 .. aModel.Num_Samples loop
          Put_Line (Routine_Name & "sample " & Integer'Image (sample));
          for layer_id in reverse
-           aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
-            if layer_id < aModel.Layers.Last_Index and
-              layer_id >  aModel.Layers.First_Index then
+           aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index - 1 loop
                Backward (aModel, sample, layer_id);
-            end if;
          end loop;
       end loop;
 
@@ -121,23 +118,20 @@ package body Neural_Model is
       Routine_Name  : constant String := "Neural_Model.Backward ";
       Prev_Layer    : Layer := aModel.Layers (L_Index + 1);
       This_Layer    : Layer := aModel.Layers (L_Index);
-      dEdY          : Real_Float_Vector := Deactivate (aModel, Sample, L_Index);
+      dEdY          : constant Real_Float_Vector := Deactivate (aModel, Sample, L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
-      Input_Error   : Real_Float_Vector (This_Layer.Input_Data'Range (2));
+      Input_Error   : constant Real_Float_Vector  :=
+        Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients) * dEdY;
       --  Output error of this layer is Prev_Layer.Input_Error
       Weights_Error : constant Real_Float_Matrix :=
                         Prev_Layer.Input_Error *
                           Get_Row (This_Layer.Input_Data, Sample);
-      D_Weights     : Real_Float_Vector :=
-                        Get_Row (This_Layer.Delta_Weights, Sample);
+      D_Weights     : constant Real_Float_Vector :=
+                        Get_Row (This_Layer.Delta_Weights, Sample) +
+                        Input_Error;
    begin
       Put_Line (Routine_Name);
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
-      Put_Line (Routine_Name & "prior layer " & Integer'Image (L_Index - 1));
-      Input_Error :=
-        Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients) * dEdY;
-
-      D_Weights := D_Weights + Input_Error;
 
       for col in D_Weights'Range loop
          This_Layer.Delta_Weights (Sample, col) := D_Weights (col);
@@ -152,47 +146,6 @@ package body Neural_Model is
       aModel.Layers (L_Index) := This_Layer;
 
    end Backward;
-
-   --  -------------------------------------------------------------------------
-
-   --     function Backward (aModel          : in out Sequential_Model;
-   --                        Sample, L_Index : Positive;
-   --                        Output_Error    : Real_Float_Vector)
-   --                        return Real_Float_Vector is
-   --        use Real_Float_Arrays;
-   --        Routine_Name  : constant String := "Neural_Model.Backward ";
-   --        aLayer        : Layer := aModel.Layers (L_Index);
-   --        --  Transpose of Coeff_Gradients is dX/dY
-   --        Input_Error   : constant Real_Float_Vector
-   --          := Output_Error *
-   --            Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients);
-   --        Weights_Error : constant Real_Float_Vector :=
-   --                          Output_Error * Transpose (aLayer.Input_Data);
-   --        D_Weights     : Real_Float_Vector :=
-   --                          Get_Row (aLayer.Delta_Weights, Sample);
-   --     begin
-   --        --           Compute_Coeff_Gradient (aModel, index, Loss_Deriv);
-   --        --           Compute_Intercept_Gradient (aModel, index, Loss_Deriv);
-   --        Put_Line (Routine_Name);
-   --        Put_Line (Routine_Name & "D_Weights length " &
-   --                    Integer'Image (D_Weights'Length));
-   --        Put_Line (Routine_Name & "Input_Error length " &
-   --                    Integer'Image (Input_Error'Length));
-   --        D_Weights := D_Weights + Input_Error;
-   --        for col in D_Weights'Range loop
-   --           aLayer.Delta_Weights (Sample, col) := D_Weights (col);
-   --        end loop;
-   --
-   --        for col in Output_Error'Range loop
-   --           aLayer.Delta_Bias (Sample, col) :=
-   --             aLayer.Delta_Bias (Sample, col) + Output_Error (col);
-   --        end loop;
-   --
-   --        aModel.Layers (L_Index) := aLayer;
-   --
-   --        return Input_Error;
-   --
-   --     end Backward;
 
    --  -------------------------------------------------------------------------
 
@@ -359,8 +312,6 @@ package body Neural_Model is
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
-      --        Print_Float_Matrix (Routine_Name & "Layer 1 nodes",
-      --                            aModel.Layers (1).Nodes);
 
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
@@ -411,10 +362,6 @@ package body Neural_Model is
                   Put_Line (Routine_Name & "Sigmoid_Activation not implemented");
                when Soft_Max_Activation => Softmax (aModel.Layers (layer).Nodes);
             end case;
-
-            --              Print_Float_Matrix (Routine_Name & "Layer" &
-            --                                    Integer'Image (layer) & " nodes",
-            --                                  aModel.Layers (layer).Nodes);
          end;  --  declare block
       end loop;  --  layers
 
@@ -449,6 +396,8 @@ package body Neural_Model is
                end;
          end case;
       end loop;
+
+      Print_Float_Vector (Routine_Name & "Loss", Loss);
 
    end Forward;
 
