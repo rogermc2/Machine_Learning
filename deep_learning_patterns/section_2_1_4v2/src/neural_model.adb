@@ -315,12 +315,17 @@ package body Neural_Model is
       use Stochastic_Optimizers;
       use Layer_Packge;
       Routine_Name : constant String := "Neural_Model.Forward ";
-      Loss         : Real_Float_Vector (1 .. aModel.Num_Samples) :=
-                       (others => 0.0);
+      Actual       : constant Real_Float_Vector :=
+                       Get_Row (aModel.Labels, Sample_Index);
+      Loss         : Float := 0.0;
+      Predicted    : Real_Float_Vector (aModel.Labels'Range (2));
+      dEdY         : Real_Float_Vector (Predicted'Range);
    begin
       Put_Line (Routine_Name & "Num layers:" &
                   Integer'Image (Integer (aModel.Layers.Length)));
-      aModel.Layers (1).Input_Data := Get_Row (aModel.Input_Data, Sample_Index);
+      aModel.Layers (1).Input_Data :=
+        Get_Row (aModel.Input_Data, Sample_Index);
+
       for layer in aModel.Layers.First_Index + 1 ..
         aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "layer" & Integer'Image (layer));
@@ -368,39 +373,29 @@ package body Neural_Model is
          end;  --  declare block
       end loop;  --  layers
 
-      for sample in 1 .. aModel.Num_Samples loop
-         for label in aModel.Labels'Range loop
-            aModel.Pred (sample, label) :=
-              aModel.Layers.Last_Element.Nodes (label);
-         end loop;
+      Predicted := aModel.Layers.Last_Element.Nodes;
 
-         case aModel.Loss_Method is
-            when Loss_Binary_Log =>
-               Put_Line (Routine_Name & "Binary_Log_Loss method not implemented");
-            when Loss_Log =>
-               Put_Line (Routine_Name & "Log_Loss method not implemented");
-            when Loss_Mean_Square_Error =>
-               Loss (sample) := Base_Neural.Mean_Squared_Error (aModel.Pred,
-                                                                aModel.Labels);
-               --  Output_Error is dE/dY for output layer
-               declare
-                  Pred       : constant Real_Float_Vector :=
-                                 Get_Row (aModel.Pred, sample);
-                  Actual     : constant Real_Float_Vector :=
-                                 Get_Row (aModel.Labels, sample);
-                  dEdY       : constant Real_Float_Vector :=
-                                 Base_Neural.MSE_Derivative (Pred, Actual);
-                  Last_Layer : Layer := aModel.Layers.Last_Element;
-               begin
-                  Last_Layer.Input_Error :=
-                    Transpose (aModel.Connections.Last_Element.Coeff_Gradients)
-                    * dEdY;
-                  aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
-               end;
-         end case;
-      end loop;
+      case aModel.Loss_Method is
+         when Loss_Binary_Log =>
+            Put_Line (Routine_Name & "Binary_Log_Loss method not implemented");
+         when Loss_Log =>
+            Put_Line (Routine_Name & "Log_Loss method not implemented");
+         when Loss_Mean_Square_Error =>
+            Loss := Base_Neural.Mean_Squared_Error (Predicted,
+                                                    Get_Row (aModel.Labels, Sample_Index));
+            --  Output_Error is dE/dY for output layer
+            declare
+               Last_Layer : Layer := aModel.Layers.Last_Element;
+            begin
+               dEdY  := Base_Neural.MSE_Derivative (Predicted, Actual);
+               Last_Layer.Input_Error :=
+                 Transpose (aModel.Connections.Last_Element.Coeff_Gradients)
+                 * dEdY;
+               aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
+            end;
+      end case;
 
-      Print_Float_Vector (Routine_Name & "Loss", Loss);
+      Put_Line (Routine_Name & "Loss"& Float'Image (Loss));
 
    end Forward;
 
