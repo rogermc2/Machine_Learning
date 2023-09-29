@@ -105,10 +105,7 @@ package body Neural_Model is
          for layer_id in reverse
            aModel.Layers.First_Index .. aModel.Layers.Last_Index loop
             if layer_id < aModel.Layers.Last_Index and
-            layer_id >  aModel.Layers.First_Index then
-               Print_Matrix_Dimensions
-                 (Routine_Name & "layer" & Integer'Image (layer_id) &
-                    " Input_Data", aModel.Layers (layer_id).Input_Data);
+              layer_id >  aModel.Layers.First_Index then
                Backward (aModel, sample, layer_id);
             end if;
          end loop;
@@ -127,35 +124,26 @@ package body Neural_Model is
       dEdY          : Real_Float_Vector := Deactivate (aModel, Sample, L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
       Input_Error   : Real_Float_Vector (This_Layer.Input_Data'Range (2));
---        Weights_Error : constant Real_Float_Vector :=
---                          Prev_Layer.Input_Error *
---                            Transpose (This_Layer.Input_Data);
---        D_Weights     : Real_Float_Vector :=
---                          Get_Row (This_Layer.Delta_Weights, Sample);
+      --  Output error of this layer is Prev_Layer.Input_Error
+      Weights_Error : constant Real_Float_Matrix :=
+                        Prev_Layer.Input_Error *
+                          Get_Row (This_Layer.Input_Data, Sample);
+      D_Weights     : Real_Float_Vector :=
+                        Get_Row (This_Layer.Delta_Weights, Sample);
    begin
       Put_Line (Routine_Name);
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
       Put_Line (Routine_Name & "prior layer " & Integer'Image (L_Index - 1));
-      Print_Matrix_Dimensions (Routine_Name & "This_Layer.Input_Data",
-                               This_Layer.Input_Data);
-      Put_Line (Routine_Name & "Input_Error length " &
-                  Integer'Image (Input_Error'Length));
-      Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
-                               aModel.Connections (L_Index - 1).Coeff_Gradients);
-      Put_Line (Routine_Name & "dEdY length " & Integer'Image (dEdY'Length));
-      Put_Line (Routine_Name & "This_Layer.Input_Error length " &
-                  Integer'Image (This_Layer.Input_Error'Length));
       Input_Error :=
         Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients) * dEdY;
 
---        Put_Line (Routine_Name & "D_Weights length " &
---                    Integer'Image (D_Weights'Length));
---        D_Weights := D_Weights + Input_Error;
+      D_Weights := D_Weights + Input_Error;
 
---        for col in D_Weights'Range loop
---           This_Layer.Delta_Weights (Sample, col) := D_Weights (col);
---        end loop;
+      for col in D_Weights'Range loop
+         This_Layer.Delta_Weights (Sample, col) := D_Weights (col);
+      end loop;
 
+      --  Output error of this layer is Prev_Layer.Input_Error
       for col in Prev_Layer.Input_Error'Range loop
          This_Layer.Delta_Bias (Sample, col) :=
            This_Layer.Delta_Bias (Sample, col) + Prev_Layer.Input_Error (col);
