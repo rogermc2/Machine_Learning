@@ -84,7 +84,7 @@ package body Neural_Model is
       Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
       Prev_Layer   : constant Layer := aModel.Layers.Last_Element;
       Prev_Nodes   : constant Real_Float_Vector := Prev_Layer.Nodes;
-      thisLayer    : Layer (Prev_Nodes'Length, Num_Nodes);
+      thisLayer    : Layer (Prev_Layer.Num_Nodes, Num_Nodes);
    begin
       thisLayer.Input_Data := Prev_Nodes;
       thisLayer.Activation := Activation;
