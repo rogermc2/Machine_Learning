@@ -19,7 +19,7 @@ procedure Sequential_Network_V2 is
    Num_Samples  : constant Positive := 1;
    Num_Features : constant Positive := 13;
    Num_Classes  : constant Positive := 1;
-   Num_Epochs   : constant Positive := 1;
+   Num_Epochs   : constant Positive := 2;
    Learn_Rate   : constant Float := 0.1;
    Input_Data   : constant Real_Float_Matrix (1 .. Num_Samples,
                                               1 .. Num_Features)

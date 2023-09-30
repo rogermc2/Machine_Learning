@@ -13,16 +13,6 @@ package body Neural_Model is
 
    procedure Backward (aModel          : in out Sequential_Model;
                        Sample, L_Index : Positive);
-   --     function Backward (aModel          : in out Sequential_Model;
-   --                        Sample, L_Index : Positive;
-   --                        Output_Error    : Real_Float_Vector)
-   --                        return Real_Float_Vector;
-   --     procedure Compute_Coeff_Gradient (aModel      : in out Sequential_Model;
-   --                                       Layer_Index : Positive;
-   --                                       Loss_Deriv  : Real_Float_Matrix);
-   --     procedure Compute_Intercept_Gradient (aModel      : in out Sequential_Model;
-   --                                           Layer_Index : Positive;
-   --                                           Loss_Deriv  : Real_Float_Matrix);
    function Deactivate (aModel          : in out Sequential_Model;
                         Sample, L_Index : Positive) return Real_Float_Vector;
    function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
@@ -30,6 +20,8 @@ package body Neural_Model is
    procedure Forward (aModel       : in out Sequential_Model;
                       Sample_Index : Positive);
    function To_Matrix (Data : Real_Float_Vector) return Real_Float_Matrix;
+   procedure Update (Connection : in out Stochastic_Optimizers.Parameters_Record;
+                     aLayer     : in out Layer;Learn_Rate : Float);
 
    --  -------------------------------------------------------------------------
 
@@ -132,10 +124,10 @@ package body Neural_Model is
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Input_Error;
 
       --  Output error of this layer is Prev_Layer.Input_Error
-      for col in Prev_Layer.Input_Error'Range loop
-         This_Layer.Delta_Bias :=
-           This_Layer.Delta_Bias + Prev_Layer.Input_Error (col);
-      end loop;
+      --        for col in Prev_Layer.Input_Error'Range loop
+      This_Layer.Delta_Bias :=
+        This_Layer.Delta_Bias + Prev_Layer.Input_Error;
+      --        end loop;
 
       aModel.Layers (L_Index) := This_Layer;
 
@@ -163,12 +155,12 @@ package body Neural_Model is
 
             for index in aModel.Connections.First_Index ..
               aModel.Connections.Last_Index loop
---                 Put_Line (Routine_Name & "Connections index" &
---                             Integer'Image (index));
---                 Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
---                                          aModel.Connections (index).Coeff_Gradients);
---                 Print_Matrix_Dimensions (Routine_Name & "Delta_Weights",
---                                          aModel.Layers (index + 1).Delta_Weights);
+               --                 Put_Line (Routine_Name & "Connections index" &
+               --                             Integer'Image (index));
+               --                 Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
+               --                                          aModel.Connections (index).Coeff_Gradients);
+               --                 Print_Matrix_Dimensions (Routine_Name & "Delta_Weights",
+               --                                          aModel.Layers (index + 1).Delta_Weights);
                aModel.Connections (index).Coeff_Gradients :=
                  aModel.Connections (index).Coeff_Gradients - Learn_Rate *
                  aModel.Layers (index + 1).Delta_Weights /
@@ -176,35 +168,23 @@ package body Neural_Model is
             end loop;
             Put_Line (Routine_Name & "Connections updated");
          end loop;
+
+         for c_index in aModel.Connections.First_Index ..
+           aModel.Connections.Last_Index loop
+            Update (aModel.Connections (c_index),
+                    aModel.Layers (c_index + 1), Learn_Rate);
+         end loop;
+         Put_Line (Routine_Name & "epoch " & Integer'Image (epoch) &
+                     " done.");
+         New_Line;
       end loop;
 
    end Compile;
 
    --  -------------------------------------------------------------------------
-
-   --     procedure Compute_Coeff_Gradient (aModel      : in out Sequential_Model;
-   --                                       Layer_Index : Positive;
-   --                                       Loss_Deriv  : Real_Float_Matrix) is
-   --        use Real_Float_Arrays;
-   --        Routine_Name : constant String := "Neural_Model.Compute_Coeff_Gradient ";
-   --        Deriv_In     : constant Real_Float_Matrix := Loss_Deriv *
-   --                         Transpose
-   --                           (aModel.Connections (Layer_Index).Coeff_Gradients);
-   --        aLayer       : Layer := aModel.Layers (Layer_Index);
-   --        Weights_Err  : constant Real_Float_Vector :=
-   --                         Get_Row (aLayer.Input_Data, 1) * Loss_Deriv;
-   --        Nodes        : Real_Float_Matrix := aLayer.Nodes;
-   --     begin
-   --        aLayer.Delta_Weights := aLayer.Delta_Weights + Weights_Err;
-   --        aLayer.Delta_Bias := aLayer.Delta_Bias + Loss_Deriv;
-   --        aModel.Layers (Layer_Index) := aLayer;
    --
-   --     end Compute_Coeff_Gradient;
-
-   --  -------------------------------------------------------------------------
-
-   --     procedure Compute_Intercept_Gradient (aModel      : in out Sequential_Model;
-   --                                           Layer_Index : Positive;
+   --        procedure Compute_Intercept_Gradient (aModel      : in out Sequential_Model;
+   --                                              Layer_Index : Positive;
    --                                           Loss_Deriv  : Real_Float_Matrix) is
    --        Routine_Name : constant String :=
    --                         "Neural_Model.Compute_Intercept_Gradient ";
@@ -332,9 +312,9 @@ package body Neural_Model is
                         aModel.Connections (layer - 1);
          begin
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
-            Print_Float_Vector
-              (Routine_Name & "layer" & Integer'Image (layer) &
-                 " Input_Data", aModel.Layers (layer).Input_Data);
+            --              Print_Float_Vector
+            --                (Routine_Name & "layer" & Integer'Image (layer) &
+            --                   " Input_Data", aModel.Layers (layer).Input_Data);
             declare
                Input_Vec : constant Real_Float_Vector :=
                              aModel.Layers (layer - 1).Nodes;
@@ -412,5 +392,28 @@ package body Neural_Model is
    end To_Matrix;
 
    --  ---------------------------------------------------------------------------
+
+   procedure Update (Connection : in out Stochastic_Optimizers.Parameters_Record;
+                     aLayer     : in out Layer; Learn_Rate : Float) is
+      use Real_Float_Arrays;
+      Routine_Name : constant String := "Neural_Model.Update ";
+   begin
+      Connection.Coeff_Gradients :=
+        Connection.Coeff_Gradients + aLayer.Delta_Weights;
+      Connection.Intercept_Grads :=
+        Connection.Intercept_Grads + aLayer.Delta_Bias;
+
+      for row in aLayer.Delta_Weights'Range loop
+         for col in aLayer.Delta_Weights'Range (2) loop
+            aLayer.Delta_Weights (row, col) := 0.0;
+         end loop;
+         aLayer.Delta_Bias (row) := 0.0;
+      end loop;
+
+      aLayer.Passes := 0;
+
+   end Update;
+
+   --    -------------------------------------------------------------------------
 
 end Neural_Model;
