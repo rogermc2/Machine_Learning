@@ -118,15 +118,19 @@ package body Neural_Model is
       Routine_Name  : constant String := "Neural_Model.Backward ";
       Prev_Layer    : Layer := aModel.Layers (L_Index + 1);
       This_Layer    : Layer := aModel.Layers (L_Index);
-      dEdY          : constant Real_Float_Vector := Deactivate (aModel, Sample, L_Index);
+      dEdY          : constant Real_Float_Vector :=
+                        Deactivate (aModel, Sample, L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
-      Input_Error   : constant Real_Float_Vector  :=
-                        Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients) * dEdY;
+      Input_Error   : constant Real_Float_Vector :=
+                        Transpose
+                          (aModel.Connections (L_Index - 1).Coeff_Gradients) *
+                        dEdY;
       --  Output error of this layer is Prev_Layer.Input_Error
       Weights_Error : constant Real_Float_Matrix :=
                         Prev_Layer.Input_Error * This_Layer.Input_Data;
    begin
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
+      Print_Float_Vector (Routine_Name & "dEdY ", dEdY);
 
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Input_Error;
       --        Print_Float_Matrix (Routine_Name & "Delta_Weights",
@@ -318,8 +322,8 @@ package body Neural_Model is
       dEdY         : Real_Float_Vector (Predicted'Range);
       Loss         : Float := 0.0;
    begin
-      Put_Line (Routine_Name & "Num layers:" &
-                  Integer'Image (Integer (aModel.Layers.Length)));
+--        Put_Line (Routine_Name & "Num layers:" &
+--                    Integer'Image (Integer (aModel.Layers.Length)));
       aModel.Layers (1).Input_Data :=
         Get_Row (aModel.Input_Data, Sample_Index);
 
@@ -331,9 +335,9 @@ package body Neural_Model is
                         aModel.Connections (layer - 1);
          begin
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
-            Print_Float_Vector
-              (Routine_Name & "layer" & Integer'Image (layer) &
-                 " Input_Data", aModel.Layers (layer).Input_Data);
+--              Print_Float_Vector
+--                (Routine_Name & "layer" & Integer'Image (layer) &
+--                   " Input_Data", aModel.Layers (layer).Input_Data);
             declare
                Input_Vec     : constant Real_Float_Vector :=
                                  aModel.Layers (layer - 1).Nodes;
@@ -352,8 +356,8 @@ package body Neural_Model is
             --                (Routine_Name & "after processing, layer" &
             --                   Integer'Image (layer) & " Input_Data",
             --                 aModel.Layers (layer).Input_Data);
-            Print_Float_Vector (Routine_Name & "nodes",
-                                aModel.Layers (layer).Nodes);
+--              Print_Float_Vector (Routine_Name & "nodes",
+--                                  aModel.Layers (layer).Nodes);
 
             case aModel.Layers (layer).Activation is
                when Identity_Activation => null;
