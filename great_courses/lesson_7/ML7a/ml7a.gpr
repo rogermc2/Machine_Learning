@@ -10,7 +10,7 @@ project ML7A is
    for Exec_Dir use ".";
 
    package Compiler is
-      for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");
+      for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux", "-largs -Wl,-ld_classic");
    end Compiler;
 
    package Linker is
@@ -24,6 +24,10 @@ project ML7A is
             for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.9/3.9.16/Frameworks/Python.framework/Versions/3.9/lib", "-lpython3.9");
       end case;
    end Linker;
+
+   package Builder is
+      for Global_Compilation_Switches ("ada") use ("-largs -Wl,-ld_classic");
+   end Builder;
 
 end ML7A;
 
