@@ -39,6 +39,8 @@ package Neural_Model is
    procedure Add_Connections (aModel : in out Sequential_Model);
    procedure Add_First_Layer (aModel     : in out Sequential_Model;
                               Input_Data : Real_Float_Vector);
+   procedure Add_Labels (aModel : in out Sequential_Model;
+                         Labels : Real_Float_Matrix);
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Activation : Activation_Kind := Identity_Activation);

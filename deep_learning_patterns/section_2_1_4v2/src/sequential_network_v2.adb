@@ -26,13 +26,14 @@ procedure Sequential_Network_V2 is
      := (others => (1.0, 0.0, 0.5, -0.5, 2.3, -5.2, 10.9, -12.0,
                     4.5, 6.9, -0.1, 7.0, -8.0));
    Labels       : constant Real_Float_Matrix (1 .. Num_Samples, 1 .. 1)
-     := (others => (others => 0.0));
+     := (others => (others => 0.5));
    theModel     : Sequential_Model (Num_Samples, Num_Features, Num_Classes,
                                     Loss_Mean_Square_Error);
    --     Classifier     : Python.Module;
 begin
    New_Line;
    Put_Line ("Program " & Program_Name);
+   Add_Labels (theModel, Labels);
    Add_First_Layer (theModel, Get_Row (Input_Data, 1));
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 10, ReLu_Activation);

@@ -43,8 +43,8 @@ package body Neural_Model is
                     0.5 * abs (Maths.Random_Float);
                end loop;
                Connect.Intercept_Grads (row)  := 0.5 * abs (Maths.Random_Float);
---                 Print_Float_Matrix (Routine_Name & "Coeff_Gradients",
---                                     Connect.Coeff_Gradients, 1, 2, 1, 2);
+               --                 Print_Float_Matrix (Routine_Name & "Coeff_Gradients",
+               --                                     Connect.Coeff_Gradients, 1, 2, 1, 2);
             end loop;
 
             aModel.Connections.Append (Connect);
@@ -65,6 +65,15 @@ package body Neural_Model is
       aModel.Layers.Append (First_Layer);
 
    end Add_First_Layer;
+
+   --  ---------------------------------------------------------------------------
+
+   procedure Add_Labels (aModel : in out Sequential_Model;
+                         Labels : Real_Float_Matrix) is
+   begin
+      aModel.Labels := Labels;
+
+   end Add_Labels;
 
    --  ---------------------------------------------------------------------------
    --  Initialization - add other layers
@@ -120,8 +129,8 @@ package body Neural_Model is
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
 
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Input_Error;
---        Print_Float_Matrix (Routine_Name & "Delta_Weights",
---                            This_Layer.Delta_Weights, 1, 2, 1, 2);
+      --        Print_Float_Matrix (Routine_Name & "Delta_Weights",
+      --                            This_Layer.Delta_Weights, 1, 2, 1, 2);
 
       --  Output error of this layer is Prev_Layer.Input_Error
       This_Layer.Delta_Bias :=
@@ -155,18 +164,18 @@ package body Neural_Model is
             --                    Integer'Image (aModel.Layers.Last_Element.Passes));
             Back_Propogate (aModel, sample, Optimiser);
 
---              Put_Line (Routine_Name & "Connections length" &
---                          Integer'Image (Integer (aModel.Connections.Length)));
+            --              Put_Line (Routine_Name & "Connections length" &
+            --                          Integer'Image (Integer (aModel.Connections.Length)));
             for index in aModel.Connections.First_Index ..
               aModel.Connections.Last_Index loop
---                 Put_Line (Routine_Name & "Connections index" &
---                             Integer'Image (index));
---                 Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
---                                          aModel.Connections (index).Coeff_Gradients);
---                 Print_Matrix_Dimensions (Routine_Name & "Delta_Weights",
---                                          aModel.Layers (index + 1).Delta_Weights);
---                 Put_Line (Routine_Name & "layer " & Integer'Image (index + 1) & " Passes" &
---                             Integer'Image (aModel.Layers (index + 1).Passes));
+               --                 Put_Line (Routine_Name & "Connections index" &
+               --                             Integer'Image (index));
+               --                 Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
+               --                                          aModel.Connections (index).Coeff_Gradients);
+               --                 Print_Matrix_Dimensions (Routine_Name & "Delta_Weights",
+               --                                          aModel.Layers (index + 1).Delta_Weights);
+               --                 Put_Line (Routine_Name & "layer " & Integer'Image (index + 1) & " Passes" &
+               --                             Integer'Image (aModel.Layers (index + 1).Passes));
                Assert (aModel.Layers (index + 1).Passes > 0,
                        Routine_Name & "layer" & Integer'Image (index + 1) &
                          " passes is zero!");
@@ -174,9 +183,9 @@ package body Neural_Model is
                  aModel.Connections (index).Coeff_Gradients - Learn_Rate *
                  aModel.Layers (index + 1).Delta_Weights /
                  Float (aModel.Layers (index + 1).Passes);
---                 New_Line;
+               --                 New_Line;
             end loop;
---              Put_Line (Routine_Name & "Connections updated");
+            --              Put_Line (Routine_Name & "Connections updated");
          end loop;
 
          for c_index in aModel.Connections.First_Index ..
@@ -332,17 +341,17 @@ package body Neural_Model is
                  := Connect.Coeff_Gradients * Input_Vec +
                    Connect.Intercept_Grads;
             begin
---                 Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec);
---                 Print_Float_Matrix (Routine_Name & "Connect.Coeff_Gradients",
---                                     Connect.Coeff_Gradients, 1, 2, 1, 2);
+               --                 Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec);
+               --                 Print_Float_Matrix (Routine_Name & "Connect.Coeff_Gradients",
+               --                                     Connect.Coeff_Gradients, 1, 2, 1, 2);
                aModel.Layers (layer).Input_Data := Input_Vec;
                aModel.Layers (layer).Nodes := Updated_Nodes;
             end;
 
---              Print_Float_Vector
---                (Routine_Name & "after processing, layer" &
---                   Integer'Image (layer) & " Input_Data",
---                 aModel.Layers (layer).Input_Data);
+            --              Print_Float_Vector
+            --                (Routine_Name & "after processing, layer" &
+            --                   Integer'Image (layer) & " Input_Data",
+            --                 aModel.Layers (layer).Input_Data);
             Print_Float_Vector (Routine_Name & "nodes",
                                 aModel.Layers (layer).Nodes);
 
@@ -364,6 +373,10 @@ package body Neural_Model is
       Predicted := aModel.Layers.Last_Element.Nodes;
       Last_Layer.Passes := Last_Layer.Passes + 1;
 
+      Print_Float_Vector (Routine_Name & "Predicted", Predicted);
+      Print_Float_Vector (Routine_Name & "Actual",
+                          Get_Row (aModel.Labels, Sample_Index));
+
       case aModel.Loss_Method is
          when Loss_Binary_Log =>
             Put_Line (Routine_Name & "Binary_Log_Loss method not implemented");
@@ -380,7 +393,8 @@ package body Neural_Model is
             aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
       end case;
 
-      Put_Line (Routine_Name & "Loss"& Float'Image (Loss));
+      Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
+      New_Line;
 
    end Forward;
 
@@ -412,12 +426,12 @@ package body Neural_Model is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Update ";
    begin
---        Print_Float_Matrix (Routine_Name & "Coeff_Gradients",
---                            Connection.Coeff_Gradients, 1, 2, 1, 2);
+      --        Print_Float_Matrix (Routine_Name & "Coeff_Gradients",
+      --                            Connection.Coeff_Gradients, 1, 2, 1, 2);
       Connection.Coeff_Gradients :=
         Connection.Coeff_Gradients + aLayer.Delta_Weights;
---        Print_Float_Matrix (Routine_Name & "updated Coeff_Gradients",
---                            Connection.Coeff_Gradients, 1, 2, 1, 2);
+      --        Print_Float_Matrix (Routine_Name & "updated Coeff_Gradients",
+      --                            Connection.Coeff_Gradients, 1, 2, 1, 2);
       Connection.Intercept_Grads :=
         Connection.Intercept_Grads + aLayer.Delta_Bias;
 
