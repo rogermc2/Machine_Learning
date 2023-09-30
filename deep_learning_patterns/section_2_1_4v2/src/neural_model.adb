@@ -131,8 +131,9 @@ package body Neural_Model is
    begin
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
       Print_Float_Vector (Routine_Name & "dEdY ", dEdY);
+      Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error);
 
-      This_Layer.Delta_Weights := This_Layer.Delta_Weights + Input_Error;
+      This_Layer.Delta_Weights := This_Layer.Delta_Weights + Weights_Error;
       --        Print_Float_Matrix (Routine_Name & "Delta_Weights",
       --                            This_Layer.Delta_Weights, 1, 2, 1, 2);
 
