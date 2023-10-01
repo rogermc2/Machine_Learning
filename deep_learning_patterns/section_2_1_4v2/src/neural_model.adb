@@ -35,9 +35,9 @@ package body Neural_Model is
       loop
          declare
             Connect :
-              Parameters_Record
-                (aModel.Layers (layer + 1).Num_Nodes,
-                 aModel.Layers (layer).Num_Nodes);
+            Parameters_Record
+              (aModel.Layers (layer + 1).Num_Nodes,
+               aModel.Layers (layer).Num_Nodes);
          begin
             for row in Connect.Coeff_Gradients'Range loop
                for col in Connect.Coeff_Gradients'Range (2) loop
@@ -127,16 +127,16 @@ package body Neural_Model is
       Prev_Layer    : Layer := aModel.Layers (L_Index + 1);
       This_Layer    : Layer                      := aModel.Layers (L_Index);
       dEdY          : constant Real_Float_Vector :=
-        Deactivate (aModel, Sample, L_Index);
+                        Deactivate (aModel, Sample, L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
       Input_Error   : constant Real_Float_Vector :=
-        Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients) * dEdY;
+                        Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients) * dEdY;
       --  Output error of this layer is Prev_Layer.Input_Error
       Weights_Error : constant Real_Float_Matrix :=
-        Prev_Layer.Input_Error * This_Layer.Input_Data;
+                        Prev_Layer.Input_Error * This_Layer.Input_Data;
    begin
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
---        Print_Float_Vector (Routine_Name & "dEdY ", dEdY);
+      --        Print_Float_Vector (Routine_Name & "dEdY ", dEdY);
       Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error, 1, 6);
 
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Weights_Error;
@@ -192,26 +192,26 @@ package body Neural_Model is
                Assert
                  (aModel.Layers (index + 1).Passes > 0,
                   Routine_Name & "layer" & Integer'Image (index + 1) &
-                  " passes is zero!");
+                    " passes is zero!");
                aModel.Connections (index).Coeff_Gradients :=
                  aModel.Connections (index).Coeff_Gradients -
                  Learn_Rate * aModel.Layers (index + 1).Delta_Weights /
-                   Float (aModel.Layers (index + 1).Passes);
+                 Float (aModel.Layers (index + 1).Passes);
                aModel.Connections (index).Intercept_Grads :=
                  aModel.Connections (index).Intercept_Grads -
                  Learn_Rate * aModel.Layers (index + 1).Delta_Bias /
-                   Float (aModel.Layers (index + 1).Passes);
---                 Print_Float_Vector
---                   (Routine_Name & "layer " & Integer'Image (index + 1) &
---                    " Delta_Bias",
---                    Learn_Rate * aModel.Layers (index + 1).Delta_Bias /
---                    Float (aModel.Layers (index + 1).Passes), 1, 6);
---                 Print_Float_Matrix
---                   (Routine_Name & "layer " & Integer'Image (index + 1) &
---                    " Delta_Weights",
---                    Learn_Rate * aModel.Layers (index + 1).Delta_Weights /
---                    Float (aModel.Layers (index + 1).Passes),
---                    1, 4, 1, 6);
+                 Float (aModel.Layers (index + 1).Passes);
+               --                 Print_Float_Vector
+               --                   (Routine_Name & "layer " & Integer'Image (index + 1) &
+               --                    " Delta_Bias",
+               --                    Learn_Rate * aModel.Layers (index + 1).Delta_Bias /
+               --                    Float (aModel.Layers (index + 1).Passes), 1, 6);
+               --                 Print_Float_Matrix
+               --                   (Routine_Name & "layer " & Integer'Image (index + 1) &
+               --                    " Delta_Weights",
+               --                    Learn_Rate * aModel.Layers (index + 1).Delta_Weights /
+               --                    Float (aModel.Layers (index + 1).Passes),
+               --                    1, 4, 1, 6);
                --                 New_Line;
             end loop;
             --              Put_Line (Routine_Name & "Connections updated");
@@ -277,7 +277,7 @@ package body Neural_Model is
       Prev_Layer   : constant Layer  := aModel.Layers (L_Index + 1);
       This_Layer   : constant Layer  := aModel.Layers (L_Index);
       Result       :
-        Real_Float_Vector (aModel.Layers (L_Index + 1).Input_Error'Range);
+      Real_Float_Vector (aModel.Layers (L_Index + 1).Input_Error'Range);
    begin
       case This_Layer.Activation is
          when Identity_Activation =>
@@ -348,14 +348,12 @@ package body Neural_Model is
       use Layer_Packge;
       Routine_Name : constant String            := "Neural_Model.Forward ";
       Actual       : constant Real_Float_Vector :=
-        Get_Row (aModel.Labels, Sample_Index);
+                       Get_Row (aModel.Labels, Sample_Index);
       Last_Layer   : Layer                      := aModel.Layers.Last_Element;
       Predicted    : Real_Float_Vector (aModel.Labels'Range (2));
       dEdY         : Real_Float_Vector (Predicted'Range);
       Loss         : Float                      := 0.0;
    begin
-      --        Put_Line (Routine_Name & "Num layers:" &
-      --                    Integer'Image (Integer (aModel.Layers.Length)));
       aModel.Layers (1).Input_Data :=
         Get_Row (aModel.Input_Data, Sample_Index);
 
@@ -364,29 +362,29 @@ package body Neural_Model is
          Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          declare
             Input_Vec     : constant Real_Float_Vector :=
-              aModel.Layers (layer - 1).Nodes;
+                              aModel.Layers (layer - 1).Nodes;
             Connect       : constant Parameters_Record :=
-              aModel.Connections (layer - 1);
+                              aModel.Connections (layer - 1);
             Updated_Nodes : constant Real_Float_Vector :=
-              Connect.Coeff_Gradients * Input_Vec + Connect.Intercept_Grads;
+                              Connect.Coeff_Gradients * Input_Vec + Connect.Intercept_Grads;
          begin
             aModel.Layers (layer).Input_Data :=
               aModel.Layers (layer - 1).Nodes;
-            --              Print_Float_Vector
-            --                (Routine_Name & "layer" & Integer'Image (layer) &
-            --                   " Input_Data", aModel.Layers (layer).Input_Data);
-            --                 Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec);
-            --                 Print_Float_Matrix (Routine_Name & "Connect.Coeff_Gradients",
-            --                                     Connect.Coeff_Gradients, 1, 2, 1, 2);
+            Print_Float_Vector
+              (Routine_Name & "layer" & Integer'Image (layer) &
+                 " Input_Data", aModel.Layers (layer).Input_Data, 1, 7);
+            Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec, 1, 7);
+            Print_Float_Matrix (Routine_Name & "Connect.Coeff_Gradients",
+                                Connect.Coeff_Gradients, 1, 2, 1, 7);
             aModel.Layers (layer).Input_Data := Input_Vec;
             aModel.Layers (layer).Nodes      := Updated_Nodes;
 
-            --              Print_Float_Vector
-            --                (Routine_Name & "after processing, layer" &
-            --                   Integer'Image (layer) & " Input_Data",
-            --                 aModel.Layers (layer).Input_Data);
-            --              Print_Float_Vector (Routine_Name & "nodes",
-            --                                  aModel.Layers (layer).Nodes);
+            Print_Float_Vector
+              (Routine_Name & "after processing, layer" &
+                 Integer'Image (layer) & " Input_Data",
+               aModel.Layers (layer).Input_Data, 1, 7);
+            Print_Float_Vector (Routine_Name & "nodes",
+                                aModel.Layers (layer).Nodes, 1, 7);
 
             case aModel.Layers (layer).Activation is
                when Identity_Activation =>
@@ -464,25 +462,25 @@ package body Neural_Model is
       use Real_Float_Arrays;
       Routine_Name : constant String := "Neural_Model.Update ";
    begin
---        Print_Float_Matrix
---          (Routine_Name & "Coeff_Gradients", Connection.Coeff_Gradients,
---           1, 2, 1, 6);
---        Print_Float_Matrix
---          (Routine_Name & "Delta_Weights", aLayer.Delta_Weights,
---           1, 2, 1, 6);
+      --        Print_Float_Matrix
+      --          (Routine_Name & "Coeff_Gradients", Connection.Coeff_Gradients,
+      --           1, 2, 1, 6);
+      --        Print_Float_Matrix
+      --          (Routine_Name & "Delta_Weights", aLayer.Delta_Weights,
+      --           1, 2, 1, 6);
       Connection.Coeff_Gradients :=
         Connection.Coeff_Gradients + aLayer.Delta_Weights;
---        Print_Float_Matrix
---          (Routine_Name & "updated Coeff_Gradients", Connection.Coeff_Gradients,
---           1, 2, 1, 6);
---        Print_Float_Vector
---          (Routine_Name & "Intercept_Grads", Connection.Intercept_Grads, 1, 6);
---        Print_Float_Vector
---          (Routine_Name & "Delta_Bias", aLayer.Delta_Bias, 1, 6);
---        Connection.Intercept_Grads :=
---          Connection.Intercept_Grads + aLayer.Delta_Bias;
---        Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
---                            Connection.Intercept_Grads, 1, 6);
+      --        Print_Float_Matrix
+      --          (Routine_Name & "updated Coeff_Gradients", Connection.Coeff_Gradients,
+      --           1, 2, 1, 6);
+      --        Print_Float_Vector
+      --          (Routine_Name & "Intercept_Grads", Connection.Intercept_Grads, 1, 6);
+      --        Print_Float_Vector
+      --          (Routine_Name & "Delta_Bias", aLayer.Delta_Bias, 1, 6);
+      --        Connection.Intercept_Grads :=
+      --          Connection.Intercept_Grads + aLayer.Delta_Bias;
+      --        Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
+      --                            Connection.Intercept_Grads, 1, 6);
 
       for row in aLayer.Delta_Weights'Range loop
          for col in aLayer.Delta_Weights'Range (2) loop
