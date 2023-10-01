@@ -374,18 +374,15 @@ package body Base_Neural is
    procedure Softmax (Activation : in out Real_Float_Matrix) is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Base_Neural.Softmax Real_Float_Matrix";
-      Activation_T : Real_Float_Matrix := Transpose (Activation);
-      Classes      : Real_Float_Vector (Activation_T'Range (2));
+      Classes      : Real_Float_Vector (Activation'Range (2));
    begin
-      for index in Activation_T'Range loop
-         Classes := Get_Row (Activation_T, index);
+      for index in Activation'Range loop
+         Classes := Get_Row (Activation, index);
          Softmax (Classes);
-         for col in Activation_T'Range (2) loop
-            Activation_T (index, col) := Classes (col);
+         for col in Activation'Range (2) loop
+            Activation (index, col) := Classes (col);
          end loop;
       end loop;
-
-      Activation := Transpose (Activation_T);
 
    end Softmax;
 
