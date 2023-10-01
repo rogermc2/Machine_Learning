@@ -188,6 +188,11 @@ package body Neural_Model is
                  aModel.Connections (index).Coeff_Gradients - Learn_Rate *
                  aModel.Layers (index + 1).Delta_Weights /
                  Float (aModel.Layers (index + 1).Passes);
+               aModel.Connections (index).Intercept_Grads :=
+                 aModel.Connections (index).Intercept_Grads - Learn_Rate *
+                 aModel.Layers (index + 1).Delta_Bias /
+                 Float (aModel.Layers (index + 1).Passes);
+
                --                 New_Line;
             end loop;
             --              Put_Line (Routine_Name & "Connections updated");

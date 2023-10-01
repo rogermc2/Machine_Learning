@@ -4,5 +4,9 @@ project Sequential_Network_V2 is
    for Object_Dir use "obj";
    for Main use ("sequential_network_v2.adb");
 
+--   package Linker is
+--     for Default_Switches ("ada") use ("-Wl, -ld_classic");
+--  end Linker;
+
 end Sequential_Network_V2;
 
