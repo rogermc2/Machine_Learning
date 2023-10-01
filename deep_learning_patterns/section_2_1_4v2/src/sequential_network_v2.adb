@@ -37,7 +37,7 @@ begin
    Add_First_Layer (theModel, Get_Row (Input_Data, 1));
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 10, ReLu_Activation);
-   Add_Layer (theModel, 1, Soft_Max_Activation);
+   Add_Layer (theModel, 1, Identity_Activation);
    Add_Connections (theModel);
 
    Compile (theModel, Num_Epochs, Learn_Rate);
