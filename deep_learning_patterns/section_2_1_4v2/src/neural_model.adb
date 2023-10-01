@@ -366,7 +366,8 @@ package body Neural_Model is
             Connect       : constant Parameters_Record :=
                               aModel.Connections (layer - 1);
             Updated_Nodes : constant Real_Float_Vector :=
-                              Connect.Coeff_Gradients * Input_Vec + Connect.Intercept_Grads;
+                              Connect.Coeff_Gradients * Input_Vec +
+                                Connect.Intercept_Grads;
          begin
             aModel.Layers (layer).Input_Data :=
               aModel.Layers (layer - 1).Nodes;
@@ -376,8 +377,10 @@ package body Neural_Model is
             Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec, 1, 7);
             Print_Float_Matrix (Routine_Name & "Connect.Coeff_Gradients",
                                 Connect.Coeff_Gradients, 1, 2, 1, 7);
+            Print_Float_Vector (Routine_Name & "Connect.Intercept_Grads",
+                                Connect.Intercept_Grads, 1, 7);
             aModel.Layers (layer).Input_Data := Input_Vec;
-            aModel.Layers (layer).Nodes      := Updated_Nodes;
+            aModel.Layers (layer).Nodes := Updated_Nodes;
 
             Print_Float_Vector
               (Routine_Name & "after processing, layer" &
