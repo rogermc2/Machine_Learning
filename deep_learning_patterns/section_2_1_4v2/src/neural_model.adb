@@ -136,8 +136,8 @@ package body Neural_Model is
         Prev_Layer.Input_Error * This_Layer.Input_Data;
    begin
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
-      Print_Float_Vector (Routine_Name & "dEdY ", dEdY);
-      Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error);
+--        Print_Float_Vector (Routine_Name & "dEdY ", dEdY);
+      Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error, 1, 6);
 
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Weights_Error;
       --        Print_Float_Matrix (Routine_Name & "Delta_Weights",
@@ -205,7 +205,7 @@ package body Neural_Model is
                  (Routine_Name & "layer " & Integer'Image (index + 1) &
                   " Delta_Bias",
                   Learn_Rate * aModel.Layers (index + 1).Delta_Bias /
-                  Float (aModel.Layers (index + 1).Passes));
+                  Float (aModel.Layers (index + 1).Passes), 1, 6);
                Print_Float_Matrix
                  (Routine_Name & "layer " & Integer'Image (index + 1) &
                   " Delta_Weights",
@@ -465,14 +465,20 @@ package body Neural_Model is
       Routine_Name : constant String := "Neural_Model.Update ";
    begin
       Print_Float_Matrix
-        (Routine_Name & "Coeff_Gradients", Connection.Coeff_Gradients, 1, 2, 1, 8);
+        (Routine_Name & "Coeff_Gradients", Connection.Coeff_Gradients,
+         1, 2, 1, 6);
+      Print_Float_Matrix
+        (Routine_Name & "Delta_Weights", aLayer.Delta_Weights,
+         1, 2, 1, 6);
       Connection.Coeff_Gradients :=
         Connection.Coeff_Gradients + aLayer.Delta_Weights;
       Print_Float_Matrix
         (Routine_Name & "updated Coeff_Gradients", Connection.Coeff_Gradients,
-         1, 2, 1, 8);
+         1, 2, 1, 6);
       Print_Float_Vector
         (Routine_Name & "Intercept_Grads", Connection.Intercept_Grads, 1, 6);
+      Print_Float_Vector
+        (Routine_Name & "Delta_Bias", aLayer.Delta_Bias, 1, 6);
       Connection.Intercept_Grads :=
         Connection.Intercept_Grads + aLayer.Delta_Bias;
       Print_Float_Vector (Routine_Name & "updated Intercept_Grads",

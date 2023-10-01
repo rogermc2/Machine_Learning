@@ -370,19 +370,22 @@ package body Base_Neural is
    --  ------------------------------------------------------------------------
    --  SoftMax returns the probability of each class
    --  probability = exp (value) / sum of all exp (v)
-   --  Activation: n_samples x n_features
+   --  Activation: n_samples x n_classes
    procedure Softmax (Activation : in out Real_Float_Matrix) is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Base_Neural.Softmax Real_Float_Matrix";
-      --  Max returns a vector with the maximum value of each row of a matrix
-      Max_Act      : constant Real_Float_Vector := Max (Activation);
-      Tmp          : Real_Float_Matrix := Activation - Max_Act;
-      Sum_Tmp      : Real_Float_Vector (Activation'Range);
+      Activation_T : Real_Float_Matrix := Transpose (Activation);
+      Classes      : Real_Float_Vector (Activation_T'Range (2));
    begin
-      Tmp := ML_Arrays_And_Matrices.Exp (Tmp);
-      Activation := Tmp;
-      Sum_Tmp := Sum (Tmp);
-      Activation := Activation / Sum_Tmp;
+      for index in Activation_T'Range loop
+         Classes := Get_Row (Activation_T, index);
+         Softmax (Classes);
+         for col in Activation_T'Range (2) loop
+            Activation_T (index, col) := Classes (col);
+         end loop;
+      end loop;
+
+      Activation := Transpose (Activation_T);
 
    end Softmax;
 
@@ -391,18 +394,20 @@ package body Base_Neural is
    procedure Softmax (Activation : in out Real_Float_Vector) is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Base_Neural.Softmax Real_Float_Vector";
-      Max_Act      : constant Float := Max (Activation);
-      Tmp          : Real_Float_Vector := Activation - Max_Act;
+      Result : Real_Float_Vector := Exp (Activation);
+      Sum    : Float := 0.0;
    begin
-      Tmp := ML_Arrays_And_Matrices.Exp (Tmp);
-      Activation := Tmp / Sum (Tmp);
+      for index in Activation'Range loop
+         Sum := Sum + Result (index);
+      end loop;
+      Activation := Result / Sum;
 
    end Softmax;
 
    --  ------------------------------------------------------------------------
    --  L158
    function Mean_Squared_Error (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
-                               return Float is
+                                return Float is
       use Real_Float_Arrays;
       Diff : Real_Float_Matrix :=
                To_Real_Float_Matrix (Y_True) - Y_Pred;
@@ -436,7 +441,7 @@ package body Base_Neural is
    --  -------------------------------------------------------------------------
 
    function Mean_Squared_Error (Y_True, Y_Pred : Real_Float_Vector)
-                               return Float is
+                                return Float is
       use Real_Float_Arrays;
       Diff : Real_Float_Vector := Y_True - Y_Pred;
    begin
@@ -466,7 +471,7 @@ package body Base_Neural is
    --  -------------------------------------------------------------------------
 
    function MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
-                return Real_Float_Vector is
+                            return Real_Float_Vector is
       use Real_Float_Arrays;
    begin
 
