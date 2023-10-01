@@ -192,7 +192,16 @@ package body Neural_Model is
                  aModel.Connections (index).Intercept_Grads - Learn_Rate *
                  aModel.Layers (index + 1).Delta_Bias /
                  Float (aModel.Layers (index + 1).Passes);
-
+               Print_Float_Vector
+                 (Routine_Name & "layer " & Integer'Image (index + 1) &
+                    " Delta_Bias",
+                  Learn_Rate * aModel.Layers (index + 1).Delta_Bias /
+                      Float (aModel.Layers (index + 1).Passes));
+               Print_Float_Matrix
+                 (Routine_Name & "layer " & Integer'Image (index + 1) &
+                    " Delta_Weights",
+                  Learn_Rate * aModel.Layers (index + 1).Delta_Weights /
+                      Float (aModel.Layers (index + 1).Passes), 1, 4, 1, 6);
                --                 New_Line;
             end loop;
             --              Put_Line (Routine_Name & "Connections updated");
@@ -328,8 +337,8 @@ package body Neural_Model is
       dEdY         : Real_Float_Vector (Predicted'Range);
       Loss         : Float := 0.0;
    begin
---        Put_Line (Routine_Name & "Num layers:" &
---                    Integer'Image (Integer (aModel.Layers.Length)));
+      --        Put_Line (Routine_Name & "Num layers:" &
+      --                    Integer'Image (Integer (aModel.Layers.Length)));
       aModel.Layers (1).Input_Data :=
         Get_Row (aModel.Input_Data, Sample_Index);
 
@@ -337,33 +346,30 @@ package body Neural_Model is
         aModel.Layers.Last_Index loop
          Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          declare
-            Connect : constant Parameters_Record :=
-                        aModel.Connections (layer - 1);
+            Input_Vec     : constant Real_Float_Vector :=
+                              aModel.Layers (layer - 1).Nodes;
+            Connect       : constant Parameters_Record :=
+                              aModel.Connections (layer - 1);
+            Updated_Nodes : constant Real_Float_Vector
+              := Connect.Coeff_Gradients * Input_Vec +
+                Connect.Intercept_Grads;
          begin
             aModel.Layers (layer).Input_Data := aModel.Layers (layer - 1).Nodes;
---              Print_Float_Vector
---                (Routine_Name & "layer" & Integer'Image (layer) &
---                   " Input_Data", aModel.Layers (layer).Input_Data);
-            declare
-               Input_Vec     : constant Real_Float_Vector :=
-                                 aModel.Layers (layer - 1).Nodes;
-               Updated_Nodes : constant Real_Float_Vector
-                 := Connect.Coeff_Gradients * Input_Vec +
-                   Connect.Intercept_Grads;
-            begin
-               --                 Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec);
-               --                 Print_Float_Matrix (Routine_Name & "Connect.Coeff_Gradients",
-               --                                     Connect.Coeff_Gradients, 1, 2, 1, 2);
-               aModel.Layers (layer).Input_Data := Input_Vec;
-               aModel.Layers (layer).Nodes := Updated_Nodes;
-            end;
+            --              Print_Float_Vector
+            --                (Routine_Name & "layer" & Integer'Image (layer) &
+            --                   " Input_Data", aModel.Layers (layer).Input_Data);
+            --                 Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec);
+            --                 Print_Float_Matrix (Routine_Name & "Connect.Coeff_Gradients",
+            --                                     Connect.Coeff_Gradients, 1, 2, 1, 2);
+            aModel.Layers (layer).Input_Data := Input_Vec;
+            aModel.Layers (layer).Nodes := Updated_Nodes;
 
             --              Print_Float_Vector
             --                (Routine_Name & "after processing, layer" &
             --                   Integer'Image (layer) & " Input_Data",
             --                 aModel.Layers (layer).Input_Data);
---              Print_Float_Vector (Routine_Name & "nodes",
---                                  aModel.Layers (layer).Nodes);
+            --              Print_Float_Vector (Routine_Name & "nodes",
+            --                                  aModel.Layers (layer).Nodes);
 
             case aModel.Layers (layer).Activation is
                when Identity_Activation => null;
