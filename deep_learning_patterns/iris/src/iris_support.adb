@@ -59,7 +59,6 @@ package body Iris_Support is
 
       for index in Target.First_Index .. Target.Last_Index loop
          Target_Item := Target (index);
-         Put_Line (Routine_Name & "target set.");
          if Target_Item.First_Element = 0.0 then
             I0.Append (index);
          elsif Target_Item.First_Element = 1.0 then
@@ -74,7 +73,13 @@ package body Iris_Support is
          X_Trimmed : Real_Float_Matrix
            (1 .. I0_Length + I1_Length, 1 .. 2);
       begin
+         Put_Line (Routine_Name & "I0_Length length:" &
+                     Integer'Image (I0_Length));
+         Put_Line (Routine_Name & "I1_Length length:" &
+                     Integer'Image (I1_Length));
          for row in 1 .. I0_Length loop
+         Put_Line (Routine_Name & "row:" & Integer'Image (row));
+         Put_Line (Routine_Name & "I0 (row):" & Integer'Image (I0 (row)));
             X_Trimmed (row, 1) := X (I0 (row), 1);
             X_Trimmed (row, 2) := X (I0 (row), 2);
          end loop;
