@@ -236,7 +236,7 @@ package ML_Types is
       Feature_Names  : String_List;
       Label_Names    : Unbounded_List;
       Feature_Values : Value_Data_Lists_2D;
-      Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
+      Label_Values   : Value_Data_Lists_2D;   --  num outputs x num classes
    end record;
 
    type Raw_Question is record
@@ -295,4 +295,5 @@ package ML_Types is
    function Slice (aList : Integer_List_2D; First, Last : Positive)
                    return Integer_List_2D;
    function Sum (Data : Integer_List) return Integer;
+
 end ML_Types;

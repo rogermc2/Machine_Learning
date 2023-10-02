@@ -7,7 +7,7 @@ with Maths;
 with Classifier_Loader;
 with ML_Types;
 with NL_Types;
---  with Type_Utilities;
+with Type_Utilities;
 
 package body Iris_Support is
 
@@ -17,14 +17,18 @@ package body Iris_Support is
    --  -------------------------------------------------------------------------
 
    function Build_Dataset return Dataset is
+      use NL_Types.Float_Package;
+      use NL_Types.Float_List_Package;
+      use Type_Utilities;
       Routine_Name      : constant String :=
                             "Iris_Support.Build_Dataset ";
       Iris_Data         : constant ML_Types.Multi_Output_Data_Record :=
                             Classifier_Loader.Load_Data ("src/iris.csv");
-      Features          : constant ML_Types.Value_Data_Lists_2D :=
-                            Iris_Data.Feature_Values;
-      Target            : constant ML_Types.Value_Data_Lists_2D :=
-                            Iris_Data.Label_Values;
+      Features          : constant NL_Types.Float_List_2D :=
+                            To_Float_List_2D (Iris_Data.Feature_Values);
+      Target            : constant NL_Types.Float_List_2D :=
+                            To_Float_List_2D (Iris_Data.Label_Values);
+      Target_Item       : NL_Types.Float_List;
       Train_Length      : constant Positive := 70;
       Test_Length       : constant Positive := 30;
       Feature_Row       : NL_Types.Float_List;
@@ -53,9 +57,11 @@ package body Iris_Support is
       end loop;
 
       for index in Target.First_Index .. Target.Last_Index loop
-         if Target (index) = 0.0 then
+         Target_Item := Target (index);
+         Put_Line (Routine_Name & "target set.");
+         if Target_Item.First_Element = 0.0 then
             I0.Append (index);
-         elsif Target (index) = 1.0 then
+         elsif Target_Item.First_Element = 1.0 then
             I1.Append (index);
          end if;
       end loop;
