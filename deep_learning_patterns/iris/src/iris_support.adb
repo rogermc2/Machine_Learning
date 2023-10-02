@@ -4,6 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
+with Basic_Printing; use Basic_Printing;
 with Classifier_Loader;
 with ML_Types;
 with NL_Types;
@@ -77,9 +78,12 @@ package body Iris_Support is
                      Integer'Image (I0_Length));
          Put_Line (Routine_Name & "I1_Length length:" &
                      Integer'Image (I1_Length));
+         Print_Matrix_Dimensions (Routine_Name & "X_Trimmed", X_Trimmed);
          for row in 1 .. I0_Length loop
          Put_Line (Routine_Name & "row:" & Integer'Image (row));
          Put_Line (Routine_Name & "I0 (row):" & Integer'Image (I0 (row)));
+            Put_Line (Routine_Name & "X (I0 (row), 1): " &
+                        Float'Image (X (I0 (row), 1)));
             X_Trimmed (row, 1) := X (I0 (row), 1);
             X_Trimmed (row, 2) := X (I0 (row), 2);
          end loop;
