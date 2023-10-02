@@ -14,5 +14,8 @@ project Iris_Example is
       for Switches ("ada") use ("-L/usr/local/lib", "-lplplot");
    end Linker;
 
+   package Stack is
+   end Stack;
+
 end Iris_Example;
 

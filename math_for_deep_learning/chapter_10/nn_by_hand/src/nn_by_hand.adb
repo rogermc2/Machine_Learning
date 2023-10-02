@@ -8,7 +8,7 @@ with NN_By_Hand_Support; use NN_By_Hand_Support;
 
 procedure NN_By_Hand is
 
---     Project_Name : constant String := "NN_By_Hand ";
+   Project_Name : constant String := "NN_By_Hand ";
    Epochs       : constant Positive := 1000;
    Eta          : constant Float := 0.1;
    Data         : constant Dataset := Build_Dataset;
@@ -26,6 +26,7 @@ procedure NN_By_Hand is
    Accuracy     : Float;
    Pred         : ML_Types.Integer_List;
 begin
+   Put_Line ("Program " & Project_Name);
    Evaluate (Net, Data.X_Test, Data.Y_Test, Tn_0, Fp_0, Fn_0, Tp_0,
              Accuracy_0, Pred_0);
    Put_Line ("Pre-training results:");

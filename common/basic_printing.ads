@@ -39,6 +39,8 @@ package Basic_Printing is
      (Name       : String; aList : Float_Vector_List;
       List_Start : Positive := 1; List_Finish : Natural := 0;
       Start      : Positive := 1; Finish : Natural := 0);
+   procedure Print_Indefinite_List (Name    : String;
+                                    theList : ML_Types.Indef_String_List);
    procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
                                   Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Integer_Array_List

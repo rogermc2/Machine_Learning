@@ -443,6 +443,32 @@ package body Python is
 
    -- --------------------------------------------------------------------------
 
+   function Call (M : Module; Function_Name : String; A, B : Integer;
+                  C : ML_Arrays_And_Matrices.Integer_Array)
+                  return Python_API.PyObject_Ptr is
+      use Interfaces.C;
+
+      function Py_BuildValue (Format  : char_array; I1, I2 : int;
+                              T1      : PyObject_Ptr) return PyObject_Ptr;
+      pragma Import (C, Py_BuildValue, "Py_BuildValue");
+      F        : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
+      C_Tuple  : constant PyObject_Ptr := To_Tuple (C);
+      PyParams : PyObject_Ptr;
+      PyResult : PyObject_Ptr;
+   begin
+      PyParams := Py_BuildValue (To_C ("iiO"), int (A), int (B), C_Tuple);
+      PyResult := Call_Object (F, PyParams);
+      
+      Py_DecRef (F);
+      Py_DecRef (C_Tuple);
+      Py_DecRef (PyParams);
+
+      return PyResult;
+
+   end Call;
+
+   -- --------------------------------------------------------------------------
+
    function Call (M : Module; Function_Name : String; A : Integer;
                   B : ML_Arrays_And_Matrices.Real_Float_Matrix)
                   return Python_API.PyObject_Ptr is
@@ -452,15 +478,15 @@ package body Python is
                               T1      : PyObject_Ptr) return PyObject_Ptr;
       pragma Import (C, Py_BuildValue, "Py_BuildValue");
       F        : constant PyObject_Ptr := Get_Symbol (M, Function_Name);
-      A_Tuple  : constant PyObject_Ptr := To_Tuple (B);
+      B_Tuple  : constant PyObject_Ptr := To_Tuple (B);
       PyParams : PyObject_Ptr;
       PyResult : PyObject_Ptr;
    begin
-      PyParams := Py_BuildValue (To_C ("iO"), int (A), A_Tuple);
+      PyParams := Py_BuildValue (To_C ("iO"), int (A), B_Tuple);
       PyResult := Call_Object (F, PyParams);
       
       Py_DecRef (F);
-      Py_DecRef (A_Tuple);
+      Py_DecRef (B_Tuple);
       Py_DecRef (PyParams);
 
       return PyResult;

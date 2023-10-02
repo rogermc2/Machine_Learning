@@ -1,0 +1,636 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 15mm
+\topmargin 10mm
+\rightmargin 10mm
+\bottommargin 10mm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Backward Propogation
+\end_layout
+
+\begin_layout Abstract
+Based on Math For Deep Learning by R.
+ T.
+ Kneusel
+\end_layout
+
+\begin_layout Section
+Forward Propagation 
+\end_layout
+
+\begin_layout Standard
+Overview of forward propagation equations:
+\begin_inset Formula 
+\begin{eqnarray*}
+z_{0} & = & w_{0}x_{0}+w_{2}x_{1}+b_{0}\\
+a_{0} & = & \sigma\left(z_{0}\right)\,\,\,\,activation\,value\\
+z_{1} & = & w_{1}x_{1}+w_{3}x_{1}+b_{1}\\
+a_{1} & = & \sigma\left(z_{1}\right)\\
+a_{2} & = & w_{4}a_{0}+w_{5}a_{1}+b_{2}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Backpropogation Algorithm
+\end_layout
+
+\begin_layout Enumerate
+Run a forward pass to map 
+\begin_inset Formula $\mathbf{x}\rightarrow\mathbf{y}$
+\end_inset
+
+, layer by layer to get the final output value 
+\series bold
+h.
+\end_layout
+
+\begin_layout Enumerate
+Calculate the value of the derivative of the loss function 
+\begin_inset Formula $\frac{\partial E}{\partial\mathbf{y}}$
+\end_inset
+
+ for the output layer using 
+\series bold
+h
+\series default
+ and 
+\begin_inset Formula $\mathbf{y}_{True}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+For each earlier layer, calculate the gradient 
+\begin_inset Formula $\frac{\partial E}{\partial\mathbf{x}}$
+\end_inset
+
+ from 
+\begin_inset Formula $\frac{\partial E}{\partial\mathbf{y}}$
+\end_inset
+
+ with 
+\begin_inset Formula $\frac{\partial E}{\partial\mathbf{x}}$
+\end_inset
+
+ becoming 
+\begin_inset Formula $\frac{\partial E}{\partial\mathbf{y}}$
+\end_inset
+
+ for the previous layer.
+\end_layout
+
+\begin_layout Section
+Loss Function
+\end_layout
+
+\begin_layout Standard
+Loss function :
+\begin_inset Formula 
+\begin{eqnarray*}
+E & = & cost\left(\mathbf{h},\mathbf{y}_{True}\right)
+\end{eqnarray*}
+
+\end_inset
+
+where:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\mathbf{y}_{True}$
+\end_inset
+
+ is the expected value (label) from the input data.
+\end_layout
+
+\begin_layout Standard
+Mean squared error
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+E & = & MSE\left(\mathbf{h},\mathbf{\mathbf{y}_{\mathbf{True}}}\right)
+\end{eqnarray*}
+
+\end_inset
+
+To calculate the MSE, take the difference between the model's predictions
+ and the ground truth, square it then average it across the whole dataset:
+\begin_inset Formula 
+\begin{eqnarray*}
+MSE & = & \frac{1}{N}\sum_{i-=1}^{N}\left(pred_{i}-actual_{i}\right)^{2}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Based on the value E, the model “knows” how much to adjust its parameters
+ to get closer to the expected output value y.
+ This adjusment is done by the backpropagation algorithm.
+\end_layout
+
+\begin_layout Standard
+Feeding backward happens by means of the partial derivatives of the feedforward
+ functions.
+ 
+\end_layout
+
+\begin_layout Standard
+Backpropagation aims to minimize the loss E by adjusting the network’s weights
+ and biases.
+\end_layout
+
+\begin_layout Standard
+The level of adjustment is determined by 
+\series bold
+the gradients of the cost function with respect to the network’s weights
+ and biases
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+The derivative of a function measures the sensitivity to a function value's
+ change with respect to a change in the cost function argument x (input
+ value).
+ 
+\end_layout
+
+\begin_layout Standard
+In other words, the derivative tells us which direction the cost function
+ is going.
+ 
+\end_layout
+
+\begin_layout Standard
+The gradient of a function 
+\begin_inset Formula $E(x_{1},x_{2},…,x_{m})$
+\end_inset
+
+ at a point 
+\series bold
+x
+\series default
+ is a vector of the partial derivatives of E in 
+\series bold
+x
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+The gradient shows how much 
+\series bold
+x
+\series default
+ needs to change (in positive or negative direction) to minimize E.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial E}{\partial\mathbf{x}} & = & \begin{bmatrix}\frac{\partial E}{\partial x_{1}} & \frac{\partial E}{\partial x_{2}} & \cdots & \frac{\partial E}{\partial x_{m}}\end{bmatrix}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Weight Equations
+\end_layout
+
+\begin_layout Standard
+Equations for the derivative 
+\begin_inset Formula $\frac{\partial E}{\partial w_{jk}^{l}}$
+\end_inset
+
+ of E for a single weight 
+\begin_inset Formula $w_{jk}^{l}$
+\end_inset
+
+ of layer 
+\begin_inset Formula $l$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial w_{jk}^{l}} & = & \frac{\partial C}{\partial z_{jk}^{l}}\frac{\partial z_{jk}^{l}}{\partial w_{jk}^{l}}\,\,\,\,chain\,rule
+\end{eqnarray*}
+
+\end_inset
+
+where:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $j$
+\end_inset
+
+ is the index of the neuron in layer 
+\begin_inset Formula $l+1$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $k$
+\end_inset
+
+ is the index of the neuron in layer 
+\begin_inset Formula $l$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{eqnarray*}
+z_{j}^{l} & = & \sum_{k=1}^{m}w_{jk}^{l}a_{k}^{l-1}+b_{j}^{l}\,\,\,\,by\,definition\\
+\frac{\partial z_{j}^{l}}{\partial w_{jk}^{l}} & = & a_{k}^{l-1}\,\,\,\,by\,differentiation\\
+\frac{\partial C}{\partial w_{jk}^{l}} & = & \frac{\partial C}{\partial z_{j}^{l}}a_{k}^{l-1}\,\,\,\,final\,value
+\end{eqnarray*}
+
+\end_inset
+
+where:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $m$
+\end_inset
+
+ is the number of neurons in layer 
+\begin_inset Formula $l-1$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial z_{j}^{l}}{\partial w_{jk}^{l}} & = & a_{k}^{l-1}\,\,\,\,by\,differentiation\\
+\frac{\partial C}{\partial w_{jk}^{l}} & = & \frac{\partial C}{\partial z_{j}^{l}}a_{k}^{l-1}\,\,\,\,final\,value
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Bias Equations
+\end_layout
+
+\begin_layout Standard
+Equations for the derivative 
+\begin_inset Formula $\frac{\partial C}{\partial b_{j}^{l}}$
+\end_inset
+
+ of C for a single bias value 
+\begin_inset Formula $b_{j}^{l}$
+\end_inset
+
+ of layer 
+\begin_inset Formula $l$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial b_{j}^{l}} & = & \frac{\partial C}{\partial z_{j}^{l}}\frac{\partial z_{j}^{l}}{\partial b_{j}^{l}}\,\,\,\,chain\,rule\\
+\frac{\partial z_{j}^{l}}{\partial b_{j}^{l}} & = & 1\,\,\,\,by\,differentiation\\
+\frac{\partial C}{\partial b_{j}^{l}} & = & \frac{\partial C}{\partial z_{j}^{l}}\times1\,\,\,\,final\,value
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Common Part
+\end_layout
+
+\begin_layout Standard
+The common part in both sets of equations is often called the “local gradient”
+ 
+\begin_inset Formula $\delta_{j}^{i}$
+\end_inset
+
+ and is expressed as: 
+\begin_inset Formula 
+\begin{eqnarray*}
+\delta_{j}^{i} & = & \frac{\partial C}{\partial z_{j}^{l}}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Optimization of Model Parameters
+\end_layout
+
+\begin_layout Standard
+The gradients allow optimization of the model’s parameters:
+\end_layout
+
+\begin_layout LyX-Code
+While termination condition not met
+\begin_inset Formula 
+\begin{eqnarray*}
+w & := & w-\epsilon\frac{\partial C}{\partial w}\\
+b & := & b-\epsilon\frac{\partial C}{\partial b}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where:
+\end_layout
+
+\begin_layout Standard
+the initial values of 
+\begin_inset Formula $w$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ are set randomly,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ is the learning rate.
+\end_layout
+
+\begin_layout Section
+Examples
+\end_layout
+
+\begin_layout Subsection
+Calculation of the gradient of C with respect to a single weight 
+\begin_inset Formula $w_{22}^{\left(2\right)}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Weight 
+\begin_inset Formula $w_{22}^{2}$
+\end_inset
+
+ connects 
+\begin_inset Formula $a_{2}^{\left(2\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $z_{2}^{\left(3\right)}$
+\end_inset
+
+ , so computing the gradient requires applying the chain rule through 
+\begin_inset Formula $z_{2}^{\left(3\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $a_{2}^{\left(3\right)}$
+\end_inset
+
+ : 
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial w_{22}^{\left(2\right)}} & = & \frac{\partial C}{\partial z_{2}^{\left(3\right)}}\cdot\frac{\partial z_{2}^{\left(3\right)}}{\partial w_{22}^{\left(2\right)}}\\
+ & = & \frac{\partial C}{\partial a_{2}^{\left(3\right)}}\cdot\frac{\partial a_{2}^{\left(3\right)}}{\partial w_{22}^{\left(2\right)}}\\
+ & = & \frac{\partial C}{\partial a_{2}^{\left(3\right)}}\cdot f'\left(z_{2}^{\left(3\right)}\right)\cdot a_{2}^{\left(3\right)}
+\end{eqnarray*}
+
+\end_inset
+
+ Calculating the final value of the derivative of C in 
+\begin_inset Formula $a_{2}^{\left(3\right)}$
+\end_inset
+
+ requires knowledge of the cost function C.
+ 
+\end_layout
+
+\begin_layout Standard
+As C is dependent on 
+\begin_inset Formula $a_{2}^{\left(3\right)}$
+\end_inset
+
+ , calculating the derivative should be fairly straightforward.
+\end_layout
+
+\begin_layout Subsection
+Calculation of the gradients of C for layer 3
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+Cost,\,C\left(\mathbf{s},\mathbf{y}\right) & = & MSE\left(\mathbf{s},\mathbf{y}\right)\\
+ & = & \left(\mathbf{s}-\mathbf{y}\right)^{2}\\
+ & = & \left(\mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}-\mathbf{y}\right)^{2}\\
+ & = & \left(\mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}\right)^{2}-\mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}\mathbf{y}+\mathbf{y}^{2}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+C'\left(\mathbf{s},\mathbf{y}\right) & = & 2\mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}-\mathbf{a}^{\left(3\right)}\mathbf{y}\\
+ & = & \mathbf{a}^{\left(3\right)}\left(2\mathbf{W}^{\left(3\right)}-\mathbf{y}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial\mathbf{W}^{\left(3\right)}} & = & \begin{bmatrix}\frac{\partial C}{\partial w_{11}^{\left(3\right)}}\\
+\frac{\partial C}{\partial w_{21}^{\left(3\right)}}\\
+\frac{\partial C}{\partial w_{31}^{\left(3\right)}}
+\end{bmatrix}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\mathbf{s} & = & \mathbf{W}^{\left(3\right)}\mathbf{a}^{\left(3\right)}\\
+ & = & \begin{bmatrix}w_{11}^{\left(3\right)} & w_{12}^{\left(3\right)}\end{bmatrix}\begin{bmatrix}\mathbf{a}_{1}^{\left(3\right)}\\
+\mathbf{a}_{2}^{\left(3\right)}
+\end{bmatrix}\\
+ & = & w_{11}^{\left(3\right)}\mathbf{a}_{1}^{\left(3\right)}+w_{12}^{\left(3\right)}\mathbf{a}_{2}^{\left(3\right)}\\
+\begin{bmatrix}s_{1}\\
+s_{2}\\
+s_{3}
+\end{bmatrix} & = & w_{11}^{\left(3\right)}\begin{bmatrix}a_{11}^{\left(3\right)}\\
+a_{12}^{\left(3\right)}\\
+a_{13}^{\left(3\right)}
+\end{bmatrix}+w_{12}^{\left(3\right)}\begin{bmatrix}a_{21}^{\left(3\right)}\\
+a_{21}^{\left(3\right)}\\
+a_{21}^{\left(3\right)}
+\end{bmatrix}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial w_{11}^{\left(3\right)}} & = & \frac{\partial C}{\partial s_{1}}\frac{\partial s_{1}}{\partial w_{11}^{\left(3\right)}}\\
+s_{1} & = & w_{11}^{\left(3\right)}a_{11}^{\left(3\right)}+w_{12}^{\left(3\right)}a_{21}^{\left(3\right)}
+\end{eqnarray*}
+
+\end_inset
+
+Therefore, the derivatives 
+\begin_inset Formula $\frac{\partial s_{1}}{\partial w_{1k}^{\left(3\right)}}$
+\end_inset
+
+ are:
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial s_{1}}{\partial w_{11}^{\left(3\right)}} & = & a_{11}^{\left(3\right)}\\
+\frac{\partial s_{1}}{\partial w_{12}^{\left(3\right)}} & = & a_{21}^{\left(3\right)}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial w_{11}^{\left(3\right)}} & = & \frac{\partial C}{\partial s_{1}}\frac{\partial s_{1}}{\partial w_{11}^{\left(3\right)}}\\
+ & = & \frac{\partial C}{\partial s_{1}}a_{11}^{\left(3\right)}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial C}{\partial w_{12}^{\left(3\right)}} & = & \frac{\partial C}{\partial s_{1}}\frac{\partial s_{1}}{\partial w_{12}^{\left(3\right)}}\\
+ & = & \frac{\partial C}{\partial s_{1}}a_{12}^{\left(3\right)}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

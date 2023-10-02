@@ -113,10 +113,11 @@ package body Neural_Loader is
    function Load_Raw_CSV_Data (File_Name : String;
                                Max_Lines : Positive := 20000)
                                return Raw_Data_Vector is
+      Routine_Name : constant String := "Neural_Loader.Load_Raw_CSV_Data ";
       Data_File : File_Type;
       Data      : Raw_Data_Vector;
    begin
-      Put_Line ("Loading " & File_Name & " CSV Data");
+      Put_Line (Routine_Name & "loading " & File_Name & " CSV Data");
       Open (Data_File, In_File, File_Name);
       Data := Load_Raw_CSV_Data (Data_File, Max_Lines);
       Close (Data_File);

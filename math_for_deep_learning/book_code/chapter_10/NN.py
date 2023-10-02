@@ -65,6 +65,7 @@ class FullyConnectedLayer:
         return np.dot(self.input, self.weights) + self.bias
 
     def backward(self, output_error):
+        print("backward output_error", output_error)
         input_error = np.dot(output_error, self.weights.T)
         weights_error = np.dot(self.input.T, output_error)
 
@@ -126,6 +127,8 @@ class Network:
 
                 # backward propagation
                 error = mse_prime(y_batch[j], output)
+                print("err", err)
+                print("error", error)
                 for layer in reversed(self.layers):
                     error = layer.backward(error)
             

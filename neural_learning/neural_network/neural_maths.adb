@@ -103,8 +103,8 @@ package body Neural_Maths is
    --  ------------------------------------------------------------------------
 
    function Mean (A : Real_Float_Matrix) return Float is
-      Length  : constant Float := Float (A'Length * A'Length (2));
-      Sum     : Float := 0.0;
+      Length : constant Float := Float (A'Length * A'Length (2));
+      Sum    : Float := 0.0;
    begin
       for row in A'First .. A'Last loop
          for col in A'First (2) .. A'Last (2) loop
@@ -268,6 +268,20 @@ package body Neural_Maths is
          for col in V'Range (2) loop
             Result (row, col) := Sigmoid_Deriv (V (row, col));
          end loop;
+      end loop;
+
+      return Result;
+
+   end Sigmoid_Deriv;
+
+   --  -------------------------------------------------------------------------
+
+   function Sigmoid_Deriv (V : Real_Float_Vector)
+                           return Real_Float_Vector is
+      Result : Real_Float_Vector (V'Range);
+   begin
+      for row in V'Range loop
+         Result (row) := Sigmoid_Deriv (V (row));
       end loop;
 
       return Result;

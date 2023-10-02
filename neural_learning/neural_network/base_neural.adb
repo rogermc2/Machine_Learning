@@ -43,7 +43,7 @@ package body Base_Neural is
    --  y_prob : n_samples x n_classes, predicted probabilities returned by a
    --  classifier's predict_proba method.
    function Log_Loss (Y_True, Y_Prob : Real_Float_Matrix) return Float is
---        Routine_Name : constant String := "Base_Neural.Log_Loss_Function ";
+      --        Routine_Name : constant String := "Base_Neural.Log_Loss_Function ";
 
       --  ----------------------------------------------------------------------
 
@@ -164,7 +164,7 @@ package body Base_Neural is
    --  L205
    function Binary_Log_Loss (Y_True, Y_Prob : Real_Float_Matrix)
                              return Float is
---        Routine_Name : constant String := "Base_Neural.Binary_Log_Loss ";
+      --        Routine_Name : constant String := "Base_Neural.Binary_Log_Loss ";
       YT2          : Real_Float_Matrix
         (Y_True'Range, Y_True'First (2) .. Y_True'Last (2) + 1);
       YP_Clip      : Real_Float_Matrix := Y_Prob;
@@ -190,8 +190,8 @@ package body Base_Neural is
    begin
       --  L226
       Clip (YP_Clip);
---        Test_Support.Print_Float_Matrix (Routine_Name & "Y_Prob", Y_Prob, 1, 3);
---        Test_Support.Print_Float_Matrix (Routine_Name & "Y_True", Y_True, 1, 3);
+      --        Test_Support.Print_Float_Matrix (Routine_Name & "Y_Prob", Y_Prob, 1, 3);
+      --        Test_Support.Print_Float_Matrix (Routine_Name & "Y_True", Y_True, 1, 3);
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for row in Y_Prob'Range loop
          for col in Y_Prob'Range (2) loop
@@ -254,6 +254,22 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
+   procedure Rect_LU (Activation : in out Float)is
+   begin
+      Activation := Float'Max (0.0, Activation);
+
+   end Rect_LU;
+
+   --  -------------------------------------------------------------------------
+
+   function Rect_LU (Activation : Float) return Float is
+   begin
+      return Float'Max (0.0, Activation);
+
+   end Rect_LU;
+
+   --  -------------------------------------------------------------------------
+
    procedure Rect_LU (Activation : in out Real_Float_Matrix) is
    begin
       for row in Activation'Range loop
@@ -265,13 +281,36 @@ package body Base_Neural is
    end Rect_LU;
 
    --  -------------------------------------------------------------------------
+
+   procedure Rect_LU (Activation : in out Real_Float_Vector) is
+   begin
+      for index in Activation'Range loop
+         Activation (index) := Float'Max (0.0, Activation (index));
+      end loop;
+
+   end Rect_LU;
+
+   --  -------------------------------------------------------------------------
+
+   function Rect_LU (Activation : Real_Float_Vector)
+                     return Real_Float_Vector is
+      Result : Real_Float_Vector (Activation'Range);
+   begin
+      for index in Activation'Range loop
+         Result (index) := Float'Max (0.0, Activation (index));
+      end loop;
+
+      return Result;
+
+   end Rect_LU;
+
+   --  -------------------------------------------------------------------------
    --  L132  del[Z == 0] = 0 means
-   --        for each element of Z that is 0, repalce the corresponding
+   --        for each element of Z that is 0, replace the corresponding
    --        element of del with 0   (f(x) = max(0 , x))
    procedure Rect_LU_Derivative (Z   : Real_Float_Matrix;
                                  Del : in out Real_Float_Matrix) is
    begin
-
       for row in Z'Range loop
          for col in Z'Range (2) loop
             if Z (row, col) = 0.0 then
@@ -283,48 +322,159 @@ package body Base_Neural is
    end Rect_LU_Derivative;
 
    --  -------------------------------------------------------------------------
+
+   procedure Rect_LU_Derivative (Z   : Real_Float_Vector;
+                                 Del : in out Real_Float_Vector) is
+   begin
+      for row in Z'Range loop
+         if Z (row) = 0.0 then
+            Del (row) := 0.0;
+         end if;
+      end loop;
+
+   end Rect_LU_Derivative;
+
+   --  -------------------------------------------------------------------------
+
+   function Rect_LU_Derivative (Z : Real_Float_Vector)
+                                return Real_Float_Vector is
+      Del : Real_Float_Vector (Z'Range) := (others => 0.0);
+   begin
+      for row in Z'Range loop
+         if Z (row) > 0.0 then
+            Del (row) := Rect_LU (Z (row)) / Z (row);
+         end if;
+      end loop;
+
+      return Del;
+
+   end Rect_LU_Derivative;
+
+   --  -------------------------------------------------------------------------
+
+   function Sigmoid (X : Float) return Float is
+      use Maths.Float_Math_Functions;
+   begin
+      return 1.0 / (1.0 + Exp (-X));
+
+   end Sigmoid;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Softmax (Activation : in out Float) is
+   begin
+      null;
+
+   end Softmax;
+
+   --  ------------------------------------------------------------------------
    --  SoftMax returns the probability of each class
    --  probability = exp (value) / sum of all exp (v)
-   --  Activation: n_samples x n_features
+   --  Activation: n_samples x n_classes
    procedure Softmax (Activation : in out Real_Float_Matrix) is
       use Real_Float_Arrays;
-      --        Routine_Name : constant String := "Base_Neural.Softmax ";
-      --  Max returns a vector with the maximum value of each row of a matrix
-      Max_Act      : constant Real_Float_Vector := Max (Activation);
-      Tmp          : Real_Float_Matrix := Activation - Max_Act;
-      Sum_Tmp      : Real_Float_Vector (Activation'Range);
+      --        Routine_Name : constant String := "Base_Neural.Softmax Real_Float_Matrix";
+      Classes      : Real_Float_Vector (Activation'Range (2));
    begin
-      Tmp := ML_Arrays_And_Matrices.Exp (Tmp);
-      Activation := Tmp;
-      Sum_Tmp := Sum (Tmp);
-      Activation := Activation / Sum_Tmp;
+      for index in Activation'Range loop
+         Classes := Get_Row (Activation, index);
+         Softmax (Classes);
+         for col in Activation'Range (2) loop
+            Activation (index, col) := Classes (col);
+         end loop;
+      end loop;
+
+   end Softmax;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Softmax (Activation : in out Real_Float_Vector) is
+      use Real_Float_Arrays;
+      --        Routine_Name : constant String := "Base_Neural.Softmax Real_Float_Vector";
+      Result : constant Real_Float_Vector := Exp (Activation);
+      Sum    : Float := 0.0;
+   begin
+      for index in Activation'Range loop
+         Sum := Sum + Result (index);
+      end loop;
+      Activation := Result / Sum;
 
    end Softmax;
 
    --  ------------------------------------------------------------------------
    --  L158
-   function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix)
-                          return Float is
+   function Mean_Squared_Error (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
+                                return Float is
       use Real_Float_Arrays;
-      Diff : constant Real_Float_Matrix := Y_True - Y_Pred;
-   begin
-
-      return Neural_Maths.Mean (Diff * Diff) / 2.0;
-
-   end Squared_Loss;
-
-   --  -------------------------------------------------------------------------
-   --  L158
-   function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
-                          return Float is
-      use Real_Float_Arrays;
-      Diff : constant Real_Float_Matrix :=
+      Diff : Real_Float_Matrix :=
                To_Real_Float_Matrix (Y_True) - Y_Pred;
    begin
+      for row in Diff'Range loop
+         for col in Diff'Range (2) loop
+            Diff (row, col) := Diff (row, col) ** 2;
+         end loop;
+      end loop;
 
-      return Neural_Maths.Mean (Diff * Diff) / 2.0;
+      return Neural_Maths.Mean (Diff);
 
-   end Squared_Loss;
+   end Mean_Squared_Error;
+
+   --  -------------------------------------------------------------------------
+
+   function Mean_Squared_Error (Y_True, Y_Pred : Real_Float_Matrix) return Float is
+      use Real_Float_Arrays;
+      Diff : Real_Float_Matrix := Y_True - Y_Pred;
+   begin
+      for row in Diff'Range loop
+         for col in Diff'Range (2) loop
+            Diff (row, col) := Diff (row, col) ** 2;
+         end loop;
+      end loop;
+
+      return Neural_Maths.Mean (Diff);
+
+   end Mean_Squared_Error;
+
+   --  -------------------------------------------------------------------------
+
+   function Mean_Squared_Error (Y_True, Y_Pred : Real_Float_Vector)
+                                return Float is
+      use Real_Float_Arrays;
+      Diff : Real_Float_Vector := Y_True - Y_Pred;
+   begin
+      for col in Diff'Range loop
+         Diff (col) := Diff (col) ** 2;
+      end loop;
+
+      return Neural_Maths.Mean (Diff);
+
+   end Mean_Squared_Error;
+
+   --  -------------------------------------------------------------------------
+   --  Squared Loss = (predicted - expected) ^ 2
+   --  = predicted^2 - 2 x predicted x expected + expected^2
+   --  Squared_Loss_Derivative wrt predicted
+   --  = 2 x predicted - 2 x expected = 2 x (predicted - expected)
+
+   function MSE_Derivative (Y_True, Y_Pred : Real_Float_Matrix)
+                            return Real_Float_Matrix is
+      use Real_Float_Arrays;
+   begin
+
+      return 2.0 * (Y_True - Y_Pred);
+
+   end MSE_Derivative;
+
+   --  -------------------------------------------------------------------------
+
+   function MSE_Derivative (Y_True, Y_Pred : Real_Float_Vector)
+                            return Real_Float_Vector is
+      use Real_Float_Arrays;
+   begin
+
+      return 2.0 * (Y_True - Y_Pred);
+
+   end MSE_Derivative;
 
    --  -------------------------------------------------------------------------
 

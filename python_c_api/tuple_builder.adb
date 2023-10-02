@@ -517,13 +517,12 @@ package body Tuple_Builder is
    function To_Tuple (Data : ML_Types.Indef_String_List) return PyObject_Ptr is
       use Interfaces.C;
       use ML_Types.Indefinite_String_Package;
-      --        Routine_Name : constant String := "Python.To_Tuple Unbounded_List ";
+--        Routine_Name : constant String := "Python.To_Tuple Unbounded_List ";
       Curs         : Cursor := Data.First;
-      Tuple        : PyObject_Ptr;
       Item         : PyObject_Ptr;
       Py_Index     : int := -1;
+      Tuple        : constant PyObject_Ptr := PyTuple_New (int (Data.Length));
    begin
-      Tuple := PyTuple_New (int (Data.Length));
       while Has_Element (Curs) loop
          Py_Index := Py_Index + 1;
          Item := PyString_FromString (To_C (Element (Curs)));
