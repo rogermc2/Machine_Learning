@@ -11,13 +11,13 @@ with Neural_Model; use Neural_Model;
 
 --  Each neuron is a very simple function that considers a weighted sum of
 --  incoming signals and then compares the value of that sum against some threshold.
-procedure Sequential_Network_V2 is
-   Program_Name : constant String := "Sequential_Network_V2 ";
+procedure Sequential_Network is
+   Program_Name : constant String := "Sequential_Network ";
 
    Num_Samples  : constant Positive := 1;
    Num_Features : constant Positive := 13;
    Num_Classes  : constant Positive := 1;
-   Num_Epochs   : constant Positive := 30;
+   Num_Epochs   : constant Positive := 40;
    Learn_Rate   : constant Float := 0.1;
    Input_Data   : constant Real_Float_Matrix (1 .. Num_Samples,
                                               1 .. Num_Features)
@@ -64,4 +64,4 @@ exception
    when Error: others => Put_Line (Program_Name & "exception");
       Put_Line (Exception_Information(Error));
 
-end Sequential_Network_V2;
+end Sequential_Network;

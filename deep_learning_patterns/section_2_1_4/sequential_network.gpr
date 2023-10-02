@@ -1,12 +1,12 @@
-project Sequential_Network_V2 is
+project Sequential_Network is
 
    for Source_Dirs use ("src", "../../common", "../../python_c_api", "../../python", "../../neural_learning/datasets", "../../neural_learning/neural_network");
    for Object_Dir use "obj";
-   for Main use ("sequential_network_v2.adb");
+   for Main use ("sequential_network.adb");
 
    package Compiler is
       for Switches ("ada") use ("-gnatw.h.ofjkmruv");
    end Compiler;
 
-end Sequential_Network_V2;
+end Sequential_Network;
 

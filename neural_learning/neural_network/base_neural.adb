@@ -391,7 +391,7 @@ package body Base_Neural is
    procedure Softmax (Activation : in out Real_Float_Vector) is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Base_Neural.Softmax Real_Float_Vector";
-      Result : Real_Float_Vector := Exp (Activation);
+      Result : constant Real_Float_Vector := Exp (Activation);
       Sum    : Float := 0.0;
    begin
       for index in Activation'Range loop
