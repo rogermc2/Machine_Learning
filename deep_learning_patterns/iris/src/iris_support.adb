@@ -4,10 +4,10 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Load_Dataset;
+with Classifier_Loader;
 with ML_Types;
 with NL_Types;
-with Type_Utilities;
+--  with Type_Utilities;
 
 package body Iris_Support is
 
@@ -19,11 +19,12 @@ package body Iris_Support is
    function Build_Dataset return Dataset is
       Routine_Name      : constant String :=
                             "Iris_Support.Build_Dataset ";
-      Iris_Data         : constant Load_Dataset.Iris_Data_Record :=
-                            Load_Dataset.Load_Iris ("src/iris.csv");
-      Features          : constant NL_Types.Float_List_2D := Iris_Data.Features;
-      Target            : constant NL_Types.Float_List :=
-                            Type_Utilities.To_Float_List (Iris_Data.Target);
+      Iris_Data         : constant ML_Types.Multi_Output_Data_Record :=
+                            Classifier_Loader.Load_Data ("src/iris.csv");
+      Features          : constant ML_Types.Value_Data_Lists_2D :=
+                            Iris_Data.Feature_Values;
+      Target            : constant ML_Types.Value_Data_Lists_2D :=
+                            Iris_Data.Label_Values;
       Train_Length      : constant Positive := 70;
       Test_Length       : constant Positive := 30;
       Feature_Row       : NL_Types.Float_List;
