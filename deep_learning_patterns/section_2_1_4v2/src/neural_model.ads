@@ -23,7 +23,7 @@ package Neural_Model is
       Delta_Bias      : Real_Float_Vector (1 .. Num_Nodes) := (others => 0.0);
       Activation      : Activation_Kind := Identity_Activation;
       --  Input_Error is dE/dX
-      Input_Error     : Real_Float_Vector (1 .. Num_Features);
+      Output_Error    : Real_Float_Vector (1 .. Num_Nodes);
       Passes          : Natural := 0;
    end record;
 

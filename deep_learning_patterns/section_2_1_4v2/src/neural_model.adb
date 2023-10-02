@@ -102,16 +102,15 @@ package body Neural_Model is
 
    procedure Back_Propogate
      (aModel    : in out Sequential_Model; Sample : Positive;
-      Optimiser :        Stochastic_Optimizers.Optimizer_Record)
-   is
+      Optimiser : Stochastic_Optimizers.Optimizer_Record) is
       use Stochastic_Optimizers;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
       Routine_Name : constant String := "Neural_Model.Back_Propogate ";
    begin
+      Put_Line (Routine_Name);
       for layer_id in reverse
-        aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index - 1
-      loop
+        aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index loop
          Backward (aModel, sample, layer_id);
       end loop;
 
@@ -120,31 +119,30 @@ package body Neural_Model is
    --  -------------------------------------------------------------------------
 
    procedure Backward
-     (aModel : in out Sequential_Model; Sample, L_Index : Positive)
-   is
+     (aModel : in out Sequential_Model; Sample, L_Index : Positive) is
       use Real_Float_Arrays;
-      Routine_Name  : constant String            := "Neural_Model.Backward ";
-      Prev_Layer    : Layer := aModel.Layers (L_Index + 1);
-      This_Layer    : Layer                      := aModel.Layers (L_Index);
+      Routine_Name  : constant String := "Neural_Model.Backward ";
+      This_Layer    : Layer := aModel.Layers (L_Index);
+      Next_Layer    : Layer := aModel.Layers (L_Index - 1);
       dEdY          : constant Real_Float_Vector :=
                         Deactivate (aModel, Sample, L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
       Input_Error   : constant Real_Float_Vector :=
-                        Transpose (aModel.Connections (L_Index - 1).Coeff_Gradients) * dEdY;
-      --  Output error of this layer is Prev_Layer.Input_Error
+                        Transpose
+                          (aModel.Connections (L_Index - 1).Coeff_Gradients) *
+                        dEdY;
       Weights_Error : constant Real_Float_Matrix :=
-                        Prev_Layer.Input_Error * This_Layer.Input_Data;
+                        dEdY * This_Layer.Input_Data;
    begin
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
       --        Print_Float_Vector (Routine_Name & "dEdY ", dEdY);
-      Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error, 1, 6);
+--        Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error, 1, 6);
 
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Weights_Error;
       --        Print_Float_Matrix (Routine_Name & "Delta_Weights",
       --                            This_Layer.Delta_Weights, 1, 2, 1, 2);
 
-      --  Output error of this layer is Prev_Layer.Input_Error
-      This_Layer.Delta_Bias := This_Layer.Delta_Bias + Prev_Layer.Input_Error;
+      This_Layer.Delta_Bias := This_Layer.Delta_Bias + This_Layer.Output_Error;
       This_Layer.Passes     := This_Layer.Passes + 1;
 
       aModel.Layers (L_Index) := This_Layer;
@@ -155,7 +153,7 @@ package body Neural_Model is
 
    procedure Compile
      (aModel     : in out Sequential_Model; Num_Epochs : Positive;
-      Learn_Rate :        Float)
+      Learn_Rate : Float)
    is
       use Ada.Assertions;
       use Real_Float_Arrays;
@@ -232,41 +230,6 @@ package body Neural_Model is
    end Compile;
 
    --  -------------------------------------------------------------------------
-   --
-   --        procedure Compute_Intercept_Gradient (aModel      : in out Sequential_Model;
-   --                                              Layer_Index : Positive;
-   --                                           Loss_Deriv  : Real_Float_Matrix) is
-   --        Routine_Name : constant String :=
-   --                         "Neural_Model.Compute_Intercept_Gradient ";
-   --        aLayer       : Layer := aModel.Layers (Layer_Index);
-   --        Nodes        : constant Real_Float_Matrix := aLayer.Nodes;
-   --        Deriv_Matrix : Real_Float_Matrix (Nodes'Range, Nodes'Range);
-   --     begin
-   --        Put_Line (Routine_Name & "Activation: " &
-   --                    Activation_Kind'Image (aLayer.Activation));
-   --        for row in Nodes'Range loop
-   --           case aLayer.Activation is
-   --              when Identity_Activation => null;
-   --              when Logistic_Activation => null;
-   --              when ReLu_Activation =>
-   --                 aModel.Connections (Layer_Index).Intercept_Grads :=
-   --                   Deriv_ReLU (Get_Row (Nodes, row));
-   --              when Sigmoid_Activation => null;
-   --              when Soft_Max_Activation =>
-   --                 Deriv_Matrix := Deriv_Softmax (Get_Row (Nodes, row));
-   --                 if Nodes'Length = 1 then
-   --                    aModel.Connections (Layer_Index).Intercept_Grads (1) := 0.0;
-   --                 else
-   --                    Put_Line (Routine_Name & "Soft_Max_Activation incomplete.");
-   --                 end if;
-   --           end case;
-   --        end loop;
-   --
-   --        aModel.Layers (Layer_Index) := aLayer;
-   --
-   --     end Compute_Intercept_Gradient;
-
-   --  -------------------------------------------------------------------------
 
    function Deactivate
      (aModel : in out Sequential_Model; Sample, L_Index : Positive)
@@ -274,10 +237,8 @@ package body Neural_Model is
    is
       use Base_Neural;
       Routine_Name : constant String := "Neural_Model.Backward_Activation ";
-      Prev_Layer   : constant Layer  := aModel.Layers (L_Index + 1);
       This_Layer   : constant Layer  := aModel.Layers (L_Index);
-      Result       :
-      Real_Float_Vector (aModel.Layers (L_Index + 1).Input_Error'Range);
+      Result       : Real_Float_Vector (This_Layer.Output_Error'Range);
    begin
       case This_Layer.Activation is
          when Identity_Activation =>
@@ -285,7 +246,7 @@ package body Neural_Model is
          when Logistic_Activation =>
             Put_Line (Routine_Name & "Logistic_Activation not implemented");
          when ReLu_Activation =>
-            Result := Rect_LU_Derivative (Prev_Layer.Input_Error);
+            Result := Rect_LU_Derivative (This_Layer.Output_Error);
          when Sigmoid_Activation =>
             Put_Line (Routine_Name & "Sigmoid_Activation not implemented");
          when Soft_Max_Activation =>
@@ -346,13 +307,13 @@ package body Neural_Model is
       use Base_Neural;
       use Stochastic_Optimizers;
       use Layer_Packge;
-      Routine_Name : constant String            := "Neural_Model.Forward ";
+      Routine_Name : constant String := "Neural_Model.Forward ";
       Actual       : constant Real_Float_Vector :=
                        Get_Row (aModel.Labels, Sample_Index);
-      Last_Layer   : Layer                      := aModel.Layers.Last_Element;
+      Last_Layer   : Layer := aModel.Layers.Last_Element;
       Predicted    : Real_Float_Vector (aModel.Labels'Range (2));
-      dEdY         : Real_Float_Vector (Predicted'Range);
-      Loss         : Float                      := 0.0;
+      --        dEdY         : Real_Float_Vector (Predicted'Range);
+      Loss         : Float := 0.0;
    begin
       aModel.Layers (1).Input_Data :=
         Get_Row (aModel.Input_Data, Sample_Index);
@@ -406,7 +367,7 @@ package body Neural_Model is
          end;  --  declare block
       end loop;  --  layers
 
-      Predicted         := aModel.Layers.Last_Element.Nodes;
+      Predicted := aModel.Layers.Last_Element.Nodes;
       Last_Layer.Passes := Last_Layer.Passes + 1;
 
       Print_Float_Vector (Routine_Name & "Predicted", Predicted);
@@ -419,14 +380,14 @@ package body Neural_Model is
          when Loss_Log =>
             Put_Line (Routine_Name & "Log_Loss method not implemented");
          when Loss_Mean_Square_Error =>
-            Loss :=
+            Loss := Loss +
               Base_Neural.Mean_Squared_Error
                 (Predicted, Get_Row (aModel.Labels, Sample_Index));
-            --  Output_Error is dE/dY for output layer
-            dEdY := Base_Neural.MSE_Derivative (Predicted, Actual);
-            Last_Layer.Input_Error :=
-              Transpose (aModel.Connections.Last_Element.Coeff_Gradients) *
-              dEdY;
+            --              Output_Error is dE/dY for output layer
+            --              dEdY := Base_Neural.MSE_Derivative (Predicted, Actual);
+            Last_Layer.Output_Error := Base_Neural.MSE_Derivative (Predicted, Actual);
+            --                Transpose (aModel.Connections.Last_Element.Coeff_Gradients) *
+            --                dEdY;
             aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
       end case;
 
