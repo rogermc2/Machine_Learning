@@ -1,5 +1,4 @@
 with Ada.Containers.Indefinite_Vectors;
-with Ada.Numerics.Generic_Real_Arrays;
 
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with Stochastic_Optimizers;
