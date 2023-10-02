@@ -108,7 +108,6 @@ package body Neural_Model is
       use Real_Matrix_List_Package;
       Routine_Name : constant String := "Neural_Model.Back_Propogate ";
    begin
-      Put_Line (Routine_Name);
       for layer_id in reverse
         aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index loop
          Backward (aModel, sample, layer_id);
@@ -135,24 +134,20 @@ package body Neural_Model is
                         dEdY * This_Layer.Input_Data;
    begin
       Put_Line (Routine_Name & "layer " & Integer'Image (L_Index));
-      Print_Float_Vector (Routine_Name & "dEdY ", dEdY, 1, 7);
-      Print_Float_Vector (Routine_Name & "Input_Error ", Input_Error, 1, 7);
+      Print_Float_Vector (Routine_Name & "Output_Error",
+                          This_Layer.Output_Error, 1, 7);
+      Print_Float_Vector (Routine_Name & "Input_Error", Input_Error, 1, 7);
 
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Weights_Error;
       --        Print_Float_Matrix (Routine_Name & "Delta_Weights",
       --                            This_Layer.Delta_Weights, 1, 2, 1, 7);
 
-      Print_Float_Vector (Routine_Name & "Delta_Bias ",
-                          This_Layer.Delta_Bias, 1, 7);
-      Print_Float_Vector (Routine_Name & "Output_Error ",
-                          This_Layer.Output_Error, 1, 7);
-
       This_Layer.Delta_Bias := This_Layer.Delta_Bias + This_Layer.Output_Error;
       This_Layer.Passes := This_Layer.Passes + 1;
-      Print_Float_Vector (Routine_Name & "updated Delta_Bias ",
-                          This_Layer.Delta_Bias, 1, 7);
-      Next_Layer.Output_Error := Input_Error;
+--        Print_Float_Vector (Routine_Name & "updated Delta_Bias ",
+--                            This_Layer.Delta_Bias, 1, 7);
       aModel.Layers (L_Index) := This_Layer;
+      aModel.Layers (L_Index - 1).Output_Error := Input_Error;
 
    end Backward;
 
@@ -180,68 +175,24 @@ package body Neural_Model is
             --              Put_Line (Routine_Name & "Layers.Last_Element.Passes" &
             --                    Integer'Image (aModel.Layers.Last_Element.Passes));
             Back_Propogate (aModel, sample, Optimiser);
-
-            for index in
-              aModel.Connections.First_Index .. aModel.Connections.Last_Index
-            loop
-               Put_Line (Routine_Name & "Connections index " &
-                           Integer'Image (index));
-               Print_Float_Vector
-                 (Routine_Name & "Intercept_Grads",
-                  aModel.Connections (index).Intercept_Grads, 1, 7);
-               --                 Put_Line (Routine_Name & "Connections index" &
-               --                             Integer'Image (index));
-               --                 Print_Matrix_Dimensions (Routine_Name & "Coeff_Gradients",
-               --                                          aModel.Connections (index).Coeff_Gradients);
-               --                 Print_Matrix_Dimensions (Routine_Name & "Delta_Weights",
-               --                                          aModel.Layers (index + 1).Delta_Weights);
-               --                 Put_Line (Routine_Name & "layer " & Integer'Image (index + 1) & " Passes" &
-               --                             Integer'Image (aModel.Layers (index + 1).Passes));
-               Assert
-                 (aModel.Layers (index + 1).Passes > 0,
-                  Routine_Name & "layer" & Integer'Image (index + 1) &
-                    " passes is zero!");
-               aModel.Connections (index).Coeff_Gradients :=
-                 aModel.Connections (index).Coeff_Gradients -
-                 Learn_Rate * aModel.Layers (index + 1).Delta_Weights /
-                 Float (aModel.Layers (index + 1).Passes);
-               aModel.Connections (index).Intercept_Grads :=
-                 aModel.Connections (index).Intercept_Grads -
-                 Learn_Rate * aModel.Layers (index + 1).Delta_Bias /
-                 Float (aModel.Layers (index + 1).Passes);
-               Print_Float_Vector (Routine_Name & "layer " &
-                                     Integer'Image (index + 1) & " Delta_Bias",
-                                   aModel.Layers (index + 1).Delta_Bias, 1, 7);
-               Print_Float_Vector
-                 (Routine_Name & "updated Intercept_Grads",
-                  aModel.Connections (index).Intercept_Grads, 1, 7);
-               --                 Print_Float_Vector
-               --                   (Routine_Name & "layer " & Integer'Image (index + 1) &
-               --                    " Delta_Bias",
-               --                    Learn_Rate * aModel.Layers (index + 1).Delta_Bias /
-               --                    Float (aModel.Layers (index + 1).Passes), 1, 6);
-               --                 Print_Float_Matrix
-               --                   (Routine_Name & "layer " & Integer'Image (index + 1) &
-               --                    " Delta_Weights",
-               --                    Learn_Rate * aModel.Layers (index + 1).Delta_Weights /
-               --                    Float (aModel.Layers (index + 1).Passes),
-               --                    1, 4, 1, 6);
-               --                 New_Line;
-            end loop;
-            --              Put_Line (Routine_Name & "Connections updated");
-         end loop;
+         end loop;  --  sample
 
          for c_index in
            aModel.Connections.First_Index .. aModel.Connections.Last_Index
          loop
-            Put_Line (Routine_Name & "update c_index " & Integer'Image (c_index));
+--              Put_Line (Routine_Name & "Connections index " &
+--                          Integer'Image (c_index));
+--              Print_Float_Vector
+--                (Routine_Name & "Intercept_Grads",
+--                 aModel.Connections (c_index).Intercept_Grads, 1, 7);
             Update
               (aModel.Connections (c_index), aModel.Layers (c_index + 1),
                Learn_Rate);
          end loop;
+         --              Put_Line (Routine_Name & "Connections updated");
          Put_Line (Routine_Name & "epoch " & Integer'Image (epoch) & " done.");
          New_Line;
-      end loop;
+      end loop;  --  epoch
 
    end Compile;
 
@@ -252,7 +203,7 @@ package body Neural_Model is
       return Real_Float_Vector
    is
       use Base_Neural;
-      Routine_Name : constant String := "Neural_Model.Backward_Activation ";
+      Routine_Name : constant String := "Neural_Model.Deactivate ";
       This_Layer   : constant Layer  := aModel.Layers (L_Index);
       Result       : Real_Float_Vector (This_Layer.Output_Error'Range);
    begin
@@ -268,7 +219,7 @@ package body Neural_Model is
          when Soft_Max_Activation =>
             Put_Line (Routine_Name & "Soft_Max_Activation not implemented");
       end case;
-      Print_Float_Vector (Routine_Name & "Result", Result, 1, 7);
+--        Print_Float_Vector (Routine_Name & "Result", Result, 1, 7);
 
       return Result;
 
@@ -318,8 +269,7 @@ package body Neural_Model is
    --  -------------------------------------------------------------------------
 
    procedure Forward
-     (aModel : in out Sequential_Model; Sample_Index : Positive)
-   is
+     (aModel : in out Sequential_Model; Sample_Index : Positive) is
       use Real_Float_Arrays;
       use Base_Neural;
       use Stochastic_Optimizers;
@@ -353,8 +303,8 @@ package body Neural_Model is
             --              Print_Float_Vector (Routine_Name & "Input_Vec", Input_Vec, 1, 7);
             --              Print_Float_Matrix (Routine_Name & "Connect.Coeff_Gradients",
             --                                  Connect.Coeff_Gradients, 1, 2, 1, 7);
-            Print_Float_Vector (Routine_Name & "Connect.Intercept_Grads",
-                                Connect.Intercept_Grads, 1, 7);
+--              Print_Float_Vector (Routine_Name & "Connect.Intercept_Grads",
+--                                  Connect.Intercept_Grads, 1, 7);
             aModel.Layers (layer).Input_Data := Input_Vec;
             aModel.Layers (layer).Nodes := Updated_Nodes;
 
@@ -402,12 +352,11 @@ package body Neural_Model is
               Base_Neural.MSE_Derivative (Predicted, Actual);
             aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
       end case;
+--        Print_Float_Vector (Routine_Name & "Last_Layer.Output_Error",
+--                            Last_Layer.Output_Error, 1, 7);
       Print_Float_Vector (Routine_Name & "Last_Layer.Output_Error",
-                          Last_Layer.Output_Error, 1, 7);
-      Print_Float_Vector (Routine_Name & "actual Last_Layer.Output_Error",
                           aModel.Layers (aModel.Layers.Last_Index).Output_Error,
                           1, 7);
-
 
       Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
       New_Line;
@@ -450,8 +399,8 @@ package body Neural_Model is
       --        Print_Float_Matrix
       --          (Routine_Name & "Delta_Weights", aLayer.Delta_Weights,
       --           1, 2, 1, 6);
-      Print_Float_Vector
-        (Routine_Name & "Intercept_Grads", Connection.Intercept_Grads, 1, 7);
+--        Print_Float_Vector
+--          (Routine_Name & "Intercept_Grads", Connection.Intercept_Grads, 1, 7);
       Connection.Coeff_Gradients :=
         Connection.Coeff_Gradients + aLayer.Delta_Weights;
       --        Print_Float_Matrix
@@ -461,8 +410,8 @@ package body Neural_Model is
       --          (Routine_Name & "Delta_Bias", aLayer.Delta_Bias, 1, 7);
       Connection.Intercept_Grads :=
         Connection.Intercept_Grads + aLayer.Delta_Bias;
-      Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
-                          Connection.Intercept_Grads, 1, 7);
+--        Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
+--                            Connection.Intercept_Grads, 1, 7);
 
       for row in aLayer.Delta_Weights'Range loop
          for col in aLayer.Delta_Weights'Range (2) loop
