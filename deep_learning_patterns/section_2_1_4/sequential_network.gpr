@@ -22,5 +22,7 @@ project Sequential_Network is
       end case;
    end Linker;
 
+   for Exec_Dir use ".";
+
 end Sequential_Network;
 
