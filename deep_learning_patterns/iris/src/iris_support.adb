@@ -27,7 +27,8 @@ package body Iris_Support is
       Features          : constant NL_Types.Float_List_2D :=
                             To_Float_List_2D (Iris_Data.Feature_Values);
       Target            : constant NL_Types.Float_List_2D :=
-                            To_Float_List_2D (Iris_Data.Label_Values);
+                            To_Float_List_2D
+                              (To_Integer_List_2D (Iris_Data.Label_Values));
       Target_Item       : NL_Types.Float_List;
       Train_Length      : constant Positive := 70;
       Test_Length       : constant Positive := 30;
