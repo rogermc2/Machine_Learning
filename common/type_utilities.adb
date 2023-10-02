@@ -50,7 +50,8 @@ package body Type_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Float_List (I : ML_Types.Integer_List) return NL_Types.Float_List is
+   function To_Float_List (I : ML_Types.Integer_List)
+                           return NL_Types.Float_List is
       F_List : NL_Types.Float_List;
    begin
       for index in I.First_Index .. I.Last_Index loop

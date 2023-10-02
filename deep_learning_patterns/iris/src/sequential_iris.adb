@@ -5,36 +5,32 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Basic_Printing; use Basic_Printing;
-with Classifier_Loader;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 with ML_Types;
 --  with Python;
---  with Shuffler;
 
+with Iris_Support; use Iris_Support;
 with Neural_Model; use Neural_Model;
 
 --  Each neuron is a very simple function that considers a weighted sum of
 --  incoming signals and then compares the value of that sum against some threshold.
 procedure Sequential_Iris is
-   use Classifier_Loader;
-   Program_Name : constant String := "Sequential_Iris ";
-
-   Iris_Data       : constant ML_Types.Multi_Output_Data_Record :=
-                       Load_Data ("src/iris.csv");
-   Iris_Features   : constant ML_Types.Value_Data_Lists_2D :=
-                       Iris_Data.Feature_Values;
+--     use Classifier_Loader;
+   Program_Name   : constant String := "Sequential_Iris ";
+   Iris_Data      : constant Dataset := Build_Dataset;
+--     Iris_Data       : constant ML_Types.Multi_Output_Data_Record :=
+--                         Load_Data ("src/iris.csv");
+--     Iris_Features   : constant ML_Types.Value_Data_Lists_2D :=
+--                         Iris_Data.Feature_Values;
    Class_Names     : ML_Types.Class_Names_List;
-   Num_Samples     : constant Positive := Positive (Iris_Features.Length);
-   Num_Features    : constant Positive := 13;
+--     Num_Samples     : constant Positive := Positive (Iris_Features.Length);
+   Num_Samples     : constant Positive := Iris_Data.Test_Length;
+   Num_Features    : constant Positive := Iris_Data.Num_Features;
    Num_Classes     : constant Positive := 1;
-   Num_Epochs      : constant Positive := 40;
+   Num_Epochs      : constant Positive := 2;
    Learn_Rate      : constant Float := 0.1;
-   Input_Data      : constant Real_Float_Matrix (1 .. Num_Samples,
-                                                 1 .. Num_Features)
-     := (others => (1.0, 0.0, 0.5, -0.5, 2.3, -5.2, 10.9, -12.0,
-                    4.5, 6.9, -0.1, 7.0, -8.0));
-   Labels          : constant Real_Float_Matrix (1 .. Num_Samples, 1 .. 1)
-     := (others => (others => 0.5));
+   Input_Data      : constant Real_Float_Matrix := Iris_Data.X_Test;
+   Labels          : constant Real_Float_Matrix := Iris_Data.Y_Test;
    theModel        : Sequential_Model (Num_Samples, Num_Features, Num_Classes,
                                        Loss_Mean_Square_Error);
    --     Classifier     : Python.Module;

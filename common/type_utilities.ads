@@ -12,6 +12,8 @@ package Type_Utilities is
 
    function To_Array (L : ML_Types.Integer_List) return Integer_Array;
    function To_Float_List (A : Float_Array) return NL_Types.Float_List;
+   function To_Float_List (I : ML_Types.Integer_List)
+                              return NL_Types.Float_List;
    function To_Float_List (F : ML_Types.Value_Data_List)
                            return NL_Types.Float_List;
    function To_Float_List_2D (Data : ML_Types.Value_Data_Lists_2D)
