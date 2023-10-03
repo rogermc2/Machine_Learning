@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Base_Neural;
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package body Neural_Model is
@@ -244,6 +244,7 @@ package body Neural_Model is
    begin
       aModel.Layers (1).Input_Data :=
         Get_Row (aModel.Input_Data, Sample_Index);
+      aModel.Layers (1).Nodes := aModel.Layers (1).Input_Data;
 
       for layer in aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index
       loop
@@ -297,6 +298,8 @@ package body Neural_Model is
             aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
       end case;
 
+      Print_Float_Vector (Routine_Name & "Predicted", Predicted);
+      Print_Float_Vector (Routine_Name & "Actual", Actual);
       Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
       New_Line;
 
