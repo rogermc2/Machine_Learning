@@ -1,12 +1,9 @@
-
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Exceptions; use Ada.Exceptions;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;    use Ada.Text_IO;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing;         use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
-with ML_Types;
 --  with Python;
 
 with Iris_Support; use Iris_Support;
@@ -15,34 +12,27 @@ with Neural_Model; use Neural_Model;
 --  Each neuron is a very simple function that considers a weighted sum of
 --  incoming signals and then compares the value of that sum against some threshold.
 procedure Sequential_Iris is
---     use Classifier_Loader;
-   Program_Name   : constant String := "Sequential_Iris ";
-   Iris_Data      : constant Dataset := Build_Dataset;
---     Iris_Data       : constant ML_Types.Multi_Output_Data_Record :=
---                         Load_Data ("src/iris.csv");
---     Iris_Features   : constant ML_Types.Value_Data_Lists_2D :=
---                         Iris_Data.Feature_Values;
-   Class_Names     : ML_Types.Class_Names_List;
---     Num_Samples     : constant Positive := Positive (Iris_Features.Length);
-   Num_Samples     : constant Positive := Iris_Data.Test_Length;
-   Num_Features    : constant Positive := Iris_Data.Num_Features;
-   Num_Classes     : constant Positive := 1;
-   Num_Epochs      : constant Positive := 3;
-   Learn_Rate      : constant Float := 0.1;
-   Input_Data      : constant Real_Float_Matrix := Iris_Data.X_Test;
-   Labels          : constant Real_Float_Matrix := Iris_Data.Y_Test;
-   theModel        : Sequential_Model (Num_Samples, Num_Features, Num_Classes,
-                                       Loss_Mean_Square_Error);
+   Program_Name : constant String            := "Sequential_Iris ";
+   Iris_Data    : constant Dataset           := Build_Dataset;
+   Num_Samples  : constant Positive          := Iris_Data.Test_Length;
+   Num_Features : constant Positive          := Iris_Data.Num_Features;
+   Num_Classes  : constant Positive          := 1;
+   Num_Epochs   : constant Positive          := 3;
+   Learn_Rate   : constant Float             := 0.1;
+   Input_Data   : constant Real_Float_Matrix := Iris_Data.X_Test;
+   Labels       : constant Real_Float_Matrix := Iris_Data.Y_Test;
+   theModel     :
+     Sequential_Model
+       (Num_Samples, Num_Features, Num_Classes, Loss_Mean_Square_Error);
    --     Classifier     : Python.Module;
 begin
    New_Line;
    Put_Line ("Program " & Program_Name);
-   Class_Names.Append (To_Unbounded_String ("Setosa"));
-   Class_Names.Append (To_Unbounded_String ("Versicolour"));
-   Class_Names.Append (To_Unbounded_String ("Virginica"));
 
-   Assert (Num_Samples > 0, Program_Name &
-             " called with empty Features vector.");
+   Assert
+     (Labels'Length = Input_Data'Length,
+      Program_Name & " Labels'Length /= Input_Data'Length.");
+   Print_Float_Matrix (Program_Name & "Labels", Labels);
    Add_Labels (theModel, Labels);
    Add_First_Layer (theModel, Get_Row (Input_Data, 1));
    Add_Layer (theModel, 2, Sigmoid_Activation);
@@ -50,11 +40,11 @@ begin
    Add_Connections (theModel);
 
    Compile (theModel, Num_Epochs, Learn_Rate);
-   --     declare
-   --  Output_Data : Real_Float_Vector := Get_Output_Value (theModel);
-   --     begin
-   --  Print_Float_Vector (Program_Name & "Output_Data", Output_Data);
-   --     end;
+   declare
+      Output_Data : constant Real_Float_Matrix := Get_Prediction (theModel);
+   begin
+      Print_Float_Matrix (Program_Name & "Predicted values", Output_Data);
+   end;
 
    --     Python.Initialize;
    --     Classifier := Python.Import_File ("sequential");
@@ -69,10 +59,11 @@ begin
    New_Line;
 
 exception
-   when Error: Constraint_Error => Put_Line (Program_Name &
-                                               "Constraint_Error");
-      Put_Line (Exception_Information(Error));
-   when Error: others => Put_Line (Program_Name & "exception");
-      Put_Line (Exception_Information(Error));
+   when Error : Constraint_Error =>
+      Put_Line (Program_Name & "Constraint_Error");
+      Put_Line (Exception_Information (Error));
+   when Error : others           =>
+      Put_Line (Program_Name & "exception");
+      Put_Line (Exception_Information (Error));
 
 end Sequential_Iris;

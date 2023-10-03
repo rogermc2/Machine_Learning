@@ -308,11 +308,11 @@ package body Neural_Model is
 
    --  ---------------------------------------------------------------------------
 
-   --     function Get_Output_Value (aModel : Sequential_Model) return Real_Float_Vector is
-   --     begin
-   --        return aModel.Layers.Last_Element.Output_Data;
-   --
-   --     end Get_Output_Value;
+   function Get_Prediction (aModel : Sequential_Model) return Real_Float_Matrix is
+      begin
+         return aModel.Pred;
+
+    end Get_Prediction;
 
    --  -------------------------------------------------------------------------
 
