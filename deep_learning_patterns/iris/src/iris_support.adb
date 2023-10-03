@@ -1,10 +1,10 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Classifier_Loader;
 with ML_Types;
 with NL_Types;
@@ -21,8 +21,8 @@ package body Iris_Support is
       use NL_Types.Float_Package;
       use NL_Types.Float_List_Package;
       use Type_Utilities;
-      Routine_Name      : constant String :=
-                            "Iris_Support.Build_Dataset ";
+--        Routine_Name      : constant String :=
+--                              "Iris_Support.Build_Dataset ";
       Iris_Data         : constant ML_Types.Multi_Output_Data_Record :=
                             Classifier_Loader.Load_Data ("src/iris.csv");
       Features          : constant NL_Types.Float_List_2D :=
@@ -42,13 +42,11 @@ package body Iris_Support is
       I1                : ML_Types.Integer_List;
       theDataset        : Dataset (Train_Length, Test_Length, 2);
    begin
-      Put_Line (Routine_Name);
       for row in X'Range loop
          Feature_Row := Features (row);
          X (row, 1) := Feature_Row (1);
          X (row, 2) := Feature_Row (2);
       end loop;
-      Put_Line (Routine_Name & "features set.");
 
       X_Means := Means (X);
       X_SDs := Standard_Deviation (X);
@@ -66,7 +64,6 @@ package body Iris_Support is
             I1.Append (index);
          end if;
       end loop;
-      Put_Line (Routine_Name & "target set.");
 
       declare
          I0_Length : constant Natural := Integer (I0.Length);
@@ -74,26 +71,15 @@ package body Iris_Support is
          X_Trimmed : Real_Float_Matrix
            (1 .. I0_Length + I1_Length, 1 .. 2);
       begin
-         Put_Line (Routine_Name & "I0_Length length:" &
-                     Integer'Image (I0_Length));
-         Put_Line (Routine_Name & "I1_Length length:" &
-                     Integer'Image (I1_Length));
-         Print_Matrix_Dimensions (Routine_Name & "X_Trimmed", X_Trimmed);
-         for row in 1 .. I0_Length loop
-         Put_Line (Routine_Name & "row:" & Integer'Image (row));
-         Put_Line (Routine_Name & "I0 (row):" & Integer'Image (I0 (row)));
-            Put_Line (Routine_Name & "X (I0 (row), 1): " &
-                        Float'Image (X (I0 (row), 1)));
-            X_Trimmed (row, 1) := X (I0 (row), 1);
-            X_Trimmed (row, 2) := X (I0 (row), 2);
+         for row in I0.First_Index .. I0.Last_Index loop
+            X_Trimmed (row + 1, 1) := X (I0 (row), 1);
+            X_Trimmed (row + 1, 2) := X (I0 (row), 2);
          end loop;
-         Put_Line (Routine_Name & "X_Trimmed initialized.");
 
-         for row in 1 .. I1_Length loop
-            X_Trimmed (I0_Length + row, 1) := X (I1 (row), 1);
-            X_Trimmed (I0_Length + row, 2) := X (I1 (row), 2);
+         for row in I0.First_Index .. I0.Last_Index loop
+            X_Trimmed (I0_Length + row + 1, 1) := X (I1 (row), 1);
+            X_Trimmed (I0_Length + row + 1, 2) := X (I1 (row), 2);
          end loop;
-         Put_Line (Routine_Name & "X_Trimmed set.");
 
          for row in 1 .. 35 loop
             theDataset.X_Train (row, 1) := X_Trimmed (row, 1);
@@ -119,8 +105,8 @@ package body Iris_Support is
          end loop;
 
          for row in 16 .. 30 loop
-            theDataset.X_Test (row, 1) := X_Trimmed (row + 85, 1);
-            theDataset.X_Test (row, 2) := X_Trimmed (row + 85, 2);
+            theDataset.X_Test (row, 1) := X_Trimmed (row + 70, 1);
+            theDataset.X_Test (row, 2) := X_Trimmed (row + 70, 2);
          end loop;
 
          for index in 1 .. 30 loop
@@ -131,7 +117,6 @@ package body Iris_Support is
             end if;
          end loop;
       end;
-      Put_Line (Routine_Name & "done.");
 
       return theDataset;
 
