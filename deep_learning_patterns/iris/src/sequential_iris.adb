@@ -12,6 +12,7 @@ with Neural_Model; use Neural_Model;
 --  Each neuron is a very simple function that considers a weighted sum of
 --  incoming signals and then compares the value of that sum against some threshold.
 procedure Sequential_Iris is
+   use Real_Float_Arrays;
    Program_Name : constant String            := "Sequential_Iris ";
    Iris_Data    : constant Dataset           := Build_Dataset;
    Num_Samples  : constant Positive          := Iris_Data.Test_Length;
@@ -41,9 +42,10 @@ begin
 
    Compile (theModel, Num_Epochs, Learn_Rate);
    declare
-      Output_Data : constant Real_Float_Matrix := Get_Prediction (theModel);
+      Predictions : constant Real_Float_Matrix := Get_Prediction (theModel);
    begin
-      Print_Float_Matrix (Program_Name & "Predicted values", Output_Data);
+      Print_Float_Matrix (Program_Name & "Predicted values", Predictions);
+      Print_Float_Matrix (Program_Name & "Prediction errors", Predictions - Labels);
    end;
 
    --     Python.Initialize;
