@@ -147,7 +147,7 @@ package body Neural_Model is
       for epoch in 1 .. Num_Epochs loop
          Put_Line (Routine_Name & "epoch " & Integer'Image (epoch));
          for sample in 1 .. aModel.Num_Samples loop
-            --              Put_Line (Routine_Name & "sample " & Integer'Image (sample));
+            Put_Line (Routine_Name & "sample " & Integer'Image (sample));
             Forward (aModel, sample);
             Back_Propogate (aModel);
          end loop;  --  sample
@@ -182,7 +182,7 @@ package body Neural_Model is
          when ReLu_Activation =>
             Result := Rect_LU_Derivative (This_Layer.Output_Error);
          when Sigmoid_Activation =>
-            Put_Line (Routine_Name & "Sigmoid_Activation not implemented");
+            Result := Sigmoid_Derivative (This_Layer.Output_Error);
          when Soft_Max_Activation =>
             Put_Line (Routine_Name & "Soft_Max_Activation not implemented");
       end case;
@@ -273,8 +273,7 @@ package body Neural_Model is
                when ReLu_Activation =>
                   Rect_LU (aModel.Layers (layer).Nodes);
                when Sigmoid_Activation =>
-                  Put_Line
-                    (Routine_Name & "Sigmoid_Activation not implemented");
+                  Sigmoid (aModel.Layers (layer).Nodes);
                when Soft_Max_Activation =>
                   Softmax (aModel.Layers (layer).Nodes);
             end case;

@@ -27,7 +27,7 @@ procedure Sequential_Iris is
    Num_Samples     : constant Positive := Iris_Data.Test_Length;
    Num_Features    : constant Positive := Iris_Data.Num_Features;
    Num_Classes     : constant Positive := 1;
-   Num_Epochs      : constant Positive := 2;
+   Num_Epochs      : constant Positive := 3;
    Learn_Rate      : constant Float := 0.1;
    Input_Data      : constant Real_Float_Matrix := Iris_Data.X_Test;
    Labels          : constant Real_Float_Matrix := Iris_Data.Y_Test;
@@ -45,8 +45,7 @@ begin
              " called with empty Features vector.");
    Add_Labels (theModel, Labels);
    Add_First_Layer (theModel, Get_Row (Input_Data, 1));
-   Add_Layer (theModel, 10, ReLu_Activation);
-   Add_Layer (theModel, 10, ReLu_Activation);
+   Add_Layer (theModel, 2, Sigmoid_Activation);
    Add_Layer (theModel, 1, Identity_Activation);
    Add_Connections (theModel);
 
