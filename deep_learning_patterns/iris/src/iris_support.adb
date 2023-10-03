@@ -24,7 +24,7 @@ package body Iris_Support is
 --        Routine_Name      : constant String :=
 --                              "Iris_Support.Build_Dataset ";
       Iris_Data         : constant ML_Types.Multi_Output_Data_Record :=
-                            Classifier_Loader.Load_Data ("src/iris.csv");
+                            Classifier_Loader.Load_Data ("src/iris_01.csv");
       Features          : constant NL_Types.Float_List_2D :=
                             To_Float_List_2D (Iris_Data.Feature_Values);
       Target            : constant NL_Types.Float_List_2D :=
