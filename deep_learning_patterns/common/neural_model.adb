@@ -108,7 +108,7 @@ package body Neural_Model is
    procedure Backward
      (aModel : in out Sequential_Model; L_Index : Positive) is
       use Real_Float_Arrays;
---        Routine_Name  : constant String := "Neural_Model.Backward ";
+      Routine_Name  : constant String := "Neural_Model.Backward ";
       This_Layer    : Layer := aModel.Layers (L_Index);
       dEdY          : constant Real_Float_Vector :=
                         Deactivate (aModel, L_Index);
@@ -125,6 +125,8 @@ package body Neural_Model is
       This_Layer.Passes := This_Layer.Passes + 1;
       aModel.Layers (L_Index) := This_Layer;
       aModel.Layers (L_Index - 1).Output_Error := Input_Error;
+      Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
+                            " Input_Error:", Input_Error);
 
    end Backward;
 
