@@ -17,14 +17,13 @@ procedure Sequential_Iris is
    Iris_Data    : constant Dataset           := Build_Dataset;
    Num_Samples  : constant Positive          := Iris_Data.Test_Length;
    Num_Features : constant Positive          := Iris_Data.Num_Features;
-   Num_Classes  : constant Positive          := 1;
    Num_Epochs   : constant Positive          := 3;
    Learn_Rate   : constant Float             := 0.1;
    Input_Data   : constant Real_Float_Matrix := Iris_Data.X_Test;
    Labels       : constant Real_Float_Matrix := Iris_Data.Y_Test;
-   theModel     :
-     Sequential_Model
-       (Num_Samples, Num_Features, Num_Classes, Loss_Mean_Square_Error);
+   Num_Classes  : constant Positive          := Labels'Length (2);
+   theModel     : Sequential_Model (Num_Samples, Num_Features, Num_Classes,
+                                    Loss_Mean_Square_Error);
    --     Classifier     : Python.Module;
 begin
    New_Line;
