@@ -17,12 +17,15 @@ package body Iris_Support is
                                 return Real_Float_Vector;
    --  -------------------------------------------------------------------------
 
-   function Build_Dataset return Dataset is
+   function Build_Dataset (Train_Length : Positive := 70;
+                           Test_Length  : Positive := 30) return Dataset is
       use NL_Types.Float_Package;
       use NL_Types.Float_List_Package;
       use Type_Utilities;
---        Routine_Name      : constant String :=
---                              "Iris_Support.Build_Dataset ";
+      --        Routine_Name      : constant String :=
+      --                              "Iris_Support.Build_Dataset ";
+      Half_Train_Length : constant Positive := Train_Length / 2;
+      Half_Test_Length  : constant Positive := Train_Length / 2;
       Iris_Data         : constant ML_Types.Multi_Output_Data_Record :=
                             Classifier_Loader.Load_Data ("src/iris_01.csv");
       Features          : constant NL_Types.Float_List_2D :=
@@ -31,8 +34,6 @@ package body Iris_Support is
                             To_Float_List_2D
                               (To_Integer_List_2D (Iris_Data.Label_Values));
       Target_Item       : NL_Types.Float_List;
-      Train_Length      : constant Positive := 70;
-      Test_Length       : constant Positive := 30;
       Feature_Row       : NL_Types.Float_List;
       X                 : Real_Float_Matrix
         (1 .. Positive (Features.Length), 1 .. 2);
@@ -81,36 +82,36 @@ package body Iris_Support is
             X_Trimmed (I0_Length + row + 1, 2) := X (I1 (row), 2);
          end loop;
 
-         for row in 1 .. 35 loop
+         for row in 1 .. Half_Train_Length loop
             theDataset.X_Train (row, 1) := X_Trimmed (row, 1);
             theDataset.X_Train (row, 2) := X_Trimmed (row, 2);
          end loop;
 
-         for row in 36 .. 70 loop
+         for row in Half_Train_Length + 1 .. Train_Length loop
             theDataset.X_Train (row, 1) := X_Trimmed (row + 14, 1);
             theDataset.X_Train (row, 2) := X_Trimmed (row + 14, 2);
          end loop;
 
-         for index in 1 .. 70 loop
-            if index < 36 then
+         for index in 1 .. Train_Length loop
+            if index <= Half_Train_Length then
                theDataset.Y_Train (index, 1) := 0.0;
             else
                theDataset.Y_Train (index, 1) := 1.0;
             end if;
          end loop;
 
-         for row in 1 .. 15 loop
+         for row in 1 .. Half_Test_Length loop
             theDataset.X_Test (row, 1) := X_Trimmed (row + 35, 1);
             theDataset.X_Test (row, 2) := X_Trimmed (row + 35, 2);
          end loop;
 
-         for row in 16 .. 30 loop
+         for row in Half_Test_Length + 1 .. Test_Length loop
             theDataset.X_Test (row, 1) := X_Trimmed (row + 70, 1);
             theDataset.X_Test (row, 2) := X_Trimmed (row + 70, 2);
          end loop;
 
-         for index in 1 .. 30 loop
-            if index < 16 then
+         for index in 1 .. Test_Length loop
+            if index <= Half_Test_Length then
                theDataset.Y_Test (index, 1) := 0.0;
             else
                theDataset.Y_Test (index, 1) := 1.0;

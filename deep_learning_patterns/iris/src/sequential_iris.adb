@@ -12,9 +12,11 @@ with Neural_Model; use Neural_Model;
 --  Each neuron is a very simple function that considers a weighted sum of
 --  incoming signals and then compares the value of that sum against some threshold.
 procedure Sequential_Iris is
-   use Real_Float_Arrays;
    Program_Name : constant String            := "Sequential_Iris ";
-   Iris_Data    : constant Dataset           := Build_Dataset;
+   Train_Length : constant Positive := 10;
+   Test_Length  : constant Positive := 5;
+   Iris_Data    : constant Dataset           :=
+                    Build_Dataset (Train_Length, Test_Length);
    Num_Samples  : constant Positive          := Iris_Data.Test_Length;
    Num_Features : constant Positive          := Iris_Data.Num_Features;
    Num_Epochs   : constant Positive          := 3;
@@ -33,19 +35,19 @@ begin
      (Labels'Length = Input_Data'Length,
       Program_Name & " Labels'Length /= Input_Data'Length.");
    Print_Float_Matrix (Program_Name & "Labels", Labels);
-   Add_Labels (theModel, Labels);
+   Add_Data (theModel, Input_Data, Labels);
    Add_First_Layer (theModel);
    Add_Layer (theModel, 2, Sigmoid_Activation);
    Add_Layer (theModel, 1, Identity_Activation);
    Add_Connections (theModel);
 
    Compile (theModel, Num_Epochs, Learn_Rate);
-   declare
-      Predictions : constant Real_Float_Matrix := Get_Prediction (theModel);
-   begin
-      Print_Float_Matrix (Program_Name & "Predicted values", Predictions);
-      Print_Float_Matrix (Program_Name & "Prediction errors", Predictions - Labels);
-   end;
+   --     declare
+   --        Predictions : constant Real_Float_Matrix := Get_Prediction (theModel);
+   --     begin
+   --        Print_Float_Matrix (Program_Name & "Predicted values", Predictions);
+   --        Print_Float_Matrix (Program_Name & "Prediction errors", Predictions - Labels);
+   --     end;
 
    --     Python.Initialize;
    --     Classifier := Python.Import_File ("sequential");
