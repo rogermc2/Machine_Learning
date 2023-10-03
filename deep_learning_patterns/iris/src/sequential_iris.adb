@@ -13,14 +13,11 @@ with Neural_Model; use Neural_Model;
 --  incoming signals and then compares the value of that sum against some threshold.
 procedure Sequential_Iris is
    Program_Name : constant String            := "Sequential_Iris ";
---     Train_Length : constant Positive := 10;
---     Test_Length  : constant Positive := 9;
    Iris_Data    : constant Dataset           := Build_Dataset;
---                      Build_Dataset (Train_Length, Test_Length);
    Num_Samples  : constant Positive          := Iris_Data.Test_Length;
    Num_Features : constant Positive          := Iris_Data.Num_Features;
    Num_Epochs   : constant Positive          := 100;
-   Learn_Rate   : constant Float             := 0.001;
+   Learn_Rate   : constant Float             := 0.1;
    Input_Data   : constant Real_Float_Matrix := Iris_Data.X_Test;
    Labels       : constant Real_Float_Matrix := Iris_Data.Y_Test;
    Num_Classes  : constant Positive          := Labels'Length (2);
