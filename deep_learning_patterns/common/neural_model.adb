@@ -54,27 +54,23 @@ package body Neural_Model is
 
    --  ---------------------------------------------------------------------------
 
-   --  Initialization - add first layer
-   procedure Add_First_Layer
-     (aModel : in out Sequential_Model; Input_Data : Real_Float_Vector)
-   is
-      First_Layer : Layer (Input_Data'Length, Input_Data'Length);
+   procedure Add_Data (aModel           : in out Sequential_Model;
+                       Features, Labels : Real_Float_Matrix) is
    begin
-      First_Layer.Input_Data := Input_Data;
-      First_Layer.Nodes      := Input_Data;
+      aModel.Input_Data := Features;
+      aModel.Labels := Labels;
+
+   end Add_Data;
+
+   --  ---------------------------------------------------------------------------
+   --  Initialization - add first layer
+   procedure Add_First_Layer (aModel : in out Sequential_Model)
+   is
+      First_Layer : Layer (aModel.Num_Features, aModel.Num_Features);
+   begin
       aModel.Layers.Append (First_Layer);
 
    end Add_First_Layer;
-
-   --  ---------------------------------------------------------------------------
-
-   procedure Add_Labels
-     (aModel : in out Sequential_Model; Labels : Real_Float_Matrix)
-   is
-   begin
-      aModel.Labels := Labels;
-
-   end Add_Labels;
 
    --  ---------------------------------------------------------------------------
    --  Initialization - add other layers

@@ -34,7 +34,7 @@ begin
       Program_Name & " Labels'Length /= Input_Data'Length.");
    Print_Float_Matrix (Program_Name & "Labels", Labels);
    Add_Labels (theModel, Labels);
-   Add_First_Layer (theModel, Get_Row (Input_Data, 1));
+   Add_First_Layer (theModel);
    Add_Layer (theModel, 2, Sigmoid_Activation);
    Add_Layer (theModel, 1, Identity_Activation);
    Add_Connections (theModel);

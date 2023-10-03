@@ -31,8 +31,8 @@ procedure Sequential_Network is
 begin
    New_Line;
    Put_Line ("Program " & Program_Name);
-   Add_Labels (theModel, Labels);
-   Add_First_Layer (theModel, Get_Row (Input_Data, 1));
+   Add_Data (theModel, Input_Data, Labels);
+   Add_First_Layer (theModel);
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 10, ReLu_Activation);
    Add_Layer (theModel, 1, Identity_Activation);
