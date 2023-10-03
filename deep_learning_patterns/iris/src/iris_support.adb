@@ -35,7 +35,7 @@ package body Iris_Support is
       Test_Length       : constant Positive := 30;
       Feature_Row       : NL_Types.Float_List;
       X                 : Real_Float_Matrix
-        (Features.First_Index .. Features.Last_Index, 1 .. 2);
+        (1 .. Positive (Features.Length), 1 .. 2);
       X_Means           : Real_Float_Vector (X'Range (2));
       X_SDs             : Real_Float_Vector (X'Range (2));
       I0                : ML_Types.Integer_List;
