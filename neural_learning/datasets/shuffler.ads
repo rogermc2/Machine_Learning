@@ -11,5 +11,6 @@ package Shuffler is
    procedure Shuffle (A : in out Real_Float_Matrix; B : in out Binary_Matrix);
    procedure Shuffle (A : in out Real_Float_Matrix; B : in out Integer_Array);
    procedure Shuffle (A : in out Real_Float_Matrix; B : in out Integer_Matrix);
+   procedure Shuffle (A, B : in out Real_Float_Matrix);
 
 end Shuffler;

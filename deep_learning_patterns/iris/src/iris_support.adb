@@ -8,6 +8,7 @@ with Maths;
 with Classifier_Loader;
 with ML_Types;
 with NL_Types;
+with Shuffler;
 with Type_Utilities;
 
 package body Iris_Support is
@@ -77,7 +78,7 @@ package body Iris_Support is
             X_Trimmed (row + 1, 2) := X (I0 (row), 2);
          end loop;
 
-         for row in I0.First_Index .. I0.Last_Index loop
+         for row in I1.First_Index .. I1.Last_Index loop
             X_Trimmed (I0_Length + row + 1, 1) := X (I1 (row), 1);
             X_Trimmed (I0_Length + row + 1, 2) := X (I1 (row), 2);
          end loop;
@@ -88,8 +89,9 @@ package body Iris_Support is
          end loop;
 
          for row in Half_Train_Length + 1 .. Train_Length loop
-            theDataset.X_Train (row, 1) := X_Trimmed (row + 14, 1);
-            theDataset.X_Train (row, 2) := X_Trimmed (row + 14, 2);
+            theDataset.X_Train (row, 1) :=
+              X_Trimmed (50 - Half_Train_Length + row, 1);
+            theDataset.X_Train (row, 2) := X_Trimmed (50 - Half_Train_Length + row, 2);
          end loop;
 
          for index in 1 .. Train_Length loop
@@ -101,13 +103,13 @@ package body Iris_Support is
          end loop;
 
          for row in 1 .. Half_Test_Length loop
-            theDataset.X_Test (row, 1) := X_Trimmed (row + 35, 1);
-            theDataset.X_Test (row, 2) := X_Trimmed (row + 35, 2);
+            theDataset.X_Test (row, 1) := X_Trimmed (row + Half_Train_Length, 1);
+            theDataset.X_Test (row, 2) := X_Trimmed (row + Half_Train_Length, 2);
          end loop;
 
          for row in Half_Test_Length + 1 .. Test_Length loop
-            theDataset.X_Test (row, 1) := X_Trimmed (row + 70, 1);
-            theDataset.X_Test (row, 2) := X_Trimmed (row + 70, 2);
+            theDataset.X_Test (row, 1) := X_Trimmed (Train_Length + row, 1);
+            theDataset.X_Test (row, 2) := X_Trimmed (Train_Length + row, 2);
          end loop;
 
          for index in 1 .. Test_Length loop
@@ -118,6 +120,9 @@ package body Iris_Support is
             end if;
          end loop;
       end;
+
+      Shuffler.Shuffle (theDataset.X_Train, theDataset.Y_Train);
+      Shuffler.Shuffle (theDataset.X_Test, theDataset.Y_Test);
 
       return theDataset;
 

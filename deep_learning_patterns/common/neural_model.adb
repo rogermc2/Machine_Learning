@@ -125,8 +125,8 @@ package body Neural_Model is
       This_Layer.Passes := This_Layer.Passes + 1;
       aModel.Layers (L_Index) := This_Layer;
       aModel.Layers (L_Index - 1).Output_Error := Input_Error;
-      Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
-                            " Input_Error:", Input_Error);
+--        Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
+--                              " Input_Error:", Input_Error);
 
    end Backward;
 
@@ -300,8 +300,8 @@ package body Neural_Model is
             aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
       end case;
 
-      Print_Float_Vector (Routine_Name & "Predicted", Predicted);
-      Print_Float_Vector (Routine_Name & "Actual", Actual);
+--        Print_Float_Vector (Routine_Name & "Predicted", Predicted);
+--        Print_Float_Vector (Routine_Name & "Actual", Actual);
       Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
       New_Line;
 
