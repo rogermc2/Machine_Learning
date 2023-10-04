@@ -22,5 +22,7 @@ project House_Prices is
       end case;
    end Linker;
 
+   for Exec_Dir use ".";
+
 end House_Prices;
 

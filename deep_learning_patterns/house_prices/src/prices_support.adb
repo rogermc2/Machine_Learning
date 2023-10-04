@@ -1,6 +1,7 @@
---  with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Indefinite_Ordered_Maps;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Maths;
@@ -8,6 +9,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use Basic_Printing;
 with Classifier_Loader;
 with ML_Types;
+with Neural_Loader;
 --  with NL_Types;
 --  with Shuffler;
 --  with Type_Utilities;
@@ -32,20 +34,20 @@ package body Prices_Support is
 
    function Build_Dataset return Dataset is
       --  use NL_Types.Float_Package;
---        use NL_Types.Float_List_Package;
---        use Type_Utilities;
+      --        use NL_Types.Float_List_Package;
+      --        use Type_Utilities;
       Routine_Name : constant String := "Prices_Support.Build_Dataset ";
       Train_Length : constant Positive := 70;
       Test_Length  : constant Positive := 30;
---        Train_Data   : constant ML_Types.Multi_Output_Data_Record :=
---          Classifier_Loader.Load_Data ("house_prices/train.csv", 0,
---                                       Train_Length);
+      --        Train_Data   : constant ML_Types.Multi_Output_Data_Record :=
+      --          Classifier_Loader.Load_Data ("house_prices/train.csv", 0,
+      --                                       Train_Length);
       --  Prices       : constant ML_Types.Multi_Output_Data_Record :=
       --    Classifier_Loader.Load_Data ("house_prices/sample_submission.csv");
---        Train_Features : constant NL_Types.Float_List_2D    :=
---          To_Float_List_2D (Train_Data.Feature_Values);
+      --        Train_Features : constant NL_Types.Float_List_2D    :=
+      --          To_Float_List_2D (Train_Data.Feature_Values);
       Test_Features : constant Integer_Matrix :=
-                        Preprocess ("house_prices/trst.csv", Test_Length);
+        Preprocess ("house_prices/test.csv", Test_Length);
       --  Target_Item  : NL_Types.Float_List;
       X : Real_Float_Matrix (Test_Features'Range, 1 .. 4);
       --  X_Means      : Real_Float_Vector (X'Range (2));
@@ -63,7 +65,7 @@ package body Prices_Support is
 
       --  X_Means := Means (X);
       --  X_SDs   := Standard_Deviation (X);
-      --  for row in X'Range loop
+      --  for row in X'RaNeural_Loader.Get_Data_Type (aRow (Positive (f_index)))nge loop
       --     Feature_Row := Features (row);
       --     X (row, 1)  := (X (row, 1) - X_Means (1)) / X_SDs (1);
       --     X (row, 2)  := (X (row, 2) - X_Means (2)) / X_SDs (2);
@@ -190,16 +192,85 @@ package body Prices_Support is
 
    function Preprocess (File_Name : String; Num_Samples : Positive)
                         return Integer_Matrix is
-      Data    : constant ML_Types.Multi_Output_Data_Record :=
-                  Classifier_Loader.Load_Data (File_Name, 0, Num_Samples);
+      Routine_Name : constant String := "Prices_Support.Preprocess ";
+      Data_File    : File_Type;
+      Raw_CSV_Data : ML_Types.Raw_Data_Vector;
+      Output_Data  : ML_Types.Multi_Output_Data_Record;
+      Data         : constant ML_Types.Multi_Output_Data_Record :=
+        Classifier_Loader.Load_Data (File_Name, 0, Num_Samples);
       Result  : Integer_Matrix (1 .. Num_Samples,
                                 1 .. Positive (Data.Feature_Values.Length));
    begin
-       return Result;
+      Put_Line (Routine_Name & "loading " & File_Name);
+      Open (Data_File, In_File, File_Name);
+      Raw_CSV_Data := Neural_Loader.Load_Raw_CSV_Data (Data_File, Num_Samples);
+      Close (Data_File);
+
+      return Result;
 
    end Preprocess;
 
    --  -------------------------------------------------------------------------
+
+   function Split_Raw_Data
+     (Raw_Data : ML_Types.Raw_Data_Vector) return ML_Types.Multi_Output_Data_Record
+   is
+      use Ada.Containers;
+      use Ada.Strings;
+      use ML_Types;
+      Routine_Name   : constant String := "Prices_Support.Split_Raw_Data ";
+      aRow           : Unbounded_List := Raw_Data.First_Element;
+      Num_Features   : constant Positive       := Positive (aRow.Length);
+      Features_List  : Value_Data_Lists_2D;
+      Feature_Values : Value_Data_List;
+      Data           : Multi_Output_Data_Record;
+   begin
+      Classifier_Loader.Parse_Header (aRow, Num_Features, Data);
+      aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
+      if aRow.Length > 1 then
+         for f_index in 1 .. Num_Features loop
+            declare
+               Row_S     : constant String    := To_String (aRow (f_index));
+               S_Last    : constant Integer   := Row_S'Last;
+               Last_Char : constant Character := Row_S (S_Last);
+            begin
+               if Character'Pos (Last_Char) < 32 then
+                  aRow (f_index) :=
+                    To_Unbounded_String (Row_S (1 .. S_Last - 1));
+               end if;
+               Assert
+                 (Neural_Loader.Get_Data_Type (aRow (Positive (f_index))) =
+                      Integer_Type, Routine_Name & "Non-integer feature type");
+            end;
+         end loop;
+
+         for row_index in
+           Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
+         loop
+            aRow := Raw_Data.Element (row_index);  --  Unbound list
+
+            Feature_Values.Clear;
+            for f_index in 1 .. Num_Features loop
+               declare
+                  Feat_String : constant String := To_String (aRow (f_index));
+                  Value : Value_Record (Integer_Type);
+               begin
+                  Value.Integer_Value := Integer'Value (Feat_String);
+                  Feature_Values.Append (Value);
+               end;  --  declare block=
+            end loop;  --  f_index in 1 .. Num_Features
+            Features_List.Append (Feature_Values);
+         end loop;  --  row_index =
+
+         Data.Feature_Values := Features_List;
+      end if;
+
+      Put_Line (Routine_Name & "done");
+      return Data;
+
+   end Split_Raw_Data;
+
+   --  -----------------------------------------------------------------------
 
    --  function Standard_Deviation (M : Real_Float_Matrix) return Real_Float_Vector
    --  is

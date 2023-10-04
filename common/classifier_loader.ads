@@ -11,5 +11,8 @@ package Classifier_Loader is
    function Load_Data (File_Name : String; Num_Outputs : Natural := 1;
                        Max_Lines : Positive := 20000)
                        return ML_Types.Multi_Output_Data_Record;
+   procedure Parse_Header
+     (Header      :        ML_Types.Unbounded_List; Num_Features : Positive;
+      Data_Record : in out ML_Types.Multi_Output_Data_Record);
 
 end Classifier_Loader;
