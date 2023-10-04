@@ -23,24 +23,24 @@ package body Prices_Support is
       use NL_Types.Float_List_Package;
       use Type_Utilities;
       Routine_Name : constant String := "Prices_Support.Build_Dataset ";
-      Train_Length : constant Positive                          := 70;
-      Test_Length  : constant Positive                          := 30;
-      Train_Data   : constant ML_Types.Multi_Output_Data_Record :=
-        Classifier_Loader.Load_Data ("house_prices/train.csv", 0,
-                                     Train_Length);
+      Train_Length : constant Positive := 70;
+      Test_Length  : constant Positive := 30;
+--        Train_Data   : constant ML_Types.Multi_Output_Data_Record :=
+--          Classifier_Loader.Load_Data ("house_prices/train.csv", 0,
+--                                       Train_Length);
       Test_Data    : constant ML_Types.Multi_Output_Data_Record :=
         Classifier_Loader.Load_Data ("house_prices/test.csv", 0, Test_Length);
       --  Prices       : constant ML_Types.Multi_Output_Data_Record :=
       --    Classifier_Loader.Load_Data ("house_prices/sample_submission.csv");
-      Train_Features : constant NL_Types.Float_List_2D    :=
-        To_Float_List_2D (Train_Data.Feature_Values);
+--        Train_Features : constant NL_Types.Float_List_2D    :=
+--          To_Float_List_2D (Train_Data.Feature_Values);
       Test_Features : constant NL_Types.Float_List_2D    :=
         To_Float_List_2D (Test_Data.Feature_Values);
       --  Target       : constant NL_Types.Float_List_2D            :=
         --  To_Float_List_2D (To_Integer_List_2D (Prices_Data.Label_Values));
       --  Target_Item  : NL_Types.Float_List;
       Feature_Row  : NL_Types.Float_List;
-      X : Real_Float_Matrix (1 .. Positive (Train_Features.Length), 1 .. 4);
+      X : Real_Float_Matrix (1 .. Positive (Test_Features.Length), 1 .. 4);
       --  X_Means      : Real_Float_Vector (X'Range (2));
       --  X_SDs        : Real_Float_Vector (X'Range (2));
       --  I0           : ML_Types.Integer_List;
@@ -49,7 +49,7 @@ package body Prices_Support is
    begin
       Put_Line (Routine_Name);
       for row in X'Range loop
-         Feature_Row := Train_Features (row);
+         Feature_Row := Test_Features (row);
          X (row, 1)  := Feature_Row (1);
          X (row, 2)  := Feature_Row (2);
          X (row, 3)  := Feature_Row (3);
