@@ -17,7 +17,10 @@ package body Prices_Support is
    package Ordered_Code_Map is new
      Ada.Containers.Indefinite_Ordered_Maps (String, Integer);
    subtype Code_Map is Ordered_Code_Map.Map;
+
    Data_Codes : Code_Map;
+
+   NA_Code    : constant Integer := -999999;
 
    --  function Means (M : Real_Float_Matrix) return Real_Float_Vector;
    function Preprocess (File_Name : String; Num_Samples : Positive)
@@ -235,6 +238,7 @@ package body Prices_Support is
 
    --  -------------------------------------------------------------------------
 begin
+   Data_Codes.Insert ("NA", NA_Code);
    Data_Codes.Insert ("RH", 1);
    Data_Codes.Insert ("RL", 2);
    Data_Codes.Insert ("TA", 3);
