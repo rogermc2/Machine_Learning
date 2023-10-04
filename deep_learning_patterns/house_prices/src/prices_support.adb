@@ -27,6 +27,9 @@ package body Prices_Support is
    --  function Means (M : Real_Float_Matrix) return Real_Float_Vector;
    function Preprocess (File_Name : String; Num_Samples : Positive)
                         return Integer_Matrix;
+   function Split_Raw_Data
+     (Raw_Data : ML_Types.Raw_Data_Vector)
+      return ML_Types.Multi_Output_Data_Record;
    --  function Standard_Deviation
    --    (M : Real_Float_Matrix) return Real_Float_Vector;
 
@@ -196,10 +199,9 @@ package body Prices_Support is
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
       Output_Data  : ML_Types.Multi_Output_Data_Record;
-      Data         : constant ML_Types.Multi_Output_Data_Record :=
-        Classifier_Loader.Load_Data (File_Name, 0, Num_Samples);
-      Result  : Integer_Matrix (1 .. Num_Samples,
-                                1 .. Positive (Data.Feature_Values.Length));
+      Split_Data   : ML_Types.Multi_Output_Data_Record;
+      Result       : Integer_Matrix (1 .. Num_Samples,
+                                1 .. 10);
    begin
       Put_Line (Routine_Name & "loading " & File_Name);
       Open (Data_File, In_File, File_Name);
