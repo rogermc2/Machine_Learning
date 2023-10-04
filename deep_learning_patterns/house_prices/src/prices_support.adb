@@ -1,5 +1,5 @@
 --  with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Maths;
 
@@ -22,14 +22,16 @@ package body Prices_Support is
       --  use NL_Types.Float_Package;
       use NL_Types.Float_List_Package;
       use Type_Utilities;
-      --        Routine_Name      : constant String :=
-      --                              "Prices_Support.Build_Dataset ";
+      Routine_Name : constant String := "Prices_Support.Build_Dataset ";
       Train_Length : constant Positive                          := 70;
       Test_Length  : constant Positive                          := 30;
       Train_Data   : constant ML_Types.Multi_Output_Data_Record :=
-        Classifier_Loader.Load_Data ("house_prices/train.csv");
+        Classifier_Loader.Load_Data ("house_prices/train.csv", 0,
+                                     Train_Length);
       Test_Data    : constant ML_Types.Multi_Output_Data_Record :=
-        Classifier_Loader.Load_Data ("house_prices/test.csv");
+        Classifier_Loader.Load_Data ("house_prices/test.csv", 0, Test_Length);
+      --  Prices       : constant ML_Types.Multi_Output_Data_Record :=
+      --    Classifier_Loader.Load_Data ("house_prices/sample_submission.csv");
       Train_Features : constant NL_Types.Float_List_2D    :=
         To_Float_List_2D (Train_Data.Feature_Values);
       Test_Features : constant NL_Types.Float_List_2D    :=
@@ -45,6 +47,7 @@ package body Prices_Support is
       --  I1           : ML_Types.Integer_List;
       theDataset   : Dataset (Train_Length, Test_Length, 4);
    begin
+      Put_Line (Routine_Name);
       for row in X'Range loop
          Feature_Row := Train_Features (row);
          X (row, 1)  := Feature_Row (1);

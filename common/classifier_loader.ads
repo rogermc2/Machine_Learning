@@ -8,7 +8,7 @@ package Classifier_Loader is
 
    Value_Error : exception;
 
-   function Load_Data (File_Name : String; Num_Outputs : Positive := 1;
+   function Load_Data (File_Name : String; Num_Outputs : Natural := 1;
                        Max_Lines : Positive := 20000)
                        return ML_Types.Multi_Output_Data_Record;
 
