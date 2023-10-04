@@ -1,4 +1,6 @@
 --  with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers.Indefinite_Ordered_Maps;
+--  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Maths;
@@ -11,6 +13,11 @@ with NL_Types;
 with Type_Utilities;
 
 package body Prices_Support is
+
+   package Ordered_Code_Map is new
+     Ada.Containers.Indefinite_Ordered_Maps (String, Integer);
+   subtype Code_Map is Ordered_Code_Map.Map;
+   Data_Codes : Code_Map;
 
    --  function Means (M : Real_Float_Matrix) return Real_Float_Vector;
    --  function Standard_Deviation
@@ -219,5 +226,59 @@ package body Prices_Support is
    --  end Standard_Deviation;
 
    --  -------------------------------------------------------------------------
+begin
+   Data_Codes.Insert ("RH", 1);
+   Data_Codes.Insert ("RL", 2);
+   Data_Codes.Insert ("TA", 3);
+   Data_Codes.Insert ("Y", 4);
+   Data_Codes.Insert ("Pave", 5);
+   Data_Codes.Insert ("GasA", 6);
+   Data_Codes.Insert ("Reg", 6);
+   Data_Codes.Insert ("Lvl", 7);
+   Data_Codes.Insert ("AllPub", 8);
+   Data_Codes.Insert ("Inside", 9);
+   Data_Codes.Insert ("Gtl", 10);
+   Data_Codes.Insert ("NAmes", 11);
+   Data_Codes.Insert ("Feedr", 12);
+   Data_Codes.Insert ("Norm", 13);
+   Data_Codes.Insert ("1Fam", 14);
+   Data_Codes.Insert ("1Story", 15);
+   Data_Codes.Insert ("Gable", 16);
+   Data_Codes.Insert ("CompShg", 17);
+   Data_Codes.Insert ("VinylSd", 18);
+   Data_Codes.Insert ("None", 19);
+   Data_Codes.Insert ("IR1", 20);
+   Data_Codes.Insert ("Corner", 23);
+   Data_Codes.Insert ("Gilbert", 25);
+   Data_Codes.Insert ("2Story", 28);
+   Data_Codes.Insert ("Ex", 29);
+   Data_Codes.Insert ("SBrkr", 30);
+   Data_Codes.Insert ("HdBoard", 32);
+   Data_Codes.Insert ("Gd", 33);
+   Data_Codes.Insert ("No", 34);
+   Data_Codes.Insert ("Unf", 35);
+   Data_Codes.Insert ("PConc", 36);
+   Data_Codes.Insert ("CBlock", 37);
+   Data_Codes.Insert ("ALQ", 38);
+   Data_Codes.Insert ("Rec", 39);
+   Data_Codes.Insert ("Fin", 40);
+   Data_Codes.Insert ("MnPrv", 41);
+   Data_Codes.Insert ("WD", 42);
+   Data_Codes.Insert ("Plywood", 43);
+   Data_Codes.Insert ("Attchd", 44);
+   Data_Codes.Insert ("TwnhsE", 45);
+   Data_Codes.Insert ("MetalSd", 46);
+   Data_Codes.Insert ("Fa", 47);
+   Data_Codes.Insert ("BrDale", 48);
+   Data_Codes.Insert ("Detchd", 49);
+   Data_Codes.Insert ("RM", 50);
+   Data_Codes.Insert ("Brk", 51);
+   Data_Codes.Insert ("NridgHt", 52);
+   Data_Codes.Insert ("Stone", 53);
+   Data_Codes.Insert ("New", 55);
+   Data_Codes.Insert ("Partial", 56);
+   Data_Codes.Insert ("CmentBd", 57);
+   Data_Codes.Insert ("Typ", 58);
+   Data_Codes.Insert ("RFn", 59);
 
 end Prices_Support;
