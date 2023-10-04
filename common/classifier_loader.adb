@@ -75,7 +75,6 @@ package body Classifier_Loader is
       Feature_Values : Value_Data_List;
       Data           : Multi_Output_Data_Record;
    begin
-      Put_Line (Routine_Name);
       Parse_Header (aRow, Num_Features, Data);
       aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
       if aRow.Length > 1 then
@@ -113,42 +112,31 @@ package body Classifier_Loader is
             end loop;
          end if;
 
-         Put_Line (Routine_Name & "Raw_Data.Last_Index:" & integer'image (Raw_Data.Last_Index));
          for row_index in
            Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
          loop
-            Put_Line (Routine_Name & "row_index:" & integer'image (row_index));
             aRow := Raw_Data.Element (row_index);  --  Unbound list
 
             Feature_Values.Clear;
             for f_index in 1 .. Num_Features loop
-               Put_Line (Routine_Name & "f_index:" & integer'image (f_index));
                declare
                   Feat_String : constant String := To_String (aRow (f_index));
                   Value : Value_Record (Feature_Types (Positive (f_index)));
                begin
-                  Put_Line (Routine_Name & "Feat_String:" & Feat_String);
                   case Feature_Types (Positive (f_index)) is
                      when Boolean_Type =>
-                        Put_Line (Routine_Name & "B Feat_String:" & Feat_String);
                         Value.Boolean_Value := Boolean'Value (Feat_String);
                      when Integer_Type =>
-                        Put_Line (Routine_Name & "I Feat_String:" & Feat_String);
                         Value.Integer_Value := Integer'Value (Feat_String);
                      when Float_Type =>
-                        Put_Line (Routine_Name & "F Feat_String:" & Feat_String);
                         Value.Float_Value := Float'Value (Feat_String);
                      when UB_String_Type =>
-                        Put_Line (Routine_Name & "2 Feat_String:" & Feat_String);
                         Value.UB_String_Value := aRow (f_index);
-                        Put_Line (Routine_Name & "3 Feat_String:" & Feat_String);
                   end case;
                   Feature_Values.Append (Value);
-               end;  --  declare block
-               Put_Line (Routine_Name & "Feature_Values updated");
+               end;  --  declare block=
             end loop;  --  f_index in 1 .. Num_Features
             Features_List.Append (Feature_Values);
-            Put_Line (Routine_Name & "Features_List updated");
 
             if Num_Outputs > 0 then
                for o_index in 1 .. Num_Outputs loop
@@ -186,9 +174,7 @@ package body Classifier_Loader is
                   Labels_List.Append (Label_Values);
                end loop;
             end if;
-            Put_Line (Routine_Name & "row_index loop end");
-         end loop;  --  row_index
-         Put_Line (Routine_Name & "Features_List done");
+         end loop;  --  row_index =
 
          Data.Feature_Values := Features_List;
          Data.Label_Values   := Labels_List;
