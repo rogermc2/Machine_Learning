@@ -8,9 +8,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use Basic_Printing;
 with Classifier_Loader;
 with ML_Types;
-with NL_Types;
+--  with NL_Types;
 --  with Shuffler;
-with Type_Utilities;
+--  with Type_Utilities;
 
 package body Prices_Support is
 
@@ -20,6 +20,8 @@ package body Prices_Support is
    Data_Codes : Code_Map;
 
    --  function Means (M : Real_Float_Matrix) return Real_Float_Vector;
+   function Preprocess (File_Name : String; Num_Samples : Positive)
+                        return Integer_Matrix;
    --  function Standard_Deviation
    --    (M : Real_Float_Matrix) return Real_Float_Vector;
 
@@ -27,27 +29,22 @@ package body Prices_Support is
 
    function Build_Dataset return Dataset is
       --  use NL_Types.Float_Package;
-      use NL_Types.Float_List_Package;
-      use Type_Utilities;
+--        use NL_Types.Float_List_Package;
+--        use Type_Utilities;
       Routine_Name : constant String := "Prices_Support.Build_Dataset ";
       Train_Length : constant Positive := 70;
       Test_Length  : constant Positive := 30;
 --        Train_Data   : constant ML_Types.Multi_Output_Data_Record :=
 --          Classifier_Loader.Load_Data ("house_prices/train.csv", 0,
 --                                       Train_Length);
-      Test_Data    : constant ML_Types.Multi_Output_Data_Record :=
-        Classifier_Loader.Load_Data ("house_prices/test.csv", 0, Test_Length);
       --  Prices       : constant ML_Types.Multi_Output_Data_Record :=
       --    Classifier_Loader.Load_Data ("house_prices/sample_submission.csv");
 --        Train_Features : constant NL_Types.Float_List_2D    :=
 --          To_Float_List_2D (Train_Data.Feature_Values);
-      Test_Features : constant NL_Types.Float_List_2D    :=
-        To_Float_List_2D (Test_Data.Feature_Values);
-      --  Target       : constant NL_Types.Float_List_2D            :=
-        --  To_Float_List_2D (To_Integer_List_2D (Prices_Data.Label_Values));
+      Test_Features : constant Integer_Matrix :=
+                        Preprocess ("house_prices/trst.csv", Test_Length);
       --  Target_Item  : NL_Types.Float_List;
-      Feature_Row  : NL_Types.Float_List;
-      X : Real_Float_Matrix (1 .. Positive (Test_Features.Length), 1 .. 4);
+      X : Real_Float_Matrix (Test_Features'Range, 1 .. 4);
       --  X_Means      : Real_Float_Vector (X'Range (2));
       --  X_SDs        : Real_Float_Vector (X'Range (2));
       --  I0           : ML_Types.Integer_List;
@@ -56,11 +53,9 @@ package body Prices_Support is
    begin
       Put_Line (Routine_Name);
       for row in X'Range loop
-         Feature_Row := Test_Features (row);
-         X (row, 1)  := Feature_Row (1);
-         X (row, 2)  := Feature_Row (2);
-         X (row, 3)  := Feature_Row (3);
-         X (row, 4)  := Feature_Row (4);
+         for col in X'Range (2) loop
+            X (row, col)  := Float (Test_Features (row, col));
+         end loop;
       end loop;
 
       --  X_Means := Means (X);
@@ -187,6 +182,19 @@ package body Prices_Support is
    --     return Result;
    --
    --  end Means;
+
+   --  -------------------------------------------------------------------------
+
+   function Preprocess (File_Name : String; Num_Samples : Positive)
+                        return Integer_Matrix is
+      Data    : constant ML_Types.Multi_Output_Data_Record :=
+                  Classifier_Loader.Load_Data (File_Name, 0, Num_Samples);
+      Result  : Integer_Matrix (1 .. Num_Samples,
+                                1 .. Positive (Data.Feature_Values.Length));
+   begin
+       return Result;
+
+   end Preprocess;
 
    --  -------------------------------------------------------------------------
 
