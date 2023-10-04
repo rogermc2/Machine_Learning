@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Base_Neural;
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package body Neural_Model is
@@ -76,7 +76,7 @@ package body Neural_Model is
    --  Initialization - add other layers
    procedure Add_Layer
      (aModel     : in out Sequential_Model; Num_Nodes : Positive;
-      Activation :        Activation_Kind := Identity_Activation)
+      Activation : Activation_Kind := Identity_Activation)
    is
 --        Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
       Prev_Layer   : constant Layer             := aModel.Layers.Last_Element;
@@ -108,7 +108,7 @@ package body Neural_Model is
    procedure Backward
      (aModel : in out Sequential_Model; L_Index : Positive) is
       use Real_Float_Arrays;
-      Routine_Name  : constant String := "Neural_Model.Backward ";
+      --  Routine_Name  : constant String := "Neural_Model.Backward ";
       This_Layer    : Layer := aModel.Layers (L_Index);
       dEdY          : constant Real_Float_Vector :=
                         Deactivate (aModel, L_Index);

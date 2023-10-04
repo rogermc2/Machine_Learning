@@ -1,0 +1,26 @@
+project House_Prices is
+
+   type Operating_System_Type is
+      ("high_sierra", "sobono");
+   Operating_System : Operating_System_Type := external ("Operating_System", "high_sierra");
+   for Source_Dirs use ("src", "../../common", "../../python_c_api", "../../python", "../../neural_learning/datasets", "../../neural_learning/neural_network", "../common", "../../neural_learning/common");
+   for Object_Dir use "obj";
+   for Main use ("prices.adb");
+
+   package Compiler is
+      for Switches ("ada") use ("-gnatw.h.ofjkmruv");
+   end Compiler;
+
+   package Linker is
+
+      case Operating_System is
+
+         when "high_sierra" =>
+
+         when "sobono" =>
+            for Default_Switches ("ada") use ("-Wl,-ld_classic");
+      end case;
+   end Linker;
+
+end House_Prices;
+

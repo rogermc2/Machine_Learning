@@ -1,0 +1,15 @@
+
+with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
+
+package Prices_Support is
+
+   type Dataset (Train_Length, Test_Length, Num_Features : Positive) is record
+      X_Train : Real_Float_Matrix (1 .. Train_Length, 1 .. Num_Features);
+      Y_Train : Real_Float_Matrix (1 .. Train_Length, 1 .. 1);
+      X_Test  : Real_Float_Matrix (1 .. Test_Length, 1 .. Num_Features);
+      Y_Test  : Real_Float_Matrix (1 .. Test_Length, 1 .. 1);
+   end record;
+
+   function Build_Dataset return Dataset;
+
+end Prices_Support;

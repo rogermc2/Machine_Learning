@@ -57,6 +57,8 @@ package body Iris_Support is
          Feature_Row := Features (row);
          X (row, 1) := (X (row, 1) - X_Means (1)) / X_SDs (1);
          X (row, 2) := (X (row, 2) - X_Means (2)) / X_SDs (2);
+         X (row, 3) := (X (row, 3) - X_Means (3)) / X_SDs (3);
+         X (row, 4) := (X (row, 4) - X_Means (4)) / X_SDs (4);
       end loop;
 
       for index in Target.First_Index .. Target.Last_Index loop
