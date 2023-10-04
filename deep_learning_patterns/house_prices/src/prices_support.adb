@@ -198,7 +198,6 @@ package body Prices_Support is
       Routine_Name : constant String := "Prices_Support.Preprocess ";
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
-      Output_Data  : ML_Types.Multi_Output_Data_Record;
       Split_Data   : ML_Types.Multi_Output_Data_Record;
       Result       : Integer_Matrix (1 .. Num_Samples,
                                 1 .. 10);
@@ -207,6 +206,8 @@ package body Prices_Support is
       Open (Data_File, In_File, File_Name);
       Raw_CSV_Data := Neural_Loader.Load_Raw_CSV_Data (Data_File, Num_Samples);
       Close (Data_File);
+
+      Split_Data := Split_Raw_Data (Raw_CSV_Data);
 
       return Result;
 
