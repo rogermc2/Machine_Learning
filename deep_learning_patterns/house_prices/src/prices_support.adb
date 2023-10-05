@@ -248,7 +248,7 @@ package body Prices_Support is
       for row_index in
         Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
       loop
-         aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
+         aRow := Raw_Data (row_index);
          if aRow.Length > 1 then
             for f_index in 1 .. Num_Features loop
                declare
@@ -284,6 +284,7 @@ package body Prices_Support is
          end if;
       end loop;
 
+      Put_Line (Routine_Name & "Conversion done");
       for row_index in
         Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
       loop
@@ -296,6 +297,7 @@ package body Prices_Support is
                   Feat_String : constant String := To_String (aRow (f_index));
                   Value       : Value_Record (Integer_Type);
                begin
+                  Put_Line (Routine_Name & "Feat_String: " & Feat_String);
                   Value.Integer_Value := Integer'Value (Feat_String);
                   Feature_Values.Append (Value);
                end;  --  declare block=
@@ -371,11 +373,12 @@ begin
    Data_Codes.Insert ("VinylSd", "18");
    Data_Codes.Insert ("None", "19");
    Data_Codes.Insert ("IR1", "20");
-   Data_Codes.Insert ("Reg", "21");
+   Data_Codes.Insert ("IR2", "21");
    Data_Codes.Insert ("LwQ", "22");
    Data_Codes.Insert ("Corner", "23");
    Data_Codes.Insert ("Gilbert", "25");
    Data_Codes.Insert ("Normal", "26");
+   Data_Codes.Insert ("Hip", "27");
    Data_Codes.Insert ("2Story", "28");
    Data_Codes.Insert ("Ex", "29");
    Data_Codes.Insert ("SBrkr", "30");
@@ -406,5 +409,33 @@ begin
    Data_Codes.Insert ("CmentBd", "57");
    Data_Codes.Insert ("Typ", "58");
    Data_Codes.Insert ("RFn", "59");
+   Data_Codes.Insert ("BrkFBuiltInace", "60");
+   Data_Codes.Insert ("Gar2", "61");
+   Data_Codes.Insert ("GLQ", "62");
+   Data_Codes.Insert ("HLS", "63");
+   Data_Codes.Insert ("StoneBr", "64");
+   Data_Codes.Insert ("Po", "65");
+   Data_Codes.Insert ("FR2", "66");
+   Data_Codes.Insert ("BLQ", "67");
+   Data_Codes.Insert ("Twnhs", "68");
+   Data_Codes.Insert ("COD", "69");
+   Data_Codes.Insert ("NPkVill", "70");
+   Data_Codes.Insert ("Brk Cmn", "71");
+   Data_Codes.Insert ("Wd Sdng", "72");
+   Data_Codes.Insert ("PosN", "73");
+   Data_Codes.Insert ("CemntBd", "74");
+   Data_Codes.Insert ("Mod", "75");
+   Data_Codes.Insert ("Mn", "76");
+   Data_Codes.Insert ("Blmngtn", "77");
+   Data_Codes.Insert ("Av", "78");
+   Data_Codes.Insert ("SLvl", "79");
+   Data_Codes.Insert ("BuiltIn", "80");
+   Data_Codes.Insert ("BrkFace", "81");
+   Data_Codes.Insert ("Reg", "82");
+   Data_Codes.Insert ("CulDSac", "83");
+   Data_Codes.Insert ("NoRidge", "84");
+   Data_Codes.Insert ("Somerst", "85");
+   Data_Codes.Insert ("FV", "86");
+   Data_Codes.Insert ("SawyerW", "87");
 
 end Prices_Support;
