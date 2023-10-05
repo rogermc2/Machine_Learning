@@ -1,8 +1,8 @@
-with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions;        use Ada.Assertions;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;           use Ada.Text_IO;
 
 --  with Maths;
 
@@ -16,17 +16,17 @@ with Neural_Loader;
 
 package body Prices_Support is
 
-   package Ordered_Code_Map is new
-     Ada.Containers.Indefinite_Ordered_Maps (String, String);
+   package Ordered_Code_Map is new Ada.Containers.Indefinite_Ordered_Maps
+     (String, String);
    subtype Code_Map is Ordered_Code_Map.Map;
 
    Data_Codes : Code_Map;
 
-   NA_Code    : constant String := "99999";
+   NA_Code : constant String := "99999";
 
    --  function Means (M : Real_Float_Matrix) return Real_Float_Vector;
-   function Preprocess (File_Name : String; Num_Samples : Positive)
-                        return Integer_Matrix;
+   function Preprocess
+     (File_Name : String; Num_Samples : Positive) return Integer_Matrix;
    function Split_Raw_Data
      (Raw_Data : ML_Types.Raw_Data_Vector)
       return ML_Types.Multi_Output_Data_Record;
@@ -39,9 +39,9 @@ package body Prices_Support is
       --  use NL_Types.Float_Package;
       --        use NL_Types.Float_List_Package;
       --        use Type_Utilities;
-      Routine_Name : constant String := "Prices_Support.Build_Dataset ";
-      Train_Length : constant Positive := 70;
-      Test_Length  : constant Positive := 30;
+      Routine_Name  : constant String := "Prices_Support.Build_Dataset ";
+      Train_Length  : constant Positive       := 70;
+      Test_Length   : constant Positive       := 30;
       --        Train_Data   : constant ML_Types.Multi_Output_Data_Record :=
       --          Classifier_Loader.Load_Data ("house_prices/train.csv", "0,
       --                                       Train_Length);
@@ -52,17 +52,17 @@ package body Prices_Support is
       Test_Features : constant Integer_Matrix :=
         Preprocess ("house_prices/test.csv", Test_Length);
       --  Target_Item  : NL_Types.Float_List;
-      X : Real_Float_Matrix (Test_Features'Range, 1 .. 4);
+      X             : Real_Float_Matrix (Test_Features'Range, 1 .. 4);
       --  X_Means      : Real_Float_Vector (X'Range (2));
       --  X_SDs        : Real_Float_Vector (X'Range (2));
       --  I0           : ML_Types.Integer_List;
       --  I1           : ML_Types.Integer_List;
-      theDataset   : Dataset (Train_Length, Test_Length, 4);
+      theDataset    : Dataset (Train_Length, Test_Length, 4);
    begin
       Put_Line (Routine_Name);
       for row in X'Range loop
          for col in X'Range (2) loop
-            X (row, col)  := Float (Test_Features (row, col));
+            X (row, col) := Float (Test_Features (row, col));
          end loop;
       end loop;
 
@@ -140,8 +140,8 @@ package body Prices_Support is
          --     theDataset.X_Test (row, 2) := X_Trimmed (70 + row, 2);
          --     theDataset.X_Test (row, 3) := X_Trimmed (70 + row, 3);
          --     theDataset.X_Test (row, 4) := X_Trimmed (70 + row, 4);
-         for row in theDataset.X_Test'range loop
-            for col in theDataset.X_Test'range (2) loop
+         for row in theDataset.X_Test'Range loop
+            for col in theDataset.X_Test'Range (2) loop
                theDataset.X_Test (row, col) :=
                  X_Trimmed (theDataset.X_Train'Length + 1 + row, col);
             end loop;
@@ -193,8 +193,9 @@ package body Prices_Support is
 
    --  -------------------------------------------------------------------------
 
-   function Preprocess (File_Name : String; Num_Samples : Positive)
-                        return Integer_Matrix is
+   function Preprocess
+     (File_Name : String; Num_Samples : Positive) return Integer_Matrix
+   is
       Routine_Name : constant String := "Prices_Support.Preprocess ";
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
@@ -215,69 +216,80 @@ package body Prices_Support is
    --  -------------------------------------------------------------------------
 
    function Split_Raw_Data
-     (Raw_Data : ML_Types.Raw_Data_Vector) return ML_Types.Multi_Output_Data_Record
+     (Raw_Data : ML_Types.Raw_Data_Vector)
+      return ML_Types.Multi_Output_Data_Record
    is
       use Ada.Containers;
       use Ada.Strings;
       use ML_Types;
-      Routine_Name   : constant String := "Prices_Support.Split_Raw_Data ";
-      aRow           : Unbounded_List := Raw_Data.First_Element;
-      Num_Features   : constant Positive       := Positive (aRow.Length);
+      Routine_Name   : constant String   := "Prices_Support.Split_Raw_Data ";
+      aRow           : Unbounded_List    := Raw_Data.First_Element;
+      Num_Features   : constant Positive := Positive (aRow.Length);
       Features_List  : Value_Data_Lists_2D;
       Feature_Values : Value_Data_List;
       Data           : Multi_Output_Data_Record;
    begin
       Classifier_Loader.Parse_Header (aRow, Num_Features, Data);
-      aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
-      if aRow.Length > 1 then
-         for f_index in 1 .. Num_Features loop
-            declare
-               Row_S     : constant String    := To_String (aRow (f_index));
-               S_Last    : constant Integer   := Row_S'Last;
-               Last_Char : constant Character := Row_S (S_Last);
-            begin
-               if Character'Pos (Last_Char) < 32 then
-                  aRow (f_index) :=
-                    To_Unbounded_String (Row_S (1 .. S_Last - 1));
-               end if;
+      for row_index in
+        Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
+      loop
+         aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
+         if aRow.Length > 1 then
+            for f_index in 1 .. Num_Features loop
+               declare
+                  Row_S     : constant String    := To_String (aRow (f_index));
+                  S_Last    : constant Integer   := Row_S'Last;
+                  Last_Char : constant Character := Row_S (S_Last);
+               begin
+                  if Character'Pos (Last_Char) < 32 then
+                     aRow (f_index) :=
+                       To_Unbounded_String (Row_S (1 .. S_Last - 1));
+                  end if;
 
-               if Neural_Loader.Get_Data_Type (aRow (f_index)) /=
-                 Integer_Type then
-                  --  Put_Line (Routine_Name & To_String (aRow (f_index)) &
-                  --              " is not an integer type");
-                  Assert (Data_Codes.Contains (To_String (aRow (f_index))),
-                     Routine_Name & To_String (aRow (f_index))
-                  & " is not in Data_Codes map");
-                  aRow (f_index) := To_Unbounded_String
-                    (Data_Codes.Element (To_String (aRow (f_index))));
-               end if;
-               Assert
-                 (Neural_Loader.Get_Data_Type (aRow (f_index)) =
-                    Integer_Type, Routine_Name & To_String (aRow (f_index))
-                  & " is not an integer type");
-            end;
-         end loop;
+                  if Neural_Loader.Get_Data_Type (aRow (f_index)) /=
+                    Integer_Type
+                  then
+                     --  Put_Line (Routine_Name & To_String (aRow (f_index)) &
+                     --              " is not an integer type");
+                     Assert
+                       (Data_Codes.Contains (To_String (aRow (f_index))),
+                        Routine_Name & To_String (aRow (f_index)) &
+                          " is not in Data_Codes map");
+                     aRow (f_index) :=
+                       To_Unbounded_String
+                         (Data_Codes.Element (To_String (aRow (f_index))));
+                  end if;
+                  Assert
+                    (Neural_Loader.Get_Data_Type (aRow (f_index)) =
+                       Integer_Type,
+                     Routine_Name & To_String (aRow (f_index)) &
+                       " is not an integer type");
+               end;
+            end loop;
+         end if;
+      end loop;
 
-         for row_index in
-           Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
-         loop
-            aRow := Raw_Data.Element (row_index);  --  Unbound list
+      for row_index in
+        Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
+      loop
+         aRow := Raw_Data.Element (row_index);  --  Unbound list
+         if aRow.Length > 1 then
 
             Feature_Values.Clear;
             for f_index in 1 .. Num_Features loop
                declare
                   Feat_String : constant String := To_String (aRow (f_index));
-                  Value : Value_Record (Integer_Type);
+                  Value       : Value_Record (Integer_Type);
                begin
                   Value.Integer_Value := Integer'Value (Feat_String);
                   Feature_Values.Append (Value);
                end;  --  declare block=
             end loop;  --  f_index in 1 .. Num_Features
             Features_List.Append (Feature_Values);
-         end loop;  --  row_index =
+         end if;
+      end loop;  --  row_index =
 
-         Data.Feature_Values := Features_List;
-      end if;
+      Data.Feature_Values := Features_List;
 
       Put_Line (Routine_Name & "done");
       return Data;
