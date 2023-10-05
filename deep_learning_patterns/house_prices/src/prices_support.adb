@@ -36,19 +36,13 @@ package body Prices_Support is
    --  -------------------------------------------------------------------------
 
    function Build_Dataset return Dataset is
-      --  use NL_Types.Float_Package;
-      --        use NL_Types.Float_List_Package;
-      --        use Type_Utilities;
       Routine_Name  : constant String := "Prices_Support.Build_Dataset ";
       Train_Length  : constant Positive       := 70;
       Test_Length   : constant Positive       := 30;
-      --        Train_Data   : constant ML_Types.Multi_Output_Data_Record :=
-      --          Classifier_Loader.Load_Data ("house_prices/train.csv", "0,
-      --                                       Train_Length);
+      --        Train_Data   : ML_Types.Multi_Output_Data_Record;
       --  Prices       : constant ML_Types.Multi_Output_Data_Record :=
       --    Classifier_Loader.Load_Data ("house_prices/sample_submission.csv");
-      --        Train_Features : constant NL_Types.Float_List_2D    :=
-      --          To_Float_List_2D (Train_Data.Feature_Values);
+      --        Train_Features : constant NL_Types.Float_List_2D;
       Test_Features : constant Integer_Matrix :=
         Preprocess ("house_prices/test.csv", Test_Length);
       --  Target_Item  : NL_Types.Float_List;
@@ -56,8 +50,7 @@ package body Prices_Support is
                                          Test_Features'Range (2));
       --  X_Means      : Real_Float_Vector (X'Range (2));
       --  X_SDs        : Real_Float_Vector (X'Range (2));
-      --  I0           : ML_Types.Integer_List;
-      --  I1           : ML_Types.Integer_List;
+      X_Trimmed     : Real_Float_Matrix (X'Range, 1 .. 4);
       theDataset    : Dataset (Train_Length, Test_Length, 4);
    begin
       Put_Line (Routine_Name);
@@ -75,87 +68,11 @@ package body Prices_Support is
       --     X (row, 2)  := (X (row, 2) - X_Means (2)) / X_SDs (2);
       --  end loop;
 
-      --  for index in Target.First_Index .. Target.Last_Index loop
-      --     Target_Item := Target (index);
-      --     if Target_Item.First_Element = 0.0 then
-      --        I0.Append (index);
-      --     elsif Target_Item.First_Element = 1.0 then
-      --        I1.Append (index);
-      --     end if;
-      --  end loop;
-
-      declare
-         --  I0_Length : constant Natural := Integer (I0.Length);
-         --  I1_Length : constant Natural := Integer (I1.Length);
-         X_Trimmed : Real_Float_Matrix (X'Range, 1 .. 4);
-      begin
-         --  for row in I0.First_Index .. I0.Last_Index loop
-         for row in X_Trimmed'Range loop
-            --  X_Trimmed (row + 1, 1) := X (I0 (row), 1);
-            --  X_Trimmed (row + 1, 2) := X (I0 (row), 2);
-            --  X_Trimmed (row + 1, 3) := X (I0 (row), 3);
-            --  X_Trimmed (row + 1, 4) := X (I0 (row), 4);
-            for col in X_Trimmed'Range (2) loop
-               X_Trimmed (row, col) := X (row, col);
-            end loop;
+      for row in X_Trimmed'Range loop
+         for col in X_Trimmed'Range (2) loop
+            X_Trimmed (row, col) := X (row, col);
          end loop;
-
-         --  for row in I1.First_Index .. I1.Last_Index loop
-         --     X_Trimmed (I0_Length + row + 1, 1) := X (I1 (row), 1);
-         --     X_Trimmed (I0_Length + row + 1, 2) := X (I1 (row), 2);
-         --     X_Trimmed (I0_Length + row + 1, 3) := X (I1 (row), 3);
-         --     X_Trimmed (I0_Length + row + 1, 4) := X (I1 (row), 4);
-         --  end loop;
-
-         --  for row in 1 .. 35 loop
-         --     theDataset.X_Train (row, 1) := X_Trimmed (row, 1);
-         --     theDataset.X_Train (row, 2) := X_Trimmed (row, 2);
-         --     theDataset.X_Train (row, 3) := X_Trimmed (row, 3);
-         --     theDataset.X_Train (row, 4) := X_Trimmed (row, 4);
-         --  end loop;
-
-         --  for row in 36 .. Train_Length loop
-         --  for row in theDataset.X_Train'Range loop
-         --     for col in theDataset.X_Train'Range (2) loop
-         --        theDataset.X_Train (row, col) := X_Trimmed (row, col);
-         --     end loop;
-         --  end loop;
-
-         --  for index in 1 .. Train_Length loop
-         --     if index <= 35 then
-         --        theDataset.Y_Train (index, 1) := 0.0;
-         --     else
-         --        theDataset.Y_Train (index, 1) := 1.0;
-         --     end if;
-         --  end loop;
-
-         --  for row in 1 .. 15 loop
-         --     theDataset.X_Test (row, 1) := X_Trimmed (row + 35, 1);
-         --     theDataset.X_Test (row, 2) := X_Trimmed (row + 35, 2);
-         --     theDataset.X_Test (row, 3) := X_Trimmed (row + 35, 3);
-         --     theDataset.X_Test (row, 4) := X_Trimmed (row + 35, 4);
-         --  end loop;
-
-         --  for row in 16 .. Test_Length loop
-         --     theDataset.X_Test (row, 1) := X_Trimmed (70 + row, 1);
-         --     theDataset.X_Test (row, 2) := X_Trimmed (70 + row, 2);
-         --     theDataset.X_Test (row, 3) := X_Trimmed (70 + row, 3);
-         --     theDataset.X_Test (row, 4) := X_Trimmed (70 + row, 4);
-         for row in theDataset.X_Test'Range loop
-            for col in theDataset.X_Test'Range (2) loop
-               theDataset.X_Test (row, col) :=
-                 X_Trimmed (theDataset.X_Train'Length + 1 + row, col);
-            end loop;
-         end loop;
-
-         --  for index in 1 .. Test_Length loop
-         --     if index <= 15 then
-         --        theDataset.Y_Test (index, 1) := 0.0;
-         --     else
-         --        theDataset.Y_Test (index, 1) := 1.0;
-         --     end if;
-         --  end loop;
-      end;
+      end loop;
 
       --  Shuffler.Shuffle (theDataset.X_Train, theDataset.Y_Train);
       --  Shuffler.Shuffle (theDataset.X_Test, theDataset.Y_Test);
