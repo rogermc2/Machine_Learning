@@ -22,7 +22,7 @@ package body Prices_Support is
 
    Data_Codes : Code_Map;
 
-   NA_Code    : constant Integer := -999999;
+   NA_Code    : constant String := "99999";
 
    --  function Means (M : Real_Float_Matrix) return Real_Float_Vector;
    function Preprocess (File_Name : String; Num_Samples : Positive)
@@ -199,8 +199,7 @@ package body Prices_Support is
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
       Split_Data   : ML_Types.Multi_Output_Data_Record;
-      Result       : Integer_Matrix (1 .. Num_Samples,
-                                1 .. 10);
+      Result       : Integer_Matrix (1 .. Num_Samples, 1 .. 10);
    begin
       Put_Line (Routine_Name & "loading " & File_Name);
       Open (Data_File, In_File, File_Name);
@@ -241,14 +240,21 @@ package body Prices_Support is
                   aRow (f_index) :=
                     To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
-               if Neural_Loader.Get_Data_Type (aRow (Positive (f_index))) /=
+
+               if Neural_Loader.Get_Data_Type (aRow (f_index)) /=
                  Integer_Type then
-                  Put_Line (Routine_Name & To_String (aRow (f_index)) &
-                              " is not an integer type");
+                  --  Put_Line (Routine_Name & To_String (aRow (f_index)) &
+                  --              " is not an integer type");
+                  Assert (Data_Codes.Contains (To_String (aRow (f_index))),
+                     Routine_Name & To_String (aRow (f_index))
+                  & " is not in Data_Codes map");
+                  aRow (f_index) := To_Unbounded_String
+                    (Data_Codes.Element (To_String (aRow (f_index))));
                end if;
                Assert
-                 (Neural_Loader.Get_Data_Type (aRow (Positive (f_index))) =
-                      Integer_Type, Routine_Name & "Non-integer feature type");
+                 (Neural_Loader.Get_Data_Type (aRow (f_index)) =
+                    Integer_Type, Routine_Name & To_String (aRow (f_index))
+                  & " is not an integer type");
             end;
          end loop;
 
@@ -317,14 +323,13 @@ package body Prices_Support is
 
    --  -------------------------------------------------------------------------
 begin
-   Data_Codes.Insert ("NA", "NA_Code");
+   Data_Codes.Insert ("NA", NA_Code);
    Data_Codes.Insert ("RH", "1");
    Data_Codes.Insert ("RL", "2");
    Data_Codes.Insert ("TA", "3");
    Data_Codes.Insert ("Y", "4");
    Data_Codes.Insert ("Pave", "5");
    Data_Codes.Insert ("GasA", "6");
-   Data_Codes.Insert ("Reg", "6");
    Data_Codes.Insert ("Lvl", "7");
    Data_Codes.Insert ("AllPub", "8");
    Data_Codes.Insert ("Inside", "9");
@@ -339,8 +344,11 @@ begin
    Data_Codes.Insert ("VinylSd", "18");
    Data_Codes.Insert ("None", "19");
    Data_Codes.Insert ("IR1", "20");
+   Data_Codes.Insert ("Reg", "21");
+   Data_Codes.Insert ("LwQ", "22");
    Data_Codes.Insert ("Corner", "23");
    Data_Codes.Insert ("Gilbert", "25");
+   Data_Codes.Insert ("Normal", "26");
    Data_Codes.Insert ("2Story", "28");
    Data_Codes.Insert ("Ex", "29");
    Data_Codes.Insert ("SBrkr", "30");
