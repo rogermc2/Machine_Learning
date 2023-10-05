@@ -4,15 +4,10 @@ with Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;           use Ada.Text_IO;
 
---  with Maths;
-
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Classifier_Loader;
 with ML_Types;
 with Neural_Loader;
---  with NL_Types;
---  with Shuffler;
---  with Type_Utilities;
 
 package body Prices_Support is
 
@@ -22,7 +17,7 @@ package body Prices_Support is
 
    Data_Codes : Code_Map;
 
-   NA_Code : constant Integer := 99999;
+   NA_Code : constant Integer := 0;
 
    function Load_Prices
      (File_Name : String; Num_Samples : Positive) return Real_Float_Matrix;
@@ -37,10 +32,9 @@ package body Prices_Support is
 
    --  -------------------------------------------------------------------------
 
-   function Build_Dataset return Dataset is
+   function Build_Dataset (Train_Length : Positive := 70;
+                           Test_Length  : Positive := 30) return Dataset is
       Routine_Name  : constant String := "Prices_Support.Build_Dataset ";
-      Train_Length  : constant Positive := 70;
-      Test_Length   : constant Positive := 30;
       Num_Features  : constant Positive := 6;
       --        Train_Data   : ML_Types.Multi_Output_Data_Record;
       --  Prices       : constant ML_Types.Multi_Output_Data_Record :=
@@ -52,9 +46,9 @@ package body Prices_Support is
       X             : Real_Float_Matrix (Test_Features'Range,
                                          1 .. Test_Features'Length (2) - 1);
       X_IDs         : Integer_Array  (X'Range);
-      Y             : Real_Float_Matrix (Test_Features'Range, 1 .. 1) :=
-                        Load_Prices ("house_prices/test_sample_submission.csv",
-                                     Test_Length);
+      --        Y             : Real_Float_Matrix (Test_Features'Range, 1 .. 1) :=
+      --                          Load_Prices ("house_prices/test_sample_submission.csv",
+      --                                       Test_Length);
       --  X_Means      : Real_Float_Vector (X'Range (2));
       --  X_SDs        : Real_Float_Vector (X'Range (2));
       X_Trimmed     : Real_Float_Matrix (X'Range, 1 .. Num_Features);
@@ -67,8 +61,7 @@ package body Prices_Support is
             X (row, col) := Float (Test_Features (row, col + 1));
          end loop;
       end loop;
-      Print_Integer_Array (Routine_Name & "X_IDs", X_IDs);
-      Print_Float_Matrix (Routine_Name & "Y", Y);
+--        Print_Integer_Array (Routine_Name & "X_IDs", X_IDs);
 
       --  X_Means := Means (X);
       --  X_SDs   := Standard_Deviation (X);
@@ -85,9 +78,10 @@ package body Prices_Support is
       end loop;
 
       theDataset.X_Test := X_Trimmed;
-
-      --  Shuffler.Shuffle (theDataset.X_Train, theDataset.Y_Train);
-      --  Shuffler.Shuffle (theDataset.X_Test, theDataset.Y_Test);
+      theDataset.Y_Test :=
+        Load_Prices ("house_prices/test_sample_submission.csv",
+                     Test_Length);
+--        Print_Float_Matrix (Routine_Name & "Y_Test", theDataset.Y_Test);
 
       return theDataset;
 
@@ -95,9 +89,8 @@ package body Prices_Support is
 
    --  -------------------------------------------------------------------------
 
-   function Load_Prices
-     (File_Name : String; Num_Samples : Positive) return Real_Float_Matrix
-   is
+   function Load_Prices (File_Name    : String; Num_Samples : Positive)
+                         return Real_Float_Matrix is
       use Ada.Containers;
       use ML_Types;
       Routine_Name : constant String := "Prices_Support.Load_Prices ";
@@ -268,12 +261,12 @@ package body Prices_Support is
          end if;
       end loop;
 
+      Feature_Values.Clear;
       for row_index in
         Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
       loop
          aRow := Raw_Data.Element (row_index);  --  Unbound list
          if aRow.Length > 1 then
-
             Feature_Values.Clear;
             for f_index in 1 .. Num_Features loop
                declare

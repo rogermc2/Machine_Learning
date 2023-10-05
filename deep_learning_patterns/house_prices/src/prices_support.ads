@@ -10,6 +10,7 @@ package Prices_Support is
       Y_Test  : Real_Float_Matrix (1 .. Test_Length, 1 .. 1);
    end record;
 
-   function Build_Dataset return Dataset;
+   function Build_Dataset (Train_Length : Positive := 70;
+                           Test_Length  : Positive := 30) return Dataset;
 
 end Prices_Support;
