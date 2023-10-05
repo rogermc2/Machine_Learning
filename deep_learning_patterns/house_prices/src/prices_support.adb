@@ -52,7 +52,8 @@ package body Prices_Support is
       Test_Features : constant Integer_Matrix :=
         Preprocess ("house_prices/test.csv", Test_Length);
       --  Target_Item  : NL_Types.Float_List;
-      X             : Real_Float_Matrix (Test_Features'Range, 1 .. 4);
+      X             : Real_Float_Matrix (Test_Features'Range,
+                                         Test_Features'Range (2));
       --  X_Means      : Real_Float_Vector (X'Range (2));
       --  X_SDs        : Real_Float_Vector (X'Range (2));
       --  I0           : ML_Types.Integer_List;
@@ -95,7 +96,7 @@ package body Prices_Support is
             --  X_Trimmed (row + 1, 3) := X (I0 (row), 3);
             --  X_Trimmed (row + 1, 4) := X (I0 (row), 4);
             for col in X_Trimmed'Range (2) loop
-               X_Trimmed (row, col) := X (row - 1, col);
+               X_Trimmed (row, col) := X (row, col);
             end loop;
          end loop;
 
@@ -114,11 +115,11 @@ package body Prices_Support is
          --  end loop;
 
          --  for row in 36 .. Train_Length loop
-         for row in theDataset.X_Train'Range loop
-            for col in theDataset.X_Train'Range (2) loop
-               theDataset.X_Train (row, col) := X_Trimmed (row, col);
-            end loop;
-         end loop;
+         --  for row in theDataset.X_Train'Range loop
+         --     for col in theDataset.X_Train'Range (2) loop
+         --        theDataset.X_Train (row, col) := X_Trimmed (row, col);
+         --     end loop;
+         --  end loop;
 
          --  for index in 1 .. Train_Length loop
          --     if index <= 35 then
