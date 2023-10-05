@@ -15,7 +15,7 @@ procedure Prices is
    use Real_Float_Arrays;
    Program_Name : constant String            := "House Prices ";
    Train_Length : constant Positive := 70;
-   Test_Length  : constant Positive := 5;
+   Test_Length  : constant Positive := 1;
    Data         : constant Dataset           := Build_Dataset (Train_Length,
                                                                Test_Length);
    Num_Samples  : constant Positive          := Data.Test_Length;
