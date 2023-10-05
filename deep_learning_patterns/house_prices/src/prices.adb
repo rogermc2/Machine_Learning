@@ -20,8 +20,8 @@ procedure Prices is
                                                                Test_Length);
    Num_Samples  : constant Positive          := Test_Length;
    Num_Features : constant Positive          := Data.Num_Features;
-   Num_Epochs   : constant Positive          := 5;
-   Learn_Rate   : constant Float             := 0.1;
+   Num_Epochs   : constant Positive          := 15;
+   Learn_Rate   : constant Float             := 0.8;
    Input_Data   : constant Real_Float_Matrix := Data.X_Test;
    Labels       : constant Real_Float_Matrix := Data.Y_Test;
    Num_Classes  : constant Positive          := Labels'Length (2);
