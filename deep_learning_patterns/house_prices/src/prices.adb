@@ -14,13 +14,13 @@ with Neural_Model; use Neural_Model;
 procedure Prices is
    use Real_Float_Arrays;
    Program_Name : constant String            := "House Prices ";
-   Iris_Data    : constant Dataset           := Build_Dataset;
-   Num_Samples  : constant Positive          := Iris_Data.Test_Length;
-   Num_Features : constant Positive          := Iris_Data.Num_Features;
+   Data         : constant Dataset           := Build_Dataset;
+   Num_Samples  : constant Positive          := Data.Test_Length;
+   Num_Features : constant Positive          := Data.Num_Features;
    Num_Epochs   : constant Positive          := 5;
    Learn_Rate   : constant Float             := 0.1;
-   Input_Data   : constant Real_Float_Matrix := Iris_Data.X_Test;
-   Labels       : constant Real_Float_Matrix := Iris_Data.Y_Test;
+   Input_Data   : constant Real_Float_Matrix := Data.X_Test;
+   Labels       : constant Real_Float_Matrix := Data.Y_Test;
    Num_Classes  : constant Positive          := Labels'Length (2);
    theModel     :
      Sequential_Model

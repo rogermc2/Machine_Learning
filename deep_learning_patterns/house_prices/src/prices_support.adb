@@ -6,7 +6,7 @@ with Ada.Text_IO;           use Ada.Text_IO;
 
 --  with Maths;
 
---  with Basic_Printing; use Basic_Printing;
+with Basic_Printing; use Basic_Printing;
 with Classifier_Loader;
 with ML_Types;
 with Neural_Loader;
@@ -22,8 +22,10 @@ package body Prices_Support is
 
    Data_Codes : Code_Map;
 
-   NA_Code : constant String := "99999";
+   NA_Code : constant Integer := 99999;
 
+   function Load_Prices
+     (File_Name : String; Num_Samples : Positive) return Real_Float_Matrix;
    --  function Means (M : Real_Float_Matrix) return Real_Float_Vector;
    function Preprocess
      (File_Name : String; Num_Samples : Positive) return Integer_Matrix;
@@ -37,32 +39,40 @@ package body Prices_Support is
 
    function Build_Dataset return Dataset is
       Routine_Name  : constant String := "Prices_Support.Build_Dataset ";
-      Train_Length  : constant Positive       := 70;
-      Test_Length   : constant Positive       := 30;
+      Train_Length  : constant Positive := 70;
+      Test_Length   : constant Positive := 30;
+      Num_Features  : constant Positive := 6;
       --        Train_Data   : ML_Types.Multi_Output_Data_Record;
       --  Prices       : constant ML_Types.Multi_Output_Data_Record :=
       --    Classifier_Loader.Load_Data ("house_prices/sample_submission.csv");
       --        Train_Features : constant NL_Types.Float_List_2D;
       Test_Features : constant Integer_Matrix :=
-        Preprocess ("house_prices/test.csv", Test_Length);
+                        Preprocess ("house_prices/test.csv", Test_Length);
       --  Target_Item  : NL_Types.Float_List;
       X             : Real_Float_Matrix (Test_Features'Range,
-                                         Test_Features'Range (2));
+                                         1 .. Test_Features'Length (2) - 1);
+      X_IDs         : Integer_Array  (X'Range);
+      Y             : Real_Float_Matrix (Test_Features'Range, 1 .. 1) :=
+                        Load_Prices ("house_prices/test_sample_submission.csv",
+                                     Test_Length);
       --  X_Means      : Real_Float_Vector (X'Range (2));
       --  X_SDs        : Real_Float_Vector (X'Range (2));
-      X_Trimmed     : Real_Float_Matrix (X'Range, 1 .. 4);
-      theDataset    : Dataset (Train_Length, Test_Length, 4);
+      X_Trimmed     : Real_Float_Matrix (X'Range, 1 .. Num_Features);
+      theDataset    : Dataset (Train_Length, Test_Length, Num_Features);
    begin
       Put_Line (Routine_Name);
       for row in X'Range loop
+         X_IDs (row) := Test_Features (row, 1);
          for col in X'Range (2) loop
-            X (row, col) := Float (Test_Features (row, col));
+            X (row, col) := Float (Test_Features (row, col + 1));
          end loop;
       end loop;
+      Print_Integer_Array (Routine_Name & "X_IDs", X_IDs);
+      Print_Float_Matrix (Routine_Name & "Y", Y);
 
       --  X_Means := Means (X);
       --  X_SDs   := Standard_Deviation (X);
-      --  for row in X'RaNeural_Loader.Get_Data_Type (aRow (Positive (f_index)))nge loop
+      --  for row in X'Range loop
       --     Feature_Row := Features (row);
       --     X (row, 1)  := (X (row, 1) - X_Means (1)) / X_SDs (1);
       --     X (row, 2)  := (X (row, 2) - X_Means (2)) / X_SDs (2);
@@ -70,9 +80,11 @@ package body Prices_Support is
 
       for row in X_Trimmed'Range loop
          for col in X_Trimmed'Range (2) loop
-            X_Trimmed (row, col) := X (row, col);
+            X_Trimmed (row, col) := X (row, col + 1);
          end loop;
       end loop;
+
+      theDataset.X_Test := X_Trimmed;
 
       --  Shuffler.Shuffle (theDataset.X_Train, theDataset.Y_Train);
       --  Shuffler.Shuffle (theDataset.X_Test, theDataset.Y_Test);
@@ -80,6 +92,60 @@ package body Prices_Support is
       return theDataset;
 
    end Build_Dataset;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Prices
+     (File_Name : String; Num_Samples : Positive) return Real_Float_Matrix
+   is
+      use Ada.Containers;
+      use ML_Types;
+      Routine_Name : constant String := "Prices_Support.Load_Prices ";
+      Data_File    : File_Type;
+      Raw_CSV_Data : Raw_Data_Vector;
+      aRow         : Unbounded_List;
+      IDs          : Integer_Array (1 .. Num_Samples);
+      Prices       : Real_Float_Matrix (1 .. Num_Samples, 1 .. 1);
+   begin
+      Put_Line (Routine_Name & "loading " & File_Name);
+      Open (Data_File, In_File, File_Name);
+      Raw_CSV_Data := Neural_Loader.Load_Raw_CSV_Data (Data_File, Num_Samples);
+      Close (Data_File);
+
+      for row_index in Prices'Range loop
+         aRow := Raw_CSV_Data (row_index + 1);
+         if aRow.Length > 1 then
+            for f_index in 1 .. 2 loop
+               declare
+                  Row_S     : constant String    := To_String (aRow (f_index));
+                  S_Last    : constant Integer   := Row_S'Last;
+                  Last_Char : constant Character := Row_S (S_Last);
+               begin
+                  if Character'Pos (Last_Char) < 32 then
+                     aRow (f_index) :=
+                       To_Unbounded_String (Row_S (1 .. S_Last - 1));
+                  end if;
+
+                  case Neural_Loader.Get_Data_Type (aRow (f_index)) is
+                     when Boolean_Type => null;
+                     when Float_Type =>
+                        Prices (row_index, 1) :=
+                          Float'Value (To_String (aRow (f_index)));
+                     when Integer_Type => null;
+                        IDs (row_index) :=
+                          Integer'Value (To_String (aRow (f_index)));
+                     when UB_String_Type => null;
+                  end case;
+               end;
+            end loop;
+
+         end if;
+      end loop;
+
+      Put_Line (Routine_Name & "done");
+      return Prices;
+
+   end Load_Prices;
 
    --  -------------------------------------------------------------------------
 
@@ -152,7 +218,6 @@ package body Prices_Support is
       return ML_Types.Multi_Output_Data_Record
    is
       use Ada.Containers;
-      use Ada.Strings;
       use ML_Types;
       Routine_Name   : constant String   := "Prices_Support.Split_Raw_Data ";
       aRow           : Unbounded_List    := Raw_Data.First_Element;
@@ -216,6 +281,9 @@ package body Prices_Support is
                   Value       : Value_Record (Integer_Type);
                begin
                   Value.Integer_Value := Integer'Value (Feat_String);
+                  if Value.Integer_Value = NA_Code then
+                     Value.Integer_Value := -NA_Code;
+                  end if;
                   Feature_Values.Append (Value);
                end;  --  declare block=
             end loop;  --  f_index in 1 .. Num_Features
@@ -269,7 +337,7 @@ package body Prices_Support is
 
    --  -------------------------------------------------------------------------
 begin
-   Data_Codes.Insert ("NA", NA_Code);
+   Data_Codes.Insert ("NA", Integer'Image (NA_Code));
    Data_Codes.Insert ("RH", "1");
    Data_Codes.Insert ("RL", "2");
    Data_Codes.Insert ("TA", "3");
