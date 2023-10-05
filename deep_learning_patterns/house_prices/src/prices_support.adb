@@ -34,29 +34,20 @@ package body Prices_Support is
 
    function Build_Dataset (Train_Length : Positive := 70;
                            Test_Length  : Positive := 30) return Dataset is
-      Routine_Name  : constant String := "Prices_Support.Build_Dataset ";
+--        Routine_Name  : constant String := "Prices_Support.Build_Dataset ";
       Num_Features  : constant Positive := 6;
-      --        Train_Data   : ML_Types.Multi_Output_Data_Record;
-      --  Prices       : constant ML_Types.Multi_Output_Data_Record :=
-      --    Classifier_Loader.Load_Data ("house_prices/sample_submission.csv");
-      --        Train_Features : constant NL_Types.Float_List_2D;
       Test_Features : constant Integer_Matrix :=
                         Preprocess ("house_prices/test.csv", Test_Length);
-      --  Target_Item  : NL_Types.Float_List;
       X             : Real_Float_Matrix (Test_Features'Range,
                                          1 .. Test_Features'Length (2) - 1);
-      X_IDs         : Integer_Array  (X'Range);
-      --        Y             : Real_Float_Matrix (Test_Features'Range, 1 .. 1) :=
-      --                          Load_Prices ("house_prices/test_sample_submission.csv",
-      --                                       Test_Length);
+--        X_IDs         : Integer_Array  (X'Range);
       --  X_Means      : Real_Float_Vector (X'Range (2));
       --  X_SDs        : Real_Float_Vector (X'Range (2));
       X_Trimmed     : Real_Float_Matrix (X'Range, 1 .. Num_Features);
       theDataset    : Dataset (Train_Length, Test_Length, Num_Features);
    begin
-      Put_Line (Routine_Name);
       for row in X'Range loop
-         X_IDs (row) := Test_Features (row, 1);
+--           X_IDs (row) := Test_Features (row, 1);
          for col in X'Range (2) loop
             X (row, col) := Float (Test_Features (row, col + 1));
          end loop;
@@ -81,7 +72,6 @@ package body Prices_Support is
       theDataset.Y_Test :=
         Load_Prices ("house_prices/test_sample_submission.csv",
                      Test_Length);
---        Print_Float_Matrix (Routine_Name & "Y_Test", theDataset.Y_Test);
 
       return theDataset;
 
@@ -97,7 +87,7 @@ package body Prices_Support is
       Data_File    : File_Type;
       Raw_CSV_Data : Raw_Data_Vector;
       aRow         : Unbounded_List;
-      IDs          : Integer_Array (1 .. Num_Samples);
+--        IDs          : Integer_Array (1 .. Num_Samples);
       Prices       : Real_Float_Matrix (1 .. Num_Samples, 1 .. 1);
    begin
       Put_Line (Routine_Name & "loading " & File_Name);
@@ -125,8 +115,8 @@ package body Prices_Support is
                         Prices (row_index, 1) :=
                           Float'Value (To_String (aRow (f_index)));
                      when Integer_Type => null;
-                        IDs (row_index) :=
-                          Integer'Value (To_String (aRow (f_index)));
+--                          IDs (row_index) :=
+--                            Integer'Value (To_String (aRow (f_index)));
                      when UB_String_Type => null;
                   end case;
                end;
@@ -135,7 +125,6 @@ package body Prices_Support is
          end if;
       end loop;
 
-      Put_Line (Routine_Name & "done");
       return Prices;
 
    end Load_Prices;
@@ -185,7 +174,7 @@ package body Prices_Support is
       Close (Data_File);
 
       Split_Data := Split_Raw_Data (Raw_CSV_Data, Num_Features);
-      Put_Line (Routine_Name & "Raw_Data split");
+
       declare
          Features : ML_Types.Value_Data_List;
          Result   : Integer_Matrix (1 .. Num_Samples, 1 .. Num_Features);
@@ -198,7 +187,6 @@ package body Prices_Support is
             end loop;
          end loop;
 
-         Put_Line (Routine_Name & "done");
          return Result;
       end;  --  declare block
 
@@ -240,8 +228,6 @@ package body Prices_Support is
                   if Neural_Loader.Get_Data_Type (aRow (f_index)) /=
                     Integer_Type
                   then
-                     --  Put_Line (Routine_Name & To_String (aRow (f_index)) &
-                     --              " is not an integer type");
                      Assert
                        (Data_Codes.Contains (To_String (aRow (f_index))),
                         Routine_Name & To_String (aRow (f_index)) &
@@ -250,6 +236,7 @@ package body Prices_Support is
                        To_Unbounded_String
                          (Data_Codes.Element (To_String (aRow (f_index))));
                   end if;
+
                   Assert
                     (Neural_Loader.Get_Data_Type (aRow (f_index)) =
                        Integer_Type,
@@ -286,7 +273,6 @@ package body Prices_Support is
 
       Data.Feature_Values := Features_List;
 
-      Put_Line (Routine_Name & "done");
       return Data;
 
    end Split_Raw_Data;

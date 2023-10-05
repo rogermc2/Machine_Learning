@@ -18,17 +18,17 @@ procedure Prices is
    Test_Length  : constant Positive := 1;
    Data         : constant Dataset           := Build_Dataset (Train_Length,
                                                                Test_Length);
-   Num_Samples  : constant Positive          := Data.Test_Length;
+   Num_Samples  : constant Positive          := Test_Length;
    Num_Features : constant Positive          := Data.Num_Features;
    Num_Epochs   : constant Positive          := 5;
    Learn_Rate   : constant Float             := 0.1;
    Input_Data   : constant Real_Float_Matrix := Data.X_Test;
    Labels       : constant Real_Float_Matrix := Data.Y_Test;
    Num_Classes  : constant Positive          := Labels'Length (2);
-   theModel     :
-     Sequential_Model
-       (Num_Samples, Num_Features, Num_Classes, Loss_Mean_Square_Error);
+   theModel     : Sequential_Model (Num_Samples, Num_Features, Num_Classes,
+                                    Loss_Mean_Square_Error);
    --     Classifier     : Python.Module;
+
 begin
    New_Line;
    Put_Line ("Program " & Program_Name);
