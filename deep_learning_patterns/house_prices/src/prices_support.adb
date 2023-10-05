@@ -208,14 +208,20 @@ package body Prices_Support is
       Close (Data_File);
 
       Split_Data := Split_Raw_Data (Raw_CSV_Data, Num_Features);
+      Put_Line (Routine_Name & "Raw_Data split");
       declare
-      Features : ML_Types.Value_Data_List;
-      Result   : Integer_Matrix (1 .. Num_Samples, 1 .. Num_Features);
+         Features : ML_Types.Value_Data_List;
+         Result   : Integer_Matrix (1 .. Num_Samples, 1 .. Num_Features);
       begin
-      for row in Result'Range loop
-         Features := Split_Data.Feature_Values (row);
-      end loop;
+         Put_Line (Routine_Name & "proceesing Split_Data");
+         for row in Result'Range loop
+            Features := Split_Data.Feature_Values (row);
+            for col in Result'Range (2) loop
+               Result (row, col) := Features (col).Integer_Value;
+            end loop;
+         end loop;
 
+         Put_Line (Routine_Name & "done");
          return Result;
       end;  --  declare block
 
