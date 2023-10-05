@@ -28,7 +28,7 @@ package body Prices_Support is
    function Preprocess
      (File_Name : String; Num_Samples : Positive) return Integer_Matrix;
    function Split_Raw_Data
-     (Raw_Data : ML_Types.Raw_Data_Vector; Num_Features : out Positive)
+     (Raw_Data : in out ML_Types.Raw_Data_Vector; Num_Features : out Positive)
       return ML_Types.Multi_Output_Data_Record;
    --  function Standard_Deviation
    --    (M : Real_Float_Matrix) return Real_Float_Vector;
@@ -230,7 +230,7 @@ package body Prices_Support is
    --  -------------------------------------------------------------------------
 
    function Split_Raw_Data
-     (Raw_Data : ML_Types.Raw_Data_Vector; Num_Features : out Positive)
+     (Raw_Data : in out ML_Types.Raw_Data_Vector; Num_Features : out Positive)
       return ML_Types.Multi_Output_Data_Record
    is
       use Ada.Containers;
@@ -281,10 +281,10 @@ package body Prices_Support is
                        " is not an integer type");
                end;
             end loop;
+            Raw_Data (row_index) := aRow;
          end if;
       end loop;
 
-      Put_Line (Routine_Name & "Conversion done");
       for row_index in
         Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
       loop
@@ -297,7 +297,6 @@ package body Prices_Support is
                   Feat_String : constant String := To_String (aRow (f_index));
                   Value       : Value_Record (Integer_Type);
                begin
-                  Put_Line (Routine_Name & "Feat_String: " & Feat_String);
                   Value.Integer_Value := Integer'Value (Feat_String);
                   Feature_Values.Append (Value);
                end;  --  declare block=
