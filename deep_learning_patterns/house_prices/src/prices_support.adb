@@ -28,7 +28,7 @@ package body Prices_Support is
    function Preprocess
      (File_Name : String; Num_Samples : Positive) return Integer_Matrix;
    function Split_Raw_Data
-     (Raw_Data : ML_Types.Raw_Data_Vector)
+     (Raw_Data : ML_Types.Raw_Data_Vector; Num_Features : out Positive)
       return ML_Types.Multi_Output_Data_Record;
    --  function Standard_Deviation
    --    (M : Real_Float_Matrix) return Real_Float_Vector;
@@ -200,23 +200,31 @@ package body Prices_Support is
       Data_File    : File_Type;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
       Split_Data   : ML_Types.Multi_Output_Data_Record;
-      Result       : Integer_Matrix (1 .. Num_Samples, 1 .. 10);
+      Num_Features : Positive;
    begin
       Put_Line (Routine_Name & "loading " & File_Name);
       Open (Data_File, In_File, File_Name);
       Raw_CSV_Data := Neural_Loader.Load_Raw_CSV_Data (Data_File, Num_Samples);
       Close (Data_File);
 
-      Split_Data := Split_Raw_Data (Raw_CSV_Data);
+      Split_Data := Split_Raw_Data (Raw_CSV_Data, Num_Features);
+      declare
+      Features : ML_Types.Value_Data_List;
+      Result   : Integer_Matrix (1 .. Num_Samples, 1 .. Num_Features);
+      begin
+      for row in Result'Range loop
+         Features := Split_Data.Feature_Values (row);
+      end loop;
 
-      return Result;
+         return Result;
+      end;  --  declare block
 
    end Preprocess;
 
    --  -------------------------------------------------------------------------
 
    function Split_Raw_Data
-     (Raw_Data : ML_Types.Raw_Data_Vector)
+     (Raw_Data : ML_Types.Raw_Data_Vector; Num_Features : out Positive)
       return ML_Types.Multi_Output_Data_Record
    is
       use Ada.Containers;
@@ -224,12 +232,13 @@ package body Prices_Support is
       use ML_Types;
       Routine_Name   : constant String   := "Prices_Support.Split_Raw_Data ";
       aRow           : Unbounded_List    := Raw_Data.First_Element;
-      Num_Features   : constant Positive := Positive (aRow.Length);
       Features_List  : Value_Data_Lists_2D;
       Feature_Values : Value_Data_List;
       Data           : Multi_Output_Data_Record;
    begin
+      Num_Features := Positive (aRow.Length);
       Classifier_Loader.Parse_Header (aRow, Num_Features, Data);
+
       for row_index in
         Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index
       loop
