@@ -37,16 +37,16 @@ package body Prices_Support is
    function Build_Dataset (Train_Length : Positive := 70;
                            Test_Length  : Positive := 30;
                            Num_Features : Natural := 0) return Dataset is
-      Routine_Name  : constant String := "Prices_Support.Build_Dataset ";
-      Test_Features : constant Integer_Matrix :=
-                        Preprocess ("house_prices/test.csv", Test_Length);
-      X             : Real_Float_Matrix (Test_Features'Range,
-                                         1 .. Test_Features'Length (2) - 1);
-      N_Features    : Positive;
+      Routine_Name   : constant String := "Prices_Support.Build_Dataset ";
+      Train_Features : constant Integer_Matrix :=
+                        Preprocess ("house_prices/test.csv", Train_Length);
+      X              : Real_Float_Matrix (Train_Features'Range,
+                                         1 .. Train_Features'Length (2) - 1);
+      N_Features     : Positive;
       --        X_IDs         : Integer_Array  (X'Range);
-      X_Means       : Real_Float_Vector (X'Range (2));
-      X_SDs         : Real_Float_Vector (X'Range (2));
-      Min_Price     : Float;
+      X_Means        : Real_Float_Vector (X'Range (2));
+      X_SDs          : Real_Float_Vector (X'Range (2));
+      Min_Price      : Float;
    begin
       if Num_Features > 0 then
          N_Features := Num_Features;
@@ -56,12 +56,12 @@ package body Prices_Support is
 
       declare
          X_Trimmed  : Real_Float_Matrix (X'Range, 1 .. N_Features);
-         theDataset : Dataset (Train_Length, Test_Length, N_Features);
+         theDataset : Dataset (Train_Length, Train_Length, N_Features);
       begin
          for row in X'Range loop
-            --           X_IDs (row) := Test_Features (row, 1);
+            --           X_IDs (row) := Train_Features (row, 1);
             for col in X'Range (2) loop
-               X (row, col) := Float (Test_Features (row, col + 1));
+               X (row, col) := Float (Train_Features (row, col + 1));
             end loop;
          end loop;
 
@@ -84,16 +84,16 @@ package body Prices_Support is
             end loop;
          end loop;
 
-         theDataset.X_Test := X_Trimmed;
-         Print_Float_Matrix (Routine_Name & "theDataset.X_Test",
-                             theDataset.X_Test, 1, 3, 1, 6);
-         theDataset.Y_Test :=
+         theDataset.X_Train := X_Trimmed;
+         Print_Float_Matrix (Routine_Name & "theDataset.X_Train",
+                             theDataset.X_Train, 1, 3, 1, 6);
+         theDataset.Y_Train :=
            Load_Prices ("house_prices/test_sample_submission.csv",
-                        Test_Length);
-         Min_Price := Min (theDataset.Y_Test);
-         for row in theDataset.Y_Test'Range loop
-            theDataset.Y_Test (row, 1) :=
-              theDataset.Y_Test (row, 1) / Min_Price;
+                        Train_Length);
+         Min_Price := Min (theDataset.Y_Train);
+         for row in theDataset.Y_Train'Range loop
+            theDataset.Y_Train (row, 1) :=
+              theDataset.Y_Train (row, 1) / Min_Price;
          end loop;
 
          return theDataset;
@@ -408,6 +408,16 @@ begin
    Data_Codes.Insert ("NoRidge", "84");
    Data_Codes.Insert ("Somerst", "85");
    Data_Codes.Insert ("FV", "86");
-   Data_Codes.Insert ("SawyerW", "87");
+   Data_Codes.Insert ("Sawyer", "87");
+   Data_Codes.Insert ("BrkTil", "88");
+   Data_Codes.Insert ("N", "89");
+   Data_Codes.Insert ("FuseA", "90");
+   Data_Codes.Insert ("SawyerW", "91");
+   Data_Codes.Insert ("RRNe", "92");
+   Data_Codes.Insert ("BrkCmn", "93");
+   Data_Codes.Insert ("GdPrv", "94");
+   Data_Codes.Insert ("Abnorml", "95");
+   Data_Codes.Insert ("ImStucc", "96");
+   Data_Codes.Insert ("ConLD", "97");
 
 end Prices_Support;
