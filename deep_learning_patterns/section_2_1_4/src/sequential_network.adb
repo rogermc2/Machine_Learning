@@ -5,7 +5,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Basic_Printing; use Basic_Printing;
 with ML_Arrays_And_Matrices; use ML_Arrays_And_Matrices;
 --  with Python;
---  with Shuffler;
 
 with Neural_Model; use Neural_Model;
 

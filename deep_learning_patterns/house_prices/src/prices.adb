@@ -15,13 +15,13 @@ procedure Prices is
    use Real_Float_Arrays;
    Program_Name : constant String            := "House Prices ";
    Train_Length : constant Positive := 70;
-   Test_Length  : constant Positive := 1;
+   Test_Length  : constant Positive := 2;
    Data         : constant Dataset           := Build_Dataset (Train_Length,
                                                                Test_Length, 6);
    Num_Samples  : constant Positive          := Test_Length;
    Num_Features : constant Positive          := Data.Num_Features;
-   Num_Epochs   : constant Positive          := 20;
-   Learn_Rate   : constant Float             := 0.8;
+   Num_Epochs   : constant Positive          := 4;
+   Learn_Rate   : constant Float             := 1.0;
    Input_Data   : constant Real_Float_Matrix := Data.X_Test;
    Labels       : constant Real_Float_Matrix := Data.Y_Test;
    Num_Classes  : constant Positive          := Labels'Length (2);

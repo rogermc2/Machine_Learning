@@ -11,9 +11,6 @@ package body Neural_Model is
 
    procedure Backward
      (aModel : in out Sequential_Model; L_Index : Positive);
-   function Deactivate
-     (aModel : in out Sequential_Model; L_Index : Positive)
-      return Real_Float_Vector;
 --     function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
 --     function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
    procedure Forward
@@ -21,6 +18,34 @@ package body Neural_Model is
    procedure Update
      (Connection : in out Stochastic_Optimizers.Parameters_Record;
       aLayer     : in out Layer; Learn_Rate : Float);
+
+   --  -------------------------------------------------------------------------
+
+   function Activation_Error
+     (aModel : in out Sequential_Model; L_Index : Positive)
+      return Real_Float_Vector
+   is
+      use Base_Neural;
+      Routine_Name : constant String := "Neural_Model.Activation_Error ";
+      This_Layer   : constant Layer  := aModel.Layers (L_Index);
+      Error        : Real_Float_Vector (This_Layer.Output_Error'Range);
+   begin
+      case This_Layer.Activation is
+         when Identity_Activation =>
+            Error := This_Layer.Output_Error;
+         when Logistic_Activation =>
+            Put_Line (Routine_Name & "Logistic_Activation not implemented");
+         when ReLu_Activation =>
+            Error := Rect_LU_Derivative (This_Layer.Output_Error);
+         when Sigmoid_Activation =>
+            Error := Sigmoid_Derivative (This_Layer.Output_Error);
+         when Soft_Max_Activation =>
+            Put_Line (Routine_Name & "Soft_Max_Activation not implemented");
+      end case;
+
+      return Error;
+
+   end Activation_Error;
 
    --  -------------------------------------------------------------------------
 
@@ -111,7 +136,7 @@ package body Neural_Model is
       --  Routine_Name  : constant String := "Neural_Model.Backward ";
       This_Layer    : Layer := aModel.Layers (L_Index);
       dEdY          : constant Real_Float_Vector :=
-                        Deactivate (aModel, L_Index);
+                        Activation_Error (aModel, L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
       Input_Error   : constant Real_Float_Vector :=
                         Transpose
@@ -160,34 +185,6 @@ package body Neural_Model is
       end loop;  --  epoch
 
    end Compile;
-
-   --  -------------------------------------------------------------------------
-
-   function Deactivate
-     (aModel : in out Sequential_Model; L_Index : Positive)
-      return Real_Float_Vector
-   is
-      use Base_Neural;
-      Routine_Name : constant String := "Neural_Model.Deactivate ";
-      This_Layer   : constant Layer  := aModel.Layers (L_Index);
-      Result       : Real_Float_Vector (This_Layer.Output_Error'Range);
-   begin
-      case This_Layer.Activation is
-         when Identity_Activation =>
-            Result := This_Layer.Output_Error;
-         when Logistic_Activation =>
-            Put_Line (Routine_Name & "Logistic_Activation not implemented");
-         when ReLu_Activation =>
-            Result := Rect_LU_Derivative (This_Layer.Output_Error);
-         when Sigmoid_Activation =>
-            Result := Sigmoid_Derivative (This_Layer.Output_Error);
-         when Soft_Max_Activation =>
-            Put_Line (Routine_Name & "Soft_Max_Activation not implemented");
-      end case;
-
-      return Result;
-
-   end Deactivate;
 
    --  -------------------------------------------------------------------------
 
