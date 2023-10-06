@@ -147,11 +147,11 @@ package body Neural_Model is
                         dEdY * This_Layer.Input_Data;
    begin
       Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
-                            " Output_Error:", This_Layer.Output_Error);
+                            " Output_Error", This_Layer.Output_Error);
       Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
-                            " dEdY:", dEdY);
+                            " dEdY", dEdY);
       Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
-                            " Input_Error:", Input_Error);
+                            " Input_Error", Input_Error);
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Weights_Error;
       This_Layer.Delta_Bias := This_Layer.Delta_Bias + This_Layer.Output_Error;
       This_Layer.Passes := This_Layer.Passes + 1;
