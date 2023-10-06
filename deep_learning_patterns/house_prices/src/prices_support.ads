@@ -11,6 +11,7 @@ package Prices_Support is
    end record;
 
    function Build_Dataset (Train_Length : Positive := 70;
-                           Test_Length  : Positive := 30) return Dataset;
+                           Test_Length  : Positive := 30;
+                           Num_Features : Natural := 0) return Dataset;
 
 end Prices_Support;

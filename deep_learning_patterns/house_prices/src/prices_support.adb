@@ -33,19 +33,28 @@ package body Prices_Support is
    --  -------------------------------------------------------------------------
 
    function Build_Dataset (Train_Length : Positive := 70;
-                           Test_Length  : Positive := 30) return Dataset is
+                           Test_Length  : Positive := 30;
+                           Num_Features : Natural := 0) return Dataset is
 --        Routine_Name  : constant String := "Prices_Support.Build_Dataset ";
-      Num_Features  : constant Positive := 6;
       Test_Features : constant Integer_Matrix :=
                         Preprocess ("house_prices/test.csv", Test_Length);
       X             : Real_Float_Matrix (Test_Features'Range,
                                          1 .. Test_Features'Length (2) - 1);
+      N_Features    : Positive;
 --        X_IDs         : Integer_Array  (X'Range);
       --  X_Means      : Real_Float_Vector (X'Range (2));
       --  X_SDs        : Real_Float_Vector (X'Range (2));
-      X_Trimmed     : Real_Float_Matrix (X'Range, 1 .. Num_Features);
-      theDataset    : Dataset (Train_Length, Test_Length, Num_Features);
    begin
+      if Num_Features > 0 then
+         N_Features := Num_Features;
+      else
+         N_Features := X'Length (2);
+      end if;
+
+      declare
+      X_Trimmed     : Real_Float_Matrix (X'Range, 1 .. N_Features);
+      theDataset    : Dataset (Train_Length, Test_Length, N_Features);
+      begin
       for row in X'Range loop
 --           X_IDs (row) := Test_Features (row, 1);
          for col in X'Range (2) loop
@@ -73,7 +82,8 @@ package body Prices_Support is
         Load_Prices ("house_prices/test_sample_submission.csv",
                      Test_Length);
 
-      return theDataset;
+         return theDataset;
+      end;  -- declare block
 
    end Build_Dataset;
 

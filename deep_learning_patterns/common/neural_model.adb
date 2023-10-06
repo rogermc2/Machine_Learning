@@ -300,6 +300,10 @@ package body Neural_Model is
             aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
       end case;
 
+      for col in Predicted'Range loop
+         aModel.Pred (Sample_Index, col) := Predicted (col);
+      end loop;
+
 --        Print_Float_Vector (Routine_Name & "Predicted", Predicted);
 --        Print_Float_Vector (Routine_Name & "Actual", Actual);
       Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
