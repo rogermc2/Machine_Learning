@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Base_Neural;
-with Basic_Printing; use Basic_Printing;
+--  with Basic_Printing; use Basic_Printing;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package body Neural_Model is
@@ -39,7 +39,7 @@ package body Neural_Model is
             Error := Rect_LU_Derivative (This_Layer.Output_Error);
          when Sigmoid_Activation =>
             Error := Sigmoid_Derivative (This_Layer.Output_Error);
-            Print_Float_Vector (Routine_Name & "Sigmoid_Derivative", Error);
+--              Print_Float_Vector (Routine_Name & "Sigmoid_Derivative", Error);
          when Soft_Max_Activation =>
             Put_Line (Routine_Name & "Soft_Max_Activation not implemented");
       end case;
@@ -134,7 +134,7 @@ package body Neural_Model is
    procedure Backward
      (aModel : in out Sequential_Model; L_Index : Positive) is
       use Real_Float_Arrays;
-      Routine_Name  : constant String := "Neural_Model.Backward ";
+--        Routine_Name  : constant String := "Neural_Model.Backward ";
       This_Layer    : Layer := aModel.Layers (L_Index);
       dEdY          : constant Real_Float_Vector :=
                         Activation_Error (aModel, L_Index);
@@ -146,18 +146,18 @@ package body Neural_Model is
       Weights_Error : constant Real_Float_Matrix :=
                         dEdY * This_Layer.Input_Data;
    begin
-      Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
-                            " Output_Error", This_Layer.Output_Error);
-      Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
-                            " dEdY", dEdY);
-      Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
-                            " Input_Error", Input_Error);
+--        Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
+--                              " Output_Error", This_Layer.Output_Error);
+--        Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
+--                              " dEdY", dEdY);
+--        Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
+--                              " Input_Error", Input_Error);
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Weights_Error;
       This_Layer.Delta_Bias := This_Layer.Delta_Bias + This_Layer.Output_Error;
       This_Layer.Passes := This_Layer.Passes + 1;
       aModel.Layers (L_Index) := This_Layer;
       aModel.Layers (L_Index - 1).Output_Error := Input_Error;
-      New_Line;
+--        New_Line;
 
    end Backward;
 
@@ -188,6 +188,7 @@ package body Neural_Model is
               (aModel.Connections (c_index), aModel.Layers (c_index + 1),
                Learn_Rate);
          end loop;
+         New_Line;
       end loop;  --  epoch
 
    end Compile;
@@ -310,9 +311,9 @@ package body Neural_Model is
 --        Print_Float_Vector (Routine_Name & "Predicted", Predicted);
 --        Print_Float_Vector (Routine_Name & "Actual", Actual);
       Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
-      Print_Float_Vector (Routine_Name & "Last_Layer.Output_Error",
-                          Last_Layer.Output_Error);
-      New_Line;
+--        Print_Float_Vector (Routine_Name & "Last_Layer.Output_Error",
+--                            Last_Layer.Output_Error);
+--        New_Line;
 
    end Forward;
 

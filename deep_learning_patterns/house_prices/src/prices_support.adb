@@ -46,6 +46,7 @@ package body Prices_Support is
       --        X_IDs         : Integer_Array  (X'Range);
       X_Means       : Real_Float_Vector (X'Range (2));
       X_SDs         : Real_Float_Vector (X'Range (2));
+      Min_Price     : Float;
    begin
       if Num_Features > 0 then
          N_Features := Num_Features;
@@ -89,6 +90,11 @@ package body Prices_Support is
          theDataset.Y_Test :=
            Load_Prices ("house_prices/test_sample_submission.csv",
                         Test_Length);
+         Min_Price := Min (theDataset.Y_Test);
+         for row in theDataset.Y_Test'Range loop
+            theDataset.Y_Test (row, 1) :=
+              theDataset.Y_Test (row, 1) / Min_Price;
+         end loop;
 
          return theDataset;
       end;  -- declare block
