@@ -43,9 +43,9 @@ package body Prices_Support is
       X             : Real_Float_Matrix (Test_Features'Range,
                                          1 .. Test_Features'Length (2) - 1);
       N_Features    : Positive;
---        X_IDs         : Integer_Array  (X'Range);
-      X_Means      : Real_Float_Vector (X'Range (2));
-      X_SDs        : Real_Float_Vector (X'Range (2));
+      --        X_IDs         : Integer_Array  (X'Range);
+      X_Means       : Real_Float_Vector (X'Range (2));
+      X_SDs         : Real_Float_Vector (X'Range (2));
    begin
       if Num_Features > 0 then
          N_Features := Num_Features;
@@ -54,37 +54,37 @@ package body Prices_Support is
       end if;
 
       declare
-      X_Trimmed  : Real_Float_Matrix (X'Range, 1 .. N_Features);
-      theDataset : Dataset (Train_Length, Test_Length, N_Features);
+         X_Trimmed  : Real_Float_Matrix (X'Range, 1 .. N_Features);
+         theDataset : Dataset (Train_Length, Test_Length, N_Features);
       begin
-      for row in X'Range loop
---           X_IDs (row) := Test_Features (row, 1);
-         for col in X'Range (2) loop
-            X (row, col) := Float (Test_Features (row, col + 1));
+         for row in X'Range loop
+            --           X_IDs (row) := Test_Features (row, 1);
+            for col in X'Range (2) loop
+               X (row, col) := Float (Test_Features (row, col + 1));
+            end loop;
          end loop;
-      end loop;
 
-      X_Means := Means (X);
-      X_SDs   := Standard_Deviation (X);
-      Print_Float_Vector (Routine_Name & "X_Means", X_Means, 1, 6);
-      Print_Float_Vector (Routine_Name & "X_SDs", X_SDs, 1, 6);
+         X_Means := Means (X);
+         X_SDs   := Standard_Deviation (X);
+         Print_Float_Vector (Routine_Name & "X_Means", X_Means, 1, 6);
+         Print_Float_Vector (Routine_Name & "X_SDs", X_SDs, 1, 6);
 
-      for row in X'Range loop
+         for row in X'Range loop
             for col in X'Range (2) loop
                X (row, col)  := (X (row, col) - X_Means (col)) / X_SDs (col);
             end loop;
-      end loop;
-
-      for row in X_Trimmed'Range loop
-         for col in X_Trimmed'Range (2) loop
-            X_Trimmed (row, col) := X (row, col + 1);
          end loop;
-      end loop;
 
-      theDataset.X_Test := X_Trimmed;
-      theDataset.Y_Test :=
-        Load_Prices ("house_prices/test_sample_submission.csv",
-                     Test_Length);
+         for row in X_Trimmed'Range loop
+            for col in X_Trimmed'Range (2) loop
+               X_Trimmed (row, col) := X (row, col + 1);
+            end loop;
+         end loop;
+
+         theDataset.X_Test := X_Trimmed;
+         theDataset.Y_Test :=
+           Load_Prices ("house_prices/test_sample_submission.csv",
+                        Test_Length);
 
          return theDataset;
       end;  -- declare block
@@ -101,7 +101,7 @@ package body Prices_Support is
       Data_File    : File_Type;
       Raw_CSV_Data : Raw_Data_Vector;
       aRow         : Unbounded_List;
---        IDs          : Integer_Array (1 .. Num_Samples);
+      --        IDs          : Integer_Array (1 .. Num_Samples);
       Prices       : Real_Float_Matrix (1 .. Num_Samples, 1 .. 1);
    begin
       Put_Line (Routine_Name & "loading " & File_Name);
@@ -129,8 +129,8 @@ package body Prices_Support is
                         Prices (row_index, 1) :=
                           Float'Value (To_String (aRow (f_index)));
                      when Integer_Type => null;
---                          IDs (row_index) :=
---                            Integer'Value (To_String (aRow (f_index)));
+                        --                          IDs (row_index) :=
+                        --                            Integer'Value (To_String (aRow (f_index)));
                      when UB_String_Type => null;
                   end case;
                end;
@@ -144,15 +144,15 @@ package body Prices_Support is
    end Load_Prices;
 
    --  -------------------------------------------------------------------------
-
+   --  Means returns the mean value of each column of the matrix X.
    function Means (M : Real_Float_Matrix) return Real_Float_Vector is
       use Real_Float_Arrays;
-      M_Length : constant Float := Float (M'Length);
+      M_Length  : constant Float := Float (M'Length);
       Sums      : Real_Float_Vector (M'Range (2)) := (others => 0.0);
    begin
-      for row in M'Range loop
-         for col in M'Range (2) loop
-            Sums (row) := Sums (row) + M (row, col);
+      for col in M'Range (2) loop
+         for row in M'Range loop
+            Sums (col) := Sums (col) + M (row, col);
          end loop;
       end loop;
 
@@ -281,37 +281,42 @@ package body Prices_Support is
    end Split_Raw_Data;
 
    --  -----------------------------------------------------------------------
-
+   --  Standard_Deviation returns the value of the standard deviation of each
+   --  column of the matrix X.
+   --  SD (col) = sqrt (sum ((X(col) - mean(X(col))^2)) / col length)
    function Standard_Deviation (M : Real_Float_Matrix)
                                 return Real_Float_Vector is
       use Maths.Float_Math_Functions;
-      M_Length  : constant Float := Float (M'Length);
-      Mean_Vals : constant Real_Float_Vector := Means (M);
-      Errors_Sq : Real_Float_Matrix (M'Range, M'Range (2));
-      Sums      : Real_Float_Vector (M'Range (2)) := (others => 0.0);
-      SD        : Real_Float_Vector (M'Range (2));
+      Routine_Name : constant String   := "Prices_Support.Standard_Deviation ";
+      Num_Rows     : constant Float := Float (M'Length);
+      Mean_Vals    : constant Real_Float_Vector := Means (M);
+--        Errors_Sq    : Real_Float_Matrix (M'Range, M'Range (2));
+--        Sums         : Real_Float_Vector (M'Range (2)) := (others => 0.0);
+      SD           : Real_Float_Vector (M'Range (2));
+      aColumn      : Real_Float_Vector (M'Range);
+      Sq_Error     : Float;
+      Sq_Error_Sum : Real_Float_Vector (M'Range (2)) := (others => 0.0);
    begin
-      for row in M'Range loop
-         for col in M'Range (2) loop
-            Errors_Sq (row, col) := (M (row, col) - Mean_Vals (col))**2;
+      for col in M'Range (2) loop
+         aColumn := Get_Col (M, col);
+         Sq_Error := 0.0;
+         for row in aColumn'Range loop
+            Sq_Error := (aColumn (row) - Mean_Vals (col))**2;
+            Sq_Error_Sum (col) := Sq_Error_Sum (col) + Sq_Error;
          end loop;
       end loop;
 
-      for row in M'Range loop
-         for col in M'Range (2) loop
-            Sums (row) := Sums (row) + Errors_Sq (row, col);
-         end loop;
+      for col in SD'Range loop
+         SD (col) := Sqrt (Sq_Error_Sum (col) / (Num_Rows - 1.0));
       end loop;
-
-      for row in SD'Range loop
-         SD (row) := Sqrt (Sums (row) / (M_Length - 1.0));
-      end loop;
+      Print_Float_Vector (Routine_Name & "SD", SD, 1 , 6);
 
       return SD;
 
    end Standard_Deviation;
 
    --  -------------------------------------------------------------------------
+
 begin
    Data_Codes.Insert ("NA", Integer'Image (NA_Code));
    Data_Codes.Insert ("RH", "1");

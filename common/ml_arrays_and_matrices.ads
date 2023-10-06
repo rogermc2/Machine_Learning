@@ -188,6 +188,8 @@ package ML_Arrays_And_Matrices is
    pragma Inline (Flatten);
    function Get_Col (Matrix : Integer_Matrix; Col : Integer)
                      return Integer_Array;
+   function Get_Col (Matrix : Real_Float_Matrix; Col : Integer)
+                     return Real_Float_Vector;
    pragma Inline (Get_Col);
    function Get_Row (Matrix : Binary_Matrix; Row : Integer)
                      return Binary_Array;
