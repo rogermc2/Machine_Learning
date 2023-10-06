@@ -66,22 +66,26 @@ package body Prices_Support is
 
          X_Means := Means (X);
          X_SDs   := Standard_Deviation (X);
-         Print_Float_Vector (Routine_Name & "X_Means", X_Means, 1, 6);
-         Print_Float_Vector (Routine_Name & "X_SDs", X_SDs, 1, 6);
+--           Print_Float_Vector (Routine_Name & "X_Means", X_Means, 1, 6);
+--           Print_Float_Vector (Routine_Name & "X_SDs", X_SDs, 1, 6);
 
          for row in X'Range loop
             for col in X'Range (2) loop
-               X (row, col)  := (X (row, col) - X_Means (col)) / X_SDs (col);
+               if X_SDs (col) > 0.0 then
+                  X (row, col)  := (X (row, col) - X_Means (col)) / X_SDs (col);
+               end if;
             end loop;
          end loop;
 
          for row in X_Trimmed'Range loop
             for col in X_Trimmed'Range (2) loop
-               X_Trimmed (row, col) := X (row, col + 1);
+               X_Trimmed (row, col) := X (row, col);
             end loop;
          end loop;
 
          theDataset.X_Test := X_Trimmed;
+         Print_Float_Matrix (Routine_Name & "theDataset.X_Test",
+                             theDataset.X_Test, 1, 3, 1, 6);
          theDataset.Y_Test :=
            Load_Prices ("house_prices/test_sample_submission.csv",
                         Test_Length);
@@ -179,18 +183,17 @@ package body Prices_Support is
       Split_Data := Split_Raw_Data (Raw_CSV_Data, Num_Features);
 
       declare
-         Features : ML_Types.Value_Data_List;
-         Result   : Integer_Matrix (1 .. Num_Samples, 1 .. Num_Features);
+         aRow     : ML_Types.Value_Data_List;
+         Features : Integer_Matrix (1 .. Num_Samples, 1 .. Num_Features);
       begin
-         Put_Line (Routine_Name & "proceesing Split_Data");
-         for row in Result'Range loop
-            Features := Split_Data.Feature_Values (row);
-            for col in Result'Range (2) loop
-               Result (row, col) := Features (col).Integer_Value;
+          for row in Features'Range loop
+            aRow := Split_Data.Feature_Values (row);
+            for col in Features'Range (2) loop
+               Features (row, col) := aRow (col).Integer_Value;
             end loop;
          end loop;
 
-         return Result;
+         return Features;
       end;  --  declare block
 
    end Preprocess;
@@ -287,11 +290,9 @@ package body Prices_Support is
    function Standard_Deviation (M : Real_Float_Matrix)
                                 return Real_Float_Vector is
       use Maths.Float_Math_Functions;
-      Routine_Name : constant String   := "Prices_Support.Standard_Deviation ";
+--        Routine_Name : constant String   := "Prices_Support.Standard_Deviation ";
       Num_Rows     : constant Float := Float (M'Length);
       Mean_Vals    : constant Real_Float_Vector := Means (M);
---        Errors_Sq    : Real_Float_Matrix (M'Range, M'Range (2));
---        Sums         : Real_Float_Vector (M'Range (2)) := (others => 0.0);
       SD           : Real_Float_Vector (M'Range (2));
       aColumn      : Real_Float_Vector (M'Range);
       Sq_Error     : Float;
@@ -309,7 +310,6 @@ package body Prices_Support is
       for col in SD'Range loop
          SD (col) := Sqrt (Sq_Error_Sum (col) / (Num_Rows - 1.0));
       end loop;
-      Print_Float_Vector (Routine_Name & "SD", SD, 1 , 6);
 
       return SD;
 
