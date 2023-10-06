@@ -4,6 +4,8 @@ with Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;           use Ada.Text_IO;
 
+with Maths;
+
 --  with Basic_Printing; use Basic_Printing;
 with Classifier_Loader;
 with ML_Types;
@@ -21,14 +23,14 @@ package body Prices_Support is
 
    function Load_Prices
      (File_Name : String; Num_Samples : Positive) return Real_Float_Matrix;
-   --  function Means (M : Real_Float_Matrix) return Real_Float_Vector;
+   function Means (M : Real_Float_Matrix) return Real_Float_Vector;
    function Preprocess
      (File_Name : String; Num_Samples : Positive) return Integer_Matrix;
    function Split_Raw_Data
      (Raw_Data : in out ML_Types.Raw_Data_Vector; Num_Features : out Positive)
       return ML_Types.Multi_Output_Data_Record;
-   --  function Standard_Deviation
-   --    (M : Real_Float_Matrix) return Real_Float_Vector;
+   function Standard_Deviation
+     (M : Real_Float_Matrix) return Real_Float_Vector;
 
    --  -------------------------------------------------------------------------
 
@@ -42,8 +44,8 @@ package body Prices_Support is
                                          1 .. Test_Features'Length (2) - 1);
       N_Features    : Positive;
 --        X_IDs         : Integer_Array  (X'Range);
-      --  X_Means      : Real_Float_Vector (X'Range (2));
-      --  X_SDs        : Real_Float_Vector (X'Range (2));
+      X_Means      : Real_Float_Vector (X'Range (2));
+      X_SDs        : Real_Float_Vector (X'Range (2));
    begin
       if Num_Features > 0 then
          N_Features := Num_Features;
@@ -141,31 +143,31 @@ package body Prices_Support is
 
    --  -------------------------------------------------------------------------
 
-   --  function Means (M : Real_Float_Matrix) return Real_Float_Vector is
-   --     M_Length : constant Float := Float (M'Length);
-   --     Sum1     : Float          := 0.0;
-   --     Sum2     : Float          := 0.0;
-   --     Sum3     : Float          := 0.0;
-   --     Sum4     : Float          := 0.0;
-   --     Result   : Real_Float_Vector (M'Range (2));
-   --  begin
-   --     for row in M'Range loop
-   --        Sum1 := Sum1 + M (row, 1);
-   --        Sum2 := Sum2 + M (row, 2);
-   --        Sum3 := Sum3 + M (row, 3);
-   --        Sum4 := Sum4 + M (row, 4);
-   --     end loop;
-   --
-   --     for row in M'Range loop
-   --        Result (1) := Sum1 / M_Length;
-   --        Result (2) := Sum2 / M_Length;
-   --        Result (3) := Sum3 / M_Length;
-   --        Result (4) := Sum4 / M_Length;
-   --     end loop;
-   --
-   --     return Result;
-   --
-   --  end Means;
+   function Means (M : Real_Float_Matrix) return Real_Float_Vector is
+      M_Length : constant Float := Float (M'Length);
+      Sum1     : Float          := 0.0;
+      Sum2     : Float          := 0.0;
+      Sum3     : Float          := 0.0;
+      Sum4     : Float          := 0.0;
+      Result   : Real_Float_Vector (M'Range (2));
+   begin
+      for row in M'Range loop
+         Sum1 := Sum1 + M (row, 1);
+         Sum2 := Sum2 + M (row, 2);
+         Sum3 := Sum3 + M (row, 3);
+         Sum4 := Sum4 + M (row, 4);
+      end loop;
+
+      for row in M'Range loop
+         Result (1) := Sum1 / M_Length;
+         Result (2) := Sum2 / M_Length;
+         Result (3) := Sum3 / M_Length;
+         Result (4) := Sum4 / M_Length;
+      end loop;
+
+      return Result;
+
+   end Means;
 
    --  -------------------------------------------------------------------------
 
@@ -289,40 +291,40 @@ package body Prices_Support is
 
    --  -----------------------------------------------------------------------
 
-   --  function Standard_Deviation (M : Real_Float_Matrix) return Real_Float_Vector
-   --  is
-   --     use Maths.Float_Math_Functions;
-   --     M_Length  : constant Float             := Float (M'Length);
-   --     Mean_Vals : constant Real_Float_Vector := Means (M);
-   --     Errors_Sq : Real_Float_Matrix (M'Range, M'Range (2));
-   --     Sum1      : Float                      := 0.0;
-   --     Sum2      : Float                      := 0.0;
-   --     Sum3      : Float                      := 0.0;
-   --     Sum4      : Float                      := 0.0;
-   --     SD        : Real_Float_Vector (M'Range (2));
-   --  begin
-   --     for row in M'Range loop
-   --        Errors_Sq (row, 1) := (M (row, 1) - Mean_Vals (1))**2;
-   --        Errors_Sq (row, 2) := (M (row, 2) - Mean_Vals (2))**2;
-   --        Errors_Sq (row, 3) := (M (row, 3) - Mean_Vals (3))**2;
-   --        Errors_Sq (row, 4) := (M (row, 4) - Mean_Vals (4))**2;
-   --     end loop;
-   --
-   --     for row in M'Range loop
-   --        Sum1 := Sum1 + Errors_Sq (row, 1);
-   --        Sum2 := Sum2 + Errors_Sq (row, 2);
-   --        Sum3 := Sum3 + Errors_Sq (row, 3);
-   --        Sum4 := Sum4 + Errors_Sq (row, 4);
-   --     end loop;
-   --
-   --     SD (1) := Sqrt (Sum1 / (M_Length - 1.0));
-   --     SD (2) := Sqrt (Sum2 / (M_Length - 1.0));
-   --     SD (3) := Sqrt (Sum3 / (M_Length - 1.0));
-   --     SD (4) := Sqrt (Sum4 / (M_Length - 1.0));
-   --
-   --     return SD;
-   --
-   --  end Standard_Deviation;
+   function Standard_Deviation (M : Real_Float_Matrix) return Real_Float_Vector
+   is
+      use Maths.Float_Math_Functions;
+      M_Length  : constant Float             := Float (M'Length);
+      Mean_Vals : constant Real_Float_Vector := Means (M);
+      Errors_Sq : Real_Float_Matrix (M'Range, M'Range (2));
+      Sum1      : Float                      := 0.0;
+      Sum2      : Float                      := 0.0;
+      Sum3      : Float                      := 0.0;
+      Sum4      : Float                      := 0.0;
+      SD        : Real_Float_Vector (M'Range (2));
+   begin
+      for row in M'Range loop
+         Errors_Sq (row, 1) := (M (row, 1) - Mean_Vals (1))**2;
+         Errors_Sq (row, 2) := (M (row, 2) - Mean_Vals (2))**2;
+         Errors_Sq (row, 3) := (M (row, 3) - Mean_Vals (3))**2;
+         Errors_Sq (row, 4) := (M (row, 4) - Mean_Vals (4))**2;
+      end loop;
+
+      for row in M'Range loop
+         Sum1 := Sum1 + Errors_Sq (row, 1);
+         Sum2 := Sum2 + Errors_Sq (row, 2);
+         Sum3 := Sum3 + Errors_Sq (row, 3);
+         Sum4 := Sum4 + Errors_Sq (row, 4);
+      end loop;
+
+      SD (1) := Sqrt (Sum1 / (M_Length - 1.0));
+      SD (2) := Sqrt (Sum2 / (M_Length - 1.0));
+      SD (3) := Sqrt (Sum3 / (M_Length - 1.0));
+      SD (4) := Sqrt (Sum4 / (M_Length - 1.0));
+
+      return SD;
+
+   end Standard_Deviation;
 
    --  -------------------------------------------------------------------------
 begin

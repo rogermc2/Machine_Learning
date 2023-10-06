@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
 --  with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -374,13 +374,11 @@ package body Base_Neural is
 
    function Sigmoid_Derivative (Z : Real_Float_Vector)
                                 return Real_Float_Vector is
-      Routine_Name : constant String := "Base_Neural.Sigmoid_Derivative ";
+--        Routine_Name : constant String := "Base_Neural.Sigmoid_Derivative ";
       Deriv : Real_Float_Vector (Z'Range) := (others => 0.0);
    begin
       for row in Z'Range loop
-         Put_Line (Routine_Name & "Z (row)" & Float'Image (Z (row)));
          Deriv (row) := Sigmoid (Z (row)) * (1.0 - Sigmoid (Z (row)));
-         Put_Line (Routine_Name & "Sigmoid (Z (row))" & Float'Image (Sigmoid (Z (row))));
       end loop;
 
       return Deriv;
