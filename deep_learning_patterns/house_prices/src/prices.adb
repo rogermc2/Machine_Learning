@@ -18,7 +18,7 @@ procedure Prices is
    Test_Length  : constant Positive := 30;
    Data         : constant Dataset           := Build_Dataset (Train_Length,
                                                                Test_Length, 6);
-   Num_Samples  : constant Positive          := Test_Length;
+   Num_Samples  : constant Positive          := Train_Length;
    Num_Features : constant Positive          := Data.Num_Features;
    Num_Epochs   : constant Positive          := 10;
    Learn_Rate   : constant Float             := 1.0;

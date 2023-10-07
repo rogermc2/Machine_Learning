@@ -86,10 +86,12 @@ package body Neural_Model is
    begin
       Assert
         (Features'Length = aModel.Input_Data'Length,
-         Routine_Name & " Features'Length /= Input_Data'Length.");
+         Routine_Name & " Features'Length" & Integer'Image (Features'Length) &
+           " /= Input_Data'Length" & Integer'Image (aModel.Input_Data'Length));
       Assert
         (Labels'Length = aModel.Labels'Length,
-         Routine_Name & " Labels'Length /= model Labels'Length.");
+         Routine_Name & "Labels'Length" & Integer'Image (Labels'Length) &
+           " /= model Labels'Length" & Integer'Image (aModel.Labels'Length));
 
       aModel.Input_Data := Features;
       aModel.Labels := Labels;
