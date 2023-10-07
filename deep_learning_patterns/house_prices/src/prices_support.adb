@@ -419,5 +419,22 @@ begin
    Data_Codes.Insert ("Abnorml", "95");
    Data_Codes.Insert ("ImStucc", "96");
    Data_Codes.Insert ("ConLD", "97");
+   Data_Codes.Insert ("NWAmes", "98");
+   Data_Codes.Insert ("1.5Fin", "99");
+   Data_Codes.Insert ("GdWo", "100");
+   Data_Codes.Insert ("Family", "101");
+   Data_Codes.Insert ("Duplex", "102");
+   Data_Codes.Insert ("Oth", "103");
+   Data_Codes.Insert ("Min1", "104");
+   Data_Codes.Insert ("Min2", "105");
+   Data_Codes.Insert ("SFoyer", "106");
+   Data_Codes.Insert ("Shed", "107");
+   Data_Codes.Insert ("WdShing", "108");
+   Data_Codes.Insert ("Wd Shng", "109");
+   Data_Codes.Insert ("2fmCon", "110");
+   Data_Codes.Insert ("OldTown", "111");
+   Data_Codes.Insert ("Basment", "112");
+   Data_Codes.Insert ("Artery", "113");
+--     Data_Codes.Insert ("Artery", "113");
 
 end Prices_Support;
