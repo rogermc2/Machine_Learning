@@ -45,7 +45,7 @@ package body Prices_Support is
                          Slice (Features, 1, Train_Length);
 --        Test_Features  : constant Integer_Matrix :=
 --                           Slice (Features, Train_Length + 1,
---                                  Train_Length + 1 + Test_Length);
+--                                  Train_Length + Test_Length);
       X              : Real_Float_Matrix (Train_Features'Range,
                                          1 .. Train_Features'Length (2) - 1);
       N_Features     : Positive;
