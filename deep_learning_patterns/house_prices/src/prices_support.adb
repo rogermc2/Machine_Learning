@@ -38,8 +38,14 @@ package body Prices_Support is
                            Test_Length  : Positive := 30;
                            Num_Features : Natural := 0) return Dataset is
       Routine_Name   : constant String := "Prices_Support.Build_Dataset ";
+      Features       : constant Integer_Matrix :=
+                         Preprocess ("house_prices/test.csv",
+                                     Train_Length + Test_Length);
       Train_Features : constant Integer_Matrix :=
-                        Preprocess ("house_prices/test.csv", Train_Length);
+                         Slice (Features, 1, Train_Length);
+--        Test_Features  : constant Integer_Matrix :=
+--                           Slice (Features, Train_Length + 1,
+--                                  Train_Length + 1 + Test_Length);
       X              : Real_Float_Matrix (Train_Features'Range,
                                          1 .. Train_Features'Length (2) - 1);
       N_Features     : Positive;
