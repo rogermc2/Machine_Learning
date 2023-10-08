@@ -14,14 +14,14 @@ with Neural_Model; use Neural_Model;
 procedure Prices is
    use Real_Float_Arrays;
    Program_Name : constant String            := "House Prices ";
-   Train_Length : constant Positive := 70;
+   Train_Length : constant Positive := 5;
    Test_Length  : constant Positive := 30;
-   Data         : constant Dataset           := Build_Dataset (Train_Length,
-                                                               Test_Length, 6);
+   Num_Features : constant Positive  := 10;
+   Data         : constant Dataset           :=
+                    Build_Dataset (Train_Length, Test_Length, Num_Features);
    Num_Samples  : constant Positive          := Train_Length;
-   Num_Features : constant Positive          := Data.Num_Features;
-   Num_Epochs   : constant Positive          := 10;
-   Learn_Rate   : constant Float             := 1.0;
+   Num_Epochs   : constant Positive          := 4;
+   Learn_Rate   : constant Float             := 0.8;
    Input_Data   : constant Real_Float_Matrix := Data.X_Train;
    Labels       : constant Real_Float_Matrix := Data.Y_Train;
    Num_Classes  : constant Positive          := Labels'Length (2);
@@ -38,7 +38,6 @@ begin
       Program_Name & " Labels'Length /= Input_Data'Length.");
    Print_Float_Matrix (Program_Name & "Input_Data", Input_Data);
    Print_Float_Matrix (Program_Name & "Labels", Labels);
-   Put_Line ("Program " & "Num_Features" & Integer'Image (Num_Features));
 
    Add_Data (theModel, Input_Data, Labels);
    Add_First_Layer (theModel);
@@ -50,8 +49,8 @@ begin
    declare
       Predictions : constant Real_Float_Matrix := Get_Prediction (theModel);
    begin
---        Print_Float_Matrix (Program_Name & "Actual values", Labels, 1, 5);
---        Print_Float_Matrix (Program_Name & "Predicted values", Predictions, 1, 5);
+      --        Print_Float_Matrix (Program_Name & "Actual values", Labels, 1, 5);
+      --        Print_Float_Matrix (Program_Name & "Predicted values", Predictions, 1, 5);
       Print_Float_Matrix
         (Program_Name & "Prediction errors", Predictions - Labels, 1, 5);
    end;
