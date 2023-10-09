@@ -12,16 +12,16 @@ with Neural_Model; use Neural_Model;
 --  Each neuron is a very simple function that considers a weighted sum of
 --  incoming signals and then compares the value of that sum against some threshold.
 procedure Prices is
-   use Real_Float_Arrays;
-   Program_Name : constant String            := "House Prices ";
+--     use Real_Float_Arrays;
+   Program_Name : constant String  := "House Prices ";
    Train_Length : constant Positive := 2;
    Test_Length  : constant Positive := 30;
-   Num_Features : constant Positive  := 8;
-   Data         : constant Dataset           :=
+   Num_Features : constant Positive := 8;
+   Data         : constant Dataset :=
                     Build_Dataset (Train_Length, Test_Length, Num_Features);
-   Num_Samples  : constant Positive          := Train_Length;
-   Num_Epochs   : constant Positive          := 30;
-   Learn_Rate   : constant Float             := 0.2;
+   Num_Samples  : constant Positive := Train_Length;
+   Num_Epochs   : constant Positive := 50;
+   Learn_Rate   : constant Float := 0.3;
    Input_Data   : constant Real_Float_Matrix := Data.X_Train;
    Labels       : constant Real_Float_Matrix := Data.Y_Train;
    Num_Classes  : constant Positive          := Labels'Length (2);
@@ -46,15 +46,15 @@ begin
    Add_Connections (theModel);
 
    Compile (theModel, Num_Epochs, Learn_Rate);
-   declare
-      Predictions : constant Real_Float_Matrix := Get_Prediction (theModel);
-   begin
-      null;
+--     declare
+--        Predictions : constant Real_Float_Matrix := Get_Prediction (theModel);
+--     begin
+--        null;
       --        Print_Float_Matrix (Program_Name & "Actual values", Labels, 1, 5);
       --        Print_Float_Matrix (Program_Name & "Predicted values", Predictions, 1, 5);
 --        Print_Float_Matrix
 --          (Program_Name & "Prediction errors", Predictions - Labels, 1, 5);
-   end;
+--     end;
 
    --     Python.Initialize;
    --     Classifier := Python.Import_File ("sequential");
