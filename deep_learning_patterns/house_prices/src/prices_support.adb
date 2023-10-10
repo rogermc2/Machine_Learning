@@ -441,6 +441,20 @@ begin
    Data_Codes.Insert ("OldTown", "111");
    Data_Codes.Insert ("Basment", "112");
    Data_Codes.Insert ("Artery", "113");
---     Data_Codes.Insert ("Artery", "113");
+   Data_Codes.Insert ("Grvl", "114");
+   Data_Codes.Insert ("P", "115");
+   Data_Codes.Insert ("Bnk", "116");
+   Data_Codes.Insert ("AsbShng", "117");
+   Data_Codes.Insert ("GasW", "118");
+   Data_Codes.Insert ("Grav", "119");
+   Data_Codes.Insert ("FuseF", "120");
+   Data_Codes.Insert ("BrkSide", "121");
+   Data_Codes.Insert ("2.5Unf", "122");
+   Data_Codes.Insert ("ClearCr", "123");
+   Data_Codes.Insert ("SWISU", "124");
+   Data_Codes.Insert ("C (all)", "125");
+   Data_Codes.Insert ("Gambrel", "126");
+   Data_Codes.Insert ("Stucco", "127");
+   Data_Codes.Insert ("Tar&Grv", "128");
 
 end Prices_Support;

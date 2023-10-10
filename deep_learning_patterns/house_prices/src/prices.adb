@@ -14,7 +14,8 @@ with Neural_Model; use Neural_Model;
 procedure Prices is
 --     use Real_Float_Arrays;
    Program_Name : constant String  := "House Prices ";
-   Train_Length : constant Positive := 2;
+   Train_Length : constant Positive := 70
+   ;
    Test_Length  : constant Positive := 30;
    Num_Features : constant Positive := 8;
    Data         : constant Dataset :=
