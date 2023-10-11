@@ -1,4 +1,4 @@
- with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -14,7 +14,8 @@ package body Neural_Model is
    --     function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
    --     function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
    procedure Forward
-     (aModel : in out Sequential_Model; Sample_Index : Positive);
+     (aModel : in out Sequential_Model; Sample_Index : Positive;
+      Loss   : in out Float);
    procedure Update
      (Connection : in out Stochastic_Optimizers.Parameters_Record;
       aLayer     : in out Layer; Learn_Rate : Float);
@@ -177,6 +178,7 @@ package body Neural_Model is
      (aModel     : in out Sequential_Model; Num_Epochs : Positive;
       Learn_Rate : Float) is
       Routine_Name : constant String := "Neural_Model.Compile ";
+      Loss         : Float := 0.0;
       --  Loss_Deriv is dE/dY for output layer
       --        Optimiser    : Optimizer_Record (Optimizer_Adam);
       --        Params       : Parameters_List;  --  list of Parameters_Record
@@ -186,8 +188,8 @@ package body Neural_Model is
       for epoch in 1 .. Num_Epochs loop
          Put_Line (Routine_Name & "epoch " & Integer'Image (epoch));
          for sample in 1 .. aModel.Num_Samples loop
-            Put_Line (Routine_Name & "sample " & Integer'Image (sample));
-            Forward (aModel, sample);
+--              Put_Line (Routine_Name & "sample " & Integer'Image (sample));
+            Forward (aModel, sample, Loss);
             Back_Propogate (aModel);
          end loop;  --  sample
 
@@ -198,6 +200,8 @@ package body Neural_Model is
               (aModel.Connections (c_index), aModel.Layers (c_index + 1),
                Learn_Rate);
          end loop;
+         Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
+         Loss := 0.0;
          New_Line;
       end loop;  --  epoch
 
@@ -247,7 +251,8 @@ package body Neural_Model is
    --  -------------------------------------------------------------------------
 
    procedure Forward
-     (aModel : in out Sequential_Model; Sample_Index : Positive) is
+     (aModel : in out Sequential_Model; Sample_Index : Positive;
+      Loss   : in out Float) is
       use Real_Float_Arrays;
       use Base_Neural;
       use Layer_Packge;
@@ -256,7 +261,6 @@ package body Neural_Model is
                        Get_Row (aModel.Labels, Sample_Index);
       Last_Layer   : Layer := aModel.Layers.Last_Element;
       Predicted    : Real_Float_Vector (aModel.Labels'Range (2));
-      Loss         : Float := 0.0;
    begin
       aModel.Layers (1).Input_Data :=
         Get_Row (aModel.Input_Data, Sample_Index);
@@ -296,10 +300,6 @@ package body Neural_Model is
       Predicted := aModel.Layers.Last_Element.Nodes;
       Last_Layer.Passes := Last_Layer.Passes + 1;
 
-      --        Print_Float_Vector (Routine_Name & "Predicted", Predicted);
-      --        Print_Float_Vector
-      --          (Routine_Name & "Actual", Get_Row (aModel.Labels, Sample_Index));
-
       case aModel.Loss_Method is
          when Loss_Binary_Log =>
             Put_Line (Routine_Name & "Binary_Log_Loss method not implemented");
@@ -317,13 +317,6 @@ package body Neural_Model is
       for col in Predicted'Range loop
          aModel.Pred (Sample_Index, col) := Predicted (col);
       end loop;
-
-      --        Print_Float_Vector (Routine_Name & "Predicted", Predicted);
-      --        Print_Float_Vector (Routine_Name & "Actual", Actual);
-      Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
-      --        Print_Float_Vector (Routine_Name & "Last_Layer.Output_Error",
-      --                            Last_Layer.Output_Error);
-      --        New_Line;
 
    end Forward;
 
