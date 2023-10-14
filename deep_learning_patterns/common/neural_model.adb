@@ -188,7 +188,7 @@ package body Neural_Model is
       for epoch in 1 .. Num_Epochs loop
          Put_Line (Routine_Name & "epoch " & Integer'Image (epoch));
          for sample in 1 .. aModel.Num_Samples loop
---              Put_Line (Routine_Name & "sample " & Integer'Image (sample));
+            --              Put_Line (Routine_Name & "sample " & Integer'Image (sample));
             Forward (aModel, sample, Loss);
             Back_Propogate (aModel);
          end loop;  --  sample
@@ -299,6 +299,16 @@ package body Neural_Model is
 
       Predicted := aModel.Layers.Last_Element.Nodes;
       Last_Layer.Passes := Last_Layer.Passes + 1;
+--        Print_Float_Vector (Routine_Name & "sample" &
+--                              Integer'Image (Sample_Index) & ": Actual",
+--                            Get_Row (aModel.Labels, Sample_Index));
+--        Print_Float_Vector (Routine_Name & "sample" &
+--                              Integer'Image (Sample_Index) & ": Predicted",
+--                            Predicted);
+      Put_Line (Routine_Name & "Error: " &
+                  Float'Image (Base_Neural.Mean_Squared_Error
+                  (Predicted, Get_Row (aModel.Labels, Sample_Index))));
+--        New_Line;
 
       case aModel.Loss_Method is
          when Loss_Binary_Log =>

@@ -20,7 +20,7 @@ procedure Prices is
    Data         : constant Dataset :=
                     Build_Dataset (Train_Length, Test_Length, Num_Features);
    Num_Samples  : constant Positive := Train_Length;
-   Num_Epochs   : constant Positive := 40;
+   Num_Epochs   : constant Positive := 11;
    Learn_Rate   : constant Float := 0.3;
    Input_Data   : constant Real_Float_Matrix := Data.X_Train;
    Labels       : constant Real_Float_Matrix := Data.Y_Train;
