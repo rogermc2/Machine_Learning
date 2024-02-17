@@ -352,6 +352,17 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
+   procedure Sigmoid (Activation : in out Real_Float_Vector) is
+      use Maths.Float_Math_Functions;
+   begin
+      for index in Activation'Range loop
+         Activation (index) := 1.0 /(1.0 + Exp (-Activation (index)));
+      end loop;
+
+   end Sigmoid;
+
+   --  -------------------------------------------------------------------------
+
    function Sigmoid (X : Float) return Float is
       use Maths.Float_Math_Functions;
    begin
@@ -360,6 +371,21 @@ package body Base_Neural is
    end Sigmoid;
 
    --  ------------------------------------------------------------------------
+
+   function Sigmoid_Derivative (Z : Real_Float_Vector)
+                                return Real_Float_Vector is
+--        Routine_Name : constant String := "Base_Neural.Sigmoid_Derivative ";
+      Deriv : Real_Float_Vector (Z'Range) := (others => 0.0);
+   begin
+      for row in Z'Range loop
+         Deriv (row) := Sigmoid (Z (row)) * (1.0 - Sigmoid (Z (row)));
+      end loop;
+
+      return Deriv;
+
+   end Sigmoid_Derivative;
+
+   --  -------------------------------------------------------------------------
 
    procedure Softmax (Activation : in out Float) is
    begin

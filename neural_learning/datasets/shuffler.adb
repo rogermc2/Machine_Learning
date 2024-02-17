@@ -45,7 +45,7 @@ package body Shuffler is
 
    procedure Generic_Float_Column_Shuffle (A : in out Array_Type) is
       use Discrete_Random;
---        Gen       : Generator;
+      --        Gen       : Generator;
       New_Index : Integer;
       aRow      : array (A'Range (2)) of Element_Type;
    begin
@@ -269,8 +269,15 @@ package body Shuffler is
 
    procedure Shuffle_FB is new
      Generic_MM_Shuffle (Element_Type1 => Float, Element_Type2 => Binary,
-                         Array_Type1   => Real_Float_Matrix,
+                         Array_Type1 => Real_Float_Matrix,
                          Array_Type2 => Binary_Matrix);
+
+   --  -------------------------------------------------------------------------
+
+   procedure Shuffle_FF is new
+     Generic_MM_Shuffle (Element_Type1 => Float, Element_Type2 => Float,
+                         Array_Type1 => Real_Float_Matrix,
+                         Array_Type2 => Real_Float_Matrix);
 
    --  -------------------------------------------------------------------------
 
@@ -312,6 +319,14 @@ package body Shuffler is
                       B : in out Integer_Matrix) is
    begin
       Shuffle_FI (A, B);
+
+   end Shuffle;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Shuffle (A, B : in out Real_Float_Matrix) is
+   begin
+      Shuffle_FF (A, B);
 
    end Shuffle;
 

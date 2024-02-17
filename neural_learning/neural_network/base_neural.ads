@@ -53,7 +53,11 @@ package Base_Neural is
                                 return Real_Float_Vector;
    pragma Inline (Rect_LU_Derivative);
    function Sigmoid (X : Float) return Float;
+   procedure Sigmoid (Activation : in out Real_Float_Vector);
    pragma Inline (Sigmoid);
+   function Sigmoid_Derivative (Z : Real_Float_Vector)
+                                return Real_Float_Vector;
+   pragma Inline (Sigmoid_Derivative);
    procedure Softmax (Activation : in out Float);
    procedure Softmax (Activation : in out Real_Float_Matrix);
    procedure Softmax (Activation : in out Real_Float_Vector);

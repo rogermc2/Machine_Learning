@@ -38,7 +38,8 @@ package body Type_Utilities is
       for index in F.First_Index .. F.Last_Index loop
          Item := F.Element (index);
          Assert (Item.Value_Kind = Float_Type,
-                 "Type_Utilities.To_Float_List invalid item "
+                 "Type_Utilities.To_Float_List from Value_Data_List " &
+                   "invalid item "
                  & Integer'Image (index) & " data type is " &
                    Data_Type'Image (Item.Value_Kind));
          Floats.Append (Item.Float_Value);
@@ -50,7 +51,8 @@ package body Type_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Float_List (I : ML_Types.Integer_List) return NL_Types.Float_List is
+   function To_Float_List (I : ML_Types.Integer_List)
+                           return NL_Types.Float_List is
       F_List : NL_Types.Float_List;
    begin
       for index in I.First_Index .. I.Last_Index loop

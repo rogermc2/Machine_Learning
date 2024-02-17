@@ -36,17 +36,15 @@ package Neural_Model is
                           Loss_Method  : Loss_Kind) is private;
 
    procedure Add_Connections (aModel : in out Sequential_Model);
-   procedure Add_First_Layer (aModel     : in out Sequential_Model;
-                              Input_Data : Real_Float_Vector);
-   procedure Add_Labels (aModel : in out Sequential_Model;
-                         Labels : Real_Float_Matrix);
+   procedure Add_Data (aModel           : in out Sequential_Model;
+                       Features, Labels : Real_Float_Matrix);
+   procedure Add_First_Layer (aModel : in out Sequential_Model);
    procedure Add_Layer (aModel     : in out Sequential_Model;
                         Num_Nodes  : Positive;
                         Activation : Activation_Kind := Identity_Activation);
    procedure Compile (aModel     : in out Sequential_Model; Num_Epochs : Positive;
                       Learn_Rate : Float);
-   --     function Get_Output_Value (aModel : Sequential_Model)
-   --                                return Real_Float_Vector;
+   function Get_Prediction (aModel : Sequential_Model) return Real_Float_Matrix;
 
 private
    type Sequential_Model (Num_Samples  : Positive;

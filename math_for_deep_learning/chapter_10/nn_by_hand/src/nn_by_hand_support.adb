@@ -16,9 +16,9 @@ package body NN_By_Hand_Support is
    function Forward (Net : Network_Package.Map; X : Real_Float_Matrix)
                      return Real_Float_Vector;
    function Means (M : Real_Float_Matrix) return Real_Float_Vector;
---     function Sigmoid (Val : Float) return Float;
    function Standard_Deviation (M : Real_Float_Matrix)
                                 return Real_Float_Vector;
+
    --  -------------------------------------------------------------------------
 
    function Build_Dataset return Dataset is
@@ -69,6 +69,8 @@ package body NN_By_Hand_Support is
          X_Trimmed : Real_Float_Matrix
            (1 .. I0_Length + I1_Length, 1 .. 2);
       begin
+         Put_Line (Routine_Name & "I0 length" & Integer'Image (I0_Length));
+         Put_Line (Routine_Name & "I1 length" & Integer'Image (I1_Length));
          for row in 1 .. I0_Length loop
             X_Trimmed (row, 1) := X (I0 (row), 1);
             X_Trimmed (row, 2) := X (I0 (row), 2);

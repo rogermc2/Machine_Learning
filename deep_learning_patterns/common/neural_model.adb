@@ -1,4 +1,4 @@
---  with Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -11,21 +11,48 @@ package body Neural_Model is
 
    procedure Backward
      (aModel : in out Sequential_Model; L_Index : Positive);
-   function Deactivate
-     (aModel : in out Sequential_Model; L_Index : Positive)
-      return Real_Float_Vector;
---     function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
---     function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
+   --     function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector;
+   --     function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix;
    procedure Forward
-     (aModel : in out Sequential_Model; Sample_Index : Positive);
+     (aModel : in out Sequential_Model; Sample_Index : Positive;
+      Loss   : in out Float);
    procedure Update
      (Connection : in out Stochastic_Optimizers.Parameters_Record;
       aLayer     : in out Layer; Learn_Rate : Float);
 
    --  -------------------------------------------------------------------------
 
+   function Activation_Error
+     (aModel : in out Sequential_Model; L_Index : Positive)
+      return Real_Float_Vector
+   is
+      use Base_Neural;
+      Routine_Name : constant String := "Neural_Model.Activation_Error ";
+      This_Layer   : constant Layer  := aModel.Layers (L_Index);
+      Error        : Real_Float_Vector (This_Layer.Output_Error'Range);
+   begin
+      case This_Layer.Activation is
+         when Identity_Activation =>
+            Error := This_Layer.Output_Error;
+         when Logistic_Activation =>
+            Put_Line (Routine_Name & "Logistic_Activation not implemented");
+         when ReLu_Activation =>
+            Error := Rect_LU_Derivative (This_Layer.Output_Error);
+         when Sigmoid_Activation =>
+            Error := Sigmoid_Derivative (This_Layer.Output_Error);
+            --              Print_Float_Vector (Routine_Name & "Sigmoid_Derivative", Error);
+         when Soft_Max_Activation =>
+            Put_Line (Routine_Name & "Soft_Max_Activation not implemented");
+      end case;
+
+      return Error;
+
+   end Activation_Error;
+
+   --  -------------------------------------------------------------------------
+
    procedure Add_Connections (aModel : in out Sequential_Model) is
---        Routine_Name : constant String := "Neural_Model.Add_Connections ";
+      --        Routine_Name : constant String := "Neural_Model.Add_Connections ";
    begin
       for layer in aModel.Layers.First_Index .. aModel.Layers.Last_Index - 1
       loop
@@ -54,35 +81,41 @@ package body Neural_Model is
 
    --  ---------------------------------------------------------------------------
 
-   --  Initialization - add first layer
-   procedure Add_First_Layer
-     (aModel : in out Sequential_Model; Input_Data : Real_Float_Vector)
-   is
-      First_Layer : Layer (Input_Data'Length, Input_Data'Length);
+   procedure Add_Data (aModel           : in out Sequential_Model;
+                       Features, Labels : Real_Float_Matrix) is
+      Routine_Name : constant String := "Neural_Model.Add_Data ";
    begin
-      First_Layer.Input_Data := Input_Data;
-      First_Layer.Nodes      := Input_Data;
+      Assert
+        (Features'Length = aModel.Input_Data'Length,
+         Routine_Name & " Features'Length" & Integer'Image (Features'Length) &
+           " /= Input_Data'Length" & Integer'Image (aModel.Input_Data'Length));
+      Assert
+        (Labels'Length = aModel.Labels'Length,
+         Routine_Name & "Labels'Length" & Integer'Image (Labels'Length) &
+           " /= model Labels'Length" & Integer'Image (aModel.Labels'Length));
+
+      aModel.Input_Data := Features;
+      aModel.Labels := Labels;
+
+   end Add_Data;
+
+   --  ---------------------------------------------------------------------------
+   --  Initialization - add first layer
+   procedure Add_First_Layer (aModel : in out Sequential_Model)
+   is
+      First_Layer : Layer (aModel.Num_Features, aModel.Num_Features);
+   begin
       aModel.Layers.Append (First_Layer);
 
    end Add_First_Layer;
 
    --  ---------------------------------------------------------------------------
-
-   procedure Add_Labels
-     (aModel : in out Sequential_Model; Labels : Real_Float_Matrix)
-   is
-   begin
-      aModel.Labels := Labels;
-
-   end Add_Labels;
-
-   --  ---------------------------------------------------------------------------
    --  Initialization - add other layers
    procedure Add_Layer
      (aModel     : in out Sequential_Model; Num_Nodes : Positive;
-      Activation :        Activation_Kind := Identity_Activation)
+      Activation : Activation_Kind := Identity_Activation)
    is
---        Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
+      --        Routine_Name : constant String := "Neural_Model.Add_Layer others  ";
       Prev_Layer   : constant Layer             := aModel.Layers.Last_Element;
       Prev_Nodes   : constant Real_Float_Vector := Prev_Layer.Nodes;
       thisLayer    : Layer (Prev_Layer.Num_Nodes, Num_Nodes);
@@ -97,8 +130,8 @@ package body Neural_Model is
 
    procedure Back_Propogate
      (aModel    : in out Sequential_Model) is
---        Optimiser : Stochastic_Optimizers.Optimizer_Record) is
---        Routine_Name : constant String := "Neural_Model.Back_Propogate ";
+      --        Optimiser : Stochastic_Optimizers.Optimizer_Record) is
+      --        Routine_Name : constant String := "Neural_Model.Back_Propogate ";
    begin
       for layer_id in reverse
         aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index loop
@@ -112,10 +145,10 @@ package body Neural_Model is
    procedure Backward
      (aModel : in out Sequential_Model; L_Index : Positive) is
       use Real_Float_Arrays;
---        Routine_Name  : constant String := "Neural_Model.Backward ";
+      --        Routine_Name  : constant String := "Neural_Model.Backward ";
       This_Layer    : Layer := aModel.Layers (L_Index);
       dEdY          : constant Real_Float_Vector :=
-                        Deactivate (aModel, L_Index);
+                        Activation_Error (aModel, L_Index);
       --  Transpose of Coeff_Gradients is dX/dY
       Input_Error   : constant Real_Float_Vector :=
                         Transpose
@@ -124,11 +157,18 @@ package body Neural_Model is
       Weights_Error : constant Real_Float_Matrix :=
                         dEdY * This_Layer.Input_Data;
    begin
+      --        Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
+      --                              " Output_Error", This_Layer.Output_Error);
+      --        Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
+      --                              " dEdY", dEdY);
+      --        Print_Float_Vector (Routine_Name & "layer" & Integer'Image (L_Index) &
+      --                              " Input_Error", Input_Error);
       This_Layer.Delta_Weights := This_Layer.Delta_Weights + Weights_Error;
       This_Layer.Delta_Bias := This_Layer.Delta_Bias + This_Layer.Output_Error;
       This_Layer.Passes := This_Layer.Passes + 1;
       aModel.Layers (L_Index) := This_Layer;
       aModel.Layers (L_Index - 1).Output_Error := Input_Error;
+      --        New_Line;
 
    end Backward;
 
@@ -138,17 +178,18 @@ package body Neural_Model is
      (aModel     : in out Sequential_Model; Num_Epochs : Positive;
       Learn_Rate : Float) is
       Routine_Name : constant String := "Neural_Model.Compile ";
+      Loss         : Float := 0.0;
       --  Loss_Deriv is dE/dY for output layer
---        Optimiser    : Optimizer_Record (Optimizer_Adam);
---        Params       : Parameters_List;  --  list of Parameters_Record
+      --        Optimiser    : Optimizer_Record (Optimizer_Adam);
+      --        Params       : Parameters_List;  --  list of Parameters_Record
    begin
---        C_Init (Optimiser.Adam, aModel.Connections);
+      --        C_Init (Optimiser.Adam, aModel.Connections);
 
       for epoch in 1 .. Num_Epochs loop
          Put_Line (Routine_Name & "epoch " & Integer'Image (epoch));
          for sample in 1 .. aModel.Num_Samples loop
             --              Put_Line (Routine_Name & "sample " & Integer'Image (sample));
-            Forward (aModel, sample);
+            Forward (aModel, sample, Loss);
             Back_Propogate (aModel);
          end loop;  --  sample
 
@@ -159,83 +200,59 @@ package body Neural_Model is
               (aModel.Connections (c_index), aModel.Layers (c_index + 1),
                Learn_Rate);
          end loop;
+         Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
+         Loss := 0.0;
+         New_Line;
       end loop;  --  epoch
 
    end Compile;
 
    --  -------------------------------------------------------------------------
 
-   function Deactivate
-     (aModel : in out Sequential_Model; L_Index : Positive)
-      return Real_Float_Vector
-   is
-      use Base_Neural;
-      Routine_Name : constant String := "Neural_Model.Deactivate ";
-      This_Layer   : constant Layer  := aModel.Layers (L_Index);
-      Result       : Real_Float_Vector (This_Layer.Output_Error'Range);
-   begin
-      case This_Layer.Activation is
-         when Identity_Activation =>
-            Result := This_Layer.Output_Error;
-         when Logistic_Activation =>
-            Put_Line (Routine_Name & "Logistic_Activation not implemented");
-         when ReLu_Activation =>
-            Result := Rect_LU_Derivative (This_Layer.Output_Error);
-         when Sigmoid_Activation =>
-            Put_Line (Routine_Name & "Sigmoid_Activation not implemented");
-         when Soft_Max_Activation =>
-            Put_Line (Routine_Name & "Soft_Max_Activation not implemented");
-      end case;
-
-      return Result;
-
-   end Deactivate;
-
-   --  -------------------------------------------------------------------------
-
---     function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector is
---        RLU   : Real_Float_Vector := X;
---        Deriv : Real_Float_Vector (X'Range);
---     begin
---        Base_Neural.Rect_LU (RLU);
---        for index in X'Range loop
---           if X (index) <= 0.0 then
---              Deriv (index) := 0.0;
---           else
---              Deriv (index) := RLU (index) / X (index);
---           end if;
---        end loop;
---
---        return RLU;
---
---     end Deriv_ReLU;
+   --     function Deriv_ReLU (X : Real_Float_Vector) return Real_Float_Vector is
+   --        RLU   : Real_Float_Vector := X;
+   --        Deriv : Real_Float_Vector (X'Range);
+   --     begin
+   --        Base_Neural.Rect_LU (RLU);
+   --        for index in X'Range loop
+   --           if X (index) <= 0.0 then
+   --              Deriv (index) := 0.0;
+   --           else
+   --              Deriv (index) := RLU (index) / X (index);
+   --           end if;
+   --        end loop;
+   --
+   --        return RLU;
+   --
+   --     end Deriv_ReLU;
 
    --  -------------------------------------------------------------------------
    --  When calculating the derivative of the softmax function,
    --  a Jacobian matrix which is the matrix of all first-order
    --  partial derivatives is needed.
---     function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix is
---        --        Routine_Name : constant String := "Neural_Model.Deriv_Softmax ";
---        Jacobian : Real_Float_Matrix (X'Range, X'Range);
---     begin
---        for row in Jacobian'Range loop
---           for col in Jacobian'Range (2) loop
---              if col = row then
---                 Jacobian (row, col) := X (col) * (1.0 - X (col));
---              else
---                 Jacobian (row, col) := -X (col) * X (row);
---              end if;
---           end loop;
---        end loop;
---
---        return Jacobian;
---
---     end Deriv_Softmax;
+   --     function Deriv_Softmax (X : Real_Float_Vector) return Real_Float_Matrix is
+   --        --        Routine_Name : constant String := "Neural_Model.Deriv_Softmax ";
+   --        Jacobian : Real_Float_Matrix (X'Range, X'Range);
+   --     begin
+   --        for row in Jacobian'Range loop
+   --           for col in Jacobian'Range (2) loop
+   --              if col = row then
+   --                 Jacobian (row, col) := X (col) * (1.0 - X (col));
+   --              else
+   --                 Jacobian (row, col) := -X (col) * X (row);
+   --              end if;
+   --           end loop;
+   --        end loop;
+   --
+   --        return Jacobian;
+   --
+   --     end Deriv_Softmax;
 
    --  -------------------------------------------------------------------------
 
    procedure Forward
-     (aModel : in out Sequential_Model; Sample_Index : Positive) is
+     (aModel : in out Sequential_Model; Sample_Index : Positive;
+      Loss   : in out Float) is
       use Real_Float_Arrays;
       use Base_Neural;
       use Layer_Packge;
@@ -244,10 +261,10 @@ package body Neural_Model is
                        Get_Row (aModel.Labels, Sample_Index);
       Last_Layer   : Layer := aModel.Layers.Last_Element;
       Predicted    : Real_Float_Vector (aModel.Labels'Range (2));
-      Loss         : Float := 0.0;
    begin
       aModel.Layers (1).Input_Data :=
         Get_Row (aModel.Input_Data, Sample_Index);
+      aModel.Layers (1).Nodes := aModel.Layers (1).Input_Data;
 
       for layer in aModel.Layers.First_Index + 1 .. aModel.Layers.Last_Index
       loop
@@ -273,8 +290,7 @@ package body Neural_Model is
                when ReLu_Activation =>
                   Rect_LU (aModel.Layers (layer).Nodes);
                when Sigmoid_Activation =>
-                  Put_Line
-                    (Routine_Name & "Sigmoid_Activation not implemented");
+                  Sigmoid (aModel.Layers (layer).Nodes);
                when Soft_Max_Activation =>
                   Softmax (aModel.Layers (layer).Nodes);
             end case;
@@ -283,10 +299,16 @@ package body Neural_Model is
 
       Predicted := aModel.Layers.Last_Element.Nodes;
       Last_Layer.Passes := Last_Layer.Passes + 1;
-
-      --        Print_Float_Vector (Routine_Name & "Predicted", Predicted);
-      --        Print_Float_Vector
-      --          (Routine_Name & "Actual", Get_Row (aModel.Labels, Sample_Index));
+--        Print_Float_Vector (Routine_Name & "sample" &
+--                              Integer'Image (Sample_Index) & ": Actual",
+--                            Get_Row (aModel.Labels, Sample_Index));
+--        Print_Float_Vector (Routine_Name & "sample" &
+--                              Integer'Image (Sample_Index) & ": Predicted",
+--                            Predicted);
+      Put_Line (Routine_Name & "Error: " &
+                  Float'Image (Base_Neural.Mean_Squared_Error
+                  (Predicted, Get_Row (aModel.Labels, Sample_Index))));
+--        New_Line;
 
       case aModel.Loss_Method is
          when Loss_Binary_Log =>
@@ -302,18 +324,19 @@ package body Neural_Model is
             aModel.Layers (aModel.Layers.Last_Index) := Last_Layer;
       end case;
 
-      Put_Line (Routine_Name & "Loss" & Float'Image (Loss));
-      New_Line;
+      for col in Predicted'Range loop
+         aModel.Pred (Sample_Index, col) := Predicted (col);
+      end loop;
 
    end Forward;
 
    --  ---------------------------------------------------------------------------
 
-   --     function Get_Output_Value (aModel : Sequential_Model) return Real_Float_Vector is
-   --     begin
-   --        return aModel.Layers.Last_Element.Output_Data;
-   --
-   --     end Get_Output_Value;
+   function Get_Prediction (aModel : Sequential_Model) return Real_Float_Matrix is
+   begin
+      return aModel.Pred;
+
+   end Get_Prediction;
 
    --  -------------------------------------------------------------------------
 
@@ -322,7 +345,7 @@ package body Neural_Model is
       aLayer     : in out Layer; Learn_Rate : Float)
    is
       use Real_Float_Arrays;
---        Routine_Name : constant String := "Neural_Model.Update ";
+      --        Routine_Name : constant String := "Neural_Model.Update ";
    begin
       Connection.Coeff_Gradients :=
         Connection.Coeff_Gradients -
